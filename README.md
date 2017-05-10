@@ -1,5 +1,5 @@
 # sftp sync extension for VS Code
-I wrote this because i must to. All others are can't fit my requirement.
+I wrote this because i must to. All others can't fit my requirement.
 ## Features
 
 * sync file/directory to remote
