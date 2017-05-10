@@ -5,22 +5,22 @@ import rpath from './remotePath';
 import * as output from './output';
 
 export const defaultConfig = {
-  remotePath: "./",
   host: "host",
   port: 22,
   username: "username",
   password: "password",
   protocol: "sftp",
-  uploadOnSave: false,
-  debug: false,
   privateKeyPath: null,
   passphrase: null,
-  ignore: ["\\.vscode", "\\.git", "\\.DS_Store"],
-  generatedFiles: {
-    uploadOnSave: false,
-    extensionsToInclude: [],
-    path: ''
-  }
+
+  remotePath: "/home",
+  uploadOnSave: false,
+
+  ignore: [
+    "/**/.vscode",
+    "/**/.git",
+    "/**/.DS_Store",
+  ],
 };
 
 export const configFileName = '.sftpConfig.json';
@@ -67,7 +67,7 @@ export function getConfig(activityPath?: string) {
 
 export default function initConfigFile() {
 	if (!vscode.workspace.rootPath) {
-		output.errorMsg('config', 'Cannot run this command without opened folder');
+		output.errorMsg('Cannot run this command without opened folder', 'config');
 	}
 	
 	const defaultConfigPath = getDefaultConfigPath();
@@ -86,6 +86,6 @@ export default function initConfigFile() {
 				.then(showConfigFile)
 		})
 		.catch(error => {
-			output.errorMsg('config', error);
+			output.errorMsg(error, 'config');
 		});
 }

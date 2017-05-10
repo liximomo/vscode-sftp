@@ -1,65 +1,79 @@
-# sftp README
-
-This is the README for your extension "sftp". After writing up a brief description, we recommend including the following sections.
-
+# sftp sync extension for VS Code
+I wrote this because i must to. All others are can't fit my requirement.
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+* sync file/directory to remote
+* sync file/directory to local
+* sync to remote on save
+* multiple config
 
-For example if there is an image subfolder under your extension project workspace:
+## Usage
+ 1. `Ctrl+Shift+P` on Windows/Linux open command palette, run `SFTP: config` command.
+ 2. use `Sync To Local` or `Sync To Remote` commnad on editor context menu or explorer context menu.
 
-\!\[feature X\]\(images/feature-x.png\)
+## config
+```js
+{
+  host: "host",
+  port: 22,
+  username: "username",
+  password: "password",
+  protocol: "sftp", // current only support sftp
+  privateKeyPath: null, // absolute path to user private key
+  passphrase: null,
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+  /**
+   * the final remotePath of select file or directory is {local file Path relative to config file path} + {remotePath in config file}.
+   * example:
+   *
+   * dirctory structure
+   *  |-a
+   *    |-c.txt
+   *  |-b
+   *    |-d
+   *      |-e.txt
+   *    |-.sftp-config.json
+   *  
+   *  config file 
+   *    {
+   *      ...
+   *      remotePath: '/home/test',
+   *      ...
+   *    }
+   *    
+   *  run command 'sync to remote' to file with result
+   *  {config file path} => /b/.sftp-config.json
+   *  {local file path} => /b/d/e.txt
+   *  {local Path relative to config file path} => d/e.txt
+   *  {configed remotePath} => '/home/test'
+   *  {final remotePath} => '/home/test/d/e.txt'
+   *  that is /b/d/e.txt => /home/test/d/e.txt
+   */ 
+  remotePath: "./", 
+  uploadOnSave: false,
 
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
+  /**
+   *  relative or absolute(start with '/') glob pattern
+   *  relative path will resolve to {directory path  which config file place} + {relative path}
+   */ 
+  ignore: [
+    ".vscode",
+    ".git",
+    ".DS_Store"
+  ],
+}
+```
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+### 0.0.1
 
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
+Initial release.
 
 -----------------------------------------------------------------------------------------------------------
 
-## Working with Markdown
+## TO-DO:
 
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on OSX or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on OSX or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (OSX) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+- [ ] better feedback
+- [ ] only upload file which is out of date
+- [ ] eslint
