@@ -32,7 +32,7 @@ I wrote this because i must to. All others can't fit my requirement.
    *  |-b
    *    |-d
    *      |-e.txt
-   *    |-.sftp-config.json
+   *    |-.sftpConfig.json
    *  
    *  config file 
    *    {
