@@ -2,10 +2,10 @@
     "name": "sftp",
     "displayName": "sftp",
     "description": "Auto sync your work to remote SFTP server",
-    "version": "0.1.0",
+    "version": "0.2.1",
     "publisher": "liximomo",
     "engines": {
-        "vscode": "^1.12.0"
+        "vscode": "^0.10.1"
     },
     "bugs": {
         "url": "https://github.com/liximomo/vscode-sftp/issues",
