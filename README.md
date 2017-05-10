@@ -57,10 +57,10 @@ I wrote this because i must to. All others can't fit my requirement.
    *  relative path will resolve to {directory path  which config file place} + {relative path}
    */ 
   ignore: [
-    ".vscode",
-    ".git",
-    ".DS_Store"
-  ],
+    "/**/.vscode",
+    "/**/.git",
+    "/**/.DS_Store"
+  ]
 }
 ```
 
