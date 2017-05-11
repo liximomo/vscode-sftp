@@ -2,6 +2,8 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+
+import throttle from './helper/throttle';
 import { sync2RemoteCommand, sync2LocalCommand } from './commands/sync';
 import editConfig from './commands/config';
 import autoSave from './commands/auto-save';
@@ -30,9 +32,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   registerCommand(context, SYNC_TO_LOCAL, sync2LocalCommand);
 
-  vscode.workspace.onDidSaveTextDocument(function (file) {
-    autoSave(file);
-  });
+  vscode.workspace.onDidSaveTextDocument(throttle(autoSave, 1000));
 }
 
 export function deactivate() {

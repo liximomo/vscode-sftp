@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as memoize from 'fast-memoize';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import rpath from './remotePath';
@@ -25,7 +26,7 @@ export const defaultConfig = {
 
 export const configFileName = '.sftpConfig.json';
 
-function lookUpConfigRoot(activityPath: string) {
+function lookUpConfigRootImpl(activityPath: string, root: string) {
   const configFilePath = path.join(activityPath, configFileName);
   return fse.pathExists(configFilePath)
     .then(exist => {
@@ -33,9 +34,15 @@ function lookUpConfigRoot(activityPath: string) {
 				return activityPath;
 			}
 
-			return lookUpConfigRoot(path.resolve(activityPath, '..'));
+      if (activityPath === root) {
+        throw new Error('config file not found');
+      }
+
+			return lookUpConfigRootImpl(path.resolve(activityPath, '..'), root);
 		});
 }
+
+const lookUpConfigRoot = memoize(lookUpConfigRootImpl);
 
 export function getDefaultConfigPath() {
   return `${vscode.workspace.rootPath}/${configFileName}`;
@@ -49,9 +56,9 @@ export function fillPattern(pattern, rootPath) {
   return fullPatterh;
 }
 
-export function getConfig(activityPath?: string) {
+export function getConfig(activityPath: string, projectRoot: string) {
   let rootDir;
-  return lookUpConfigRoot(activityPath)
+  return lookUpConfigRoot(activityPath, projectRoot)
     .then(configDir => {
       rootDir = configDir;
       const configFilePath = path.join(configDir, configFileName);
