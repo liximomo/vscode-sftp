@@ -7,7 +7,7 @@ import { transport } from '../modules/conveyer';
 import SFTPFileSystem from '../model/SFTPFileSystem';
 import LocalFileSystem from '../model/LocalFileSystem';
 
-function failedTask(result) {
+function failedTask(result, index, array) {
   return result.error;
 }
 

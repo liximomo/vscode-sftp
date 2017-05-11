@@ -1,4 +1,4 @@
-// import * as output from '../modules/output';
+import * as output from '../modules/output';
 import { getConfig } from '../modules/config';
 import { sync2Remote, sync2Local } from '../modules/sync';
 
@@ -12,11 +12,13 @@ import { sync2Remote, sync2Local } from '../modules/sync';
 export function sync2RemoteCommand(item) {
   const activityPath = item.fsPath;
   getConfig(activityPath)
-    .then(config => sync2Remote(activityPath, config));
+    .then(config => sync2Remote(activityPath, config))
+    .catch(output.errorMsg);
 }
 
 export function sync2LocalCommand(item) {
   const activityPath = item.fsPath;
   getConfig(activityPath)
-    .then(config => sync2Local(activityPath, config));
+    .then(config => sync2Local(activityPath, config))
+    .catch(output.errorMsg);
 }

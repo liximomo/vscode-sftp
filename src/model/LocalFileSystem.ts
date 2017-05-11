@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
+import * as FileStatus from 'stat-mode';
 import FileSystem, { FileEntry, Stats } from './FileSystem';
 
 export default class LocalFileSystem extends FileSystem {
@@ -7,15 +8,18 @@ export default class LocalFileSystem extends FileSystem {
     super(pathResolver);
   }
 
-  stat(path: string): Promise<Stats> {
+  lstat(path: string): Promise<Stats> {
     return new Promise((resolve, reject) => {
-      fs.stat(path, (err, stat) => {
+      fs.lstat(path, (err, stat) => {
         if (err) {
           reject(err);
           return;
         }
 
-        resolve(stat);
+        resolve({
+          ...stat,
+          type: this.getFileTypecharacter(stat),
+        });
       });
     });
   }
@@ -32,7 +36,7 @@ export default class LocalFileSystem extends FileSystem {
     });
   }
 
-  put(input: fs.ReadStream | Buffer, path, option = this.defaultStreamOption): Promise<any> {
+  put(input: fs.ReadStream | Buffer, path, option = this.defaultStreamOption): Promise<null> {
     return new Promise((resolve, reject) => {
       const stream = fs.createWriteStream(path, option);
 
@@ -48,7 +52,31 @@ export default class LocalFileSystem extends FileSystem {
     });
   }
 
-  mkdir(dir: string): Promise<any> {
+  readlink(path: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      fs.readlink(path, (err, linkString) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve(linkString);
+      });
+    });
+  }
+  
+  symlink(targetPath: string, path: string): Promise<null> {
+    return new Promise((resolve, reject) => {
+      fs.symlink(targetPath, path, null, err => {
+        if (err && err.code !== 'EEXIST') {
+          reject(err);
+        }
+        resolve();
+      });
+    });
+  }
+  
+  mkdir(dir: string): Promise<null> {
     return new Promise((resolve, reject) => {
       fs.mkdir(dir, (err) => {
         if (err && err.code !== 'EEXIST') { // reject except already exist
@@ -59,19 +87,20 @@ export default class LocalFileSystem extends FileSystem {
     });
   }
 
-  ensureDir(dir: string): Promise<any> {
+  ensureDir(dir: string): Promise<null> {
     return fse.ensureDir(dir);
   }
 
   toFileEntry(fullPath, stat) {
+    const statModel = new FileStatus(stat);
     return {
       fspath: fullPath,
-      type: this.getFileTypecharacter(stat),
+      type: this.getFileTypecharacter(statModel),
       name: this.pathResolver.basename(fullPath),
       size: stat.size,
       modifyTime: stat.mtime.getTime() / 1000,
       accessTime: stat.atime.getTime() / 1000,
-    }
+    };
   }
 
   list(dir: string): Promise<FileEntry[]> {
@@ -84,7 +113,7 @@ export default class LocalFileSystem extends FileSystem {
 
         const fileStatus = files.map(file => {
           const fspath = this.pathResolver.join(dir, file);
-          return this.stat(fspath)
+          return this.lstat(fspath)
             .then(stat => this.toFileEntry(fspath, stat));
         });
 

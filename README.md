@@ -66,9 +66,11 @@ I wrote this because i must to. All others can't fit my requirement.
 
 ## Release Notes
 
-### 0.0.1
+### 0.2.2
+* Support symbolic link
 
-Initial release.
+### 0.0.1
+* Initial release.
 
 -----------------------------------------------------------------------------------------------------------
 
@@ -77,3 +79,17 @@ Initial release.
 - [ ] better feedback
 - [ ] only upload file which is out of date
 - [ ] eslint
+
+## Known Issues
+
+### Issue
+ENFILE: file table overflow ...
+### Solution
+MacOS have a harsh limit on number of open files. Run those command
+```bash
+echo kern.maxfiles=65536 | sudo tee -a /etc/sysctl.conf
+echo kern.maxfilesperproc=65536 | sudo tee -a /etc/sysctl.conf
+sudo sysctl -w kern.maxfiles=65536
+sudo sysctl -w kern.maxfilesperproc=65536
+ulimit -n 65536
+```

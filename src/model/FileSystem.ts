@@ -23,9 +23,7 @@ export type StreamOption = {
 };
 
 export type Stats = {
-  isDirectory: () => boolean,
-  isFile:  () => boolean,
-  isSymbolicLink:  () => boolean,
+  type: FileType,
 };
 
 export default abstract class FileSystem {
@@ -40,13 +38,15 @@ export default abstract class FileSystem {
   }
 
   abstract get(path, option?: StreamOption): Promise<fs.ReadStream>;
-  abstract put(input: fs.ReadStream | Buffer, path, option?: StreamOption): Promise<any>;
-  abstract mkdir(dir: string): Promise<any>;
-  abstract ensureDir(dir: string): Promise<any>;
+  abstract put(input: fs.ReadStream | Buffer, path, option?: StreamOption): Promise<null>;
+  abstract mkdir(dir: string): Promise<null>;
+  abstract ensureDir(dir: string): Promise<null>;
   abstract list(dir: string): Promise<FileEntry[]>;
-  abstract stat(path: string): Promise<Stats>;
+  abstract lstat(path: string): Promise<Stats>;
+  abstract readlink(path: string): Promise<string>;
+  abstract symlink(targetPath: string, path: string): Promise<null>;
 
-  getFileTypecharacter(stat: fs.Stats) {
+  getFileTypecharacter(stat: fs.Stats): FileType {
     if (stat.isDirectory()) {
       return FileType.Directory;
     } else if (stat.isFile()) {

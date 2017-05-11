@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import FileStatus from 'stat-mode';
+import * as FileStatus from 'stat-mode';
 import FileSystem, { FileEntry, Stats } from './FileSystem';
 
 export default class SFTPFileSystem extends FileSystem {
@@ -10,15 +10,18 @@ export default class SFTPFileSystem extends FileSystem {
     this.sftp = sftpClient;
   }
 
-  stat(path: string): Promise<Stats> {
+  lstat(path: string): Promise<Stats> {
     return new Promise((resolve, reject) => {
-      this.sftp.stat(path, (err, stat) => {
+      this.sftp.lstat(path, (err, stat) => {
         if (err) {
           reject(err);
           return;
         }
 
-        resolve(stat);
+        resolve({
+          ...stat,
+          type: this.getFileTypecharacter(stat),
+        });
       });
     });
   }
@@ -35,7 +38,7 @@ export default class SFTPFileSystem extends FileSystem {
     });
   }
 
-  put(input: fs.ReadStream | Buffer, path, option = this.defaultStreamOption): Promise<any> {
+  put(input: fs.ReadStream | Buffer, path, option = this.defaultStreamOption): Promise<null> {
     return new Promise((resolve, reject) => {
       const stream = this.sftp.createWriteStream(path, option);
 
@@ -51,7 +54,31 @@ export default class SFTPFileSystem extends FileSystem {
     });
   }
 
-  mkdir(dir: string): Promise<any> {
+  readlink(path: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      this.sftp.readlink(path, (err, linkString) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve(linkString);
+      });
+    });
+  }
+
+  symlink(targetPath: string, path: string): Promise<null> {
+    return new Promise((resolve, reject) => {
+      this.sftp.symlink(targetPath, path, err => {
+        if (err && err.code !== 4) { // reject except already exist
+          reject(err);
+        }
+        resolve();
+      });
+    });
+  }
+
+  mkdir(dir: string): Promise<null> {
     return new Promise((resolve, reject) => {
       this.sftp.mkdir(dir, (err) => {
         if (err && err.code !== 4) { // reject except already exist
@@ -62,7 +89,7 @@ export default class SFTPFileSystem extends FileSystem {
     });
   }
 
-  ensureDir(dir: string): Promise<any> {
+  ensureDir(dir: string): Promise<null> {
     let dirWithoutRoot = dir.slice(1);
     return new Promise((resolve, reject) => {
       const tokens = dirWithoutRoot.split(this.pathResolver.sep);
@@ -84,10 +111,10 @@ export default class SFTPFileSystem extends FileSystem {
     });
   }
 
-  toFileEntry(dir, item): FileEntry {
+  toFileEntry(fullPath, item): FileEntry {
     const stat = new FileStatus(item.attrs);
     return {
-      fspath: this.pathResolver.join(dir, item.filename),
+      fspath: fullPath,
       type: this.getFileTypecharacter(stat),
       name: item.filename,
       size: item.attrs.size,
@@ -104,7 +131,8 @@ export default class SFTPFileSystem extends FileSystem {
           return;
         }
 
-        const fileEntries = result.map(item => this.toFileEntry(dir, item));
+        const fileEntries = result.map(item =>
+          this.toFileEntry(this.pathResolver.join(dir, item.filename), item));
         resolve(fileEntries);
       });
     });
