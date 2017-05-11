@@ -25,9 +25,7 @@
         "remote"
     ],
     "activationEvents": [
-        "onCommand:sftp.config.default",
-        "onCommand:sftp.sync.remote",
-        "onCommand:sftp.sync.local"
+        "*"
     ],
     "icon": "icon.png",
     "main": "./out/src/extension",

@@ -24,11 +24,6 @@ function registerCommand(
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-
-  // Use the console to output diagnostic information (console.log) and errors (console.error)
-  // This line of code will only be executed once when your extension is activated
-  console.log('Congratulations, your extension "sftp" is now active!');
-
   registerCommand(context, CONFIG, editConfig);
 
   registerCommand(context, SYNC_TO_REMOTE, sync2RemoteCommand);
