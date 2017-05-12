@@ -18,9 +18,12 @@ export function sync2RemoteCommand(item) {
   }
 
   const activityPath = item.fsPath;
-  getConfig(activityPath, vscode.workspace.rootPath)
-    .then(config => sync2Remote(activityPath, config))
-    .catch(output.errorMsg);
+  try {
+    const config = getConfig(activityPath);
+    sync2Remote(activityPath, config).catch(output.errorMsg);
+  } catch (error) {
+    output.errorMsg(error);
+  }
 }
 
 export function sync2LocalCommand(item) {
@@ -30,7 +33,10 @@ export function sync2LocalCommand(item) {
   }
 
   const activityPath = item.fsPath;
-  getConfig(activityPath, vscode.workspace.rootPath)
-    .then(config => sync2Local(activityPath, config))
-    .catch(output.errorMsg);
+  try {
+    const config = getConfig(activityPath);
+    sync2Local(activityPath, config).catch(output.errorMsg);
+  } catch (error) {
+    output.errorMsg(error);
+  }
 }

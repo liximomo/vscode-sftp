@@ -1,5 +1,5 @@
-import initConfigFile from '../modules/config';
+import { newConfig } from '../modules/config';
 
 export default function editConfig() {
-  initConfigFile();
+  newConfig();
 }

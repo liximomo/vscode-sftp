@@ -66,6 +66,9 @@ I wrote this because i must to. All others can't fit my requirement.
 
 ## Release Notes
 
+### 0.3.0
+* load config at start up(slow down at first but no need search and load config each time when a command executes)
+
 ### 0.2.2
 * Support symbolic link
 

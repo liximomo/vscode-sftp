@@ -2,8 +2,16 @@ import * as vscode from 'vscode';
 import * as memoize from 'fast-memoize';
 import * as fse from 'fs-extra';
 import * as path from 'path';
+import * as glob from 'glob';
 import rpath from './remotePath';
 import * as output from './output';
+import Trie from '../model/Trie';
+
+let configTrie = null;
+
+function getPathRelativeWorkspace(path) {
+  return vscode.workspace.asRelativePath(path);
+}
 
 export const defaultConfig = {
   host: "host",
@@ -26,6 +34,8 @@ export const defaultConfig = {
 
 export const configFileName = '.sftpConfig.json';
 
+const configGlobPattern = `${vscode.workspace.rootPath}/**/${configFileName}`;
+
 function lookUpConfigRootImpl(activityPath: string, root: string) {
   const configFilePath = path.join(activityPath, configFileName);
   return fse.pathExists(configFilePath)
@@ -44,6 +54,31 @@ function lookUpConfigRootImpl(activityPath: string, root: string) {
 
 const lookUpConfigRoot = memoize(lookUpConfigRootImpl);
 
+export function addConfig(configPath) {
+  return fse.readJson(configPath)
+    .then(config => {
+      const configRoot = path.dirname(configPath);
+      return configTrie.add(getPathRelativeWorkspace(configRoot), {
+        ...config,
+        configRoot,
+      });
+    });
+}
+
+export function initConfigs() {
+  return new Promise((resolve, reject) => {
+    glob(configGlobPattern, (error, files) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      configTrie = new Trie({});
+
+      Promise.all(files.map(addConfig)).then(resolve);
+    });
+  });
+}
+
 export function getDefaultConfigPath() {
   return `${vscode.workspace.rootPath}/${configFileName}`;
 };
@@ -56,23 +91,19 @@ export function fillPattern(pattern, rootPath) {
   return fullPatterh;
 }
 
-export function getConfig(activityPath: string, projectRoot: string) {
-  let rootDir;
-  return lookUpConfigRoot(activityPath, projectRoot)
-    .then(configDir => {
-      rootDir = configDir;
-      const configFilePath = path.join(configDir, configFileName);
-      return configFilePath;
-    })
-    .then(fse.readJson)
-    .then(config => ({
-      ...config,
-      ignore: config.ignore.map(pattern => fillPattern(pattern, rootDir)),
-      remotePath: rpath.join(config.remotePath, path.relative(rootDir, activityPath)),
-    }));
+export function getConfig(activityPath: string) {
+  const config = configTrie.findPrefix(getPathRelativeWorkspace(activityPath));
+  if (!config) {
+    throw new Error('config file not found');
+  }
+  return {
+    ...config,
+    ignore: config.ignore.map(pattern => fillPattern(pattern, config.configRoot)),
+    remotePath: rpath.join(config.remotePath, path.relative(config.configRoot, activityPath)),
+  };
 };
 
-export default function initConfigFile() {
+export function newConfig() {
 	if (!vscode.workspace.rootPath) {
 		output.errorMsg('Cannot run this command without opened folder', 'config');
 	}
