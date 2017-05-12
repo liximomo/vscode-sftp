@@ -39,13 +39,14 @@ export function activate(context: vscode.ExtensionContext) {
 
       registerCommand(context, SYNC_TO_LOCAL, sync2LocalCommand);
 
-      const updateConfig = (file) => {
-        if (path.basename(file.fileName) !== configFileName) {
-          return;
+      const handleDocumentSave = (file) => {
+        if (path.basename(file.fileName) === configFileName) {
+          addConfig(file.fileName);
+        } else {
+          autoSave(file);
         }
-        addConfig(file.fileName);
       };
-      vscode.workspace.onDidSaveTextDocument(throttle(updateConfig, 300));
+      vscode.workspace.onDidSaveTextDocument(throttle(handleDocumentSave, 300));
     });
 }
 

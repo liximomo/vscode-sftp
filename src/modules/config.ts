@@ -67,11 +67,16 @@ export function addConfig(configPath) {
 
 export function initConfigs() {
   return new Promise((resolve, reject) => {
-    glob(configGlobPattern, (error, files) => {
+    glob(configGlobPattern, {
+      cwd: vscode.workspace.rootPath,
+      nodir: true,
+    }, (error, files) => {
       if (error) {
         reject(error);
         return;
       }
+
+      console.log('config files:', files);
       configTrie = new Trie({});
 
       Promise.all(files.map(addConfig)).then(resolve);

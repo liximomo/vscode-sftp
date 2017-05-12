@@ -2,7 +2,7 @@
     "name": "sftp",
     "displayName": "sftp",
     "description": "Auto sync your work to remote SFTP server",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "publisher": "liximomo",
     "engines": {
         "vscode": "^0.10.1"
