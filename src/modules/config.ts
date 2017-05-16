@@ -3,7 +3,7 @@ import * as memoize from 'fast-memoize';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
-import rpath from './remotePath';
+import rpath, { normalize } from './remotePath';
 import * as output from './output';
 import Trie from '../model/Trie';
 
@@ -104,7 +104,7 @@ export function getConfig(activityPath: string) {
   return {
     ...config,
     ignore: config.ignore.map(pattern => fillPattern(pattern, config.configRoot)),
-    remotePath: rpath.join(config.remotePath, path.relative(config.configRoot, activityPath)),
+    remotePath: rpath.join(config.remotePath, normalize(path.relative(config.configRoot, activityPath))),
   };
 };
 
