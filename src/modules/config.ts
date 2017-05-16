@@ -132,3 +132,14 @@ export function newConfig() {
 			output.errorMsg(error, 'config');
 		});
 }
+
+export function getHostInfo(config) {
+  return {
+    host: config.host,
+    port: config.port,
+    username: config.username,
+    password: config.password,
+    privateKeyPath: config.privateKeyPath,
+    passphrase: config.passphrase,
+  };
+}
