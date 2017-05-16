@@ -5,7 +5,7 @@
     "version": "0.3.1",
     "publisher": "liximomo",
     "engines": {
-        "vscode": "^0.10.1"
+        "vscode": "^1.0.0"
     },
     "bugs": {
         "url": "https://github.com/liximomo/vscode-sftp/issues",
