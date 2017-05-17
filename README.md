@@ -75,13 +75,13 @@ I wrote this because i must to. All others can't fit my requirements.
   syncMode: 'update',
 
   /**
-   *  relative or absolute(start with '/') glob pattern
-   *  relative path will resolve to {directory path  which config file place} + {relative path}
+   *  glob pattern
+   *  path will be append directory path which config file place
    */ 
   ignore: [
-    "/**/.vscode",
-    "/**/.git",
-    "/**/.DS_Store"
+    "**/.vscode",
+    "**/.git",
+    "**/.DS_Store"
   ]
 }
 ```

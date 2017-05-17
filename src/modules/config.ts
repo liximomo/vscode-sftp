@@ -37,7 +37,7 @@ export const defaultConfig = {
 
 export const configFileName = '.sftpConfig.json';
 
-const configGlobPattern = `${vscode.workspace.rootPath}/**/${configFileName}`;
+const configGlobPattern = `/**/${configFileName}`;
 
 function lookUpConfigRootImpl(activityPath: string, root: string) {
   const configFilePath = path.join(activityPath, configFileName);
@@ -72,6 +72,7 @@ export function initConfigs() {
   return new Promise((resolve, reject) => {
     glob(configGlobPattern, {
       cwd: vscode.workspace.rootPath,
+      root: vscode.workspace.rootPath,
       nodir: true,
     }, (error, files) => {
       if (error) {
@@ -92,11 +93,7 @@ export function getDefaultConfigPath() {
 };
 
 export function fillPattern(pattern, rootPath) {
-  let fullPatterh = pattern;
-  if (pattern.indexOf('/') !== 0) {
-    fullPatterh = path.join(rootPath, pattern);
-  }
-  return fullPatterh;
+  return path.join(rootPath, pattern);
 }
 
 export function getConfig(activityPath: string) {
