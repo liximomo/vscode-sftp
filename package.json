@@ -36,6 +36,14 @@
                 "title": "SFTP: Edit Config"
             },
             {
+                "command": "sftp.trans.remote",
+                "title": "SFTP: Upload"
+            },
+            {
+                "command": "sftp.trans.local",
+                "title": "SFTP: Download"
+            },
+            {
                 "command": "sftp.sync.remote",
                 "title": "SFTP: Sync To Remote"
             },
@@ -48,21 +56,31 @@
             "explorer/context": [
                 {
                     "command": "sftp.sync.remote",
-                    "group": "sftp@1"
+                    "group": "sftp.sync@1",
+                    "when": "explorerResourceIsFolder"
                 },
                 {
                     "command": "sftp.sync.local",
-                    "group": "sftp@2"
+                    "group": "sftp.sync@2",
+                    "when": "explorerResourceIsFolder"
+                },
+                {
+                    "command": "sftp.trans.remote",
+                    "group": "sftp.trans@3"
+                },
+                {
+                    "command": "sftp.trans.local",
+                    "group": "sftp.trans@4"
                 }
             ],
             "editor/context": [
                 {
-                    "command": "sftp.sync.remote",
-                    "group": "sftp@1"
+                    "command": "sftp.trans.remote",
+                    "group": "sftp.trans@1"
                 },
                 {
-                    "command": "sftp.sync.local",
-                    "group": "sftp@2"
+                    "command": "sftp.trans.local",
+                    "group": "sftp.trans@2"
                 }
             ]
         }

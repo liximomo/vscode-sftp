@@ -2,15 +2,21 @@ import * as minimatch from 'minimatch';
 
 import * as output from '../modules/output';
 import FileSystem, { FileEntry, FileType }  from '../model/FileSystem';
-import Client from './sftp-client';
-import rpath from './remotePath';
+import rpath, { normalize } from './remotePath';
 import flatMap from '../helper/flatMap';
 
-type TransportOption = {
+interface TransportOption {
   ignore: string[],
 };
 
-type TransportResult = {
+type SyncModel = 'full' | 'update';
+
+interface SyncOption {
+  ignore: string[],
+  model: SyncModel,
+};
+
+interface TransportResult {
   target: string,
   error?: boolean,
   payload?: any,
@@ -20,12 +26,93 @@ const defaultTransportOption = {
   ignore: [],
 };
 
+const defaultSyncOption = {
+  ignore: [],
+  model: <SyncModel>'update',
+};
+
 function testIgnore(target, pattern) {
   return minimatch(target, pattern);
 }
 
 function shouldSkip(path, ignore) {
   return ignore.some(pattern => testIgnore(path, pattern));
+}
+
+const toHash = (items: any[], key: string, transform?: (a: any) => any): { [key: string]: any } =>
+  items.reduce((hash, item) => {
+    let transformedItem = item;
+    if (transform) {
+      transformedItem = transform(item);
+    }
+    hash[transformedItem[key]] = transformedItem;
+    return hash;
+  }, {});
+
+export function sync(srcDir: string, desDir: string, srcFs: FileSystem, desFs: FileSystem, option: SyncOption = defaultSyncOption): Promise<TransportResult[] | TransportResult> {
+  const syncFiles = ([srcFileEntries, desFileEntries]) => {
+    const srcFileTable = toHash(srcFileEntries, 'id', fileEntry => ({
+      ...fileEntry,
+      id: normalize(srcFs.pathResolver.relative(srcDir, fileEntry.fspath)),
+    }));
+
+    const desFileTable = toHash(desFileEntries, 'id', fileEntry => ({
+      ...fileEntry,
+      id: normalize(desFs.pathResolver.relative(desDir, fileEntry.fspath)),
+    }));
+
+    const fileExisted = [];
+    const symExisted = [];
+
+    const fileMissed = [];
+    const symMissed = [];
+
+    Object.keys(srcFileTable).forEach(id => {
+      const srcFile = srcFileTable[id];
+      const file = desFileTable[id];
+      if (file) {
+        switch (file.type) {
+          case FileType.File:
+            fileExisted.push([srcFile, file]);
+            break;
+          case FileType.SymbolicLink:
+            symExisted.push([srcFile, file]);
+            break;
+          default:
+            // do not process
+        }
+      } else {
+        switch (file.type) {
+          case FileType.File:
+            fileMissed.push([srcFile, file]);
+            break;
+          case FileType.SymbolicLink:
+            symMissed.push([srcFile, file]);
+            break;
+          default:
+            // do not process
+        }
+      }
+    });
+
+    const createTransport = transFunc => ([srcfile, desFile]) => transFunc(srcfile.fspath, desFile.fspath, srcFs, desFs, option);
+    const transportTasks = [
+      ...fileExisted.map(createTransport(transportFile)),
+      ...symExisted.map(createTransport(transportSymlink)),
+    ];
+
+    const result = Promise.all<TransportResult[] | TransportResult>(transportTasks)
+      .then(result => flatMap(result, a => a));
+    return result;
+  };
+
+  return Promise.all([srcFs.list(srcDir), desFs.list(desDir)])
+    .then(syncFiles)
+    .catch(err => ({
+      target: srcDir,
+      error: true,
+      payload: err,
+    }));
 }
 
 export function transport(src: string, des: string, srcFs: FileSystem, desFs: FileSystem, option: TransportOption = defaultTransportOption): Promise<TransportResult[] | TransportResult> {

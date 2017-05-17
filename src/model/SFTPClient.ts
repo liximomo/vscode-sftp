@@ -1,7 +1,7 @@
 import { Client } from 'ssh2';
 import FileStatus from 'stat-mode';
 import * as fs from 'fs';
-import rpath from './remotePath';
+import rpath from '../modules/remotePath';
 
 const permissionSpiltReg = /-/gi;
 

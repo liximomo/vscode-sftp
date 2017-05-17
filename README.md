@@ -2,9 +2,12 @@
 I wrote this because i must to. All others can't fit my requirement.
 ## Features
 
-* sync file/directory to remote
-* sync file/directory to local
-* sync to remote on save
+* sync directory to remote
+* sync directory to local
+* download file/directory to local
+* upload file/directory to local
+* upload to remote on save
+* multiple file format support(file, direcotry, symbolic link)
 * multiple config
 
 ## Usage
@@ -52,6 +55,14 @@ I wrote this because i must to. All others can't fit my requirement.
   remotePath: "./", 
   uploadOnSave: false,
 
+
+  /**
+   *  avaliable value: update | full
+   *  update: sync exist file only
+   *  full: sync exist file and remove none-exist file
+   */ 
+  syncMode: 'update',
+
   /**
    *  relative or absolute(start with '/') glob pattern
    *  relative path will resolve to {directory path  which config file place} + {relative path}
@@ -64,24 +75,11 @@ I wrote this because i must to. All others can't fit my requirement.
 }
 ```
 
-## Release Notes
-
-### 0.3.0
-* load config at start up(slow down at first but no need search and load config each time when a command executes)
-
-### 0.2.2
-* Support symbolic link
-
-### 0.0.1
-* Initial release.
-
 -----------------------------------------------------------------------------------------------------------
 
 ## TO-DO:
 
-- [ ] better feedback
-- [ ] only upload file which is out of date
-- [ ] eslint
+- [ ] lint source code
 
 ## Known Issues
 

@@ -1,7 +1,8 @@
-# Change Log
-All notable changes to the "sftp" extension will be documented in this file.
+## [0.4.0] - 2017-05-17
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+### Config
+* add option `syncModel`
 
-## [Unreleased]
-- Initial release
+### Command
+* upload
+* download

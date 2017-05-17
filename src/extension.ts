@@ -7,12 +7,14 @@ import * as path from 'path';
 import throttle from './helper/throttle';
 import * as output from './modules/output';
 import { initConfigs, addConfig, configFileName } from './modules/config';
-import { sync2RemoteCommand, sync2LocalCommand } from './commands/sync';
+import { sync2RemoteCommand, sync2LocalCommand, uploadCommand, downloadCommand } from './commands/sync';
 import editConfig from './commands/config';
 import autoSave from './commands/auto-save';
 import {
   SYNC_TO_REMOTE,
   SYNC_TO_LOCAL,
+  UPLOAD,
+  DOWNLOAD,
   CONFIG,
 } from './CommandConstants';
 
@@ -38,6 +40,10 @@ export function activate(context: vscode.ExtensionContext) {
       registerCommand(context, SYNC_TO_REMOTE, sync2RemoteCommand);
 
       registerCommand(context, SYNC_TO_LOCAL, sync2LocalCommand);
+
+      registerCommand(context, UPLOAD, uploadCommand);
+
+      registerCommand(context, DOWNLOAD, downloadCommand);
 
       const handleDocumentSave = (file) => {
         if (path.basename(file.fileName) === configFileName) {

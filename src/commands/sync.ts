@@ -1,8 +1,7 @@
-import * as vscode from 'vscode';
-
 import * as output from '../modules/output';
 import { getConfig } from '../modules/config';
-import { upload, download } from '../modules/sync';
+import { upload, download, sync2Remote, sync2Local } from '../modules/sync';
+import  { createFileCommand } from '../helper/createCommand';
 
 // item:
 // fsPath:"/Users/mymomo/workspace/lanyilv/src/htdocs/lanyicj_platform/environments"
@@ -11,32 +10,11 @@ import { upload, download } from '../modules/sync';
 // path:"/Users/mymomo/workspace/lanyilv/src/htdocs/lanyicj_platform/environments"
 // scheme:"file"
 
-export function sync2RemoteCommand(item) {
-  if (!(item && item.fsPath)) {
-    output.errorMsg(new Error('command must run on a file or directory!'));
-    return;
-  }
+export const sync2RemoteCommand = createFileCommand(sync2Remote);
+export const sync2LocalCommand = createFileCommand(sync2Local);
 
-  const activityPath = item.fsPath;
-  try {
-    const config = getConfig(activityPath);
-    upload(activityPath, config).catch(output.errorMsg);
-  } catch (error) {
-    output.errorMsg(error);
-  }
-}
+export const uploadCommand = createFileCommand(upload);
+export const downloadCommand = createFileCommand(download);
 
-export function sync2LocalCommand(item) {
-  if (!(item && item.fsPath)) {
-    output.errorMsg(new Error('command must run on a file or directory!'));
-    return;
-  }
 
-  const activityPath = item.fsPath;
-  try {
-    const config = getConfig(activityPath);
-    download(activityPath, config).catch(output.errorMsg);
-  } catch (error) {
-    output.errorMsg(error);
-  }
-}
+

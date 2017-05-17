@@ -1,9 +1,9 @@
 import * as path from 'path';
 
 import * as output from '../modules/output';
-import Client from '../modules/sftp-client';
 import rpath from '../modules/remotePath';
-import { transport } from '../modules/conveyer';
+import { transport, sync } from '../modules/conveyer';
+import Client from '../model/SFTPClient';
 import SFTPFileSystem from '../model/SFTPFileSystem';
 import LocalFileSystem from '../model/LocalFileSystem';
 
@@ -15,10 +15,10 @@ function printFailTask(result) {
   return output.print(`${result.target} failed: ${result.payload.message}`);
 }
 
-function printResult(result) {
+function printResult(msg, result) {
   const fails = [].concat(result).filter(failedTask)
   if (!fails.length) {
-    output.status('sync done');
+    output.status(msg);
     return;
   }
   fails.forEach(printFailTask);
@@ -39,13 +39,13 @@ const getRemoteClient = option => {
     .then(() => client);
 }
 
-const createTask = func => (source, config) =>
+const createTask = (name, func) => (source, config) =>
   getRemoteClient(getHostInfo(config))
-    .then(remoteClient => func(source, remoteClient, config), err => {
+    .then(remoteClient => func(source, config, remoteClient), err => {
       output.errorMsg(err, 'connect to server')
-    }).then(printResult);
+    }).then(result => printResult(`${name} done`, result));
 
-export const upload = createTask((source, remoteClient, config) => transport(
+export const upload = createTask('upload', (source, config, remoteClient) => transport(
   source,
   config.remotePath,
   new LocalFileSystem(path),
@@ -55,13 +55,36 @@ export const upload = createTask((source, remoteClient, config) => transport(
   }
 ));
 
-export const download = createTask((source, remoteClient, config) => transport(
+export const download = createTask('download', (source, config, remoteClient) => transport(
   config.remotePath,
   source,
   new SFTPFileSystem(rpath, remoteClient.sftp),
   new LocalFileSystem(path),
   {
     ignore: config.ignore,
+  }
+));
+
+export const sync2Remote = createTask('sync remote', (source, config, remoteClient) => sync(
+  source,
+  config.remotePath,
+  new LocalFileSystem(path),
+  new SFTPFileSystem(rpath, remoteClient.sftp),
+  {
+    ignore: config.ignore,
+    model: config.syncMode,
+    
+  }
+));
+
+export const sync2Local= createTask('sync local', (source, config, remoteClient) => sync(
+  config.remotePath,
+  source,
+  new SFTPFileSystem(rpath, remoteClient.sftp),
+  new LocalFileSystem(path),
+  {
+    ignore: config.ignore,
+    model: config.syncMode,
   }
 ));
 

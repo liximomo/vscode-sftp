@@ -25,6 +25,8 @@ export const defaultConfig = {
   remotePath: "/home",
   uploadOnSave: false,
 
+  syncMode: 'update',
+
   ignore: [
     "/**/.vscode",
     "/**/.git",
