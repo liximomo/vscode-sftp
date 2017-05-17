@@ -104,6 +104,7 @@ export function getConfig(activityPath: string) {
     throw new Error('config file not found');
   }
   return {
+    ...defaultConfig,
     ...config,
     ignore: config.ignore.map(pattern => fillPattern(pattern, config.configRoot)),
     remotePath: rpath.join(config.remotePath, normalize(path.relative(config.configRoot, activityPath))),

@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as FileStatus from 'stat-mode';
-import FileSystem, { FileEntry, Stats } from './FileSystem';
+import FileSystem, { FileEntry, FileType, Stats } from './FileSystem';
 
 export default class SFTPFileSystem extends FileSystem {
   private sftp: any;
@@ -72,6 +72,7 @@ export default class SFTPFileSystem extends FileSystem {
       this.sftp.symlink(targetPath, path, err => {
         if (err && err.code !== 4) { // reject except already exist
           reject(err);
+          return;
         }
         resolve();
       });
@@ -80,9 +81,10 @@ export default class SFTPFileSystem extends FileSystem {
 
   mkdir(dir: string): Promise<null> {
     return new Promise((resolve, reject) => {
-      this.sftp.mkdir(dir, (err) => {
+      this.sftp.mkdir(dir, err => {
         if (err && err.code !== 4) { // reject except already exist
           reject(err);
+          return;
         }
         resolve();
       });
@@ -137,4 +139,46 @@ export default class SFTPFileSystem extends FileSystem {
       });
     });
   }
-} 
+
+  unlink(path: string): Promise<null> {
+    return new Promise((resolve, reject) => {
+      this.sftp.unlink(path, err => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve();
+      });
+    });
+  }
+
+  rmdir(path: string, recursive: boolean): Promise<null> {
+    return new Promise((resolve, reject) => {
+      if (!recursive) {
+        return this.sftp.rmdir(path, err => {
+          if (err) {
+            reject(err);
+            return;
+          }
+          resolve();
+        });
+      }
+
+      return this.list(path).then(fileEntries => {
+        if (!fileEntries.length) {
+          return this.rmdir(path, false);
+        }
+
+        const rmPromises = fileEntries.map(file => {
+          if (file.type === FileType.Directory) {
+            return this.rmdir(file.fspath, true);
+          }
+          return this.unlink(file.fspath);
+        });
+
+        return Promise.all(rmPromises).then(() => this.rmdir(path, false));
+      });
+    });
+  }
+}

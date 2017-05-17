@@ -1,8 +1,7 @@
 ## [0.4.0] - 2017-05-17
-
 ### Config
-* add option `syncModel`
+* Add option `syncModel`
 
 ### Command
-* upload
-* download
+* new command Upload
+* new command Download

@@ -50,6 +50,10 @@ const toHash = (items: any[], key: string, transform?: (a: any) => any): { [key:
   }, {});
 
 export function sync(srcDir: string, desDir: string, srcFs: FileSystem, desFs: FileSystem, option: SyncOption = defaultSyncOption): Promise<TransportResult[] | TransportResult> {
+  if (shouldSkip(srcDir, option.ignore)) {
+    return Promise.resolve([{ target: srcDir }]);
+  }
+
   const syncFiles = ([srcFileEntries, desFileEntries]) => {
     const srcFileTable = toHash(srcFileEntries, 'id', fileEntry => ({
       ...fileEntry,
@@ -61,53 +65,88 @@ export function sync(srcDir: string, desDir: string, srcFs: FileSystem, desFs: F
       id: normalize(desFs.pathResolver.relative(desDir, fileEntry.fspath)),
     }));
 
-    const fileExisted = [];
-    const symExisted = [];
+    const file2trans = [];
+    const dir2trans = [];
+    const dir2sync = [];
 
     const fileMissed = [];
-    const symMissed = [];
+    const dirMissed = [];
 
     Object.keys(srcFileTable).forEach(id => {
       const srcFile = srcFileTable[id];
       const file = desFileTable[id];
-      if (file) {
-        switch (file.type) {
-          case FileType.File:
-            fileExisted.push([srcFile, file]);
-            break;
-          case FileType.SymbolicLink:
-            symExisted.push([srcFile, file]);
-            break;
-          default:
-            // do not process
-        }
-      } else {
-        switch (file.type) {
-          case FileType.File:
-            fileMissed.push([srcFile, file]);
-            break;
-          case FileType.SymbolicLink:
-            symMissed.push([srcFile, file]);
-            break;
-          default:
-            // do not process
-        }
+      switch (srcFile.type) {
+        case FileType.Directory:
+          if (file) {
+            dir2sync.push([srcFile, file]);
+          } else if (option.model !== 'update') {
+            dir2trans.push([srcFile, { fspath: desFs.pathResolver.join(desDir, srcFile.name) }]);
+          }
+          break;
+        case FileType.File:
+        case FileType.SymbolicLink:
+          if (file) {
+            file2trans.push([srcFile, file]);
+          } else if (option.model !== 'update') {
+            file2trans.push([srcFile, { fspath: desFs.pathResolver.join(desDir, srcFile.name) }]);
+          }
+          break;
+        default:
+          // do not process
       }
     });
+    
+    if (option.model === 'full') {
+      Object.keys(desFileTable).forEach(id => {
+        const srcFile = srcFileTable[id];
+        const file = desFileTable[id];
+        switch (file.type) {
+          case FileType.Directory:
+            if (!srcFile) {
+              dirMissed.push(file);
+            }
+            break;
+          case FileType.File:
+          case FileType.SymbolicLink:
+            if (!srcFile) {
+              fileMissed.push(file);
+            }
+            break;
+          default:
+            // do not process
+        }
+      });
+    }
 
-    const createTransport = transFunc => ([srcfile, desFile]) => transFunc(srcfile.fspath, desFile.fspath, srcFs, desFs, option);
-    const transportTasks = [
-      ...fileExisted.map(createTransport(transportFile)),
-      ...symExisted.map(createTransport(transportSymlink)),
-    ];
+    const transFileTasks = file2trans.map(([srcfile, desFile]) =>
+      transportFile(srcfile.fspath, desFile.fspath, srcFs, desFs, option)
+    );
+    const transDirTasks = dir2trans.map(([srcfile, desFile]) =>
+      transportDir(srcfile.fspath, desFile.fspath, srcFs, desFs, option)
+    );
+    const syncDirTasks = dir2sync.map(([srcfile, desFile]) =>
+      sync(srcfile.fspath, desFile.fspath, srcFs, desFs, option)
+    );
 
-    const result = Promise.all<TransportResult[] | TransportResult>(transportTasks)
-      .then(result => flatMap(result, a => a));
-    return result;
+    const clearFileTasks = fileMissed.map(file =>
+      removeFile(file.fspath, desFs, option)
+    );
+    const clearDirTasks = dirMissed.map(file =>
+      removeDir(file.fspath, desFs, option)
+    );
+    
+    return Promise.all<TransportResult[] | TransportResult>([
+      ...transFileTasks,
+      ...transDirTasks,
+      ...clearFileTasks,
+      ...syncDirTasks,
+      ...clearDirTasks,
+    ]);
   };
 
-  return Promise.all([srcFs.list(srcDir), desFs.list(desDir)])
+  return Promise.all([srcFs.list(srcDir), desFs.list(desDir).catch(err => [])])
     .then(syncFiles)
+    .then(result => flatMap(result, a => a))
     .catch(err => ({
       target: srcDir,
       error: true,
@@ -207,6 +246,40 @@ function transportSymlink(src: string, des: string, srcFs: FileSystem, desFs: Fi
     }))
     .catch(err => ({
       target: src,
+      error: true,
+      payload: err,
+    }));
+}
+
+function removeFile(path: string, fs: FileSystem, option): Promise<TransportResult> {
+  if (shouldSkip(path, option.ignore)) {
+    return Promise.resolve({ target: path });
+  }
+  
+  output.status(`remove ${path}`);
+  return fs.unlink(path)
+    .then(() => ({
+      target: path,
+    }))
+    .catch(err => ({
+      target: path,
+      error: true,
+      payload: err,
+    }));
+}
+
+function removeDir(path: string, fs: FileSystem, option): Promise<TransportResult> {
+  if (shouldSkip(path, option.ignore)) {
+    return Promise.resolve({ target: path });
+  }
+  
+  output.status(`remove dir ${path}`);
+  return fs.rmdir(path, true)
+    .then(() => ({
+      target: path,
+    }))
+    .catch(err => ({
+      target: path,
       error: true,
       payload: err,
     }));

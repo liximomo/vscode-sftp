@@ -70,6 +70,7 @@ export default class LocalFileSystem extends FileSystem {
       fs.symlink(targetPath, path, null, err => {
         if (err && err.code !== 'EEXIST') {
           reject(err);
+          return;
         }
         resolve();
       });
@@ -78,9 +79,10 @@ export default class LocalFileSystem extends FileSystem {
   
   mkdir(dir: string): Promise<null> {
     return new Promise((resolve, reject) => {
-      fs.mkdir(dir, (err) => {
+      fs.mkdir(dir, err => {
         if (err && err.code !== 'EEXIST') { // reject except already exist
           reject(err);
+          return;
         }
         resolve();
       });
@@ -121,4 +123,34 @@ export default class LocalFileSystem extends FileSystem {
       });
     });
   }
-} 
+  
+  unlink(path: string): Promise<null> {
+    return new Promise((resolve, reject) => {
+      fs.unlink(path, err => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve();
+      });
+    });
+  }
+
+  rmdir(path: string, recursive: boolean): Promise<null> {
+    if (recursive) {
+      return fse.remove(path)
+    }
+
+    return new Promise((resolve, reject) => {
+      fs.rmdir(path, err => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve();
+      });
+    });
+  }
+}

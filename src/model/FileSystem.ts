@@ -45,6 +45,8 @@ export default abstract class FileSystem {
   abstract lstat(path: string): Promise<Stats>;
   abstract readlink(path: string): Promise<string>;
   abstract symlink(targetPath: string, path: string): Promise<null>;
+  abstract unlink(path: string): Promise<null>;
+  abstract rmdir(path: string, recursive: boolean): Promise<null>;
 
   getFileTypecharacter(stat: fs.Stats): FileType {
     if (stat.isDirectory()) {

@@ -1,5 +1,5 @@
 # sftp sync extension for VS Code
-I wrote this because i must to. All others can't fit my requirement.
+I wrote this because i must to. All others can't fit my requirements.
 ## Features
 
 * sync directory to remote
@@ -12,7 +12,17 @@ I wrote this because i must to. All others can't fit my requirement.
 
 ## Usage
  1. `Ctrl+Shift+P` on Windows/Linux open command palette, run `SFTP: config` command.
- 2. use `Sync To Local` or `Sync To Remote` commnad on editor context menu or explorer context menu.
+ 2. use commnad on editor context menu or explorer context menu.
+
+### Command
+| Command              | describe                                    |
+| -------------------- |---------------------------------------------|
+| SFTP: Config         | create a new config file at workspace root  |
+| SFTP: Upload         | upload file/directory                       |
+| SFTP: Download       | download file/directory                     |
+| SFTP: Sync To Remote | sync local directory to remote              |
+| SFTP: Sync To Local  | sync remote directory to local              |
+  
 
 ## config
 ```js
@@ -59,7 +69,8 @@ I wrote this because i must to. All others can't fit my requirement.
   /**
    *  avaliable value: update | full
    *  update: sync exist file only
-   *  full: sync exist file and remove none-exist file
+   *  full: sync exist file, remove deleted file, add missed file
+   *  if you want sync exist file and add missed file, use "upload" commond!
    */ 
   syncMode: 'update',
 

@@ -2,7 +2,7 @@
     "name": "sftp",
     "displayName": "sftp",
     "description": "Auto sync your work to remote SFTP server",
-    "version": "0.3.2",
+    "version": "0.4.0",
     "publisher": "liximomo",
     "engines": {
         "vscode": "^1.0.0"
@@ -33,7 +33,7 @@
         "commands": [
             {
                 "command": "sftp.config.default",
-                "title": "SFTP: Edit Config"
+                "title": "SFTP: Config"
             },
             {
                 "command": "sftp.trans.remote",
