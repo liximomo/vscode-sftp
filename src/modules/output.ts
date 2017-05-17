@@ -19,8 +19,19 @@ export function errorMsg(error: Error | string, event?: string) {
 
 const STATUS_TIMEOUT = 4200;
 
+let statusDispose = null;
+let statusDisposeTimeout = null;
 export function status(event: string) {
-  return vscode.window.setStatusBarMessage(event, STATUS_TIMEOUT);
+  if (statusDispose) {
+    clearTimeout(statusDisposeTimeout);
+    statusDispose.dispose();
+  }
+
+  statusDispose = vscode.window.setStatusBarMessage(event);
+  statusDisposeTimeout = setTimeout(() => {
+    statusDispose.dispose();
+    statusDispose = null;
+  }, STATUS_TIMEOUT);
 }
 
 export function print(msg) {

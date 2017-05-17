@@ -9,8 +9,9 @@ import Trie from '../model/Trie';
 
 let configTrie = null;
 
-function getPathRelativeWorkspace(path) {
-  return vscode.workspace.asRelativePath(path);
+function getPathRelativeWorkspace(filePath) {
+  const relativePath = vscode.workspace.asRelativePath(filePath);
+  return relativePath === vscode.workspace.rootPath ? '@workroot' :  `@workroot/${relativePath}`;
 }
 
 export const defaultConfig = {
@@ -46,7 +47,7 @@ function lookUpConfigRootImpl(activityPath: string, root: string) {
 				return activityPath;
 			}
 
-      if (activityPath === root) {
+      if (!~activityPath.indexOf(root)) {
         throw new Error('config file not found');
       }
 
