@@ -9,9 +9,14 @@ import Trie from '../model/Trie';
 
 let configTrie = null;
 
+const normalizedWorkspacePath = normalize(vscode.workspace.rootPath);
 function getPathRelativeWorkspace(filePath) {
-  const relativePath = vscode.workspace.asRelativePath(filePath);
-  return relativePath === vscode.workspace.rootPath ? '@workroot' : `@workroot${path.sep}${relativePath}`;
+  const normalizePath = normalize(filePath);
+  if (normalizePath === normalizedWorkspacePath) {
+    return '@workroot';
+  }
+  const relativePath = rpath.relative(normalizedWorkspacePath, normalizePath);
+  return `@workroot/${relativePath}`;
 }
 
 export const defaultConfig = {
@@ -80,8 +85,7 @@ export function initConfigs() {
         return;
       }
 
-      console.log('config files:', files);
-      configTrie = new Trie({}, { delimiter: path.sep });
+      configTrie = new Trie({});
 
       Promise.all(files.map(addConfig)).then(resolve);
     });

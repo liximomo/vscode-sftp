@@ -34,11 +34,18 @@ export function status(event: string) {
   }, STATUS_TIMEOUT);
 }
 
-export function print(msg) {
+export function print(...args) {
   if (outputChannel === undefined) {
     outputChannel = vscode.window.createOutputChannel(EXTENSION_NAME);
-    outputChannel.show();
+    // outputChannel.show();
   }
+
+  const msg = args.map(arg => {
+    if (typeof arg === 'object') {
+      return JSON.stringify(arg);
+    }
+    return arg;
+  }).join(' ');
 
   outputChannel.appendLine(msg);
 }
