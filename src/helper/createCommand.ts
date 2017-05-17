@@ -11,6 +11,7 @@ export function createFileCommand(fileTask) {
     const activityPath = item.fsPath;
     try {
       const config = getConfig(activityPath);
+      output.status('connecting...');
       fileTask(activityPath, config).catch(output.errorMsg);
     } catch (error) {
       output.errorMsg(error);

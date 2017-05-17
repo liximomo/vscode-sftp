@@ -11,7 +11,7 @@ let configTrie = null;
 
 function getPathRelativeWorkspace(filePath) {
   const relativePath = vscode.workspace.asRelativePath(filePath);
-  return relativePath === vscode.workspace.rootPath ? '@workroot' :  `@workroot/${relativePath}`;
+  return relativePath === vscode.workspace.rootPath ? '@workroot' : `@workroot${path.sep}${relativePath}`;
 }
 
 export const defaultConfig = {
@@ -80,7 +80,7 @@ export function initConfigs() {
       }
 
       console.log('config files:', files);
-      configTrie = new Trie({});
+      configTrie = new Trie({}, { delimiter: path.sep });
 
       Promise.all(files.map(addConfig)).then(resolve);
     });

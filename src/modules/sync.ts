@@ -41,9 +41,8 @@ const getRemoteClient = option => {
 
 const createTask = (name, func) => (source, config) =>
   getRemoteClient(getHostInfo(config))
-    .then(remoteClient => func(source, config, remoteClient), err => {
-      output.errorMsg(err, 'connect to server')
-    }).then(result => printResult(`${name} done`, result));
+    .then(remoteClient => func(source, config, remoteClient))
+    .then(result => printResult(`${name} done`, result));
 
 export const upload = createTask('upload', (source, config, remoteClient) => transport(
   source,
