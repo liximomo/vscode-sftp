@@ -1,43 +1,63 @@
 import * as vscode from 'vscode';
+import { EXTENSION_NAME } from '../constants';
 
-export const EXTENSION_NAME = 'sftp';
+class StatusBarItem {
+  private name: string;
+  private statusBarItem: vscode.StatusBarItem;
 
-let outputChannel;
+  public isShow: boolean;
+
+  constructor(name) {
+    this.name = name;
+    this.isShow = false;
+    this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+  }
+  
+  msg(text: string, varient?: number | Promise<any>) {
+    if (!this.isShow) {
+      this.statusBarItem.show();
+      this.isShow = true;
+    }
+
+    this.statusBarItem.text = text;
+
+    if (typeof varient === 'number') {
+      setTimeout(this.hide, varient);
+    }
+
+    if (typeof varient === 'object' && typeof varient.then === 'function') {
+      varient.then(this.hide, this.hide)
+    }
+  }
+
+  hide = () => {
+    this.statusBarItem.hide();
+    this.isShow = false;
+  }
+}
+
+export const status = new StatusBarItem('info');
 
 export function success(msg: string, event?: string) {
   return vscode.window.showInformationMessage(`[${event || EXTENSION_NAME}]: ${msg}`);
 }
 
-export function errorMsg(error: Error | string, event?: string) {
+export function onError(error: Error | string, event?: string) {
   let errorString = error;
   if (error instanceof Error) {
     errorString = error.message;
   }
 
+  status.msg('fail', 2000);
+
   return vscode.window.showErrorMessage(`[${event || EXTENSION_NAME}]: ${errorString}`);
 }
 
-const STATUS_TIMEOUT = 4200;
-
-let statusDispose = null;
-let statusDisposeTimeout = null;
-export function status(event: string) {
-  if (statusDispose) {
-    clearTimeout(statusDisposeTimeout);
-    statusDispose.dispose();
-  }
-
-  statusDispose = vscode.window.setStatusBarMessage(event);
-  statusDisposeTimeout = setTimeout(() => {
-    statusDispose.dispose();
-    statusDispose = null;
-  }, STATUS_TIMEOUT);
-}
-
+let outputChannel;
 export function print(...args) {
   if (outputChannel === undefined) {
     outputChannel = vscode.window.createOutputChannel(EXTENSION_NAME);
-    // outputChannel.show();
+    outputChannel.show();
   }
 
   const msg = args.map(arg => {

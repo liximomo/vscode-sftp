@@ -1,3 +1,5 @@
+export const EXTENSION_NAME = 'sftp';
+
 export const CONFIG = 'sftp.config.default';
 
 export const SYNC_TO_REMOTE = 'sftp.sync.remote';

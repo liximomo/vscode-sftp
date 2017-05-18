@@ -13,6 +13,6 @@ export default function autoSave(file) {
   }
 
   if (config.uploadOnSave) {
-    upload(activityPath, config).catch(output.errorMsg);
+    upload(activityPath, config).catch(output.onError);
   }
 }

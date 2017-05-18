@@ -115,7 +115,7 @@ export function getConfig(activityPath: string) {
 
 export function newConfig() {
 	if (!vscode.workspace.rootPath) {
-		output.errorMsg('Cannot run this command without opened folder', 'config');
+		output.onError('Cannot run this command without opened folder', 'config');
 	}
 	
 	const defaultConfigPath = getDefaultConfigPath();
@@ -134,7 +134,7 @@ export function newConfig() {
 				.then(showConfigFile)
 		})
 		.catch(error => {
-			output.errorMsg(error, 'config');
+			output.onError(error, 'config');
 		});
 }
 

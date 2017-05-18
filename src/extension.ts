@@ -16,7 +16,7 @@ import {
   UPLOAD,
   DOWNLOAD,
   CONFIG,
-} from './CommandConstants';
+} from './constants';
 
 function registerCommand(
   context: vscode.ExtensionContext,
@@ -36,7 +36,7 @@ export function activate(context: vscode.ExtensionContext) {
   
   initConfigs()
     .then(() => {
-      output.status('SFTP Ready');
+      output.status.msg('SFTP Ready', 1000 * 8);
       registerCommand(context, SYNC_TO_REMOTE, sync2RemoteCommand);
 
       registerCommand(context, SYNC_TO_LOCAL, sync2LocalCommand);

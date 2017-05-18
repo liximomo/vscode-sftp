@@ -4,17 +4,16 @@ import { getConfig } from '../modules/config';
 export function createFileCommand(fileTask) {
   return item => {
     if (!(item && item.fsPath)) {
-      output.errorMsg(new Error('command must run on a file or directory!'));
+      output.onError(new Error('command must run on a file or directory!'));
       return;
     }
 
     const activityPath = item.fsPath;
     try {
       const config = getConfig(activityPath);
-      output.status('connecting...');
-      fileTask(activityPath, config).catch(output.errorMsg);
+      fileTask(activityPath, config).catch(output.onError);
     } catch (error) {
-      output.errorMsg(error);
+      output.onError(error);
     }
   };
 }

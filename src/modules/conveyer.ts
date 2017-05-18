@@ -54,7 +54,9 @@ export function sync(srcDir: string, desDir: string, srcFs: FileSystem, desFs: F
     return Promise.resolve([{ target: srcDir }]);
   }
 
+  output.status.msg(`collect files...`);
   const syncFiles = ([srcFileEntries, desFileEntries]) => {
+    output.status.msg('diff files...');
     const srcFileTable = toHash(srcFileEntries, 'id', fileEntry => ({
       ...fileEntry,
       id: normalize(srcFs.pathResolver.relative(srcDir, fileEntry.fspath)),
@@ -79,7 +81,7 @@ export function sync(srcDir: string, desDir: string, srcFs: FileSystem, desFs: F
         case FileType.Directory:
           if (file) {
             dir2sync.push([srcFile, file]);
-          } else if (option.model !== 'update') {
+          } else if (option.model === 'full') {
             dir2trans.push([srcFile, { fspath: desFs.pathResolver.join(desDir, srcFile.name) }]);
           }
           break;
@@ -87,7 +89,7 @@ export function sync(srcDir: string, desDir: string, srcFs: FileSystem, desFs: F
         case FileType.SymbolicLink:
           if (file) {
             file2trans.push([srcFile, file]);
-          } else if (option.model !== 'update') {
+          } else if (option.model === 'full') {
             file2trans.push([srcFile, { fspath: desFs.pathResolver.join(desDir, srcFile.name) }]);
           }
           break;
@@ -178,7 +180,7 @@ function transportDir(src: string, des: string, srcFs: FileSystem, desFs: FileSy
   }
 
   const listFiles = () => {
-    output.status(`retriving directory ${src}`);
+    output.status.msg(`retriving directory ${src}`);
     return srcFs.list(src);
   };
 
@@ -215,7 +217,7 @@ function transportFile(src: string, des: string, srcFs: FileSystem, desFs: FileS
     return Promise.resolve({ target: src });
   }
   
-  output.status(`uploading ${src}`);
+  output.status.msg(`uploading ${src}`);
   return srcFs.get(src)
     .then(inputStream => desFs.put(inputStream, des))
     .then(() => ({
@@ -233,7 +235,7 @@ function transportSymlink(src: string, des: string, srcFs: FileSystem, desFs: Fi
     return Promise.resolve({ target: src });
   }
   
-  output.status(`uploading ${src}`);
+  output.status.msg(`uploading ${src}`);
   return srcFs.readlink(src)
     .then(targetPath => {
       const absolutePath = srcFs.pathResolver.isAbsolute(targetPath)
@@ -256,7 +258,7 @@ function removeFile(path: string, fs: FileSystem, option): Promise<TransportResu
     return Promise.resolve({ target: path });
   }
   
-  output.status(`remove ${path}`);
+  output.status.msg(`remove ${path}`);
   return fs.unlink(path)
     .then(() => ({
       target: path,
@@ -273,7 +275,7 @@ function removeDir(path: string, fs: FileSystem, option): Promise<TransportResul
     return Promise.resolve({ target: path });
   }
   
-  output.status(`remove dir ${path}`);
+  output.status.msg(`remove dir ${path}`);
   return fs.rmdir(path, true)
     .then(() => ({
       target: path,

@@ -18,7 +18,7 @@ function printFailTask(result) {
 function printResult(msg, result) {
   const fails = [].concat(result).filter(failedTask)
   if (!fails.length) {
-    output.status(msg);
+    output.status.msg(msg, 2000);
     return;
   }
   fails.forEach(printFailTask);
@@ -35,6 +35,7 @@ const getHostInfo = config => ({
 
 const getRemoteClient = option => {
   const client = new Client(option);
+  output.status.msg('connecting...');
   return client.connect()
     .then(() => client);
 }
@@ -86,27 +87,3 @@ export const sync2Local= createTask('sync local', (source, config, remoteClient)
     model: config.syncMode,
   }
 ));
-
-// // config syncMode: 'full' | 'update'
-// export function sync2Remote(source, config) {
-//   return getRemoteClient({
-//     host: config.host,
-//     port: config.port,
-//     username: config.username,
-//     password: config.password,
-//     privateKeyPath: config.privateKeyPath,
-//     passphrase: config.passphrase,
-//   }).then(remoteClient => {
-//     return transport(
-//       config.remotePath,
-//       source,
-//       new SFTPFileSystem(rpath, remoteClient.sftp),
-//       new LocalFileSystem(path),
-//       {
-//         ignore: config.ignore,
-//       }
-//     );
-//   }, err => {
-//       output.errorMsg(err, 'connect to server')
-//   }).then(printResult);
-// }
