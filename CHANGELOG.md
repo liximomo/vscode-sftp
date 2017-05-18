@@ -1,3 +1,7 @@
+## [0.4.12] - 2017-05-18
+### Bugfix
+* fix binary file upload
+
 ## [0.4.11] - 2017-05-18
 ### Feedback
 * better status indication

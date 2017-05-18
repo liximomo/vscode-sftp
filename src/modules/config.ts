@@ -9,8 +9,8 @@ import Trie from '../model/Trie';
 
 let configTrie = null;
 
-const normalizedWorkspacePath = normalize(vscode.workspace.rootPath);
 function getPathRelativeWorkspace(filePath) {
+  const normalizedWorkspacePath = normalize(vscode.workspace.rootPath);
   const normalizePath = normalize(filePath);
   if (normalizePath === normalizedWorkspacePath) {
     return '@workroot';
