@@ -7,6 +7,7 @@ import * as path from 'path';
 import throttle from './helper/throttle';
 import * as output from './modules/output';
 import { initConfigs, addConfig, configFileName } from './modules/config';
+import { invalidClient } from './modules/client';
 import { sync2RemoteCommand, sync2LocalCommand, uploadCommand, downloadCommand } from './commands/sync';
 import editConfig from './commands/config';
 import autoSave from './commands/auto-save';
@@ -51,6 +52,9 @@ export function activate(context: vscode.ExtensionContext) {
 
       const handleDocumentSave = (file) => {
         if (path.basename(file.fileName) === configFileName) {
+
+          // make sure to re-conncet
+          invalidClient();
           addConfig(file.fileName);
         } else {
           autoSave(file);

@@ -1,8 +1,9 @@
 import * as path from 'path';
 
-import * as output from '../modules/output';
-import rpath from '../modules/remotePath';
-import { transport, sync } from '../modules/conveyer';
+import * as output from './output';
+import rpath from './remotePath';
+import { transport, sync } from './conveyer';
+import getRemoteClient from './client';
 import Client from '../model/SFTPClient';
 import SFTPFileSystem from '../model/SFTPFileSystem';
 import LocalFileSystem from '../model/LocalFileSystem';
@@ -33,12 +34,12 @@ const getHostInfo = config => ({
   passphrase: config.passphrase,
 });
 
-const getRemoteClient = option => {
-  const client = new Client(option);
-  output.status.msg('connecting...');
-  return client.connect()
-    .then(() => client);
-}
+// const getRemoteClient = option => {
+//   const client = new Client(option);
+//   output.status.msg('connecting...');
+//   return client.connect()
+//     .then(() => client);
+// }
 
 const createTask = (name, func) => (source, config) =>
   getRemoteClient(getHostInfo(config))

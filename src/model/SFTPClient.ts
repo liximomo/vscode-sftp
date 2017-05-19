@@ -19,9 +19,20 @@ export default class SFTPClient {
   public sftp: any;
   private client: any;
 
-  constructor(option: Option) {
+  constructor(option?: Option) {
     this.client = new Client();
     this.option = option;
+  }
+
+  setOption(option?: Option) {
+    this.option = option;
+  }
+
+  onDisconnected(cb) {
+    this.client
+      .on('end', cb)
+      .on('close', cb)
+      .on('error', cb);
   }
 
   connect() {
@@ -42,6 +53,8 @@ export default class SFTPClient {
           reject(err);
         })
         .connect({
+          keepaliveInterval: 1000 * 60 * 5,
+          keepaliveCountMax: 2,
           ...this.option,
           privateKey, 
         });
