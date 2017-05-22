@@ -6,6 +6,7 @@ import * as glob from 'glob';
 import rpath, { normalize } from './remotePath';
 import * as output from './output';
 import Trie from '../model/Trie';
+import { WORKSPACE_TRIE_TOKEN } from '../constants';
 
 let configTrie = null;
 
@@ -13,10 +14,10 @@ function getPathRelativeWorkspace(filePath) {
   const normalizedWorkspacePath = normalize(vscode.workspace.rootPath);
   const normalizePath = normalize(filePath);
   if (normalizePath === normalizedWorkspacePath) {
-    return '@workroot';
+    return WORKSPACE_TRIE_TOKEN;
   }
   const relativePath = rpath.relative(normalizedWorkspacePath, normalizePath);
-  return `@workroot/${relativePath}`;
+  return `${WORKSPACE_TRIE_TOKEN}/${relativePath}`;
 }
 
 export const defaultConfig = {

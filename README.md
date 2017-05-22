@@ -11,8 +11,10 @@ I wrote this because I must to. All others can't fit my requirements.
 * multiple config
 
 ## Usage
- 1. `Ctrl+Shift+P` on Windows/Linux open command palette, run `SFTP: config` command.
- 2. use commnad on editor context menu or explorer context menu.
+1. `Ctrl+Shift+P` on Windows/Linux open command palette, run `SFTP: config` command.
+2. Run commnad on editor context menu or explorer context menu.
+
+*Note* ：A commnad must run with a target(file or directory). When Running command within command palette will result in target be workspace root.
 
 ### Command
 | Command              | describe                                    |

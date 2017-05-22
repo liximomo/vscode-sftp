@@ -1,6 +1,10 @@
+## [0.5.1] - 2017-05-22
+### enhance
+* provide a way to run command at the workspace root
+
 ## [0.5.0] - 2017-05-19
 ### feature
-* keep ssh conncet alive (re conncet only when needed)
+* Keep ssh conncet alive (re conncet only when needed)
 
 ## [0.4.12] - 2017-05-18
 ### Bugfix
