@@ -8,13 +8,18 @@ type TrieNodeChildren = {
 
 class TrieNode {
   public token: string;
-  public value: any;
+  private value: any;
   private children: TrieNodeChildren;
 
   constructor(token: string, value = null) {
     this.token = token;
     this.value = value;
     this.children = {};
+  }
+
+  // is store value
+  isLoaded() {
+    return this.value !== null;
   }
 
   setValue(value: any): TrieNode {
@@ -31,6 +36,10 @@ class TrieNode {
     return this;
   }
   
+  getChildren(): TrieNode[] {
+    return Object.keys(this.children).map(key => this.children[key]);
+  }
+
   addChild(token: string, childNode): TrieNode {
     this.children[token] = childNode;
     return this;
@@ -122,6 +131,23 @@ export default class Trie {
       return this.findNode(childNode, rest);
     }
     return null;
+  }
+
+  findValueWithShortestBranch(): any[] {
+    const nodeQueue = [this.root];
+    const result = [];
+
+    do {
+      let curentNode = nodeQueue.shift();
+      if (curentNode.isLoaded()) {
+        result.push(curentNode.getValue());
+      } else {
+        const childrenNodes = curentNode.getChildren();
+        nodeQueue.push(...childrenNodes);
+      }
+    } while(nodeQueue.length > 0)
+
+    return result;
   }
 
   splitPath(path: string): string[] {

@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 
 import * as output from '../modules/output';
 import { getConfig } from '../modules/config';
-import { WORKSPACE_TRIE_TOKEN } from '../constants';
 
 const workspaceItem = {
   fsPath: vscode.workspace.rootPath,

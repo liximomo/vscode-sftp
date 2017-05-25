@@ -34,6 +34,8 @@ export const defaultConfig = {
 
   syncMode: 'update',
 
+  autoUploadGeneratedFile: 'false',
+
   ignore: [
     "/**/.vscode",
     "/**/.git",
@@ -67,14 +69,16 @@ export function addConfig(configPath) {
   return fse.readJson(configPath)
     .then(config => {
       const configRoot = path.dirname(configPath);
-      return configTrie.add(getPathRelativeWorkspace(configRoot), {
+      const fullConfig = {
         ...config,
         configRoot,
-      });
+      };
+      configTrie.add(getPathRelativeWorkspace(configRoot), fullConfig);
+      return fullConfig;
     });
 }
 
-export function initConfigs() {
+export function initConfigs(): Promise<Trie> {
   return new Promise((resolve, reject) => {
     glob(configGlobPattern, {
       cwd: vscode.workspace.rootPath,
@@ -88,7 +92,7 @@ export function initConfigs() {
 
       configTrie = new Trie({});
 
-      Promise.all(files.map(addConfig)).then(resolve);
+      Promise.all(files.map(addConfig)).then(() => resolve(configTrie));
     });
   });
 }

@@ -8,6 +8,7 @@ import throttle from './helper/throttle';
 import * as output from './modules/output';
 import { initConfigs, addConfig, configFileName } from './modules/config';
 import { invalidClient } from './modules/client';
+import watchFiles from './modules/fileWatcher';
 import { sync2RemoteCommand, sync2LocalCommand, uploadCommand, downloadCommand } from './commands/sync';
 import editConfig from './commands/config';
 import autoSave from './commands/auto-save';
@@ -40,7 +41,7 @@ export function activate(context: vscode.ExtensionContext) {
   registerCommand(context, CONFIG, editConfig);
   
   initConfigs()
-    .then(() => {
+    .then(configTrie => {
       output.status.msg('SFTP Ready', 1000 * 8);
       registerCommand(context, SYNC_TO_REMOTE, sync2RemoteCommand);
 
@@ -50,12 +51,17 @@ export function activate(context: vscode.ExtensionContext) {
 
       registerCommand(context, DOWNLOAD, downloadCommand);
 
+      watchFiles(configTrie.findValueWithShortestBranch());
+
       const handleDocumentSave = (file) => {
         if (path.basename(file.fileName) === configFileName) {
 
           // make sure to re-conncet
           invalidClient();
-          addConfig(file.fileName);
+          addConfig(file.fileName)
+            .then(config => {
+              watchFiles(config);
+            });
         } else {
           autoSave(file);
         }
