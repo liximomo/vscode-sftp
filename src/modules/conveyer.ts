@@ -1,3 +1,4 @@
+import * as vscode from 'vscode';
 import * as minimatch from 'minimatch';
 
 import * as output from '../modules/output';
@@ -30,6 +31,10 @@ const defaultSyncOption = {
   ignore: [],
   model: <SyncModel>'update',
 };
+
+function fileName2Show(filePath) {
+  return vscode.workspace.asRelativePath(filePath);
+}
 
 function testIgnore(target, pattern) {
   return minimatch(target, pattern);
@@ -180,7 +185,7 @@ function transportDir(src: string, des: string, srcFs: FileSystem, desFs: FileSy
   }
 
   const listFiles = () => {
-    output.status.msg(`retriving directory ${src}`);
+    output.status.msg(`retriving directory ${fileName2Show(src)}`);
     return srcFs.list(src);
   };
 
@@ -217,7 +222,7 @@ function transportFile(src: string, des: string, srcFs: FileSystem, desFs: FileS
     return Promise.resolve({ target: src });
   }
   
-  output.status.msg(`uploading ${src}`);
+  output.status.msg(`uploading ${fileName2Show(src)}`);
   return srcFs.get(src)
     .then(inputStream => desFs.put(inputStream, des))
     .then(() => ({
@@ -235,7 +240,7 @@ function transportSymlink(src: string, des: string, srcFs: FileSystem, desFs: Fi
     return Promise.resolve({ target: src });
   }
   
-  output.status.msg(`uploading ${src}`);
+  output.status.msg(`uploading ${fileName2Show(src)}`);
   return srcFs.readlink(src)
     .then(targetPath => {
       const absolutePath = srcFs.pathResolver.isAbsolute(targetPath)
@@ -258,7 +263,7 @@ function removeFile(path: string, fs: FileSystem, option): Promise<TransportResu
     return Promise.resolve({ target: path });
   }
   
-  output.status.msg(`remove ${path}`);
+  output.status.msg(`remove ${fileName2Show(path)}`);
   return fs.unlink(path)
     .then(() => ({
       target: path,
@@ -275,7 +280,7 @@ function removeDir(path: string, fs: FileSystem, option): Promise<TransportResul
     return Promise.resolve({ target: path });
   }
   
-  output.status.msg(`remove dir ${path}`);
+  output.status.msg(`remove dir ${fileName2Show(path)}`);
   return fs.rmdir(path, true)
     .then(() => ({
       target: path,

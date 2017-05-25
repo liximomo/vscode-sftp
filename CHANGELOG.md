@@ -1,28 +1,35 @@
+## [0.5.2] - 2017-05-22
+### Bugfix
+* Running a command through shortcut couldn't find active document correctly.
+
+### Feedback
+* Show path that is relative to the workspace root instead of full path on status bar.
+
 ## [0.5.1] - 2017-05-22
-### enhance
-* provide a way to run command at the workspace root
+### Enhance
+* Provide a way to run command at the workspace root
 
 ## [0.5.0] - 2017-05-19
-### feature
+### Feature
 * Keep ssh conncet alive (re conncet only when needed)
 
 ## [0.4.12] - 2017-05-18
 ### Bugfix
-* fix binary file upload
+* Fix binary file upload
 
 ## [0.4.11] - 2017-05-18
 ### Feedback
-* better status indication
+* Better status indication
 
 ## [0.4.10] - 2017-05-18
 ### Bugfix
-* config file not found in windows
-* check existence of privateKeyPath
+* Config file not found in windows
+* Check existence of privateKeyPath
 
 ## [0.4.0] - 2017-05-17
 ### Config
 * Add option `syncModel`
 
 ### Command
-* new command Upload
-* new command Download
+* New command Upload
+* New command Download

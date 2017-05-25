@@ -11,13 +11,20 @@ const workspaceItem = {
 export function createFileCommand(fileTask) {
   return item => {
     // if no file/direcory selected, assume workspace be selected.
-    const fileItem = item === undefined ? workspaceItem : item;
+    let fileItem = item === undefined ? workspaceItem : item;
+    
+    if (!fileItem.fsPath) {
+      // run through shortcut
+      const active = vscode.window.activeTextEditor;
+	    if (!active || !active.document) {
+        output.onError(new Error('command must run on a file or directory!'));
+        return;
+      }
 
-    if (!(fileItem && fileItem.fsPath)) {
-      output.onError(new Error('command must run on a file or directory!'));
-      return;
+      fileItem = {
+        fsPath: active.document.fileName
+      };
     }
-
     const activityPath = fileItem.fsPath;
     try {
       const config = getConfig(activityPath);
