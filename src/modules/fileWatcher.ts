@@ -34,7 +34,7 @@ function setUpWatcher(config) {
       const file = uri.fsPath;
       try {
         const config = getConfig(file);
-        upload(file, config).catch(output.onError);
+        upload(file, config, true).catch(output.onError);
       } catch (error) {
         output.onError(error);
       }
@@ -46,7 +46,10 @@ function setUpWatcher(config) {
       const file = uri.fsPath;
       try {
         const config = getConfig(file);
-        removeRemote(config.remotePath, config).catch(output.onError);
+        removeRemote(config.remotePath, {
+          ...config,
+          skipDir: true
+        }, true).catch(output.onError);
       } catch (error) {
         output.onError(error);
       }
@@ -62,7 +65,7 @@ export function onFileChange(cb: (uri: vscode.Uri) => void) {
   }
 
   workspaceWatcher.onDidChange(uri => {
-     cb(uri);
+    cb(uri);
   });
 }
 

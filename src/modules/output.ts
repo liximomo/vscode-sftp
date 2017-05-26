@@ -46,6 +46,7 @@ export function onError(error: Error | string, event?: string) {
   let errorString = error;
   if (error instanceof Error) {
     errorString = error.message;
+    print(error.stack);
   }
 
   status.msg('fail', 2000);

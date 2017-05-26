@@ -74,9 +74,7 @@ export default class SFTPClient {
   }
 
   end() {
-    return new Promise((resolve) => {
-      resolve(this.client.end());
-    });
+    return this.client.end();
   }
 }
 

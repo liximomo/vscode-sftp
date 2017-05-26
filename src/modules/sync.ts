@@ -16,13 +16,15 @@ function printFailTask(result) {
   return output.print(`${result.target} failed: ${result.payload.message}`);
 }
 
-function printResult(msg, result) {
+function printResult(msg, result, silent) {
   const fails = [].concat(result).filter(failedTask)
-  if (!fails.length) {
-    output.status.msg(msg, 2000);
-    return;
+  if (fails.length) {
+    fails.forEach(printFailTask);
+  } else {
+    if (!silent) {
+      output.status.msg(msg, 2000);
+    }
   }
-  fails.forEach(printFailTask);
 }
 
 const getHostInfo = config => ({
@@ -41,15 +43,10 @@ const getHostInfo = config => ({
 //     .then(() => client);
 // }
 
-const createTask = (name, func, silent: boolean = false) => (source, config) =>
+const createTask = (name, func) => (source, config, silent: boolean = false) =>
   getRemoteClient(getHostInfo(config))
     .then(remoteClient => func(source, config, remoteClient))
-    .then(result => {
-      if (silent) {
-        return;
-      }
-      printResult(`${name} done`, result);
-    });
+    .then(result => printResult(`${name} done`, result, silent));
 
 export const upload = createTask('upload', (source, config, remoteClient) => transport(
   source,
@@ -94,13 +91,11 @@ export const sync2Local= createTask('sync local', (source, config, remoteClient)
   }
 ));
 
-export const removeRemote = (path, config) => {
-  return getRemoteClient(getHostInfo(config))
-    .then(remoteClient => remove(
-      path,
-      new SFTPFileSystem(rpath, remoteClient.sftp),
-      {
-        ignore: config.ignore,
-      }
-    ));
-}
+export const removeRemote = createTask('remove', (source, config, remoteClient) => remove(
+  source,
+  new SFTPFileSystem(rpath, remoteClient.sftp),
+  {
+    ignore: config.ignore,
+    skipDir: config.skipDir,
+  }
+));

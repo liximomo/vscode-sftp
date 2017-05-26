@@ -7,7 +7,7 @@ import * as path from 'path';
 import throttle from './helper/throttle';
 import * as output from './modules/output';
 import { initConfigs, addConfig, configFileName } from './modules/config';
-import { invalidClient } from './modules/client';
+import { invalidClient, endClient } from './modules/client';
 import { onFileChange, watchFiles, cleafAllWatcher } from './modules/fileWatcher';
 import { sync2RemoteCommand, sync2LocalCommand, uploadCommand, downloadCommand } from './commands/sync';
 import editConfig from './commands/config';
@@ -72,4 +72,5 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {
   cleafAllWatcher();
+  endClient();
 }

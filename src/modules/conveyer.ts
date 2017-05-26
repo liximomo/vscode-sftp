@@ -189,14 +189,20 @@ export function remove(path: string, fs: FileSystem, option): Promise<TransportR
       let result;
       switch (stat.type) {
         case FileType.Directory:
-          result = removeDir(path, fs, option);
+          if (!option.skipDir) {
+            result = removeDir(path, fs, option);
+          }
           break;
         case FileType.File:
         case FileType.SymbolicLink:
           result = removeFile(path, fs, option);
           break;
         default:
-          // do not process
+          result = [{
+            target: path,
+            error: true,
+            payload: new Error(`${path} with unsupport file type`),
+          }];
       }
       return result;
     });

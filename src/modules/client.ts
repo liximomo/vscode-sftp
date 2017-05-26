@@ -6,14 +6,19 @@ let needReconect = true;
 const client = new Client();
 client.onDisconnected(invalidClient);
 
+// prevent concurrent connecting;
+let pendingPromise = null;
+
 export default function getClient(option) {
   if (!needReconect) {
+    pendingPromise = null;
     return Promise.resolve(client);
   }
 
-  client.setOption(option);
-  output.status.msg('connecting...');
-  return client.connect()
+  if (!pendingPromise) {
+    client.setOption(option);
+    output.status.msg('connecting...');
+    pendingPromise = client.connect()
     .then(() => {
       needReconect = false;
       return client;
@@ -21,8 +26,15 @@ export default function getClient(option) {
       invalidClient();
       throw err;
     });
+  }
+  return pendingPromise;
 }
 
 export function invalidClient() {
   needReconect = true;
+}
+
+export function endClient() {
+  client.end();
+  invalidClient();
 }

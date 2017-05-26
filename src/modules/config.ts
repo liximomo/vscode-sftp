@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import * as memoize from 'fast-memoize';
+// import * as memoize from 'fast-memoize';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
