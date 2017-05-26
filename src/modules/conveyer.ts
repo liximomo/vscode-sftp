@@ -164,7 +164,7 @@ export function sync(srcDir: string, desDir: string, srcFs: FileSystem, desFs: F
 export function transport(src: string, des: string, srcFs: FileSystem, desFs: FileSystem, option: TransportOption = defaultTransportOption): Promise<TransportResult[] | TransportResult> {
   return srcFs.lstat(src)
     .then(stat => {
-      let result: Promise<any> | Promise<any>[] ;
+      let result;
       
       if (stat.type === FileType.Directory) {
         result = transportDir(src, des, srcFs, desFs, option);
@@ -174,6 +174,29 @@ export function transport(src: string, des: string, srcFs: FileSystem, desFs: Fi
       } else if (stat.type === FileType.SymbolicLink) {
         result = desFs.ensureDir(desFs.pathResolver.dirname(des))
           .then(() => transportSymlink(src, des, srcFs, desFs, option));
+      }
+      return result;
+    });
+}
+
+export function remove(path: string, fs: FileSystem, option): Promise<TransportResult> {
+  if (shouldSkip(path, option.ignore)) {
+    return Promise.resolve({ target: path });
+  }
+
+  return fs.lstat(path)
+    .then(stat => {
+      let result;
+      switch (stat.type) {
+        case FileType.Directory:
+          result = removeDir(path, fs, option);
+          break;
+        case FileType.File:
+        case FileType.SymbolicLink:
+          result = removeFile(path, fs, option);
+          break;
+        default:
+          // do not process
       }
       return result;
     });

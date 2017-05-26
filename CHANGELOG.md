@@ -1,3 +1,8 @@
+## [0.5.3] - 2017-05-26
+### Feature
+* AutoSave now works even in external file update!🎉🎉🎉
+* A new configuration `watcher`. Now there is a way to perceive external file change(create, delete).
+
 ## [0.5.2] - 2017-05-22
 ### Bugfix
 * Running a command through shortcut couldn't find active document correctly.

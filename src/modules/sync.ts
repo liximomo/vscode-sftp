@@ -2,7 +2,7 @@ import * as path from 'path';
 
 import * as output from './output';
 import rpath from './remotePath';
-import { transport, sync } from './conveyer';
+import { transport, sync, remove } from './conveyer';
 import getRemoteClient from './client';
 import Client from '../model/SFTPClient';
 import SFTPFileSystem from '../model/SFTPFileSystem';
@@ -41,10 +41,15 @@ const getHostInfo = config => ({
 //     .then(() => client);
 // }
 
-const createTask = (name, func) => (source, config) =>
+const createTask = (name, func, silent: boolean = false) => (source, config) =>
   getRemoteClient(getHostInfo(config))
     .then(remoteClient => func(source, config, remoteClient))
-    .then(result => printResult(`${name} done`, result));
+    .then(result => {
+      if (silent) {
+        return;
+      }
+      printResult(`${name} done`, result);
+    });
 
 export const upload = createTask('upload', (source, config, remoteClient) => transport(
   source,
@@ -88,3 +93,14 @@ export const sync2Local= createTask('sync local', (source, config, remoteClient)
     model: config.syncMode,
   }
 ));
+
+export const removeRemote = (path, config) => {
+  return getRemoteClient(getHostInfo(config))
+    .then(remoteClient => remove(
+      path,
+      new SFTPFileSystem(rpath, remoteClient.sftp),
+      {
+        ignore: config.ignore,
+      }
+    ));
+}

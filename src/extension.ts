@@ -8,7 +8,7 @@ import throttle from './helper/throttle';
 import * as output from './modules/output';
 import { initConfigs, addConfig, configFileName } from './modules/config';
 import { invalidClient } from './modules/client';
-import watchFiles from './modules/fileWatcher';
+import { onFileChange, watchFiles, cleafAllWatcher } from './modules/fileWatcher';
 import { sync2RemoteCommand, sync2LocalCommand, uploadCommand, downloadCommand } from './commands/sync';
 import editConfig from './commands/config';
 import autoSave from './commands/auto-save';
@@ -53,22 +53,23 @@ export function activate(context: vscode.ExtensionContext) {
 
       watchFiles(configTrie.findValueWithShortestBranch());
 
-      const handleDocumentSave = (file) => {
-        if (path.basename(file.fileName) === configFileName) {
+      const handleDocumentChange = (uri: vscode.Uri) => {
+        if (path.basename(uri.fsPath) === configFileName) {
 
           // make sure to re-conncet
           invalidClient();
-          addConfig(file.fileName)
+          addConfig(uri.fsPath)
             .then(config => {
               watchFiles(config);
-            });
+            }, output.onError);
         } else {
-          autoSave(file);
+          autoSave(uri);
         }
       };
-      vscode.workspace.onDidSaveTextDocument(throttle(handleDocumentSave, 300));
-    });
+      onFileChange(throttle(handleDocumentChange, 300));
+    }, output.onError);
 }
 
 export function deactivate() {
+  cleafAllWatcher();
 }

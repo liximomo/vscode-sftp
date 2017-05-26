@@ -14,7 +14,9 @@ I wrote this because I must to. All others can't fit my requirements.
 1. `Ctrl+Shift+P` on Windows/Linux open command palette, run `SFTP: config` command.
 2. Run commnad on editor context menu or explorer context menu.
 
-*Note* ：A commnad must run with a target(file or directory). When Running command within command palette will result in target be workspace root.
+*Note1* ：A commnad must run with a target(file or directory). When Running command within command palette will result in target be workspace root.
+
+*Note2* ：Sync commands will only avaliable to a directory. Try not to bind shortcut to those commands becasue there is no way to firgut out the target direcotry.
 
 ### Command
 | Command              | describe                                    |
@@ -25,9 +27,16 @@ I wrote this because I must to. All others can't fit my requirements.
 | SFTP: Sync To Remote | sync local directory to remote              |
 | SFTP: Sync To Local  | sync remote directory to local              |
   
+### Glossary
+`config root`: Full pathname of the directory which you put config file put in
+
+**config root**: 
+
+**config root**: 
 
 ## config
 ```js
+// default config
 {
   host: "host",
   port: 22,
@@ -38,7 +47,7 @@ I wrote this because I must to. All others can't fit my requirements.
   passphrase: null,
 
   /**
-   * the final remotePath of select file or directory is {local file Path relative to config file path} + {remotePath in config file}.
+   * The final remotePath of select file or directory is {remotePath in config file} + {local file Path relative to `config root`}.
    * example:
    *
    * dirctory structure
@@ -59,7 +68,7 @@ I wrote this because I must to. All others can't fit my requirements.
    *  run command 'sync to remote' to file with result
    *  {config file path} => /b/.sftp-config.json
    *  {local file path} => /b/d/e.txt
-   *  {local Path relative to config file path} => d/e.txt
+   *  {local Path relative to `config root`} => d/e.txt
    *  {configed remotePath} => '/home/test'
    *  {final remotePath} => '/home/test/d/e.txt'
    *  that is /b/d/e.txt => /home/test/d/e.txt
@@ -77,14 +86,33 @@ I wrote this because I must to. All others can't fit my requirements.
   syncMode: 'update',
 
   /**
-   *  glob pattern
-   *  path will be append directory path which config file place
+   *  glob pattern that will be append to `config root`
    */ 
   ignore: [
     "**/.vscode",
     "**/.git",
     "**/.DS_Store"
-  ]
+  ],
+
+  /**
+   *  Watching external file changes. Such as compile/build output or git branch switching.
+   *  Watcher will be disable when files set to null or both autoDelete and autoUpload set to false,
+   */
+  watcher: {
+    // avaliable value: null | glob pattern
+    // null: disable watcher
+    // glob pattern: same logic as ignore
+    files: null, 
+
+    // avaliable value: true or false
+    // whether or not auto upload created files
+    autoUpload: true,
+
+    // avaliable value: true or false
+    // whether or not auto delete removed files
+    autoDelete: true,
+  }
+
 }
 ```
 

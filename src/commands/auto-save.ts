@@ -2,8 +2,8 @@ import { getConfig } from '../modules/config';
 import { upload } from '../modules/sync';
 import * as output from '../modules/output';
 
-export default function autoSave(file) {
-  const activityPath = file.fileName;
+export default function autoSave(uri) {
+  const activityPath = uri.fsPath;
   let config;
   try {
     config = getConfig(activityPath);

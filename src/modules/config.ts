@@ -20,57 +20,54 @@ function getPathRelativeWorkspace(filePath) {
   return `${WORKSPACE_TRIE_TOKEN}/${relativePath}`;
 }
 
+export const configFileName = '.sftpConfig.json';
+
 export const defaultConfig = {
-  host: "host",
+  host: 'host',
   port: 22,
-  username: "username",
-  password: "password",
-  protocol: "sftp",
+  username: 'username',
+  password: 'password',
+  protocol: 'sftp',
   privateKeyPath: null,
   passphrase: null,
 
-  remotePath: "/home",
+  remotePath: '/home',
   uploadOnSave: false,
 
   syncMode: 'update',
 
-  autoUploadGeneratedFile: 'false',
+  watcher: {
+    files: false,
+    autoUpload: true,
+    autoDelete: true,
+  },
 
   ignore: [
-    "/**/.vscode",
-    "/**/.git",
-    "/**/.DS_Store",
+    '**/.vscode',
+    '**/.git',
+    '**/.DS_Store',
+    `**/${configFileName}`,
   ],
 };
 
-export const configFileName = '.sftpConfig.json';
-
 const configGlobPattern = `/**/${configFileName}`;
 
-function lookUpConfigRootImpl(activityPath: string, root: string) {
-  const configFilePath = path.join(activityPath, configFileName);
-  return fse.pathExists(configFilePath)
-    .then(exist => {
-			if (exist) {
-				return activityPath;
-			}
+export function getDefaultConfigPath() {
+  return `${vscode.workspace.rootPath}/${configFileName}`;
+};
 
-      if (!~activityPath.indexOf(root)) {
-        throw new Error('config file not found');
-      }
-
-			return lookUpConfigRootImpl(path.resolve(activityPath, '..'), root);
-		});
+export function fillGlobPattern(pattern, rootPath) {
+  return path.join(normalize(rootPath), normalize(pattern));
 }
-
-const lookUpConfigRoot = memoize(lookUpConfigRootImpl);
 
 export function addConfig(configPath) {
   return fse.readJson(configPath)
     .then(config => {
       const configRoot = path.dirname(configPath);
       const fullConfig = {
+        ...defaultConfig,
         ...config,
+        ignore: config.ignore.map(pattern => fillGlobPattern(pattern, configRoot)),
         configRoot,
       };
       configTrie.add(getPathRelativeWorkspace(configRoot), fullConfig);
@@ -92,17 +89,10 @@ export function initConfigs(): Promise<Trie> {
 
       configTrie = new Trie({});
 
-      Promise.all(files.map(addConfig)).then(() => resolve(configTrie));
+      return Promise.all(files.map(addConfig))
+        .then(() => resolve(configTrie), reject);
     });
   });
-}
-
-export function getDefaultConfigPath() {
-  return `${vscode.workspace.rootPath}/${configFileName}`;
-};
-
-export function fillPattern(pattern, rootPath) {
-  return path.join(rootPath, pattern);
 }
 
 export function getConfig(activityPath: string) {
@@ -111,9 +101,7 @@ export function getConfig(activityPath: string) {
     throw new Error('config file not found');
   }
   return {
-    ...defaultConfig,
     ...config,
-    ignore: config.ignore.map(pattern => fillPattern(pattern, config.configRoot)),
     remotePath: rpath.join(config.remotePath, normalize(path.relative(config.configRoot, activityPath))),
   };
 };
