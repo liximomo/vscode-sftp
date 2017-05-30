@@ -1,11 +1,63 @@
 import * as vscode from 'vscode';
 
+import throttle from '../helper/throttle';
 import { upload } from './sync';
 import { getConfig, fillGlobPattern } from './config';
 import { removeRemote } from './sync';
 import * as output from './output';
 
 const watchers = {};
+const uploadQueue = [];
+const deleteQueue = [];
+
+const PROCESS__DALEY = 300;
+
+function fileError(event, file, showErrorWindow = true) {
+  return error =>  {
+    output.error(`${event} ${file}`, '\n', error.stack);
+    if (showErrorWindow) {
+      output.showOutPutChannel();
+    }
+  };
+}
+
+function doUpload() {
+  const files = uploadQueue.slice().map(uri => uri.fsPath).sort();
+  uploadQueue.length = 0;
+  files.forEach(file => {
+    let config;
+    try {
+      config = getConfig(file);
+    } catch (error) {
+      output.onError(error);
+      return;
+    }
+    
+    upload(file, config, true).catch(fileError('upload', file));
+  });
+}
+
+function doDelete() {
+  const files = deleteQueue.slice().map(uri => uri.fsPath).sort();
+  deleteQueue.length = 0;
+  let config; 
+  files.forEach(file => {
+    try {
+      config = getConfig(file);
+    } catch (error) {
+      output.onError(error);
+      return;
+    }
+
+    removeRemote(config.remotePath, {
+      ...config,
+      skipDir: true
+    }, true).catch(fileError('delete', config.remotePath, false));
+  });
+}
+
+const throttleUpload = throttle(doUpload, PROCESS__DALEY, { leading: false });
+const throttleDelete = throttle(doDelete, PROCESS__DALEY + 200, { leading: false });
 
 function clearWatcher(fileWatcher) {
   fileWatcher.dispose();
@@ -31,28 +83,15 @@ function setUpWatcher(config) {
 
   if (watchConfig.autoUpload) {
     watcher.onDidCreate(uri => {
-      const file = uri.fsPath;
-      try {
-        const config = getConfig(file);
-        upload(file, config, true).catch(output.onError);
-      } catch (error) {
-        output.onError(error);
-      }
+      uploadQueue.push(uri);
+      throttleUpload();
     });
   }
   
   if (watchConfig.autoDelete) {
     watcher.onDidDelete(uri => {
-      const file = uri.fsPath;
-      try {
-        const config = getConfig(file);
-        removeRemote(config.remotePath, {
-          ...config,
-          skipDir: true
-        }, true).catch(output.onError);
-      } catch (error) {
-        output.onError(error);
-      }
+      deleteQueue.push(uri);
+      throttleDelete();
     });
   }
 }

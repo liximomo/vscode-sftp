@@ -46,7 +46,7 @@ export function onError(error: Error | string, event?: string) {
   let errorString = error;
   if (error instanceof Error) {
     errorString = error.message;
-    print(error.stack);
+    print(event, '\n', error.stack);
   }
 
   status.msg('fail', 2000);
@@ -55,10 +55,16 @@ export function onError(error: Error | string, event?: string) {
 }
 
 let outputChannel;
+
+export function showOutPutChannel() {
+  if (outputChannel !== undefined) {
+    outputChannel.show();
+  }
+}
+
 export function print(...args) {
   if (outputChannel === undefined) {
     outputChannel = vscode.window.createOutputChannel(EXTENSION_NAME);
-    outputChannel.show();
   }
 
   const msg = args.map(arg => {
@@ -69,4 +75,12 @@ export function print(...args) {
   }).join(' ');
 
   outputChannel.appendLine(msg);
+}
+
+export function debug(...args) {
+  print('[debug]:', ...args);
+}
+
+export function error(...args) {
+  print('[error]:', ...args);
 }

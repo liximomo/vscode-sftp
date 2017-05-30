@@ -4,7 +4,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import throttle from './helper/throttle';
 import * as output from './modules/output';
 import { initConfigs, addConfig, configFileName } from './modules/config';
 import { invalidClient, endClient } from './modules/client';
@@ -36,8 +35,6 @@ export function activate(context: vscode.ExtensionContext) {
   if(!vscode.workspace.rootPath) {
     return;
   }
-
-  console.log('sftp active');
   registerCommand(context, CONFIG, editConfig);
   
   initConfigs()
@@ -66,7 +63,7 @@ export function activate(context: vscode.ExtensionContext) {
           autoSave(uri);
         }
       };
-      onFileChange(throttle(handleDocumentChange, 300));
+      onFileChange(handleDocumentChange);
     }, output.onError);
 }
 

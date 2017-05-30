@@ -2,6 +2,7 @@ import { Client } from 'ssh2';
 import FileStatus from 'stat-mode';
 import * as fs from 'fs';
 import rpath from '../modules/remotePath';
+import * as output from '../modules/output';
 
 const permissionSpiltReg = /-/gi;
 
@@ -30,9 +31,18 @@ export default class SFTPClient {
 
   onDisconnected(cb) {
     this.client
-      .on('end', cb)
-      .on('close', cb)
-      .on('error', cb);
+      .on('end', () => {
+        output.debug('connect end');
+        cb();
+      })
+      .on('close', () => {
+        output.debug('connect close');
+        cb();
+      })
+      .on('error', () => {
+        output.debug('connect error');
+        cb();
+      });
   }
 
   connect() {

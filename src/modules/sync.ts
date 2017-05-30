@@ -20,6 +20,7 @@ function printResult(msg, result, silent) {
   const fails = [].concat(result).filter(failedTask)
   if (fails.length) {
     fails.forEach(printFailTask);
+    output.showOutPutChannel();
   } else {
     if (!silent) {
       output.status.msg(msg, 2000);

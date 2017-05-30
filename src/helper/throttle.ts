@@ -1,4 +1,5 @@
 export default function throttle(func, delay, {
+  leading = true,
   trailing = true
 } = {}) {
   let lastExec = - (delay + 1);
@@ -18,9 +19,13 @@ export default function throttle(func, delay, {
     }
     
     if (elapsed > delay) {
-      exec(false)();
+      if (leading) {
+        exec(false)();
+      } else {
+        timeout = setTimeout(exec(true), delay);
+      }
     } else if (trailing) {
-      timeout = setTimeout(exec(true),  delay - elapsed);
+      timeout = setTimeout(exec(true), delay - elapsed);
     }
   };
 
