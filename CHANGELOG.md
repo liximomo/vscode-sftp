@@ -1,3 +1,11 @@
+## [0.5.4] - 2017-05-30
+### Feedback
+* Better error log
+* output debug info in sftp output channel
+
+### Bugfix
+* fix some files missed uploading when they has updated because of throttle.
+
 ## [0.5.3] - 2017-05-26
 ### Feature
 * AutoSave now works even in external file update!🎉🎉🎉
