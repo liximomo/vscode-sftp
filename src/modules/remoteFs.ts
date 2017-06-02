@@ -21,7 +21,7 @@ export default function getRemoteFs(option): Promise<RemoteFileSystem> {
   }
 
   if (!pendingPromise) {
-    output.debug(`change remote to ${option.protocol}`);
+    output.debug('conncet to remote');
     if (option.protocol === 'sftp') {
       fs = new SFTPFileSystem(rpath, option);
     } else if (option.protocol === 'ftp') {
@@ -46,6 +46,7 @@ export default function getRemoteFs(option): Promise<RemoteFileSystem> {
 
 export function invalidRemote() {
   needReconect = true;
+  pendingPromise = null;
 }
 
 export function endRemote() {

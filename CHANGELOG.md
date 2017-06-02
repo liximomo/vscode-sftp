@@ -8,6 +8,7 @@
 ### Bugfix
 * fix `SFTPFileSystem.rmdir` doesn't resolve correctly.
 * disable watcher on pulling files.
+* make true re-conncet when it need to.
 
 ## [0.5.4] - 2017-05-30
 ### Feedback
