@@ -1,3 +1,14 @@
+## [0.6.0] - 2017-06-02
+### Feature
+* support ftp(since the current popular node-ftp library doesn't work perfectly, Be optimistic！)
+
+### Feedback
+* more debug info
+
+### Bugfix
+* fix `SFTPFileSystem.rmdir` doesn't resolve correctly.
+* disable watcher on pulling files.
+
 ## [0.5.4] - 2017-05-30
 ### Feedback
 * Better error log

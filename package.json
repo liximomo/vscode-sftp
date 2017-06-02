@@ -1,8 +1,8 @@
 {
     "name": "sftp",
     "displayName": "sftp",
-    "description": "SFTP/FTP auto sync",
-    "version": "0.5.4",
+    "description": "SFTP/FTP sync",
+    "version": "0.6.0",
     "publisher": "liximomo",
     "engines": {
         "vscode": "^1.0.0"

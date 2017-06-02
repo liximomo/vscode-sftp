@@ -8,7 +8,8 @@ export default function autoSave(uri) {
   try {
     config = getConfig(activityPath);
   } catch (error) {
-    // allow config error
+    output.error(`context: get config reason:${error.stack}`);
+    output.onError(error, 'autoSave');
     return;
   }
 

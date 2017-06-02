@@ -74,8 +74,6 @@ export const download = createTask('download', (source, config, remotefs) => {
       ignore: config.ignore,
     }
   ).then(r => {
-    console.log(r);
-    console.log('enableWatcher');
     enableWatcher();
     return r;
   }, e => {

@@ -48,7 +48,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
       const stream = this.sftp.createWriteStream(path, option);
 
       stream.on('error', reject);
-      stream.on('close', resolve);
+      stream.on('finish', resolve);
 
       if (input instanceof Buffer) {
         stream.end(input);
