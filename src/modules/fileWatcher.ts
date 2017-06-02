@@ -83,6 +83,10 @@ function setUpWatcher(config) {
 
   if (watchConfig.autoUpload) {
     watcher.onDidCreate(uri => {
+      if (disableWatch) {
+        return;
+      }
+
       uploadQueue.push(uri);
       throttleUpload();
     });
@@ -90,6 +94,10 @@ function setUpWatcher(config) {
   
   if (watchConfig.autoDelete) {
     watcher.onDidDelete(uri => {
+      if (disableWatch) {
+        return;
+      }
+
       deleteQueue.push(uri);
       throttleDelete();
     });
@@ -98,12 +106,28 @@ function setUpWatcher(config) {
 
 let workspaceWatcher = null;
 
+let disableWatch = false;
+
+export function disableWatcher() {
+  disableWatch = true;
+}
+
+export function enableWatcher() {
+  setTimeout(function() {
+    disableWatch = false;
+  }, 300); // delay because change happens after task finish. 
+}
+
 export function onFileChange(cb: (uri: vscode.Uri) => void) {
   if (!workspaceWatcher) {
      workspaceWatcher = vscode.workspace.createFileSystemWatcher(`${vscode.workspace.rootPath}/**`, true, false, true);
   }
 
   workspaceWatcher.onDidChange(uri => {
+    if (disableWatch) {
+      return;
+    }
+
     cb(uri);
   });
 }

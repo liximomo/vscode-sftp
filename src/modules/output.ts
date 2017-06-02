@@ -69,7 +69,7 @@ export function print(...args) {
 
   const msg = args.map(arg => {
     if (typeof arg === 'object') {
-      return JSON.stringify(arg);
+      return JSON.stringify(arg, null, 4);
     }
     return arg;
   }).join(' ');

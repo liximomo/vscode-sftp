@@ -1,7 +1,7 @@
 {
     "name": "sftp",
     "displayName": "sftp",
-    "description": "Auto sync your work to remote SFTP server",
+    "description": "SFTP/FTP auto sync",
     "version": "0.5.4",
     "publisher": "liximomo",
     "engines": {
@@ -103,10 +103,12 @@
     "dependencies": {
         "fast-memoize": "^2.2.7",
         "fs-extra": "^3.0.1",
+        "ftp": "^0.3.10",
         "glob": "^7.1.1",
         "minimatch": "^3.0.4",
         "ssh2": "^0.5.4",
-        "stat-mode": "^0.2.2"
+        "stat-mode": "^0.2.2",
+        "upath": "^1.0.0"
     },
     "jest": {
         "moduleFileExtensions": [

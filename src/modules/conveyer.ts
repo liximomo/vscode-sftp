@@ -2,8 +2,8 @@ import * as vscode from 'vscode';
 import * as minimatch from 'minimatch';
 
 import * as output from '../modules/output';
-import FileSystem, { FileEntry, FileType }  from '../model/FileSystem';
-import rpath, { normalize } from './remotePath';
+import FileSystem, { FileEntry, FileType }  from '../model/Fs/FileSystem';
+import { normalize } from './remotePath';
 import flatMap from '../helper/flatMap';
 
 interface TransportOption {
@@ -37,7 +37,7 @@ function fileName2Show(filePath) {
 }
 
 function testIgnore(target, pattern) {
-  return minimatch(target, pattern);
+  return target.indexOf(pattern) === 0 || minimatch(target, pattern);
 }
 
 function shouldSkip(path, ignore) {
@@ -54,8 +54,127 @@ const toHash = (items: any[], key: string, transform?: (a: any) => any): { [key:
     return hash;
   }, {});
 
+function transportDir(src: string, des: string, srcFs: FileSystem, desFs: FileSystem, option): Promise<TransportResult[]> {
+  if (shouldSkip(src, option.ignore)) {
+    return Promise.resolve([{ target: src }]);
+  }
+
+  const listFiles = () => {
+    output.status.msg(`retriving directory ${fileName2Show(src)}`);
+    return srcFs.list(src);
+  };
+
+  const uploadItem = (item: FileEntry) => {
+    if (item.type === FileType.Directory) {
+      return transportDir(item.fspath, desFs.pathResolver.join(des, item.name), srcFs, desFs, option);
+    } else if (item.type === FileType.SymbolicLink) {
+      return transportSymlink(item.fspath, desFs.pathResolver.join(des, item.name), srcFs, desFs, option);
+    } else if (item.type === FileType.File) {
+      return transportFile(item.fspath, desFs.pathResolver.join(des, item.name), srcFs, desFs, option);
+    }
+
+    return [{
+      target: item.fspath,
+      error: true,
+      op: 'transmission',
+      payload: new Error('unsupport file type'),
+    }];
+  }
+  
+  return desFs.ensureDir(des)
+    .then(listFiles)
+    .then(items => items.map(uploadItem))
+    .then(tasks => Promise.all<TransportResult[] | TransportResult>(tasks))
+    .then(result => flatMap(result, a => a))
+    .catch(err => ({
+      target: src,
+      error: true,
+      op: 'transmission dir',
+      payload: err,
+    }));
+}
+
+function transportFile(src: string, des: string, srcFs: FileSystem, desFs: FileSystem, option): Promise<TransportResult> {
+  if (shouldSkip(src, option.ignore)) {
+    return Promise.resolve({ target: src });
+  }
+  
+  output.status.msg(`uploading ${fileName2Show(src)}`);
+  return srcFs.get(src)
+    .then(inputStream => desFs.put(inputStream, des))
+    .then(() => ({
+      target: src,
+    }))
+    .catch(err => ({
+      target: src,
+      error: true,
+      op: 'transmission file',
+      payload: err,
+    }));
+}
+
+function transportSymlink(src: string, des: string, srcFs: FileSystem, desFs: FileSystem, option): Promise<TransportResult> {
+  if (shouldSkip(src, option.ignore)) {
+    return Promise.resolve({ target: src });
+  }
+  
+  output.status.msg(`uploading ${fileName2Show(src)}`);
+  return srcFs.readlink(src)
+    .then(targetPath => {
+      // const absolutePath = srcFs.pathResolver.isAbsolute(targetPath)
+      //   ? targetPath
+      //   : srcFs.pathResolver.resolve(src, targetPath);
+      desFs.symlink(targetPath, des);
+    })
+    .then(() => ({
+      target: src,
+    }))
+    .catch(err => ({
+      target: src,
+      error: true,
+      op: 'transmission Symlink',
+      payload: err,
+    }));
+}
+
+function removeFile(path: string, fs: FileSystem, option): Promise<TransportResult> {
+  if (shouldSkip(path, option.ignore)) {
+    return Promise.resolve({ target: path });
+  }
+  
+  output.status.msg(`remove ${fileName2Show(path)}`);
+  return fs.unlink(path)
+    .then(() => ({
+      target: path,
+    }))
+    .catch(err => ({
+      target: path,
+      error: true,
+      op: 'remove file',
+      payload: err,
+    }));
+}
+
+function removeDir(path: string, fs: FileSystem, option): Promise<TransportResult> {
+  if (shouldSkip(path, option.ignore)) {
+    return Promise.resolve({ target: path });
+  }
+  
+  output.status.msg(`remove dir ${fileName2Show(path)}`);
+  return fs.rmdir(path, true)
+    .then(() => ({
+      target: path,
+    }))
+    .catch(err => ({
+      target: path,
+      error: true,
+      op: 'remove dir',
+      payload: err,
+    }));
+}
+
 export function sync(srcDir: string, desDir: string, srcFs: FileSystem, desFs: FileSystem, option: SyncOption = defaultSyncOption): Promise<TransportResult[] | TransportResult> {
-  if (shouldSkip(srcDir, option.ignore)) {
+ if (shouldSkip(srcDir, option.ignore)) {
     return Promise.resolve([{ target: srcDir }]);
   }
 
@@ -71,7 +190,7 @@ export function sync(srcDir: string, desDir: string, srcFs: FileSystem, desFs: F
       ...fileEntry,
       id: normalize(desFs.pathResolver.relative(desDir, fileEntry.fspath)),
     }));
-
+    
     const file2trans = [];
     const dir2trans = [];
     const dir2sync = [];
@@ -141,7 +260,7 @@ export function sync(srcDir: string, desDir: string, srcFs: FileSystem, desFs: F
     const clearDirTasks = dirMissed.map(file =>
       removeDir(file.fspath, desFs, option)
     );
-    
+
     return Promise.all<TransportResult[] | TransportResult>([
       ...transFileTasks,
       ...transDirTasks,
@@ -153,10 +272,14 @@ export function sync(srcDir: string, desDir: string, srcFs: FileSystem, desFs: F
 
   return Promise.all([srcFs.list(srcDir), desFs.list(desDir).catch(err => [])])
     .then(syncFiles)
-    .then(result => flatMap(result, a => a))
+    .then(result => {
+      output.status.msg(`sync finish ${srcDir}`);
+      return flatMap(result, a => a);
+    })
     .catch(err => ({
       target: srcDir,
       error: true,
+      op: 'sync',
       payload: err,
     }));
 }
@@ -201,122 +324,10 @@ export function remove(path: string, fs: FileSystem, option): Promise<TransportR
           result = [{
             target: path,
             error: true,
-            payload: new Error(`${path} with unsupport file type`),
+            op: 'remove',
+            payload: new Error('unsupport file type'),
           }];
       }
       return result;
     });
-}
-
-function transportDir(src: string, des: string, srcFs: FileSystem, desFs: FileSystem, option): Promise<TransportResult[]> {
-  if (shouldSkip(src, option.ignore)) {
-    return Promise.resolve([{ target: src }]);
-  }
-
-  const listFiles = () => {
-    output.status.msg(`retriving directory ${fileName2Show(src)}`);
-    return srcFs.list(src);
-  };
-
-  const uploadItem = (item: FileEntry) => {
-    if (item.type === FileType.Directory) {
-      return transportDir(item.fspath, rpath.join(des, item.name), srcFs, desFs, option);
-    } else if (item.type === FileType.SymbolicLink) {
-      return transportSymlink(item.fspath, rpath.join(des, item.name), srcFs, desFs, option);
-    } else if (item.type === FileType.File) {
-      return transportFile(item.fspath, rpath.join(des, item.name), srcFs, desFs, option);
-    }
-
-    return [{
-      target: item.fspath,
-      error: true,
-      payload: new Error(`${item.fspath} with unsupport file type`),
-    }];
-  }
-  
-  return desFs.ensureDir(des)
-    .then(listFiles)
-    .then(items => items.map(uploadItem))
-    .then(tasks => Promise.all<TransportResult[] | TransportResult>(tasks))
-    .then(result => flatMap(result, a => a))
-    .catch(err => ({
-      target: src,
-      error: true,
-      payload: err,
-    }));
-}
-
-function transportFile(src: string, des: string, srcFs: FileSystem, desFs: FileSystem, option): Promise<TransportResult> {
-  if (shouldSkip(src, option.ignore)) {
-    return Promise.resolve({ target: src });
-  }
-  
-  output.status.msg(`uploading ${fileName2Show(src)}`);
-  return srcFs.get(src)
-    .then(inputStream => desFs.put(inputStream, des))
-    .then(() => ({
-      target: src,
-    }))
-    .catch(err => ({
-      target: src,
-      error: true,
-      payload: err,
-    }));
-}
-
-function transportSymlink(src: string, des: string, srcFs: FileSystem, desFs: FileSystem, option): Promise<TransportResult> {
-  if (shouldSkip(src, option.ignore)) {
-    return Promise.resolve({ target: src });
-  }
-  
-  output.status.msg(`uploading ${fileName2Show(src)}`);
-  return srcFs.readlink(src)
-    .then(targetPath => {
-      const absolutePath = srcFs.pathResolver.isAbsolute(targetPath)
-        ? targetPath
-        : srcFs.pathResolver.resolve(src, targetPath);
-      desFs.symlink(absolutePath, des);
-    })
-    .then(() => ({
-      target: src,
-    }))
-    .catch(err => ({
-      target: src,
-      error: true,
-      payload: err,
-    }));
-}
-
-function removeFile(path: string, fs: FileSystem, option): Promise<TransportResult> {
-  if (shouldSkip(path, option.ignore)) {
-    return Promise.resolve({ target: path });
-  }
-  
-  output.status.msg(`remove ${fileName2Show(path)}`);
-  return fs.unlink(path)
-    .then(() => ({
-      target: path,
-    }))
-    .catch(err => ({
-      target: path,
-      error: true,
-      payload: err,
-    }));
-}
-
-function removeDir(path: string, fs: FileSystem, option): Promise<TransportResult> {
-  if (shouldSkip(path, option.ignore)) {
-    return Promise.resolve({ target: path });
-  }
-  
-  output.status.msg(`remove dir ${fileName2Show(path)}`);
-  return fs.rmdir(path, true)
-    .then(() => ({
-      target: path,
-    }))
-    .catch(err => ({
-      target: path,
-      error: true,
-      payload: err,
-    }));
 }

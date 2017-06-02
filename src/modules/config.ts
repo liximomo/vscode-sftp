@@ -30,6 +30,7 @@ export const defaultConfig = {
   protocol: 'sftp',
   privateKeyPath: null,
   passphrase: null,
+  passive: false,
 
   remotePath: '/home',
   uploadOnSave: false,
@@ -57,7 +58,7 @@ export function getDefaultConfigPath() {
 };
 
 export function fillGlobPattern(pattern, rootPath) {
-  return path.join(normalize(rootPath), normalize(pattern));
+  return `${normalize(rootPath)}/${pattern}`;
 }
 
 export function addConfig(configPath) {
@@ -70,7 +71,9 @@ export function addConfig(configPath) {
         ignore: config.ignore.map(pattern => fillGlobPattern(pattern, configRoot)),
         configRoot,
       };
-      configTrie.add(getPathRelativeWorkspace(configRoot), fullConfig);
+      const triePath = getPathRelativeWorkspace(configRoot);
+      configTrie.add(triePath, fullConfig);
+      output.debug(`config at ${triePath}`, fullConfig);
       return fullConfig;
     });
 }

@@ -18,13 +18,13 @@ export default class LocalFileSystem extends FileSystem {
 
         resolve({
           ...stat,
-          type: this.getFileTypecharacter(stat),
+          type: FileSystem.getFileTypecharacter(stat),
         });
       });
     });
   }
 
-  get(path, option = this.defaultStreamOption): Promise<fs.ReadStream> {
+  get(path, option): Promise<fs.ReadStream> {
     return new Promise((resolve, reject) => {
       try {
         const stream = fs.createReadStream(path, option);
@@ -36,7 +36,7 @@ export default class LocalFileSystem extends FileSystem {
     });
   }
 
-  put(input: fs.ReadStream | Buffer, path, option = this.defaultStreamOption): Promise<null> {
+  put(input: fs.ReadStream | Buffer, path, option): Promise<null> {
     return new Promise((resolve, reject) => {
       const stream = fs.createWriteStream(path, option);
 
@@ -97,7 +97,7 @@ export default class LocalFileSystem extends FileSystem {
     const statModel = new FileStatus(stat);
     return {
       fspath: fullPath,
-      type: this.getFileTypecharacter(statModel),
+      type: FileSystem.getFileTypecharacter(statModel),
       name: this.pathResolver.basename(fullPath),
       size: stat.size,
       modifyTime: stat.mtime.getTime() / 1000,

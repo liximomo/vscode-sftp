@@ -6,7 +6,7 @@ import * as path from 'path';
 
 import * as output from './modules/output';
 import { initConfigs, addConfig, configFileName } from './modules/config';
-import { invalidClient, endClient } from './modules/client';
+import { invalidRemote, endRemote } from './modules/remoteFs';
 import { onFileChange, watchFiles, cleafAllWatcher } from './modules/fileWatcher';
 import { sync2RemoteCommand, sync2LocalCommand, uploadCommand, downloadCommand } from './commands/sync';
 import editConfig from './commands/config';
@@ -36,10 +36,11 @@ export function activate(context: vscode.ExtensionContext) {
     return;
   }
   registerCommand(context, CONFIG, editConfig);
-  
+
   initConfigs()
     .then(configTrie => {
       output.status.msg('SFTP Ready', 1000 * 8);
+      
       registerCommand(context, SYNC_TO_REMOTE, sync2RemoteCommand);
 
       registerCommand(context, SYNC_TO_LOCAL, sync2LocalCommand);
@@ -54,7 +55,7 @@ export function activate(context: vscode.ExtensionContext) {
         if (path.basename(uri.fsPath) === configFileName) {
 
           // make sure to re-conncet
-          invalidClient();
+          invalidRemote();
           addConfig(uri.fsPath)
             .then(config => {
               watchFiles(config);
@@ -69,5 +70,5 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {
   cleafAllWatcher();
-  endClient();
+  endRemote();
 }

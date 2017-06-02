@@ -1,13 +1,18 @@
 import * as fs from 'fs';
 import * as FileStatus from 'stat-mode';
-import FileSystem, { FileEntry, FileType, Stats } from './FileSystem';
+import FileSystem, { FileEntry, FileType, Stats, StreamOption } from './FileSystem';
+import RemoteFileSystem from './RemoteFileSystem';
+import { Option } from '../Client/RemoteClient';
+import SFTPClient from '../Client/SFTPClient';
 
-export default class SFTPFileSystem extends FileSystem {
-  private sftp: any;
+export default class SFTPFileSystem extends RemoteFileSystem {
+  constructor(pathResolver, option: Option) {
+    super(pathResolver);
+    this.setClient(new SFTPClient(option));
+  }
 
-  constructor(pathResolver, sftpClient) {
-    super(pathResolver)
-    this.sftp = sftpClient;
+  get sftp() {
+    return this.getClient().getFsClient();
   }
 
   lstat(path: string): Promise<Stats> {
@@ -20,13 +25,13 @@ export default class SFTPFileSystem extends FileSystem {
 
         resolve({
           ...stat,
-          type: this.getFileTypecharacter(stat),
+          type: FileSystem.getFileTypecharacter(stat),
         });
       });
     });
   }
 
-  get(path, option = this.defaultStreamOption): Promise<fs.ReadStream> {
+  get(path, option?: StreamOption): Promise<fs.ReadStream> {
     return new Promise((resolve, reject) => {
       try {
         const stream = this.sftp.createReadStream(path, option);
@@ -38,7 +43,7 @@ export default class SFTPFileSystem extends FileSystem {
     });
   }
 
-  put(input: fs.ReadStream | Buffer, path, option = this.defaultStreamOption): Promise<null> {
+  put(input: fs.ReadStream | Buffer, path, option?: StreamOption): Promise<null> {
     return new Promise((resolve, reject) => {
       const stream = this.sftp.createWriteStream(path, option);
 
@@ -92,11 +97,11 @@ export default class SFTPFileSystem extends FileSystem {
   }
 
   ensureDir(dir: string): Promise<null> {
-    let dirWithoutRoot = dir.slice(1);
     return new Promise((resolve, reject) => {
-      const tokens = dirWithoutRoot.split(this.pathResolver.sep);
+      const tokens = dir.split(this.pathResolver.sep);
 
-      let dirPath = '/';
+      let root = tokens.shift();
+      let dirPath = root === '' ? '/' : root;
 
       const mkdir = () => {
         let token = tokens.shift();
@@ -117,7 +122,7 @@ export default class SFTPFileSystem extends FileSystem {
     const stat = new FileStatus(item.attrs);
     return {
       fspath: fullPath,
-      type: this.getFileTypecharacter(stat),
+      type: FileSystem.getFileTypecharacter(stat),
       name: item.filename,
       size: item.attrs.size,
       modifyTime: item.attrs.mtime * 1000,
@@ -156,29 +161,35 @@ export default class SFTPFileSystem extends FileSystem {
   rmdir(path: string, recursive: boolean): Promise<null> {
     return new Promise((resolve, reject) => {
       if (!recursive) {
-        return this.sftp.rmdir(path, err => {
+        this.sftp.rmdir(path, err => {
           if (err) {
             reject(err);
             return;
           }
           resolve();
         });
+        return;
       }
 
-      return this.list(path).then(fileEntries => {
-        if (!fileEntries.length) {
-          return this.rmdir(path, false);
-        }
-
-        const rmPromises = fileEntries.map(file => {
-          if (file.type === FileType.Directory) {
-            return this.rmdir(file.fspath, true);
+      this.list(path)
+        .then(fileEntries => {
+          if (!fileEntries.length) {
+            this.rmdir(path, false)
+              .then(resolve, reject);
+            return;
           }
-          return this.unlink(file.fspath);
-        });
 
-        return Promise.all(rmPromises).then(() => this.rmdir(path, false));
-      });
+          const rmPromises = fileEntries.map(file => {
+            if (file.type === FileType.Directory) {
+              return this.rmdir(file.fspath, true);
+            }
+            return this.unlink(file.fspath);
+          });
+
+         Promise.all(rmPromises)
+            .then(() => this.rmdir(path, false))
+            .then(resolve, reject);
+        })
     });
   }
 }

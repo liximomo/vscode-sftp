@@ -1,9 +1,9 @@
-import * as path from 'path';
+import * as upath from 'upath';
 
-const remotePath = path.posix;
+const remotePath = upath;
 
 export default remotePath;
 
 export function normalize(path) {
-  return path.replace(/\\/g, '/');
+  return upath.toUnix(path);
 }

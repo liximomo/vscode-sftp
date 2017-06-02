@@ -42,9 +42,10 @@ I wrote this because I must to. All others can't fit my requirements.
   port: 22,
   username: "username",
   password: "password",
-  protocol: "sftp", // current only support sftp
+  protocol: "sftp", // sftp or ftp
   privateKeyPath: null, // absolute path to user private key
   passphrase: null,
+  passive: false, // ftp passive mode
 
   /**
    * The final remotePath of select file or directory is {remotePath in config file} + {local file Path relative to `config root`}.

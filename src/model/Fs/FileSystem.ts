@@ -6,7 +6,7 @@ export enum FileType {
   SymbolicLink,
 };
 
-export type FileEntry = {
+export interface FileEntry {
   fspath: string,
   type: FileType,
   name: string,
@@ -15,23 +15,20 @@ export type FileEntry = {
   accessTime: number,
 };
 
-export type StreamOption = {
-  flags: string,
-  encoding: string | null,
-  mode: number,
-  autoClose: boolean,
+export interface StreamOption {
+  flags?: string,
+  encoding?: string | null,
+  mode?: number,
+  autoClose?: boolean,
 };
 
-export type Stats = {
+export interface Stats {
   type: FileType,
+  target?: string,
 };
 
 export default abstract class FileSystem {
   public pathResolver: any;
-
-  protected defaultStreamOption = {
-    // encoding: 'utf8',
-  }
 
   constructor(pathResolver: any) {
     this.pathResolver = pathResolver;
@@ -48,7 +45,7 @@ export default abstract class FileSystem {
   abstract unlink(path: string): Promise<null>;
   abstract rmdir(path: string, recursive: boolean): Promise<null>;
 
-  getFileTypecharacter(stat: fs.Stats): FileType {
+  static getFileTypecharacter(stat: fs.Stats): FileType {
     if (stat.isDirectory()) {
       return FileType.Directory;
     } else if (stat.isFile()) {
@@ -57,4 +54,5 @@ export default abstract class FileSystem {
       return FileType.SymbolicLink;
     }
   }
+
 }
