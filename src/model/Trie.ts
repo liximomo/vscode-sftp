@@ -71,6 +71,10 @@ export default class Trie {
     this.root = new TrieNode('@root');
     Object.keys(dict).forEach(key => this.add(key, dict[key]));
   }
+  
+  isEmpty() {
+    return this.root.getChildrenNum() <= 0;
+  }
 
   add(path: string | string[], value): void {
     const tokens = Array.isArray(path) ? path : this.splitPath(path);

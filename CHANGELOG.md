@@ -1,3 +1,7 @@
+## [0.6.1] - 2017-06-03
+### Bugfix
+* Don't watch file when there is no .sftpConfig file.
+
 ## [0.6.0] - 2017-06-02
 ### Feature
 * support ftp(since the current popular node-ftp library doesn't work perfectly, Be optimistic！)
