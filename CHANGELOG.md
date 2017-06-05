@@ -1,3 +1,7 @@
+## [0.6.2] - 2017-06-05
+### Bugfix
+* Incorrectly config not found error popup.
+
 ## [0.6.1] - 2017-06-03
 ### Bugfix
 * Don't watch file when there is no .sftpConfig file.

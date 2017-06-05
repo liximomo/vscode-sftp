@@ -205,6 +205,9 @@ export function sync(srcDir: string, desDir: string, srcFs: FileSystem, desFs: F
         case FileType.Directory:
           if (file) {
             dir2sync.push([srcFile, file]);
+
+            // delete process file
+            delete desFileTable[id];
           } else if (option.model === 'full') {
             dir2trans.push([srcFile, { fspath: desFs.pathResolver.join(desDir, srcFile.name) }]);
           }
@@ -213,6 +216,9 @@ export function sync(srcDir: string, desDir: string, srcFs: FileSystem, desFs: F
         case FileType.SymbolicLink:
           if (file) {
             file2trans.push([srcFile, file]);
+
+            // delete process file
+            delete desFileTable[id];
           } else if (option.model === 'full') {
             file2trans.push([srcFile, { fspath: desFs.pathResolver.join(desDir, srcFile.name) }]);
           }
@@ -224,19 +230,14 @@ export function sync(srcDir: string, desDir: string, srcFs: FileSystem, desFs: F
     
     if (option.model === 'full') {
       Object.keys(desFileTable).forEach(id => {
-        const srcFile = srcFileTable[id];
         const file = desFileTable[id];
         switch (file.type) {
           case FileType.Directory:
-            if (!srcFile) {
               dirMissed.push(file);
-            }
             break;
           case FileType.File:
           case FileType.SymbolicLink:
-            if (!srcFile) {
               fileMissed.push(file);
-            }
             break;
           default:
             // do not process

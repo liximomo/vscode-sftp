@@ -137,7 +137,7 @@ export function watchFiles(config) {
   configs.forEach(setUpWatcher);
 }
 
-export function cleafAllWatcher() {
+export function clearAllWatcher() {
   if (workspaceWatcher) {
     clearWatcher(workspaceWatcher);
   }
