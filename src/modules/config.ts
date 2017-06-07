@@ -58,13 +58,14 @@ export function getDefaultConfigPath() {
 };
 
 export function fillGlobPattern(pattern, rootPath) {
-  return `${normalize(rootPath)}/${pattern}`;
+  return rpath.join(rootPath, pattern);
 }
 
 export function addConfig(configPath) {
   return fse.readJson(configPath)
     .then(config => {
-      const configRoot = path.dirname(configPath);
+      const normalizeConfigPath = normalize(configPath);
+      const configRoot = rpath.dirname(normalizeConfigPath);
       const fullConfig = {
         ...defaultConfig,
         ...config,
@@ -105,6 +106,7 @@ export function getConfig(activityPath: string) {
   }
   return {
     ...config,
+    //  TO-DO rpath.relative('c:/a/b/c', 'c:\a\b\c\d.txt')
     remotePath: rpath.join(config.remotePath, normalize(path.relative(config.configRoot, activityPath))),
   };
 };

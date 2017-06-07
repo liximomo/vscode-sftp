@@ -1,3 +1,11 @@
+## [0.6.7] - 2017-06-07
+### Enhance
+* Keeping active so you don't have to reload vscode to active sftp when create config file at the first time.
+
+## [0.6.6] - 2017-06-06
+### Bugfix
+* Window can't auto create dir non-existing.
+
 ## [0.6.2] - 2017-06-05
 ### Bugfix
 * Incorrectly config not found error popup.

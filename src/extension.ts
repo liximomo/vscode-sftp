@@ -39,8 +39,6 @@ export function activate(context: vscode.ExtensionContext) {
 
   initConfigs()
     .then(configTrie => {
-      const configFound = !configTrie.isEmpty();
-      
       registerCommand(context, SYNC_TO_REMOTE, sync2RemoteCommand);
 
       registerCommand(context, SYNC_TO_LOCAL, sync2LocalCommand);
@@ -65,12 +63,8 @@ export function activate(context: vscode.ExtensionContext) {
         }
       };
 
-      if (configFound) {
-        output.status.msg('SFTP Ready', 1000 * 8);
-        onFileChange(handleDocumentChange);
-      } else {
-        output.debug('no config found');
-      }
+      output.status.msg('SFTP Ready', 1000 * 8);
+      onFileChange(handleDocumentChange);
     }, output.onError);
 }
 

@@ -1,0 +1,24 @@
+{
+    "host": "localhost",
+    "port": 22,
+    "username": "mymomo",
+    "password": "liximomo",
+    "protocol": "sftp",
+    "privateKeyPath": null,
+    "passphrase": null,
+    "passive": false,
+    "remotePath": "/Users/mymomo/sftp-test/",
+    "uploadOnSave": false,
+    "syncMode": "update",
+    "watcher": {
+        "files": false,
+        "autoUpload": true,
+        "autoDelete": true
+    },
+    "ignore": [
+        "**/.vscode",
+        "**/.git",
+        "**/.DS_Store",
+        "**/.sftpConfig.json"
+    ]
+}

@@ -98,8 +98,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
 
   ensureDir(dir: string): Promise<null> {
     return new Promise((resolve, reject) => {
-      const tokens = dir.split(this.pathResolver.sep);
-
+      const tokens = dir.split('/');
       let root = tokens.shift();
       let dirPath = root === '' ? '/' : root;
 

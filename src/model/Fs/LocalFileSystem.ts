@@ -41,7 +41,7 @@ export default class LocalFileSystem extends FileSystem {
       const stream = fs.createWriteStream(path, option);
 
       stream.on('error', reject);
-      stream.on('close', resolve);
+      stream.on('finish', resolve);
 
       if (input instanceof Buffer) {
         stream.end(input);
