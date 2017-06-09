@@ -75,9 +75,8 @@ export default class SFTPFileSystem extends RemoteFileSystem {
   symlink(targetPath: string, path: string): Promise<null> {
     return new Promise((resolve, reject) => {
       this.sftp.symlink(targetPath, path, err => {
-        if (err && err.code !== 4) { // reject except already exist
+        if (err) {
           reject(err);
-          return;
         }
         resolve();
       });
@@ -87,7 +86,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
   mkdir(dir: string): Promise<null> {
     return new Promise((resolve, reject) => {
       this.sftp.mkdir(dir, err => {
-        if (err && err.code !== 4) { // reject except already exist
+        if (err) {
           reject(err);
           return;
         }
@@ -111,9 +110,16 @@ export default class SFTPFileSystem extends RemoteFileSystem {
         token += '/';
         dirPath = this.pathResolver.join(dirPath, token);
         return this.mkdir(dirPath)
-          .then(mkdir);
+          .then(mkdir, err => {
+            if (err.code === 4) {
+              // ignore already exist
+              mkdir();
+            } else {
+              reject(err);
+            }
+          });
       };
-      return mkdir();
+      mkdir();
     });
   }
 

@@ -7,7 +7,7 @@ import LocalFileSystem from '../model/Fs/LocalFileSystem';
 import { disableWatcher, enableWatcher } from './fileWatcher';
 
 function failedTask(result, index, array) {
-  return result.error;
+  return result && result.error;
 }
 
 function printFailTask(result) {

@@ -68,7 +68,7 @@ export default class LocalFileSystem extends FileSystem {
   symlink(targetPath: string, path: string): Promise<null> {
     return new Promise((resolve, reject) => {
       fs.symlink(targetPath, path, null, err => {
-        if (err && err.code !== 'EEXIST') {
+        if (err) {
           reject(err);
           return;
         }
@@ -80,7 +80,7 @@ export default class LocalFileSystem extends FileSystem {
   mkdir(dir: string): Promise<null> {
     return new Promise((resolve, reject) => {
       fs.mkdir(dir, err => {
-        if (err && err.code !== 'EEXIST') { // reject except already exist
+        if (err) {
           reject(err);
           return;
         }

@@ -86,8 +86,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
   mkdir(dir: string): Promise<null> {
     return new Promise((resolve, reject) => {
       this.ftp.mkdir(dir, err => {
-        // if (err && err.message !== 'Cannot create a file when that file already exists.') { // reject except already exist
-        if (err && err.code !== 550) { // reject except already exist
+        if (err) {
           reject(err);
           return;
         }
@@ -112,9 +111,17 @@ export default class FTPFileSystem extends RemoteFileSystem {
         token += '/';
         dirPath = this.pathResolver.join(dirPath, token);
         return this.mkdir(dirPath)
-          .then(mkdir);
+          .then(mkdir, err => {
+            // if (err && err.message !== 'Cannot create a file when that file already exists.') { // reject except already exist
+            if (err.code === 550) {
+              // ignore already exist
+              mkdir();
+            } else {
+              reject(err);
+            }
+          });
       };
-      return mkdir();
+      mkdir();
     });
   }
 

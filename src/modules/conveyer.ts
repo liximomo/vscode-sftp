@@ -121,10 +121,11 @@ function transportSymlink(src: string, des: string, srcFs: FileSystem, desFs: Fi
   output.status.msg(`uploading ${fileName2Show(src)}`);
   return srcFs.readlink(src)
     .then(targetPath => {
-      // const absolutePath = srcFs.pathResolver.isAbsolute(targetPath)
-      //   ? targetPath
-      //   : srcFs.pathResolver.resolve(src, targetPath);
-      desFs.symlink(targetPath, des);
+      return desFs.symlink(targetPath, des).catch(err => {
+        // ignore file already exist
+        if (err.code === 'EEXIST') return;
+          throw err;
+        });
     })
     .then(() => ({
       target: src,
@@ -300,6 +301,10 @@ export function transport(src: string, des: string, srcFs: FileSystem, desFs: Fi
           .then(() => transportSymlink(src, des, srcFs, desFs, option));
       }
       return result;
+    }, err => {
+      // ignore file or directory not exist
+      if (err.code === 'ENOENT') return;
+      throw err;
     });
 }
 
@@ -330,5 +335,9 @@ export function remove(path: string, fs: FileSystem, option): Promise<TransportR
           }];
       }
       return result;
+    }, err => {
+      // ignore file or directory not exist
+      if (err.code === 'ENOENT') return;
+      throw err;
     });
 }
