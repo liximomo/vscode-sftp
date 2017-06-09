@@ -35,9 +35,11 @@ export function activate(context: vscode.ExtensionContext) {
   if(!vscode.workspace.rootPath) {
     return;
   }
+
+  output.status.msg('SFTP searching configs...');
   registerCommand(context, CONFIG, editConfig);
 
-  initConfigs()
+  return initConfigs()
     .then(configTrie => {
       registerCommand(context, SYNC_TO_REMOTE, sync2RemoteCommand);
 

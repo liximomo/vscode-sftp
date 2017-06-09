@@ -1,3 +1,7 @@
+## [0.6.8] - 2017-06-09
+### Enhance
+* Activate the extension only when it needs to. You must have the vscode greater than 1.13.0.
+
 ## [0.6.7] - 2017-06-07
 ### Enhance
 * Keeping active so you don't have to reload vscode to active sftp when create config file at the first time.

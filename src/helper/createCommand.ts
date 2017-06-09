@@ -29,7 +29,7 @@ export function createFileCommand(fileTask) {
       const config = getConfig(activityPath);
       fileTask(activityPath, config).catch(output.onError);
     } catch (error) {
-      output.onError(error, activityPath);
+      output.onError(`(${activityPath}) ${error.message} `);
     }
   };
 }

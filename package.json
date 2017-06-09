@@ -2,10 +2,10 @@
     "name": "sftp",
     "displayName": "sftp",
     "description": "SFTP/FTP sync",
-    "version": "0.6.7",
+    "version": "0.6.8",
     "publisher": "liximomo",
     "engines": {
-        "vscode": "^1.0.0"
+        "vscode": "^1.13.0"
     },
     "bugs": {
         "url": "https://github.com/liximomo/vscode-sftp/issues",
@@ -25,7 +25,12 @@
         "remote"
     ],
     "activationEvents": [
-        "*"
+        "onCommand:sftp.config.default",
+        "onCommand:sftp.trans.remote",
+        "onCommand:sftp.trans.local",
+        "onCommand:sftp.sync.remote",
+        "onCommand:sftp.sync.local",
+        "workspaceContains:**/.sftpConfig.json"
     ],
     "icon": "icon.png",
     "main": "./out/src/extension",
