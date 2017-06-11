@@ -21,6 +21,7 @@ interface TransportResult {
   target: string,
   error?: boolean,
   payload?: any,
+  op?: string,
 };
 
 const defaultTransportOption = {
@@ -56,7 +57,10 @@ const toHash = (items: any[], key: string, transform?: (a: any) => any): { [key:
 
 function transportDir(src: string, des: string, srcFs: FileSystem, desFs: FileSystem, option): Promise<TransportResult[]> {
   if (shouldSkip(src, option.ignore)) {
-    return Promise.resolve([{ target: src }]);
+    return Promise.resolve([{
+      target: src,
+      ignored: true,
+    }]);
   }
 
   const listFiles = () => {
@@ -96,7 +100,10 @@ function transportDir(src: string, des: string, srcFs: FileSystem, desFs: FileSy
 
 function transportFile(src: string, des: string, srcFs: FileSystem, desFs: FileSystem, option): Promise<TransportResult> {
   if (shouldSkip(src, option.ignore)) {
-    return Promise.resolve({ target: src });
+    return Promise.resolve({
+      target: src,
+      ignored: true,
+    });
   }
   
   output.status.msg(`uploading ${fileName2Show(src)}`);
@@ -115,7 +122,10 @@ function transportFile(src: string, des: string, srcFs: FileSystem, desFs: FileS
 
 function transportSymlink(src: string, des: string, srcFs: FileSystem, desFs: FileSystem, option): Promise<TransportResult> {
   if (shouldSkip(src, option.ignore)) {
-    return Promise.resolve({ target: src });
+    return Promise.resolve({
+      target: src,
+      ignored: true,
+    });
   }
   
   output.status.msg(`uploading ${fileName2Show(src)}`);
@@ -123,7 +133,7 @@ function transportSymlink(src: string, des: string, srcFs: FileSystem, desFs: Fi
     .then(targetPath => {
       return desFs.symlink(targetPath, des).catch(err => {
         // ignore file already exist
-        if (err.code === 'EEXIST') return;
+        if (err.code === 4 || err.code === 'EEXIST') return;
           throw err;
         });
     })
@@ -140,7 +150,10 @@ function transportSymlink(src: string, des: string, srcFs: FileSystem, desFs: Fi
 
 function removeFile(path: string, fs: FileSystem, option): Promise<TransportResult> {
   if (shouldSkip(path, option.ignore)) {
-    return Promise.resolve({ target: path });
+    return Promise.resolve({
+      target: path,
+      ignored: true,
+    });
   }
   
   output.status.msg(`remove ${fileName2Show(path)}`);
@@ -158,7 +171,10 @@ function removeFile(path: string, fs: FileSystem, option): Promise<TransportResu
 
 function removeDir(path: string, fs: FileSystem, option): Promise<TransportResult> {
   if (shouldSkip(path, option.ignore)) {
-    return Promise.resolve({ target: path });
+    return Promise.resolve({
+      target: path,
+      ignored: true,
+    });
   }
   
   output.status.msg(`remove dir ${fileName2Show(path)}`);
@@ -175,12 +191,15 @@ function removeDir(path: string, fs: FileSystem, option): Promise<TransportResul
 }
 
 export function sync(srcDir: string, desDir: string, srcFs: FileSystem, desFs: FileSystem, option: SyncOption = defaultSyncOption): Promise<TransportResult[] | TransportResult> {
- if (shouldSkip(srcDir, option.ignore)) {
-    return Promise.resolve([{ target: srcDir }]);
+  if (shouldSkip(srcDir, option.ignore)) {
+    return Promise.resolve({
+      target: srcDir,
+      ignored: true,
+    });
   }
 
-  output.status.msg(`collect files...`);
-  const syncFiles = ([srcFileEntries, desFileEntries]) => {
+  output.status.msg(`collect files ${srcDir}...`);
+  const syncFiles = ([srcFileEntries, desFileEntries]: FileEntry[][]) => {
     output.status.msg('diff files...');
     const srcFileTable = toHash(srcFileEntries, 'id', fileEntry => ({
       ...fileEntry,
@@ -193,6 +212,7 @@ export function sync(srcDir: string, desDir: string, srcFs: FileSystem, desFs: F
     }));
     
     const file2trans = [];
+    const symlink2trans = [];
     const dir2trans = [];
     const dir2sync = [];
 
@@ -214,7 +234,6 @@ export function sync(srcDir: string, desDir: string, srcFs: FileSystem, desFs: F
           }
           break;
         case FileType.File:
-        case FileType.SymbolicLink:
           if (file) {
             file2trans.push([srcFile, file]);
 
@@ -222,6 +241,16 @@ export function sync(srcDir: string, desDir: string, srcFs: FileSystem, desFs: F
             delete desFileTable[id];
           } else if (option.model === 'full') {
             file2trans.push([srcFile, { fspath: desFs.pathResolver.join(desDir, srcFile.name) }]);
+          }
+          break;
+        case FileType.SymbolicLink:
+          if (file) {
+            symlink2trans.push([srcFile, file]);
+
+            // delete process file
+            delete desFileTable[id];
+          } else if (option.model === 'full') {
+            symlink2trans.push([srcFile, { fspath: desFs.pathResolver.join(desDir, srcFile.name) }]);
           }
           break;
         default:
@@ -249,6 +278,9 @@ export function sync(srcDir: string, desDir: string, srcFs: FileSystem, desFs: F
     const transFileTasks = file2trans.map(([srcfile, desFile]) =>
       transportFile(srcfile.fspath, desFile.fspath, srcFs, desFs, option)
     );
+    const transSymlinkTasks = symlink2trans.map(([srcfile, desFile]) =>
+      transportSymlink(srcfile.fspath, desFile.fspath, srcFs, desFs, option)
+    );
     const transDirTasks = dir2trans.map(([srcfile, desFile]) =>
       transportDir(srcfile.fspath, desFile.fspath, srcFs, desFs, option)
     );
@@ -262,9 +294,10 @@ export function sync(srcDir: string, desDir: string, srcFs: FileSystem, desFs: F
     const clearDirTasks = dirMissed.map(file =>
       removeDir(file.fspath, desFs, option)
     );
-
+  
     return Promise.all<TransportResult[] | TransportResult>([
       ...transFileTasks,
+      ...transSymlinkTasks,
       ...transDirTasks,
       ...clearFileTasks,
       ...syncDirTasks,
@@ -272,8 +305,10 @@ export function sync(srcDir: string, desDir: string, srcFs: FileSystem, desFs: F
     ]);
   };
 
-  return Promise.all([srcFs.list(srcDir), desFs.list(desDir).catch(err => [])])
-    .then(syncFiles)
+  return Promise.all([
+    srcFs.list(srcDir).catch(err => []),
+    desFs.list(desDir).catch(err => [])
+  ]).then(syncFiles)
     .then(result => {
       output.status.msg(`sync finish ${srcDir}`);
       return flatMap(result, a => a);
@@ -287,6 +322,13 @@ export function sync(srcDir: string, desDir: string, srcFs: FileSystem, desFs: F
 }
 
 export function transport(src: string, des: string, srcFs: FileSystem, desFs: FileSystem, option: TransportOption = defaultTransportOption): Promise<TransportResult[] | TransportResult> {
+  if (shouldSkip(src, option.ignore)) {
+    return Promise.resolve({
+      target: src,
+      ignored: true,
+    });
+  }
+
   return srcFs.lstat(src)
     .then(stat => {
       let result;
@@ -310,7 +352,10 @@ export function transport(src: string, des: string, srcFs: FileSystem, desFs: Fi
 
 export function remove(path: string, fs: FileSystem, option): Promise<TransportResult> {
   if (shouldSkip(path, option.ignore)) {
-    return Promise.resolve({ target: path });
+    return Promise.resolve({
+      target: path,
+      ignored: true,
+    });
   }
 
   return fs.lstat(path)

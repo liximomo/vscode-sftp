@@ -1,3 +1,8 @@
+## [0.6.9] - 2017-06-11
+### Bugfix
+* Remove unnecessary error message.
+* Sync blocks on symlink.
+
 ## [0.6.8] - 2017-06-09
 ### Enhance
 * Activate the extension only when it needs to. You must have the vscode greater than 1.13.0.

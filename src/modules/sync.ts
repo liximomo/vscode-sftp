@@ -10,27 +10,53 @@ function failedTask(result, index, array) {
   return result && result.error;
 }
 
+function logIgnored(result) {
+  output.print([
+    '',
+    `ignore: ${result.target}`
+  ].join('\n'));
+}
+
 function printFailTask(result) {
-  return output.print([
+  output.print([
     '',
     '------',
     `target: ${result.target}`,
     `context: ${result.op}`,
-    `reason: ${result.payload.message}`,
+    `error: ${result.payload}`,
     '------',
-    '',
   ].join('\n'));
 }
 
 function printResult(msg, result, silent) {
-  output.debug(`task ${msg} finish`);
-  const fails = [].concat(result).filter(failedTask)
+  output.print(`\n\n${msg} at ${new Date()}`);
+  const {
+    fails = [],
+    ignored = [],
+  } = [].concat(result)
+    .filter(result => typeof result === 'object')
+    .reduce((classification, result) => {
+      if (result.error) {
+        classification.fails.push(result);
+      } else if (result.ignored) {
+        classification.ignored.push(result);
+      }
+      return classification;
+    }, {
+      fails: [],
+      ignored: [],
+    });
+
   if (fails.length) {
     fails.forEach(printFailTask);
     output.showOutPutChannel();
     output.status.msg(`${msg} failed`, 2000);
   } else {
-    if (!silent) {
+    ignored.forEach(logIgnored);
+
+    if (silent) {
+      output.status.msg('', 0);
+    } else {
       output.status.msg(`${msg} done`, 2000);
     }
   }
@@ -90,7 +116,6 @@ export const sync2Remote = createTask('sync remote', (source, config, remotefs) 
   {
     ignore: config.ignore,
     model: config.syncMode,
-    
   }
 ));
 

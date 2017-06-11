@@ -139,7 +139,7 @@ export default class LocalFileSystem extends FileSystem {
 
   rmdir(path: string, recursive: boolean): Promise<null> {
     if (recursive) {
-      return fse.remove(path)
+      return fse.remove(path);
     }
 
     return new Promise((resolve, reject) => {

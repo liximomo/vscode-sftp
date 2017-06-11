@@ -180,7 +180,9 @@ export default class SFTPFileSystem extends RemoteFileSystem {
         .then(fileEntries => {
           if (!fileEntries.length) {
             this.rmdir(path, false)
-              .then(resolve, reject);
+              .then(resolve, e => {
+                reject(e);
+              });
             return;
           }
 
@@ -191,10 +193,14 @@ export default class SFTPFileSystem extends RemoteFileSystem {
             return this.unlink(file.fspath);
           });
 
-         Promise.all(rmPromises)
+          Promise.all(rmPromises)
             .then(() => this.rmdir(path, false))
-            .then(resolve, reject);
-        })
+            .then(resolve, e => { // BUG just reject will occur weird bug.
+              reject(e);
+            });
+        }, err => {
+          reject(err);
+        });
     });
   }
 }
