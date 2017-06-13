@@ -1,20 +1,11 @@
 import * as fs from 'fs';
 import * as FileStatus from 'stat-mode';
-import FileSystem, { FileEntry, FileType, Stats, StreamOption } from './FileSystem';
+import FileSystem, { IFileEntry, FileType, IStats, IStreamOption } from './FileSystem';
 import RemoteFileSystem from './RemoteFileSystem';
-import { Option } from '../Client/RemoteClient';
+import { IClientOption } from '../Client/RemoteClient';
 import FTPClient from '../Client/FTPClient';
 
 export default class FTPFileSystem extends RemoteFileSystem {
-  constructor(pathResolver, option: Option) {
-    super(pathResolver);
-    this.setClient(new FTPClient(option));
-  }
-
-  get ftp() {
-    return this.getClient().getFsClient();
-  }
-
   static getFileType(type) {
     if (type === 'd') {
       return FileType.Directory;
@@ -25,7 +16,16 @@ export default class FTPFileSystem extends RemoteFileSystem {
     }
   }
 
-  lstat(path: string): Promise<Stats> {
+  constructor(pathResolver, option: IClientOption) {
+    super(pathResolver);
+    this.setClient(new FTPClient(option));
+  }
+
+  get ftp() {
+    return this.getClient().getFsClient();
+  }
+
+  lstat(path: string): Promise<IStats> {
     return new Promise((resolve, reject) => {
       this.ftp.list(path, (err, stats) => {
         if (err) {
@@ -42,7 +42,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
     });
   }
 
-  get(path, option?: StreamOption): Promise<fs.ReadStream> {
+  get(path, option?: IStreamOption): Promise<fs.ReadStream> {
     return new Promise((resolve, reject) => {
       this.ftp.get(path, (err, stream) => {
         if (err) {
@@ -60,7 +60,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
     });
   }
 
-  put(input: fs.ReadStream | Buffer, path, option?: StreamOption): Promise<null> {
+  put(input: fs.ReadStream | Buffer, path, option?: IStreamOption): Promise<null> {
     return new Promise((resolve, reject) => {
       this.ftp.put(input, path, err => {
         if (err) {
@@ -99,7 +99,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
     return new Promise((resolve, reject) => {
       const tokens = dir.split(this.pathResolver.sep);
 
-      let root = tokens.shift();
+      const root = tokens.shift();
       let dirPath = root === '' ? '/' : root;
 
       const mkdir = () => {
@@ -112,7 +112,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
         dirPath = this.pathResolver.join(dirPath, token);
         return this.mkdir(dirPath)
           .then(mkdir, err => {
-            // if (err && err.message !== 'Cannot create a file when that file already exists.') { // reject except already exist
+            // if (err && err.message !== 'Cannot create a file when that file already exists.')
             if (err.code === 550) {
               // ignore already exist
               mkdir();
@@ -125,7 +125,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
     });
   }
 
-  toFileEntry(fullPath, stat): FileEntry {
+  toFileEntry(fullPath, stat): IFileEntry {
     return {
       fspath: fullPath,
       type: FTPFileSystem.getFileType(stat.type),
@@ -136,7 +136,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
     };
   }
 
-  list(dir: string): Promise<FileEntry[]> {
+  list(dir: string): Promise<IFileEntry[]> {
     return new Promise((resolve, reject) => {
       this.ftp.list(dir, (err, result = []) => {
         if (err) {

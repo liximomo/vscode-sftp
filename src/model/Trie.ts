@@ -1,15 +1,17 @@
+/* tslint:disable:max-classes-per-file ... */
 const defaultOption = {
   delimiter: '/',
 };
 
-type TrieNodeChildren = {
+interface ITrieNodeChildren {
   [key: string]: TrieNode,
 }
 
 class TrieNode {
-  public token: string;
+  token: string;
+
   private value: any;
-  private children: TrieNodeChildren;
+  private children: ITrieNodeChildren;
 
   constructor(token: string, value = null) {
     this.token = token;
@@ -26,7 +28,7 @@ class TrieNode {
     this.value = value;
     return this;
   }
-  
+
   getValue(): any {
     return this.value;
   }
@@ -35,7 +37,7 @@ class TrieNode {
     this.value = null;
     return this;
   }
-  
+
   getChildren(): TrieNode[] {
     return Object.keys(this.children).map(key => this.children[key]);
   }
@@ -71,7 +73,7 @@ export default class Trie {
     this.root = new TrieNode('@root');
     Object.keys(dict).forEach(key => this.add(key, dict[key]));
   }
-  
+
   isEmpty() {
     return this.root.getChildrenNum() <= 0;
   }
@@ -142,14 +144,14 @@ export default class Trie {
     const result = [];
 
     do {
-      let curentNode = nodeQueue.shift();
+      const curentNode = nodeQueue.shift();
       if (curentNode.isLoaded()) {
         result.push(curentNode.getValue());
       } else {
         const childrenNodes = curentNode.getChildren();
         nodeQueue.push(...childrenNodes);
       }
-    } while(nodeQueue.length > 0)
+    } while (nodeQueue.length > 0)
 
     return result;
   }
@@ -159,8 +161,8 @@ export default class Trie {
     if (path[0] === this.option.delimiter) {
       normalizePath = normalizePath.substr(1)
     }
-    if (path[path.length-1] === this.option.delimiter) {
-      normalizePath = normalizePath.substr(0, path.length-1)
+    if (path[path.length - 1] === this.option.delimiter) {
+      normalizePath = normalizePath.substr(0, path.length - 1)
     }
     return normalizePath.split(this.option.delimiter);
   }

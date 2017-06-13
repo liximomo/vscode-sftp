@@ -1,3 +1,7 @@
+## [0.6.10] - 2017-06-13
+### Enhance
+* Better log.
+
 ## [0.6.9] - 2017-06-11
 ### Bugfix
 * Remove unnecessary error message.

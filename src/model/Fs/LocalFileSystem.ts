@@ -1,14 +1,14 @@
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as FileStatus from 'stat-mode';
-import FileSystem, { FileEntry, Stats } from './FileSystem';
+import FileSystem, { IFileEntry, IStats } from './FileSystem';
 
 export default class LocalFileSystem extends FileSystem {
   constructor(pathResolver: any) {
     super(pathResolver);
   }
 
-  lstat(path: string): Promise<Stats> {
+  lstat(path: string): Promise<IStats> {
     return new Promise((resolve, reject) => {
       fs.lstat(path, (err, stat) => {
         if (err) {
@@ -64,7 +64,7 @@ export default class LocalFileSystem extends FileSystem {
       });
     });
   }
-  
+
   symlink(targetPath: string, path: string): Promise<null> {
     return new Promise((resolve, reject) => {
       fs.symlink(targetPath, path, null, err => {
@@ -76,7 +76,7 @@ export default class LocalFileSystem extends FileSystem {
       });
     });
   }
-  
+
   mkdir(dir: string): Promise<null> {
     return new Promise((resolve, reject) => {
       fs.mkdir(dir, err => {
@@ -105,7 +105,7 @@ export default class LocalFileSystem extends FileSystem {
     };
   }
 
-  list(dir: string): Promise<FileEntry[]> {
+  list(dir: string): Promise<IFileEntry[]> {
     return new Promise((resolve, reject) => {
       fs.readdir(dir, (err, files) => {
         if (err) {
@@ -123,7 +123,7 @@ export default class LocalFileSystem extends FileSystem {
       });
     });
   }
-  
+
   unlink(path: string): Promise<null> {
     return new Promise((resolve, reject) => {
       fs.unlink(path, err => {

@@ -13,7 +13,7 @@ function failedTask(result, index, array) {
 function logIgnored(result) {
   output.print([
     '',
-    `ignore: ${result.target}`
+    `ignore: ${result.target}`,
   ].join('\n'));
 }
 
@@ -29,31 +29,40 @@ function printFailTask(result) {
 }
 
 function printResult(msg, result, silent) {
-  output.print(`\n\n${msg} at ${new Date()}`);
   const {
-    fails = [],
-    ignored = [],
+    success,
+    fails,
+    ignored,
   } = [].concat(result)
-    .filter(result => typeof result === 'object')
-    .reduce((classification, result) => {
-      if (result.error) {
-        classification.fails.push(result);
-      } else if (result.ignored) {
-        classification.ignored.push(result);
+    .filter(resultItem => typeof resultItem === 'object')
+    .reduce((classification, resultItem) => {
+      if (resultItem.error) {
+        classification.fails.push(resultItem);
+      } else if (resultItem.ignored) {
+        classification.ignored.push(resultItem);
+      } else {
+        classification.success.push(resultItem);
       }
       return classification;
     }, {
+      success: [],
       fails: [],
       ignored: [],
     });
 
+  ignored.forEach(logIgnored);
+
+  const availableResult = success.length + fails.length;
+  if (availableResult <= 0) {
+    return;
+  }
+
+  output.print(`\n\n${msg} at ${new Date()}`);
   if (fails.length) {
     fails.forEach(printFailTask);
     output.showOutPutChannel();
-    output.status.msg(`${msg} failed`, 2000);
+    output.status.msg(`${msg} done (${fails.length} fails)`, 2000);
   } else {
-    ignored.forEach(logIgnored);
-
     if (silent) {
       output.status.msg('', 0);
     } else {
@@ -77,7 +86,6 @@ const createTask = (name, func) => (source, config, silent: boolean = false) =>
   getRemoteFs(getHostInfo(config))
     .then(remotefs => func(source, config, remotefs))
     .then(result => printResult(name, result, silent));
-  
 
 export const upload = createTask('upload', (source, config, remotefs) => transport(
   source,

@@ -1,5 +1,6 @@
 # sftp sync extension for VS Code
-I wrote this because I must to. All others can't fit my requirements.
+Very simple and intuitive and works.
+
 ## Features
 
 * sync directory to remote
@@ -8,7 +9,7 @@ I wrote this because I must to. All others can't fit my requirements.
 * upload file/directory to local
 * upload to remote on save
 * multiple file format support(file, direcotry, symbolic link)
-* multiple config
+* multiple config(anywhere under workspace)
 
 ## Usage
 1. `Ctrl+Shift+P` on Windows/Linux open command palette, run `SFTP: config` command.
@@ -100,7 +101,7 @@ I wrote this because I must to. All others can't fit my requirements.
    *  Watcher will be disable when files set to null or both autoDelete and autoUpload set to false,
    */
   watcher: {
-    // avaliable value: null | glob pattern
+    // avaliable value: null | glob patternv
     // null: disable watcher
     // glob pattern: same logic as ignore
     files: null, 
@@ -118,10 +119,6 @@ I wrote this because I must to. All others can't fit my requirements.
 ```
 
 -----------------------------------------------------------------------------------------------------------
-
-## TO-DO:
-
-- [ ] lint source code
 
 ## Known Issues
 

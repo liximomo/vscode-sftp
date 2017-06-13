@@ -1,8 +1,8 @@
 import * as Client from 'ftp';
-import RemoteClient, { Option } from './RemoteClient';
+import RemoteClient, { IClientOption } from './RemoteClient';
 
-export default class FTPClient extends RemoteClient{
-  constructor(option?: Option) {
+export default class FTPClient extends RemoteClient {
+  constructor(option?: IClientOption) {
     super(option);
   }
 
@@ -21,13 +21,13 @@ export default class FTPClient extends RemoteClient{
             resolve();
           }
         })
-        .on('error', (err) => {
+        .on('error', err => {
           reject(err);
         })
         .connect({
           keepalive: 1000 * 10,
           ...option,
-          user: option.username
+          user: option.username,
         });
     });
   }
@@ -40,4 +40,3 @@ export default class FTPClient extends RemoteClient{
     return this.client;
   }
 }
-

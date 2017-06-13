@@ -6,7 +6,7 @@ export enum FileType {
   SymbolicLink,
 };
 
-export interface FileEntry {
+export interface IFileEntry {
   fspath: string,
   type: FileType,
   name: string,
@@ -15,36 +15,19 @@ export interface FileEntry {
   accessTime: number,
 };
 
-export interface StreamOption {
+export interface IStreamOption {
   flags?: string,
   encoding?: string | null,
   mode?: number,
   autoClose?: boolean,
 };
 
-export interface Stats {
+export interface IStats {
   type: FileType,
   target?: string,
 };
 
 export default abstract class FileSystem {
-  public pathResolver: any;
-
-  constructor(pathResolver: any) {
-    this.pathResolver = pathResolver;
-  }
-
-  abstract get(path, option?: StreamOption): Promise<fs.ReadStream>;
-  abstract put(input: fs.ReadStream | Buffer, path, option?: StreamOption): Promise<null>;
-  abstract mkdir(dir: string): Promise<null>;
-  abstract ensureDir(dir: string): Promise<null>;
-  abstract list(dir: string): Promise<FileEntry[]>;
-  abstract lstat(path: string): Promise<Stats>;
-  abstract readlink(path: string): Promise<string>;
-  abstract symlink(targetPath: string, path: string): Promise<null>;
-  abstract unlink(path: string): Promise<null>;
-  abstract rmdir(path: string, recursive: boolean): Promise<null>;
-
   static getFileTypecharacter(stat: fs.Stats): FileType {
     if (stat.isDirectory()) {
       return FileType.Directory;
@@ -55,4 +38,20 @@ export default abstract class FileSystem {
     }
   }
 
+  pathResolver: any;
+
+  constructor(pathResolver: any) {
+    this.pathResolver = pathResolver;
+  }
+
+  abstract get(path, option?: IStreamOption): Promise<fs.ReadStream>;
+  abstract put(input: fs.ReadStream | Buffer, path, option?: IStreamOption): Promise<null>;
+  abstract mkdir(dir: string): Promise<null>;
+  abstract ensureDir(dir: string): Promise<null>;
+  abstract list(dir: string): Promise<IFileEntry[]>;
+  abstract lstat(path: string): Promise<IStats>;
+  abstract readlink(path: string): Promise<string>;
+  abstract symlink(targetPath: string, path: string): Promise<null>;
+  abstract unlink(path: string): Promise<null>;
+  abstract rmdir(path: string, recursive: boolean): Promise<null>;
 }

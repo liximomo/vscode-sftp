@@ -2,17 +2,17 @@ import * as vscode from 'vscode';
 import { EXTENSION_NAME } from '../constants';
 
 class StatusBarItem {
+  isShow: boolean;
+
   private name: string;
   private statusBarItem: vscode.StatusBarItem;
-
-  public isShow: boolean;
 
   constructor(name) {
     this.name = name;
     this.isShow = false;
     this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
   }
-  
+
   msg(text: string, varient?: number | Promise<any>) {
     if (!this.isShow) {
       this.statusBarItem.show();

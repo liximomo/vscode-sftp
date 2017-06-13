@@ -112,28 +112,28 @@ export function getConfig(activityPath: string) {
 };
 
 export function newConfig() {
-	if (!vscode.workspace.rootPath) {
-		output.onError('Cannot run this command without opened folder', 'config');
-	}
-	
-	const defaultConfigPath = getDefaultConfigPath();
+  if (!vscode.workspace.rootPath) {
+    output.onError('Cannot run this command without opened folder', 'config');
+  }
 
-	const showConfigFile = () =>
-		vscode.workspace.openTextDocument(defaultConfigPath)
-			.then(vscode.window.showTextDocument);
+  const defaultConfigPath = getDefaultConfigPath();
 
-	fse.pathExists(defaultConfigPath)
-		.then(exist => {
-			if (exist) {
-				return showConfigFile()
-			}
+  const showConfigFile = () =>
+    vscode.workspace.openTextDocument(defaultConfigPath)
+      .then(vscode.window.showTextDocument);
 
-			return fse.writeJson(defaultConfigPath, defaultConfig, { spaces: 4 })
-				.then(showConfigFile)
-		})
-		.catch(error => {
-			output.onError(error, 'config');
-		});
+  fse.pathExists(defaultConfigPath)
+    .then(exist => {
+      if (exist) {
+        return showConfigFile()
+      }
+
+      return fse.writeJson(defaultConfigPath, defaultConfig, { spaces: 4 })
+        .then(showConfigFile)
+    })
+    .catch(error => {
+      output.onError(error, 'config');
+    });
 }
 
 export function getHostInfo(config) {

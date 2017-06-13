@@ -1,11 +1,11 @@
 import { Client } from 'ssh2';
 import * as fs from 'fs';
-import RemoteClient, { Option } from './RemoteClient';
+import RemoteClient, { IClientOption } from './RemoteClient';
 
-export default class SFTPClient extends RemoteClient{
+export default class SFTPClient extends RemoteClient {
   private sftp: any;
 
-  constructor(option?: Option) {
+  constructor(option?: IClientOption) {
     super(option);
   }
 
@@ -28,14 +28,14 @@ export default class SFTPClient extends RemoteClient{
             resolve();
           });
         })
-        .on('error', (err) => {
+        .on('error', err => {
           reject(err);
         })
         .connect({
           keepaliveInterval: 1000 * 30,
           keepaliveCountMax: 2,
           ...option,
-          privateKey, 
+          privateKey,
         });
 
       if (!privateKeyPath) {
@@ -60,4 +60,3 @@ export default class SFTPClient extends RemoteClient{
     return this.sftp;
   }
 }
-

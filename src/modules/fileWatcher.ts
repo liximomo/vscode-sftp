@@ -32,7 +32,7 @@ function doUpload() {
       output.onError(error);
       return;
     }
-    
+
     upload(file, config, true).catch(fileError('upload', file));
   });
 }
@@ -40,7 +40,7 @@ function doUpload() {
 function doDelete() {
   const files = deleteQueue.slice().map(uri => uri.fsPath).sort();
   deleteQueue.length = 0;
-  let config; 
+  let config;
   files.forEach(file => {
     try {
       config = getConfig(file);
@@ -51,7 +51,7 @@ function doDelete() {
 
     removeRemote(config.remotePath, {
       ...config,
-      skipDir: true
+      skipDir: true,
     }, true).catch(fileError('delete', config.remotePath, false));
   });
 }
@@ -71,7 +71,7 @@ function setUpWatcher(config) {
     // clear old watcher
     clearWatcher(watcher);
   }
-  
+
   const shouldAddListenser = watchConfig.autoUpload || watchConfig.autoDelete;
   if (watchConfig.files === false || !shouldAddListenser) {
     return;
@@ -91,7 +91,7 @@ function setUpWatcher(config) {
       throttleUpload();
     });
   }
-  
+
   if (watchConfig.autoDelete) {
     watcher.onDidDelete(uri => {
       if (disableWatch) {
@@ -113,9 +113,9 @@ export function disableWatcher() {
 }
 
 export function enableWatcher() {
-  setTimeout(function() {
+  setTimeout(() => {
     disableWatch = false;
-  }, 300); // delay because change happens after task finish. 
+  }, 300); // delay because change happens after task finish.
 }
 
 export function onFileChange(cb: (uri: vscode.Uri) => void) {

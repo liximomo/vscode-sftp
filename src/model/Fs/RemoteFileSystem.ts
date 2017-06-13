@@ -1,4 +1,4 @@
-import FileSystem, { FileEntry, FileType, Stats } from './FileSystem';
+import FileSystem, { IFileEntry, FileType, IStats } from './FileSystem';
 import RemoteClient from '../Client/RemoteClient';
 
 export default abstract class RemoteFileSystem extends FileSystem {

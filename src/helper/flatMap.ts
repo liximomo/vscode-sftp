@@ -1,3 +1,3 @@
-export default function flatMap<T, U>(items: Array<T>, handle: (item: T) => Array<U> | U): Array<U> {
+export default function flatMap<T, U>(items: T[], handle: (item: T) => U[] | U): U[] {
   return items.reduce((result, item) => result.concat(handle(item)), []);
 }

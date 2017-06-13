@@ -1,6 +1,6 @@
 import * as output from '../../modules/output';
 
-export interface Option {
+export interface IClientOption {
   host: string,
   port: number,
   username: string,
@@ -11,10 +11,10 @@ export interface Option {
 };
 
 export default abstract class RemoteClient {
-  private option: any;
   protected client: any;
+  private option: any;
 
-  constructor(option?: Option) {
+  constructor(option?: IClientOption) {
     this.option = option;
     this.client = this.initClient();
   }
@@ -34,13 +34,13 @@ export default abstract class RemoteClient {
         output.debug('connect close');
         cb();
       })
-      .on('error', (err) => {
+      .on('error', err => {
         output.debug('remote error', err);
         cb();
       });
   }
 
-  setOption(option: Option) {
+  setOption(option: IClientOption) {
     this.option = option;
   }
 
