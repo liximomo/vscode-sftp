@@ -69,7 +69,7 @@ export function addConfig(configPath) {
       const fullConfig = {
         ...defaultConfig,
         ...config,
-        ignore: config.ignore.map(pattern => fillGlobPattern(pattern, configRoot)),
+        ignore: config.ignore,
         configRoot,
       };
       const triePath = getPathRelativeWorkspace(configRoot);
