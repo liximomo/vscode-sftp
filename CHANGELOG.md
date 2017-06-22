@@ -1,3 +1,7 @@
+## [0.6.11] - 2017-06-22
+### Feature
+* Ignore works for download/sync remote file to local.
+
 ## [0.6.10] - 2017-06-13
 ### Enhance
 * Better log.
@@ -29,23 +33,23 @@
 
 ## [0.6.0] - 2017-06-02
 ### Feature
-* support ftp(since the current popular node-ftp library doesn't work perfectly, Be optimistic！)
+* Support ftp
 
 ### Feedback
-* more debug info
+* More debug info
 
 ### Bugfix
-* fix `SFTPFileSystem.rmdir` doesn't resolve correctly.
-* disable watcher on pulling files.
-* make true re-conncet when it need to.
+* Fix `SFTPFileSystem.rmdir` doesn't resolve correctly.
+* Disable watcher on pulling files.
+* Make true re-conncet when it need to.
 
 ## [0.5.4] - 2017-05-30
 ### Feedback
 * Better error log
-* output debug info in sftp output channel
+* Output debug info in sftp output channel
 
 ### Bugfix
-* fix some files missed uploading when they has updated because of throttle.
+* Fix some files missed uploading when they has updated because of throttle.
 
 ## [0.5.3] - 2017-05-26
 ### Feature

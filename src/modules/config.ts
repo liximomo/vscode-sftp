@@ -66,10 +66,12 @@ export function addConfig(configPath) {
     .then(config => {
       const normalizeConfigPath = normalize(configPath);
       const configRoot = rpath.dirname(normalizeConfigPath);
+      const localIgnore = config.ignore.map(pattern => fillGlobPattern(pattern, configRoot));
+      const remoteIgnore = config.ignore.map(pattern => fillGlobPattern(pattern, config.remotePath));
       const fullConfig = {
         ...defaultConfig,
         ...config,
-        ignore: config.ignore.map(pattern => fillGlobPattern(pattern, configRoot)),
+        ignore: localIgnore.concat(remoteIgnore),
         configRoot,
       };
       const triePath = getPathRelativeWorkspace(configRoot);

@@ -88,7 +88,7 @@ Very simple and intuitive and works.
   syncMode: 'update',
 
   /**
-   *  glob pattern that will be append to `config root`
+   *  glob pattern that will be append to `config root` and `remotePath`
    */ 
   ignore: [
     "**/.vscode",
