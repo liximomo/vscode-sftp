@@ -80,6 +80,7 @@ const getHostInfo = config => ({
   privateKeyPath: config.privateKeyPath,
   passphrase: config.passphrase,
   passive: config.passive,
+  interactiveAuth: config.interactiveAuth,
 });
 
 const createTask = (name, func) => (source, config, silent: boolean = false) =>

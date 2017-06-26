@@ -26,13 +26,14 @@ export const defaultConfig = {
   host: 'host',
   port: 22,
   username: 'username',
-  password: 'password',
+  password: null,
   protocol: 'sftp',
   privateKeyPath: null,
   passphrase: null,
   passive: false,
+  interactiveAuth: false,
 
-  remotePath: '/home',
+  remotePath: '/',
   uploadOnSave: false,
 
   syncMode: 'update',

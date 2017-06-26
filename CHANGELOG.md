@@ -1,3 +1,7 @@
+## [0.6.12] - 2017-06-26
+### Feature
+* Interactive authentication.
+
 ## [0.6.11] - 2017-06-22
 ### Feature
 * Ignore works for download/sync remote file to local.

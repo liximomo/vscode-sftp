@@ -13,11 +13,15 @@ export default class SFTPClient extends RemoteClient {
     return new Client();
   }
 
-  connect() {
-    const option = this.getOption();
-    const { privateKeyPath } = option;
+  connect(readline) {
+    const {
+      interactiveAuth,
+      password,
+      privateKeyPath,
+      ...option,
+    } = this.getOption();
     return new Promise((resolve, reject) => {
-      const connectWithKey = privateKey => this.client
+      const connectWithCredential = (passwd?, privateKey?) => this.client
         .on('ready', () => {
           this.client.sftp((err, sftp) => {
             if (err) {
@@ -34,21 +38,46 @@ export default class SFTPClient extends RemoteClient {
         .connect({
           keepaliveInterval: 1000 * 30,
           keepaliveCountMax: 2,
+          readyTimeout: 99999999,
           ...option,
           privateKey,
+          password: passwd,
+          tryKeyboard: interactiveAuth,
         });
 
-      if (!privateKeyPath) {
-        connectWithKey(undefined);
-      } else {
-        fs.readFile(privateKeyPath, (err, data) => {
-          if (err) {
-            reject(err);
-            return;
+      if (interactiveAuth) {
+        this.client.on('keyboard-interactive', function redo(
+          name,
+          instructions,
+          instructionsLang,
+          prompts,
+          finish,
+          stackedAnswers
+        ) {
+          const answers = stackedAnswers || [];
+          if (answers.length < prompts.length) {
+            readline(prompts[answers.length].prompt).then(answer => {
+              answers.push(answer);
+              redo(name, instructions, instructionsLang, prompts, finish, answers);
+            });
+          } else {
+            finish(answers);
           }
-          connectWithKey(data);
         });
       }
+
+      if (!privateKeyPath) {
+        connectWithCredential(password);
+        return;
+      }
+
+      fs.readFile(privateKeyPath, (err, data) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        connectWithCredential(password, data);
+      });
     });
   }
 

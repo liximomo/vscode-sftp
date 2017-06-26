@@ -3,6 +3,7 @@ Very simple and intuitive and works.
 
 ## Features
 
+* dual authentication
 * sync directory to remote
 * sync directory to local
 * download file/directory to local
@@ -47,6 +48,9 @@ Very simple and intuitive and works.
   privateKeyPath: null, // absolute path to user private key
   passphrase: null,
   passive: false, // ftp passive mode
+
+  // try interactive authentication, useful for dual auth. (requires the server has keyboard-interactive enabled)
+  interactiveAuth: true, 
 
   /**
    * The final remotePath of select file or directory is {remotePath in config file} + {local file Path relative to `config root`}.

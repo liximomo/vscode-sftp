@@ -1,3 +1,4 @@
+import * as vscode from 'vscode';
 import rpath from './remotePath';
 import * as output from '../modules/output';
 import RemoteFileSystem from '../model/Fs/RemoteFileSystem';
@@ -32,7 +33,19 @@ export default function getRemoteFs(option): Promise<RemoteFileSystem> {
     const client = fs.getClient();
     client.onDisconnected(invalidRemote);
     output.status.msg('connecting...');
-    pendingPromise = client.connect()
+    pendingPromise = client.connect(prompt => {
+      // tslint:disable-next-line prefer-const
+      let password = false;
+      // if (/password/i.test(prompt)) {
+      //   password = true;
+      // }
+
+      return vscode.window.showInputBox({
+        ignoreFocusOut: true,
+        password,
+        prompt,
+      }) as Promise<string | null>;
+    })
     .then(() => {
       needReconect = false;
       return fs;
