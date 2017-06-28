@@ -81,6 +81,7 @@ const getHostInfo = config => ({
   passphrase: config.passphrase,
   passive: config.passive,
   interactiveAuth: config.interactiveAuth,
+  agent: config.agent,
 });
 
 const createTask = (name, func) => (source, config, silent: boolean = false) =>

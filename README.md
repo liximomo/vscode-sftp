@@ -45,6 +45,12 @@ Very simple and intuitive and works.
   username: "username",
   password: "password",
   protocol: "sftp", // sftp or ftp
+
+  /**
+   * string - Path to ssh-agent's UNIX socket for ssh-agent-based user authentication.
+   * Windows users: set to 'pageant' for authenticating with Pageant or (actual) path to a cygwin "UNIX socket.
+   */
+  agent: null, 
   privateKeyPath: null, // absolute path to user private key
   passphrase: null,
   passive: false, // ftp passive mode

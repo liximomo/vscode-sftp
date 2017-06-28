@@ -5,9 +5,11 @@ export interface IClientOption {
   port: number,
   username: string,
   password: string,
-  passive?: boolean,
-  privateKeyPath?: string,
-  passphrase?: string,
+  privateKeyPath?: string,  // ssh-only
+  passphrase?: string,  // ssh-only
+  interactiveAuth?: boolean, // ssh-only
+  agent?: string, // ssh-only
+  passive?: boolean, // ftp-only
 };
 
 export default abstract class RemoteClient {

@@ -28,6 +28,7 @@ export const defaultConfig = {
   username: 'username',
   password: null,
   protocol: 'sftp',
+  agent: null,
   privateKeyPath: null,
   passphrase: null,
   passive: false,

@@ -1,3 +1,7 @@
+## [0.6.13] - 2017-06-28
+### Feature
+* ssh agent authentication.
+
 ## [0.6.12] - 2017-06-26
 ### Feature
 * Interactive authentication.
