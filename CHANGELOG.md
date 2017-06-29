@@ -1,3 +1,7 @@
+## [0.6.14] - 2017-06-29
+### Enhance
+* show authentication input as asterisk.
+
 ## [0.6.13] - 2017-06-28
 ### Feature
 * ssh agent authentication.

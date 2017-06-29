@@ -35,7 +35,7 @@ export default function getRemoteFs(option): Promise<RemoteFileSystem> {
     output.status.msg('connecting...');
     pendingPromise = client.connect(prompt => {
       // tslint:disable-next-line prefer-const
-      let password = false;
+      let password = true;
       // if (/password/i.test(prompt)) {
       //   password = true;
       // }
