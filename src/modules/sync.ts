@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as output from './output';
 import { transport, sync, remove } from './conveyer';
 import getRemoteFs from './remoteFs';
-import LocalFileSystem from '../model/Fs/LocalFileSystem';
+import localFs from './localFs';
 import { disableWatcher, enableWatcher } from './fileWatcher';
 
 function failedTask(result, index, array) {
@@ -92,7 +92,7 @@ const createTask = (name, func) => (source, config, silent: boolean = false) =>
 export const upload = createTask('upload', (source, config, remotefs) => transport(
   source,
   config.remotePath,
-  new LocalFileSystem(path),
+  localFs,
   remotefs,
   {
     ignore: config.ignore,
@@ -105,7 +105,7 @@ export const download = createTask('download', (source, config, remotefs) => {
     config.remotePath,
     source,
     remotefs,
-    new LocalFileSystem(path),
+    localFs,
     {
       ignore: config.ignore,
     }
@@ -121,7 +121,7 @@ export const download = createTask('download', (source, config, remotefs) => {
 export const sync2Remote = createTask('sync remote', (source, config, remotefs) => sync(
   source,
   config.remotePath,
-  new LocalFileSystem(path),
+  localFs,
   remotefs,
   {
     ignore: config.ignore,
@@ -135,7 +135,7 @@ export const sync2Local = createTask('sync local', (source, config, remotefs) =>
     config.remotePath,
     source,
     remotefs,
-    new LocalFileSystem(path),
+    localFs,
     {
       ignore: config.ignore,
       model: config.syncMode,

@@ -1,3 +1,7 @@
+## [0.7.0] - 2017-06-30
+### Breaking Change
+* Now config files are located in .vscode folder. Just move every .sftpConfig.json to the .vscode folder of same hierarchy.
+
 ## [0.6.14] - 2017-06-29
 ### Enhance
 * show authentication input as asterisk.

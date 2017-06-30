@@ -20,6 +20,8 @@ function getPathRelativeWorkspace(filePath) {
   return `${WORKSPACE_TRIE_TOKEN}/${relativePath}`;
 }
 
+const vscodeFolder = '.vscode';
+
 export const configFileName = '.sftpConfig.json';
 
 export const defaultConfig = {
@@ -53,10 +55,15 @@ export const defaultConfig = {
   ],
 };
 
-const configGlobPattern = `/**/${configFileName}`;
+const configGlobPattern = `/**/${vscodeFolder}/${configFileName}`;
+// const fallbackConfigGlobPattern = `/**/${configFileName}`;
+
+export function getDefaultConfigFolder() {
+  return `${vscode.workspace.rootPath}/${vscodeFolder}`;
+};
 
 export function getDefaultConfigPath() {
-  return `${vscode.workspace.rootPath}/${configFileName}`;
+  return `${getDefaultConfigFolder()}/${configFileName}`;
 };
 
 export function fillGlobPattern(pattern, rootPath) {
@@ -67,7 +74,9 @@ export function addConfig(configPath) {
   return fse.readJson(configPath)
     .then(config => {
       const normalizeConfigPath = normalize(configPath);
-      const configRoot = rpath.dirname(normalizeConfigPath);
+      let configRoot = rpath.dirname(normalizeConfigPath);
+      configRoot = rpath.dirname(configRoot);
+
       const localIgnore = config.ignore.map(pattern => fillGlobPattern(pattern, configRoot));
       const remoteIgnore = config.ignore.map(pattern => fillGlobPattern(pattern, config.remotePath));
       const fullConfig = {
@@ -132,8 +141,9 @@ export function newConfig() {
         return showConfigFile()
       }
 
-      return fse.writeJson(defaultConfigPath, defaultConfig, { spaces: 4 })
-        .then(showConfigFile)
+      return fse.ensureDir(getDefaultConfigFolder())
+        .then(_ => fse.writeJson(defaultConfigPath, defaultConfig, { spaces: 4 }))
+        .then(showConfigFile);
     })
     .catch(error => {
       output.onError(error, 'config');
