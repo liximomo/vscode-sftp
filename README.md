@@ -2,7 +2,7 @@
 Very simple and intuitive and works.
 
 ## Breaking Change
-**Since 0.7.0** config files are located in **.vscode** folder. Just move every .sftpConfig.json file to the .vscode folder of same hierarchy.
+**Since 0.7.0** config files are located in **.vscode** folder. Just move every .sftpConfig.json file into an .vscode folder.
 
 ## Features
 
@@ -33,7 +33,7 @@ Very simple and intuitive and works.
 | SFTP: Sync To Local  | sync remote directory to local              |
   
 ### Glossary
-`config root`: Full pathname of the directory which you put config file put in
+`config root`: The directory where the `.vscode/.sftpConfig` file is located in.
 
 **config root**: 
 
@@ -71,7 +71,7 @@ Very simple and intuitive and works.
    *  |-b
    *    |-d
    *      |-e.txt
-   *    |-.sftpConfig.json
+   *    |-.vscode/.sftpConfig.json
    *  
    *  config file 
    *    {

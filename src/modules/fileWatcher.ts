@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 
-import throttle from '../helper/throttle';
 import { upload } from './sync';
 import { getConfig, fillGlobPattern } from './config';
 import { removeRemote } from './sync';
@@ -56,9 +55,6 @@ function doDelete() {
   });
 }
 
-const throttleUpload = throttle(doUpload, PROCESS__DALEY, { leading: false });
-const throttleDelete = throttle(doDelete, PROCESS__DALEY + 200, { leading: false });
-
 function clearWatcher(fileWatcher) {
   fileWatcher.dispose();
 }
@@ -88,7 +84,7 @@ function setUpWatcher(config) {
       }
 
       uploadQueue.push(uri);
-      throttleUpload();
+      doUpload();
     });
   }
 
@@ -99,7 +95,7 @@ function setUpWatcher(config) {
       }
 
       deleteQueue.push(uri);
-      throttleDelete();
+      doDelete();
     });
   }
 }

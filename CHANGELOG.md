@@ -1,3 +1,7 @@
+## [0.7.1] - 2017-07-04
+### Bugfix
+* Fix miss files because of throttle.
+
 ## [0.7.0] - 2017-06-30
 ### Breaking Change
 * Now config files are located in .vscode folder. Just move every .sftpConfig.json to the .vscode folder of same hierarchy.
