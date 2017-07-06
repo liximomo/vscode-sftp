@@ -39,6 +39,8 @@ export function activate(context: vscode.ExtensionContext) {
 
   return initConfigs()
     .then(configTrie => {
+      output.status.msg('SFTP Ready', 1000 * 8);
+
       registerCommand(context, SYNC_TO_REMOTE, sync2RemoteCommand);
 
       registerCommand(context, SYNC_TO_LOCAL, sync2LocalCommand);
@@ -63,7 +65,6 @@ export function activate(context: vscode.ExtensionContext) {
         }
       };
 
-      output.status.msg('SFTP Ready', 1000 * 8);
       onFileChange(handleDocumentChange);
     }, output.onError);
 }

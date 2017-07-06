@@ -30,7 +30,7 @@
         "onCommand:sftp.trans.local",
         "onCommand:sftp.sync.remote",
         "onCommand:sftp.sync.local",
-        "workspaceContains:**/.sftpConfig.json"
+        "workspaceContains:**/.vscode/.sftpConfig.json"
     ],
     "icon": "icon.png",
     "main": "./out/src/extension",
