@@ -216,12 +216,12 @@ export function sync(
   srcFs: FileSystem,
   desFs: FileSystem,
   option: ISyncOption = defaultSyncOption
-): Promise<ITransportResult[] | ITransportResult> {
+): Promise<ITransportResult[]> {
   if (shouldSkip(srcDir, option.ignore)) {
-    return Promise.resolve({
+    return Promise.resolve([{
       target: srcDir,
       ignored: true,
-    });
+    }]);
   }
 
   output.status.msg(`collect files ${fileName2Show(srcDir)}...`);
@@ -353,12 +353,12 @@ export function transport(
   srcFs: FileSystem,
   desFs: FileSystem,
   option: ITransportOption = defaultTransportOption
-): Promise<ITransportResult[] | ITransportResult> {
+): Promise<ITransportResult[]> {
   if (shouldSkip(src, option.ignore)) {
-    return Promise.resolve({
+    return Promise.resolve([{
       target: src,
       ignored: true,
-    });
+    }]);
   }
 
   return srcFs.lstat(src)

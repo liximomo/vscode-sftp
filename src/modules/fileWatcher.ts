@@ -109,6 +109,10 @@ export function disableWatcher() {
 }
 
 export function enableWatcher() {
+  if (!disableWatch) {
+    return;
+  }
+
   setTimeout(() => {
     disableWatch = false;
   }, 300); // delay because change happens after task finish.

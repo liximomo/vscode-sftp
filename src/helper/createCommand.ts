@@ -3,33 +3,25 @@ import * as vscode from 'vscode';
 import * as output from '../modules/output';
 import { getConfig } from '../modules/config';
 
-const workspaceItem = {
+const workspaceItem: ITarget = {
   fsPath: vscode.workspace.rootPath,
 };
 
-export function createFileCommand(fileTask) {
-  return item => {
-    // if no file/direcory selected, assume workspace be selected.
-    let fileItem = item === undefined ? workspaceItem : item;
+export interface ITarget {
+  fsPath: string;
+}
 
-    if (!fileItem.fsPath) {
-      // run through shortcut
-      const active = vscode.window.activeTextEditor;
-      if (!active || !active.document) {
-        output.onError(new Error('command must run on a file or directory!'));
-        return;
-      }
-
-      fileItem = {
-        fsPath: active.document.fileName,
-      };
-    }
-    const activityPath = fileItem.fsPath;
+export function createFileCommand(fileTask, getTarget: (item) => Promise<ITarget[] | ITarget>) {
+  const runTask = (target: ITarget) => {
+    const activityPath = target.fsPath;
     try {
       const config = getConfig(activityPath);
       fileTask(activityPath, config).catch(output.onError);
     } catch (error) {
-      output.onError(`(${activityPath}) ${error.message} `);
+      throw new Error(`(${activityPath}) ${error.message}`);
     }
   };
+  const runTasks = (target: ITarget[] | ITarget) => [].concat(target).forEach(runTask);
+
+  return item => getTarget(item).then(runTasks).catch(output.onError);
 }
