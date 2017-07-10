@@ -23,5 +23,14 @@ export function createFileCommand(fileTask, getTarget: (item) => Promise<ITarget
   };
   const runTasks = (target: ITarget[] | ITarget) => [].concat(target).forEach(runTask);
 
-  return item => getTarget(item).then(runTasks).catch(output.onError);
+  return item =>
+    getTarget(item)
+      .then(target => {
+        if (!target) {
+          return;
+        }
+
+        runTasks(target);
+      })
+      .catch(output.onError);
 }

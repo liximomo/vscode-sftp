@@ -10,16 +10,6 @@ import { WORKSPACE_TRIE_TOKEN } from '../constants';
 
 let configTrie = null;
 
-function getPathRelativeWorkspace(filePath) {
-  const normalizedWorkspacePath = normalize(vscode.workspace.rootPath);
-  const normalizePath = normalize(filePath);
-  if (normalizePath === normalizedWorkspacePath) {
-    return WORKSPACE_TRIE_TOKEN;
-  }
-  const relativePath = rpath.relative(normalizedWorkspacePath, normalizePath);
-  return `${WORKSPACE_TRIE_TOKEN}/${relativePath}`;
-}
-
 const vscodeFolder = '.vscode';
 
 export const configFileName = '.sftpConfig.json';
@@ -57,6 +47,16 @@ export const defaultConfig = {
 
 const configGlobPattern = `/**/${vscodeFolder}/${configFileName}`;
 // const fallbackConfigGlobPattern = `/**/${configFileName}`;
+
+export function getPathRelativeWorkspace(filePath) {
+  const normalizedWorkspacePath = normalize(vscode.workspace.rootPath);
+  const normalizePath = normalize(filePath);
+  if (normalizePath === normalizedWorkspacePath) {
+    return WORKSPACE_TRIE_TOKEN;
+  }
+  const relativePath = rpath.relative(normalizedWorkspacePath, normalizePath);
+  return `${WORKSPACE_TRIE_TOKEN}/${relativePath}`;
+}
 
 export function getDefaultConfigFolder() {
   return `${vscode.workspace.rootPath}/${vscodeFolder}`;
@@ -122,6 +122,22 @@ export function getConfig(activityPath: string) {
     //  TO-DO rpath.relative('c:/a/b/c', 'c:\a\b\c\d.txt')
     remotePath: rpath.join(config.remotePath, normalize(path.relative(config.configRoot, activityPath))),
   };
+};
+
+export function getAllConfigs() {
+  if (configTrie === undefined) {
+    return [];
+  }
+
+  return configTrie.getAllValues()
+};
+
+export function getShortestDistinctConfigs() {
+  if (configTrie === undefined) {
+    return [];
+  }
+
+  return configTrie.findValueWithShortestBranch()
 };
 
 export function newConfig() {

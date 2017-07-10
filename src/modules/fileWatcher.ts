@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 
+import { isValidFile } from '../helper/documentFilter';
 import { upload } from './sync';
 import { getConfig, fillGlobPattern } from './config';
 import { removeRemote } from './sync';
@@ -83,6 +84,10 @@ function setUpWatcher(config) {
         return;
       }
 
+      if (!isValidFile(uri)) {
+        return;
+      }
+
       uploadQueue.push(uri);
       doUpload();
     });
@@ -91,6 +96,10 @@ function setUpWatcher(config) {
   if (watchConfig.autoDelete) {
     watcher.onDidDelete(uri => {
       if (disableWatch) {
+        return;
+      }
+
+      if (!isValidFile(uri)) {
         return;
       }
 
@@ -125,6 +134,10 @@ export function onFileChange(cb: (uri: vscode.Uri) => void) {
 
   workspaceWatcher.onDidChange(uri => {
     if (disableWatch) {
+      return;
+    }
+
+    if (!isValidFile(uri)) {
       return;
     }
 

@@ -139,6 +139,23 @@ export default class Trie {
     return null;
   }
 
+  getAllValues(): any[] {
+    const nodeQueue = [this.root];
+    const result = [];
+
+    do {
+      const curentNode = nodeQueue.shift();
+      if (curentNode.isLoaded()) {
+        result.push(curentNode.getValue());
+      }
+
+      const childrenNodes = curentNode.getChildren();
+      nodeQueue.push(...childrenNodes);
+    } while (nodeQueue.length > 0)
+
+    return result;
+  }
+
   findValueWithShortestBranch(): any[] {
     const nodeQueue = [this.root];
     const result = [];

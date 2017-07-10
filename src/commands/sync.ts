@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import * as output from '../modules/output';
-import { getConfig } from '../modules/config';
+import { getPathRelativeWorkspace, getConfig, getAllConfigs } from '../modules/config';
 import { upload, download, sync2Remote, sync2Local } from '../modules/sync';
-import { createFileCommand } from '../helper/createCommand';
+import { createFileCommand, ITarget } from '../helper/createCommand';
 
 // item:
 // fsPath:"/Users/mymomo/workspace/lanyilv/src/htdocs/lanyicj_platform/environments"
@@ -11,34 +11,65 @@ import { createFileCommand } from '../helper/createCommand';
 // path:"/Users/mymomo/workspace/lanyilv/src/htdocs/lanyicj_platform/environments"
 // scheme:"file"
 
-const getCurrentActiveTarget = item => new Promise((resolve, reject) => {
-  let fileItem = item;
+const getAllProjects = () =>
+  new Promise((resolve, reject) => {
+    // getAllProjects
+    const configs = getAllConfigs();
+    const projectsList = configs
+      .map(cfg => ({
+        value: cfg.configRoot,
+        label: getPathRelativeWorkspace(cfg.configRoot),
+      }))
+      .sort((l, r) => l.label.localeCompare(r.label));
 
-  if (!fileItem.fsPath) {
-    // run through shortcut
+    vscode.window
+      .showQuickPick(projectsList as vscode.QuickPickItem[], {
+        ignoreFocusOut: true,
+        placeHolder: 'Select a folder...',
+      })
+      .then(
+        selection =>
+          resolve({
+            fsPath: (selection as any).value,
+          }),
+        reject
+      );
+  });
+
+const getActiveTarget = () =>
+  new Promise((resolve, reject) => {
     const active = vscode.window.activeTextEditor;
     if (!active || !active.document) {
-      reject(new Error('Action must have a file or directory as target!'));
-      return;
+      throw new Error('Action must have a file or directory as target!');
     }
 
-    fileItem = {
+    resolve({
       fsPath: active.document.fileName,
-    };
+    });
+  });
+
+const getTarget = item => {
+  if (item === undefined) {
+    return getAllProjects();
   }
 
-  resolve(fileItem);
-});
+  if (!item.fsPath) {
+    return getActiveTarget();
+  }
 
-const getAllOpenFiles = item => new Promise((resolve, reject) => {
-  // output.debug(vscode.window.visibleTextEditors.map(editors => editors.document));
-  output.debug('visibleTextEditors', vscode.window.visibleTextEditors.length);
-  output.debug('known textDocuments', vscode.workspace.textDocuments.length);
-  resolve(item);
-});
+  return Promise.resolve(item);
+};
 
-export const sync2RemoteCommand = createFileCommand(sync2Remote, getCurrentActiveTarget);
-export const sync2LocalCommand = createFileCommand(sync2Local, getCurrentActiveTarget);
+const getFolderTarget = item => {
+  if (item && item.fsPath) {
+    return Promise.resolve(item);
+  }
 
-export const uploadCommand = createFileCommand(upload, getCurrentActiveTarget);
-export const downloadCommand = createFileCommand(download, getCurrentActiveTarget);
+  return getAllProjects();
+};
+
+export const sync2RemoteCommand = createFileCommand(sync2Remote, getFolderTarget);
+export const sync2LocalCommand = createFileCommand(sync2Local, getFolderTarget);
+
+export const uploadCommand = createFileCommand(upload, getTarget);
+export const downloadCommand = createFileCommand(download, getTarget);

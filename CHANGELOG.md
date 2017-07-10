@@ -1,3 +1,7 @@
+## [0.7.2] - 2017-07-04
+### Feature
+* Add a way to execute commands on all detected config root folders.(run commands throw command palette)
+
 ## [0.7.1] - 2017-07-04
 ### Bugfix
 * Fix miss files because of throttle.

@@ -5,9 +5,10 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 
 import * as output from './modules/output';
-import { initConfigs, addConfig, configFileName } from './modules/config';
+import { initConfigs, addConfig, configFileName, getShortestDistinctConfigs } from './modules/config';
 import { invalidRemote, endRemote } from './modules/remoteFs';
 import { onFileChange, watchFiles, clearAllWatcher } from './modules/fileWatcher';
+// import traceFileActivities from './modules/fileActivities.js';
 import { sync2RemoteCommand, sync2LocalCommand, uploadCommand, downloadCommand } from './commands/sync';
 import editConfig from './commands/config';
 import autoSave from './commands/auto-save';
@@ -34,11 +35,13 @@ function registerCommand(
 export function activate(context: vscode.ExtensionContext) {
   if (!vscode.workspace.rootPath) return;
 
-  output.status.msg('SFTP searching configs...');
+  // traceFileActivities(vscode);
+
+  output.status.msg('SFTP init...');
   registerCommand(context, CONFIG, editConfig);
 
   return initConfigs()
-    .then(configTrie => {
+    .then(_ => {
       output.status.msg('SFTP Ready', 1000 * 8);
 
       registerCommand(context, SYNC_TO_REMOTE, sync2RemoteCommand);
@@ -49,7 +52,7 @@ export function activate(context: vscode.ExtensionContext) {
 
       registerCommand(context, DOWNLOAD, downloadCommand);
 
-      watchFiles(configTrie.findValueWithShortestBranch());
+      watchFiles(getShortestDistinctConfigs());
 
       const handleDocumentChange = (uri: vscode.Uri) => {
         if (path.basename(uri.fsPath) === configFileName) {

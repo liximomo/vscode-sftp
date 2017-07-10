@@ -19,7 +19,7 @@ Very simple and intuitive and works.
 1. `Ctrl+Shift+P` on Windows/Linux open command palette, run `SFTP: config` command.
 2. Run commnad on editor context menu or explorer context menu.
 
-*Note1* ：A commnad must run with a target(file or directory). When Running command within command palette will result in target be workspace root.
+*Note1* ：A commnad must run with a target(file or directory). When Running command within command palette will ask you to select a folder.
 
 *Note2* ：Sync commands will only avaliable to a directory. Try not to bind shortcut to those commands becasue there is no way to firgut out the target direcotry.
 
