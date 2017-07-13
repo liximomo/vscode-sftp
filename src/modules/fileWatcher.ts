@@ -61,7 +61,7 @@ function clearWatcher(fileWatcher) {
 }
 
 function setUpWatcher(config) {
-  const watchConfig = config.watcher;
+  const watchConfig = config.watcher !== undefined ? config.watcher : {};
 
   let watcher = watchers[config.configRoot];
   if (watcher) {

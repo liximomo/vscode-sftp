@@ -1,5 +1,8 @@
 ## [0.7.3] - 2017-07-13
-### Correct README
+### Feature
+* Config validation.
+
+### Misc
 * More accurate watcher description.
 
 ## [0.7.2] - 2017-07-04

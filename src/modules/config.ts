@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
+import * as Joi from 'joi';
 import rpath, { normalize } from './remotePath';
 import * as output from './output';
 import Trie from '../model/Trie';
@@ -11,6 +12,34 @@ import { WORKSPACE_TRIE_TOKEN } from '../constants';
 let configTrie = null;
 
 const vscodeFolder = '.vscode';
+
+const nullable = schema => schema.optional().allow(null);
+
+const configScheme = {
+  host: Joi.string().required(),
+  port: Joi.number().integer(),
+  username: Joi.string().required(),
+  password: nullable(Joi.string()),
+  protocol: Joi.any().valid('sftp', 'ftp'),
+  agent: nullable(Joi.string()),
+  privateKeyPath: nullable(Joi.string()),
+  passphrase: nullable(Joi.string()),
+  passive: Joi.boolean().optional(),
+  interactiveAuth: Joi.boolean().optional(),
+
+  remotePath: Joi.string().required(),
+  uploadOnSave: Joi.boolean().optional(),
+
+  syncMode: Joi.any().valid('update', 'full'),
+
+  watcher: {
+    files: Joi.string().allow(false, null).optional(),
+    autoUpload: Joi.boolean().optional(),
+    autoDelete: Joi.boolean().optional(),
+  },
+
+  ignore: Joi.array().min(0).items(Joi.string()),
+};
 
 export const configFileName = '.sftpConfig.json';
 
@@ -33,8 +62,8 @@ export const defaultConfig = {
 
   watcher: {
     files: false,
-    autoUpload: true,
-    autoDelete: true,
+    autoUpload: false,
+    autoDelete: false,
   },
 
   ignore: [
@@ -73,6 +102,20 @@ export function fillGlobPattern(pattern, rootPath) {
 export function addConfig(configPath) {
   return fse.readJson(configPath)
     .then(config => {
+      const {
+        error: validationError,
+      } = Joi.validate(config, configScheme, {
+        convert: false,
+        language: {
+          object: {
+            child: '!!prop "{{!child}}" fails because {{reason}}',
+          },
+        },
+      });
+      if (validationError) {
+        throw new Error(`config validation error ${validationError.message}`);
+      }
+
       const normalizeConfigPath = normalize(configPath);
       let configRoot = rpath.dirname(normalizeConfigPath);
       configRoot = rpath.dirname(configRoot);
