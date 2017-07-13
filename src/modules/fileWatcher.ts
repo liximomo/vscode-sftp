@@ -70,7 +70,8 @@ function setUpWatcher(config) {
   }
 
   const shouldAddListenser = watchConfig.autoUpload || watchConfig.autoDelete;
-  if (watchConfig.files === false || !shouldAddListenser) {
+  // tslint:disable-next-line triple-equals
+  if (watchConfig.files == false || !shouldAddListenser) {
     return;
   }
 

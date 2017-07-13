@@ -1,3 +1,7 @@
+## [0.7.3] - 2017-07-13
+### Correct README
+* More accurate watcher description.
+
 ## [0.7.2] - 2017-07-04
 ### Feature
 * Add a way to execute commands on all detected config root folders.(run commands throw command palette)

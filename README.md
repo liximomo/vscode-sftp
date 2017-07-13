@@ -114,10 +114,10 @@ Very simple and intuitive and works.
    *  Watcher will be disable when files set to null or both autoDelete and autoUpload set to false,
    */
   watcher: {
-    // avaliable value: null | glob patternv
-    // null: disable watcher
+    // avaliable value: false or glob pattern
+    // false: disable watcher
     // glob pattern: same logic as ignore
-    files: null, 
+    files: false, 
 
     // avaliable value: true or false
     // whether or not auto upload created files
