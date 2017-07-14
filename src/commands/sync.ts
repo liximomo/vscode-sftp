@@ -19,6 +19,7 @@ const getAllProjects = () =>
       .map(cfg => ({
         value: cfg.configRoot,
         label: getPathRelativeWorkspace(cfg.configRoot),
+        description: cfg.configRoot,
       }))
       .sort((l, r) => l.label.localeCompare(r.label));
 

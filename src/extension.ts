@@ -40,36 +40,32 @@ export function activate(context: vscode.ExtensionContext) {
   output.status.msg('SFTP init...');
   registerCommand(context, CONFIG, editConfig);
 
+  const handleDocumentChange = (uri: vscode.Uri) => {
+    if (path.basename(uri.fsPath) === configFileName) {
+
+      // make sure to re-conncet
+      invalidRemote();
+      addConfig(uri.fsPath)
+        .then(config => {
+          watchFiles(config);
+        }, output.onError);
+    } else {
+      autoSave(uri);
+    }
+  };
+  onFileChange(handleDocumentChange);
+
   return initConfigs()
     .then(_ => {
-      output.status.msg('SFTP Ready', 1000 * 8);
-
-      registerCommand(context, SYNC_TO_REMOTE, sync2RemoteCommand);
-
-      registerCommand(context, SYNC_TO_LOCAL, sync2LocalCommand);
-
-      registerCommand(context, UPLOAD, uploadCommand);
-
-      registerCommand(context, DOWNLOAD, downloadCommand);
-
       watchFiles(getShortestDistinctConfigs());
-
-      const handleDocumentChange = (uri: vscode.Uri) => {
-        if (path.basename(uri.fsPath) === configFileName) {
-
-          // make sure to re-conncet
-          invalidRemote();
-          addConfig(uri.fsPath)
-            .then(config => {
-              watchFiles(config);
-            }, output.onError);
-        } else {
-          autoSave(uri);
-        }
-      };
-
-      onFileChange(handleDocumentChange);
-    }, output.onError);
+    }, output.onError)
+    .then(_ => {
+      output.status.msg('SFTP Ready', 1000 * 8);
+      registerCommand(context, SYNC_TO_REMOTE, sync2RemoteCommand);
+      registerCommand(context, SYNC_TO_LOCAL, sync2LocalCommand);
+      registerCommand(context, UPLOAD, uploadCommand);
+      registerCommand(context, DOWNLOAD, downloadCommand);
+    });
 }
 
 export function deactivate() {

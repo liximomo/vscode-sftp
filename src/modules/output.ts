@@ -39,7 +39,7 @@ class StatusBarItem {
 export const status = new StatusBarItem('info');
 
 export function success(msg: string, event?: string) {
-  return vscode.window.showInformationMessage(`[${event || EXTENSION_NAME}]: ${msg}`);
+  return vscode.window.showInformationMessage(`[${event || EXTENSION_NAME}] ${msg}`);
 }
 
 export function onError(err: Error | string, event?: string) {
@@ -51,7 +51,7 @@ export function onError(err: Error | string, event?: string) {
 
   status.msg('fail', 2000);
 
-  return vscode.window.showErrorMessage(`[${event || EXTENSION_NAME}]: ${errorString}`);
+  return vscode.window.showErrorMessage(`[${event || EXTENSION_NAME}] ${errorString}`);
 }
 
 let outputChannel;

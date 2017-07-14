@@ -9,7 +9,7 @@ import * as output from './output';
 import Trie from '../model/Trie';
 import { WORKSPACE_TRIE_TOKEN } from '../constants';
 
-let configTrie = null;
+const configTrie = new Trie({});
 
 const vscodeFolder = '.vscode';
 
@@ -113,7 +113,7 @@ export function addConfig(configPath) {
         },
       });
       if (validationError) {
-        throw new Error(`config validation error ${validationError.message}`);
+        throw new Error(`config validation fail: ${validationError.message}`);
       }
 
       const normalizeConfigPath = normalize(configPath);
@@ -146,8 +146,6 @@ export function initConfigs(): Promise<Trie> {
         reject(error);
         return;
       }
-
-      configTrie = new Trie({});
 
       return Promise.all(files.map(addConfig))
         .then(() => resolve(configTrie), reject);

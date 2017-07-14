@@ -1,3 +1,7 @@
+## [0.7.4] - 2017-07-14
+### Enhance
+* Config validation failing at startup does not require a reload to make extension work.
+
 ## [0.7.3] - 2017-07-13
 ### Feature
 * Config validation.
