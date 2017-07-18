@@ -1,5 +1,9 @@
 import * as vscode from 'vscode';
+import { getConfig } from './editorConfig';
 import { EXTENSION_NAME } from '../constants';
+
+const config = getConfig();
+const printDebugLog = config.printDebugLog;
 
 class StatusBarItem {
   isShow: boolean;
@@ -26,14 +30,14 @@ class StatusBarItem {
     }
 
     if (typeof varient === 'object' && typeof varient.then === 'function') {
-      varient.then(this.hide, this.hide)
+      varient.then(this.hide, this.hide);
     }
   }
 
   hide = () => {
     this.statusBarItem.hide();
     this.isShow = false;
-  }
+  };
 }
 
 export const status = new StatusBarItem('info');
@@ -67,17 +71,26 @@ export function print(...args) {
     outputChannel = vscode.window.createOutputChannel(EXTENSION_NAME);
   }
 
-  const msg = args.map(arg => {
-    if (typeof arg === 'object') {
-      return JSON.stringify(arg, null, 4);
-    }
-    return arg;
-  }).join(' ');
+  const msg = args
+    .map(arg => {
+      if (typeof arg === 'object') {
+        return JSON.stringify(arg, null, 4);
+      }
+      return arg;
+    })
+    .join(' ');
 
   outputChannel.appendLine(msg);
 }
 
+export function info(...args) {
+  print('[info]:', ...args);
+}
+
 export function debug(...args) {
+  if (!printDebugLog) {
+    return;
+  }
   print('[debug]:', ...args);
 }
 

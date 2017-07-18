@@ -1,131 +1,131 @@
 {
-    "name": "sftp",
-    "displayName": "sftp",
-    "description": "SFTP/FTP sync",
-    "version": "0.7.4",
-    "publisher": "liximomo",
-    "engines": {
-        "vscode": "^1.13.0"
-    },
-    "bugs": {
-        "url": "https://github.com/liximomo/vscode-sftp/issues",
-        "email": "liximomo@gmail.com"
-    },
-    "homepage": "https://github.com/liximomo/vscode-sftp/blob/master/README.md",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/liximomo/vscode-sftp.git"
-    },
-    "categories": [
-        "Other"
-    ],
-    "keywords": [
-        "sftp",
-        "sync",
-        "remote"
-    ],
-    "activationEvents": [
-        "onCommand:sftp.config.default",
-        "onCommand:sftp.trans.remote",
-        "onCommand:sftp.trans.local",
-        "onCommand:sftp.sync.remote",
-        "onCommand:sftp.sync.local",
-        "workspaceContains:**/.vscode/.sftpConfig.json"
-    ],
-    "icon": "icon.png",
-    "main": "./out/src/extension",
-    "contributes": {
-        "commands": [
-            {
-                "command": "sftp.config.default",
-                "title": "SFTP: Config"
-            },
-            {
-                "command": "sftp.trans.remote",
-                "title": "SFTP: Upload"
-            },
-            {
-                "command": "sftp.trans.local",
-                "title": "SFTP: Download"
-            },
-            {
-                "command": "sftp.sync.remote",
-                "title": "SFTP: Sync To Remote"
-            },
-            {
-                "command": "sftp.sync.local",
-                "title": "SFTP: Sync To Local"
-            }
-        ],
-        "menus": {
-            "explorer/context": [
-                {
-                    "command": "sftp.sync.remote",
-                    "group": "sftp.sync@1",
-                    "when": "explorerResourceIsFolder"
-                },
-                {
-                    "command": "sftp.sync.local",
-                    "group": "sftp.sync@2",
-                    "when": "explorerResourceIsFolder"
-                },
-                {
-                    "command": "sftp.trans.remote",
-                    "group": "sftp.trans@3"
-                },
-                {
-                    "command": "sftp.trans.local",
-                    "group": "sftp.trans@4"
-                }
-            ],
-            "editor/context": [
-                {
-                    "command": "sftp.trans.remote",
-                    "group": "sftp.trans@1"
-                },
-                {
-                    "command": "sftp.trans.local",
-                    "group": "sftp.trans@2"
-                }
-            ]
+  "name": "sftp",
+  "displayName": "sftp",
+  "description": "SFTP/FTP sync",
+  "version": "0.7.5",
+  "publisher": "liximomo",
+  "engines": {
+    "vscode": "^1.13.0"
+  },
+  "bugs": {
+    "url": "https://github.com/liximomo/vscode-sftp/issues",
+    "email": "liximomo@gmail.com"
+  },
+  "homepage": "https://github.com/liximomo/vscode-sftp/blob/master/README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/liximomo/vscode-sftp.git"
+  },
+  "categories": ["Other"],
+  "keywords": ["sftp", "sync", "remote"],
+  "activationEvents": [
+    "onCommand:sftp.config.default",
+    "onCommand:sftp.trans.remote",
+    "onCommand:sftp.trans.local",
+    "onCommand:sftp.sync.remote",
+    "onCommand:sftp.sync.local",
+    "workspaceContains:**/.vscode/.sftpConfig.json"
+  ],
+  "icon": "icon.png",
+  "main": "./out/src/extension",
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "sftp configuration",
+      "properties": {
+        "sftp.printDebugLog": {
+          "type": "boolean",
+          "default": false,
+          "description": "print debug log on sftp output channel.(reload vscode when change this)"
         }
+      }
     },
-    "scripts": {
-        "vscode:prepublish": "tsc -p ./",
-        "compile": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "node ./node_modules/vscode/bin/test",
-        "test:spec": "jest"
-    },
-    "devDependencies": {
-        "@types/mocha": "^2.2.32",
-        "@types/node": "^6.0.40",
-        "jest": "^20.0.4",
-        "mocha": "^2.3.3",
-        "tslint": "^5.4.3",
-        "typescript": "^2.0.3",
-        "vscode": "^1.0.0"
-    },
-    "dependencies": {
-        "fs-extra": "^3.0.1",
-        "ftp": "^0.3.10",
-        "glob": "^7.1.1",
-        "joi": "^10.6.0",
-        "minimatch": "^3.0.4",
-        "ssh2": "^0.5.4",
-        "stat-mode": "^0.2.2",
-        "upath": "^1.0.0"
-    },
-    "jest": {
-        "moduleFileExtensions": [
-            "ts",
-            "js"
-        ],
-        "transform": {
-            "^.+\\.ts$": "<rootDir>/test/preprocessor.js"
+    "commands": [
+      {
+        "command": "sftp.config.default",
+        "title": "SFTP: Config"
+      },
+      {
+        "command": "sftp.trans.remote",
+        "title": "SFTP: Upload"
+      },
+      {
+        "command": "sftp.trans.local",
+        "title": "SFTP: Download"
+      },
+      {
+        "command": "sftp.sync.remote",
+        "title": "SFTP: Sync To Remote"
+      },
+      {
+        "command": "sftp.sync.local",
+        "title": "SFTP: Sync To Local"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "sftp.sync.remote",
+          "group": "sftp.sync@1",
+          "when": "explorerResourceIsFolder"
         },
-        "testMatch": [
-            "**/test/*.spec.js"
-        ]
+        {
+          "command": "sftp.sync.local",
+          "group": "sftp.sync@2",
+          "when": "explorerResourceIsFolder"
+        },
+        {
+          "command": "sftp.trans.remote",
+          "group": "sftp.trans@3"
+        },
+        {
+          "command": "sftp.trans.local",
+          "group": "sftp.trans@4"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "sftp.trans.remote",
+          "group": "sftp.trans@1"
+        },
+        {
+          "command": "sftp.trans.local",
+          "group": "sftp.trans@2"
+        }
+      ]
     }
+  },
+  "scripts": {
+    "vscode:prepublish": "tsc -p ./",
+    "compile": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "node ./node_modules/vscode/bin/test",
+    "test:spec": "jest"
+  },
+  "devDependencies": {
+    "@types/mocha": "^2.2.32",
+    "@types/node": "^6.0.40",
+    "jest": "^20.0.4",
+    "mocha": "^2.3.3",
+    "tslint": "^5.4.3",
+    "typescript": "^2.0.3",
+    "vscode": "^1.0.0"
+  },
+  "dependencies": {
+    "fs-extra": "^3.0.1",
+    "ftp": "^0.3.10",
+    "glob": "^7.1.1",
+    "joi": "^10.6.0",
+    "minimatch": "^3.0.4",
+    "ssh2": "^0.5.4",
+    "stat-mode": "^0.2.2",
+    "upath": "^1.0.0"
+  },
+  "jest": {
+    "moduleFileExtensions": ["ts", "js"],
+    "transform": {
+      "^.+\\.ts$": "<rootDir>/test/preprocessor.js"
+    },
+    "testMatch": ["**/test/*.spec.js"]
+  }
 }

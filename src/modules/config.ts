@@ -66,12 +66,7 @@ export const defaultConfig = {
     autoDelete: false,
   },
 
-  ignore: [
-    '**/.vscode',
-    '**/.git',
-    '**/.DS_Store',
-    `**/${configFileName}`,
-  ],
+  ignore: ['**/.vscode', '**/.git', '**/.DS_Store', `**/${configFileName}`],
 };
 
 const configGlobPattern = `/**/${vscodeFolder}/${configFileName}`;
@@ -89,67 +84,67 @@ export function getPathRelativeWorkspace(filePath) {
 
 export function getDefaultConfigFolder() {
   return `${vscode.workspace.rootPath}/${vscodeFolder}`;
-};
+}
 
 export function getDefaultConfigPath() {
   return `${getDefaultConfigFolder()}/${configFileName}`;
-};
+}
 
 export function fillGlobPattern(pattern, rootPath) {
   return rpath.join(rootPath, pattern);
 }
 
 export function addConfig(configPath) {
-  return fse.readJson(configPath)
-    .then(config => {
-      const {
-        error: validationError,
-      } = Joi.validate(config, configScheme, {
-        convert: false,
-        language: {
-          object: {
-            child: '!!prop "{{!child}}" fails because {{reason}}',
-          },
+  return fse.readJson(configPath).then(config => {
+    const { error: validationError } = Joi.validate(config, configScheme, {
+      convert: false,
+      language: {
+        object: {
+          child: '!!prop "{{!child}}" fails because {{reason}}',
         },
-      });
-      if (validationError) {
-        throw new Error(`config validation fail: ${validationError.message}`);
-      }
-
-      const normalizeConfigPath = normalize(configPath);
-      let configRoot = rpath.dirname(normalizeConfigPath);
-      configRoot = rpath.dirname(configRoot);
-
-      const localIgnore = config.ignore.map(pattern => fillGlobPattern(pattern, configRoot));
-      const remoteIgnore = config.ignore.map(pattern => fillGlobPattern(pattern, config.remotePath));
-      const fullConfig = {
-        ...defaultConfig,
-        ...config,
-        ignore: localIgnore.concat(remoteIgnore),
-        configRoot,
-      };
-      const triePath = getPathRelativeWorkspace(configRoot);
-      configTrie.add(triePath, fullConfig);
-      output.debug(`config at ${triePath}`, fullConfig);
-      return fullConfig;
+      },
     });
+    if (validationError) {
+      throw new Error(`config validation fail: ${validationError.message}`);
+    }
+
+    const normalizeConfigPath = normalize(configPath);
+    let configRoot = rpath.dirname(normalizeConfigPath);
+    configRoot = rpath.dirname(configRoot);
+
+    const localIgnore = config.ignore.map(pattern => fillGlobPattern(pattern, configRoot));
+    const remoteIgnore = config.ignore.map(pattern => fillGlobPattern(pattern, config.remotePath));
+    const fullConfig = {
+      ...defaultConfig,
+      ...config,
+      ignore: localIgnore.concat(remoteIgnore),
+      configRoot,
+    };
+    const triePath = getPathRelativeWorkspace(configRoot);
+    configTrie.add(triePath, fullConfig);
+    output.info(`config at ${triePath}`, fullConfig);
+    return fullConfig;
+  });
 }
 
 export function initConfigs(): Promise<Trie> {
   return new Promise((resolve, reject) => {
-    glob(configGlobPattern, {
-      cwd: vscode.workspace.rootPath,
-      root: vscode.workspace.rootPath,
-      nodir: true,
-    }, (error, files) => {
-      if (error) {
-        reject(error);
-        return;
-      }
+    glob(
+      configGlobPattern,
+      {
+        cwd: vscode.workspace.rootPath,
+        root: vscode.workspace.rootPath,
+        nodir: true,
+      },
+      (error, files) => {
+        if (error) {
+          reject(error);
+          return;
+        }
 
-      return Promise.all(files.map(addConfig))
-        .then(() => resolve(configTrie), reject);
-    });
+        return Promise.all(files.map(addConfig)).then(() => resolve(configTrie), reject);
+      }
+    );
   });
 }
 
@@ -161,25 +156,28 @@ export function getConfig(activityPath: string) {
   return {
     ...config,
     //  TO-DO rpath.relative('c:/a/b/c', 'c:\a\b\c\d.txt')
-    remotePath: rpath.join(config.remotePath, normalize(path.relative(config.configRoot, activityPath))),
+    remotePath: rpath.join(
+      config.remotePath,
+      normalize(path.relative(config.configRoot, activityPath))
+    ),
   };
-};
+}
 
 export function getAllConfigs() {
   if (configTrie === undefined) {
     return [];
   }
 
-  return configTrie.getAllValues()
-};
+  return configTrie.getAllValues();
+}
 
 export function getShortestDistinctConfigs() {
   if (configTrie === undefined) {
     return [];
   }
 
-  return configTrie.findValueWithShortestBranch()
-};
+  return configTrie.findValueWithShortestBranch();
+}
 
 export function newConfig() {
   if (!vscode.workspace.rootPath) {
@@ -189,16 +187,17 @@ export function newConfig() {
   const defaultConfigPath = getDefaultConfigPath();
 
   const showConfigFile = () =>
-    vscode.workspace.openTextDocument(defaultConfigPath)
-      .then(vscode.window.showTextDocument);
+    vscode.workspace.openTextDocument(defaultConfigPath).then(vscode.window.showTextDocument);
 
-  fse.pathExists(defaultConfigPath)
+  fse
+    .pathExists(defaultConfigPath)
     .then(exist => {
       if (exist) {
-        return showConfigFile()
+        return showConfigFile();
       }
 
-      return fse.ensureDir(getDefaultConfigFolder())
+      return fse
+        .ensureDir(getDefaultConfigFolder())
         .then(_ => fse.writeJson(defaultConfigPath, defaultConfig, { spaces: 4 }))
         .then(showConfigFile);
     })

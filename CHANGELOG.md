@@ -1,3 +1,7 @@
+## [0.7.5] - 2017-07-18
+### Feature
+* A new editor config `sftp.printDebugLog`, dafault with false.
+
 ## [0.7.4] - 2017-07-14
 ### Enhance
 * Config validation failing at startup does not require a reload to make extension work.

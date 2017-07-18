@@ -11,11 +11,11 @@ function failedTask(result, index, array) {
 }
 
 function logIgnored(result) {
-  output.print(['', `ignore: ${result.target}`].join('\n'));
+  output.debug(['', `ignore: ${result.target}`].join('\n'));
 }
 
 function printFailTask(result) {
-  output.print(
+  output.debug(
     [
       '',
       '------',
@@ -56,7 +56,7 @@ function printResult(msg, result, silent) {
     return;
   }
 
-  output.print(`\n\n${msg} at ${new Date()}`);
+  output.debug(`\n\n${msg} at ${new Date()}`);
   if (fails.length) {
     fails.forEach(printFailTask);
     output.showOutPutChannel();
