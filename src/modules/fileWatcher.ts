@@ -13,7 +13,7 @@ const deleteQueue = [];
 const PROCESS__DALEY = 300;
 
 function fileError(event, file, showErrorWindow = true) {
-  return error =>  {
+  return error => {
     output.error(`${event} ${file}`, '\n', error.stack);
     if (showErrorWindow) {
       output.showOutPutChannel();
@@ -49,10 +49,14 @@ function doDelete() {
       return;
     }
 
-    removeRemote(config.remotePath, {
-      ...config,
-      skipDir: true,
-    }, true).catch(fileError('delete', config.remotePath, false));
+    removeRemote(
+      config.remotePath,
+      {
+        ...config,
+        skipDir: true,
+      },
+      true
+    ).catch(fileError('delete', config.remotePath, false));
   });
 }
 
@@ -130,7 +134,12 @@ export function enableWatcher() {
 
 export function onFileChange(cb: (uri: vscode.Uri) => void) {
   if (!workspaceWatcher) {
-     workspaceWatcher = vscode.workspace.createFileSystemWatcher(`${vscode.workspace.rootPath}/**`, true, false, true);
+    workspaceWatcher = vscode.workspace.createFileSystemWatcher(
+      `${vscode.workspace.rootPath}/**`,
+      true,
+      false,
+      true
+    );
   }
 
   workspaceWatcher.onDidChange(uri => {

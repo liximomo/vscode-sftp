@@ -110,7 +110,7 @@ Very simple and intuitive and works.
   ],
 
   /**
-   *  Watching external file changes. Such as compile/build output or git branch switching.
+   *  Watching external file changes(create and remove only). Such as compile/build output or git branch switching.
    *  Watcher will be disable when files set to null or both autoDelete and autoUpload set to false,
    */
   watcher: {

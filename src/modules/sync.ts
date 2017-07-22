@@ -56,7 +56,7 @@ function printResult(msg, result, silent) {
     return;
   }
 
-  output.debug(`\n\n${msg} at ${new Date()}`);
+  output.debug(`${msg} at ${new Date()}`);
   if (fails.length) {
     fails.forEach(printFailTask);
     output.showOutPutChannel();
