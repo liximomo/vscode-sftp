@@ -1,34 +1,34 @@
 {
-	"extends": "tslint:recommended",
-	"rules": {
-		"no-unused-expression": true,
-		"no-duplicate-variable": true,
-		"no-unused-variable": true,
-		"curly": [true, "ignore-same-line"],
-		"class-name": true,
-		"semicolon": ["always"],
-		"triple-equals": true,
-		"quotemark": [true, "single"],
-		"arrow-parens": [true, "ban-single-arg-parens"],
-		"ordered-imports": [false],
-		"object-literal-sort-keys": false,
-		"trailing-comma": [
-			true,
-			{
-				"multiline": {
-					"objects": "always",
-					"arrays": "always",
-					"functions": "never",
-					"typeLiterals": "ignore"
-				},
-				"singleline": {
-					"objects": "never",
-					"arrays": "never",
-					"functions": "never",
-					"typeLiterals": "ignore"
-				}
-			}
-		],
-		"member-access": [true, "no-public"]
-	}
+  "extends": "tslint:recommended",
+  "rules": {
+    "no-unused-expression": true,
+    "no-duplicate-variable": true,
+    "no-unused-variable": true,
+    "curly": [true, "ignore-same-line"],
+    "class-name": true,
+    "semicolon": ["always"],
+    "triple-equals": true,
+    "quotemark": [true, "single"],
+    "arrow-parens": [true, "ban-single-arg-parens"],
+    "ordered-imports": [false],
+    "object-literal-sort-keys": false,
+    "trailing-comma": [
+      true,
+      {
+        "multiline": {
+          "objects": "always",
+          "arrays": "always",
+          "functions": "never",
+          "typeLiterals": "ignore"
+        },
+        "singleline": {
+          "objects": "never",
+          "arrays": "never",
+          "functions": "never",
+          "typeLiterals": "ignore"
+        }
+      }
+    ],
+    "member-access": [true, "no-public"]
+  }
 }

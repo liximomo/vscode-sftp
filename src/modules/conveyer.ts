@@ -9,20 +9,20 @@ import flatMap from '../helper/flatMap';
 type SyncModel = 'full' | 'update';
 
 interface ITransportOption {
-  ignore: string[],
-};
+  ignore: string[];
+}
 
 interface ISyncOption {
-  ignore: string[],
-  model: SyncModel,
-};
+  ignore: string[];
+  model: SyncModel;
+}
 
 interface ITransportResult {
-  target: string,
-  error?: boolean,
-  payload?: any,
-  op?: string,
-};
+  target: string;
+  error?: boolean;
+  payload?: any;
+  op?: string;
+}
 
 const defaultTransportOption = {
   ignore: [],
@@ -38,7 +38,7 @@ function fileName2Show(filePath) {
 }
 
 function testIgnore(target, pattern) {
-  return target.indexOf(pattern) === 0 || minimatch(target, pattern);
+  return target.indexOf(pattern) === 0 || minimatch(target, pattern, { dot: true });
 }
 
 function shouldSkip(path, ignore) {
@@ -63,10 +63,12 @@ function transportDir(
   option: ITransportOption
 ): Promise<ITransportResult[]> {
   if (shouldSkip(src, option.ignore)) {
-    return Promise.resolve([{
-      target: src,
-      ignored: true,
-    }]);
+    return Promise.resolve([
+      {
+        target: src,
+        ignored: true,
+      },
+    ]);
   }
 
   const listFiles = () => {
@@ -76,32 +78,55 @@ function transportDir(
 
   const uploadItem = (item: IFileEntry) => {
     if (item.type === FileType.Directory) {
-      return transportDir(item.fspath, desFs.pathResolver.join(des, item.name), srcFs, desFs, option);
+      return transportDir(
+        item.fspath,
+        desFs.pathResolver.join(des, item.name),
+        srcFs,
+        desFs,
+        option
+      );
     } else if (item.type === FileType.SymbolicLink) {
-      return transportSymlink(item.fspath, desFs.pathResolver.join(des, item.name), srcFs, desFs, option);
+      return transportSymlink(
+        item.fspath,
+        desFs.pathResolver.join(des, item.name),
+        srcFs,
+        desFs,
+        option
+      );
     } else if (item.type === FileType.File) {
-      return transportFile(item.fspath, desFs.pathResolver.join(des, item.name), srcFs, desFs, option);
+      return transportFile(
+        item.fspath,
+        desFs.pathResolver.join(des, item.name),
+        srcFs,
+        desFs,
+        option
+      );
     }
 
-    return [{
-      target: item.fspath,
-      error: true,
-      op: 'transmission',
-      payload: new Error('unsupport file type'),
-    }];
+    return [
+      {
+        target: item.fspath,
+        error: true,
+        op: 'transmission',
+        payload: new Error('unsupport file type'),
+      },
+    ];
   };
 
-  return desFs.ensureDir(des)
+  return desFs
+    .ensureDir(des)
     .then(listFiles)
     .then(items => items.map(uploadItem))
     .then(tasks => Promise.all<ITransportResult[] | ITransportResult>(tasks))
     .then(result => flatMap(result, a => a))
-    .catch(err => ({
-      target: src,
-      error: true,
-      op: 'transmission dir',
-      payload: err,
-    }));
+    .catch(err => [
+      {
+        target: src,
+        error: true,
+        op: 'transmission dir',
+        payload: err,
+      },
+    ]);
 }
 
 function transportFile(
@@ -119,7 +144,8 @@ function transportFile(
   }
 
   output.status.msg(`uploading ${fileName2Show(src)}`);
-  return srcFs.get(src)
+  return srcFs
+    .get(src)
     .then(inputStream => desFs.put(inputStream, des))
     .then(() => ({
       target: src,
@@ -147,13 +173,14 @@ function transportSymlink(
   }
 
   output.status.msg(`uploading ${fileName2Show(src)}`);
-  return srcFs.readlink(src)
+  return srcFs
+    .readlink(src)
     .then(targetPath => {
       return desFs.symlink(targetPath, des).catch(err => {
         // ignore file already exist
         if (err.code === 4 || err.code === 'EEXIST') {
-          return
-        };
+          return;
+        }
         throw err;
       });
     })
@@ -177,7 +204,8 @@ function removeFile(path: string, fs: FileSystem, option): Promise<ITransportRes
   }
 
   output.status.msg(`remove ${fileName2Show(path)}`);
-  return fs.unlink(path)
+  return fs
+    .unlink(path)
     .then(() => ({
       target: path,
     }))
@@ -198,7 +226,8 @@ function removeDir(path: string, fs: FileSystem, option): Promise<ITransportResu
   }
 
   output.status.msg(`remove dir ${fileName2Show(path)}`);
-  return fs.rmdir(path, true)
+  return fs
+    .rmdir(path, true)
     .then(() => ({
       target: path,
     }))
@@ -218,10 +247,12 @@ export function sync(
   option: ISyncOption = defaultSyncOption
 ): Promise<ITransportResult[]> {
   if (shouldSkip(srcDir, option.ignore)) {
-    return Promise.resolve([{
-      target: srcDir,
-      ignored: true,
-    }]);
+    return Promise.resolve([
+      {
+        target: srcDir,
+        ignored: true,
+      },
+    ]);
   }
 
   output.status.msg(`collect files ${fileName2Show(srcDir)}...`);
@@ -276,11 +307,14 @@ export function sync(
             // delete process file
             delete desFileTable[id];
           } else if (option.model === 'full') {
-            symlink2trans.push([srcFile, { fspath: desFs.pathResolver.join(desDir, srcFile.name) }]);
+            symlink2trans.push([
+              srcFile,
+              { fspath: desFs.pathResolver.join(desDir, srcFile.name) },
+            ]);
           }
           break;
         default:
-          // do not process
+        // do not process
       }
     });
 
@@ -296,7 +330,7 @@ export function sync(
             fileMissed.push(file);
             break;
           default:
-            // do not process
+          // do not process
         }
       });
     }
@@ -314,12 +348,8 @@ export function sync(
       sync(srcfile.fspath, desFile.fspath, srcFs, desFs, option)
     );
 
-    const clearFileTasks = fileMissed.map(file =>
-      removeFile(file.fspath, desFs, option)
-    );
-    const clearDirTasks = dirMissed.map(file =>
-      removeDir(file.fspath, desFs, option)
-    );
+    const clearFileTasks = fileMissed.map(file => removeFile(file.fspath, desFs, option));
+    const clearDirTasks = dirMissed.map(file => removeDir(file.fspath, desFs, option));
 
     return Promise.all<ITransportResult[] | ITransportResult>([
       ...transFileTasks,
@@ -331,20 +361,20 @@ export function sync(
     ]);
   };
 
-  return Promise.all([
-    srcFs.list(srcDir).catch(err => []),
-    desFs.list(desDir).catch(err => []),
-  ]).then(syncFiles)
+  return Promise.all([srcFs.list(srcDir).catch(err => []), desFs.list(desDir).catch(err => [])])
+    .then(syncFiles)
     .then(result => {
       output.status.msg(`sync finish ${fileName2Show(srcDir)}`);
       return flatMap(result, a => a);
     })
-    .catch(err => ({
-      target: srcDir,
-      error: true,
-      op: 'sync',
-      payload: err,
-    }));
+    .catch(err => [
+      {
+        target: srcDir,
+        error: true,
+        op: 'sync',
+        payload: err,
+      },
+    ]);
 }
 
 export function transport(
@@ -355,31 +385,37 @@ export function transport(
   option: ITransportOption = defaultTransportOption
 ): Promise<ITransportResult[]> {
   if (shouldSkip(src, option.ignore)) {
-    return Promise.resolve([{
-      target: src,
-      ignored: true,
-    }]);
+    return Promise.resolve([
+      {
+        target: src,
+        ignored: true,
+      },
+    ]);
   }
 
-  return srcFs.lstat(src)
-    .then(stat => {
+  return srcFs.lstat(src).then(
+    stat => {
       let result;
 
       if (stat.type === FileType.Directory) {
         result = transportDir(src, des, srcFs, desFs, option);
       } else if (stat.type === FileType.File) {
-        result = desFs.ensureDir(desFs.pathResolver.dirname(des))
+        result = desFs
+          .ensureDir(desFs.pathResolver.dirname(des))
           .then(() => transportFile(src, des, srcFs, desFs, option));
       } else if (stat.type === FileType.SymbolicLink) {
-        result = desFs.ensureDir(desFs.pathResolver.dirname(des))
+        result = desFs
+          .ensureDir(desFs.pathResolver.dirname(des))
           .then(() => transportSymlink(src, des, srcFs, desFs, option));
       }
       return result;
-    }, err => {
+    },
+    err => {
       // ignore file or directory not exist
       if (err.code === 'ENOENT') return;
       throw err;
-    });
+    }
+  );
 }
 
 export function remove(path: string, fs: FileSystem, option): Promise<ITransportResult> {
@@ -390,8 +426,8 @@ export function remove(path: string, fs: FileSystem, option): Promise<ITransport
     });
   }
 
-  return fs.lstat(path)
-    .then(stat => {
+  return fs.lstat(path).then(
+    stat => {
       let result;
       switch (stat.type) {
         case FileType.Directory:
@@ -404,17 +440,21 @@ export function remove(path: string, fs: FileSystem, option): Promise<ITransport
           result = removeFile(path, fs, option);
           break;
         default:
-          result = [{
-            target: path,
-            error: true,
-            op: 'remove',
-            payload: new Error('unsupport file type'),
-          }];
+          result = [
+            {
+              target: path,
+              error: true,
+              op: 'remove',
+              payload: new Error('unsupport file type'),
+            },
+          ];
       }
       return result;
-    }, err => {
+    },
+    err => {
       // ignore file or directory not exist
       if (err.code === 'ENOENT') return;
       throw err;
-    });
+    }
+  );
 }

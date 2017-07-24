@@ -66,7 +66,7 @@ export const defaultConfig = {
     autoDelete: false,
   },
 
-  ignore: ['**/.vscode', '**/.git', '**/.DS_Store', `**/${configFileName}`],
+  ignore: ['**/.vscode/**', '**/.git/**', '**/.DS_Store'],
 };
 
 const configGlobPattern = `/**/${vscodeFolder}/${configFileName}`;

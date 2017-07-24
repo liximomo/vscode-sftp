@@ -1,3 +1,7 @@
+## [0.7.6] - 2017-07-24
+### Bugfix
+* Fix [files in "ignored" directories are still uploaded](https://github.com/liximomo/vscode-sftp/issues/15). Thanks for [Tom Spence](https://github.com/tomjaimz)'s help.
+
 ## [0.7.5] - 2017-07-18
 ### Feature
 * A new editor config `sftp.printDebugLog`, dafault with false.
