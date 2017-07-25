@@ -3,7 +3,7 @@ import * as minimatch from 'minimatch';
 
 import * as output from '../modules/output';
 import FileSystem, { IFileEntry, FileType } from '../model/Fs/FileSystem';
-import { normalize } from './remotePath';
+import remotePath, { normalize } from './remotePath';
 import flatMap from '../helper/flatMap';
 
 type SyncModel = 'full' | 'update';
@@ -42,7 +42,8 @@ function testIgnore(target, pattern) {
 }
 
 function shouldSkip(path, ignore) {
-  return ignore.some(pattern => testIgnore(path, pattern));
+  const normalizedPath = normalize(path);
+  return ignore.some(pattern => testIgnore(normalizedPath, pattern));
 }
 
 const toHash = (items: any[], key: string, transform?: (a: any) => any): { [key: string]: any } =>
@@ -62,7 +63,7 @@ function transportDir(
   desFs: FileSystem,
   option: ITransportOption
 ): Promise<ITransportResult[]> {
-  if (shouldSkip(src, option.ignore)) {
+  if (shouldSkip(remotePath.join(src, '/'), option.ignore)) {
     return Promise.resolve([
       {
         target: src,
@@ -218,7 +219,7 @@ function removeFile(path: string, fs: FileSystem, option): Promise<ITransportRes
 }
 
 function removeDir(path: string, fs: FileSystem, option): Promise<ITransportResult> {
-  if (shouldSkip(path, option.ignore)) {
+  if (shouldSkip(remotePath.join(path, '/'), option.ignore)) {
     return Promise.resolve({
       target: path,
       ignored: true,

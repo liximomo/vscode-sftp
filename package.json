@@ -2,7 +2,7 @@
   "name": "sftp",
   "displayName": "sftp",
   "description": "SFTP/FTP sync",
-  "version": "0.7.6",
+  "version": "0.7.7",
   "publisher": "liximomo",
   "engines": {
     "vscode": "^1.13.0"

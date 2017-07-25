@@ -1,3 +1,7 @@
+## [0.7.7] - 2017-07-25
+### Bugfix
+* Fix folder match of ignore.
+
 ## [0.7.6] - 2017-07-24
 ### Bugfix
 * Fix [files in "ignored" directories are still uploaded](https://github.com/liximomo/vscode-sftp/issues/15). Thanks for [Tom Spence](https://github.com/tomjaimz)'s help.
