@@ -33,12 +33,13 @@ function registerCommand(
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-  if (!vscode.workspace.rootPath) return;
-
   // traceFileActivities(vscode);
 
-  output.status.msg('SFTP init...');
   registerCommand(context, CONFIG, editConfig);
+  registerCommand(context, SYNC_TO_REMOTE, sync2RemoteCommand);
+  registerCommand(context, SYNC_TO_LOCAL, sync2LocalCommand);
+  registerCommand(context, UPLOAD, uploadCommand);
+  registerCommand(context, DOWNLOAD, downloadCommand);
 
   const handleDocumentChange = (uri: vscode.Uri) => {
     if (path.basename(uri.fsPath) === configFileName) {
@@ -55,16 +56,17 @@ export function activate(context: vscode.ExtensionContext) {
   };
   onFileChange(handleDocumentChange);
 
+  if (!vscode.workspace.rootPath) {
+    return;
+  }
+
+  output.status.msg('SFTP init...');
   return initConfigs()
     .then(_ => {
       watchFiles(getShortestDistinctConfigs());
     }, output.onError)
     .then(_ => {
       output.status.msg('SFTP Ready', 1000 * 8);
-      registerCommand(context, SYNC_TO_REMOTE, sync2RemoteCommand);
-      registerCommand(context, SYNC_TO_LOCAL, sync2LocalCommand);
-      registerCommand(context, UPLOAD, uploadCommand);
-      registerCommand(context, DOWNLOAD, downloadCommand);
     });
 }
 

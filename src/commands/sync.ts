@@ -3,6 +3,7 @@ import * as output from '../modules/output';
 import { getPathRelativeWorkspace, getConfig, getAllConfigs } from '../modules/config';
 import { upload, download, sync2Remote, sync2Local } from '../modules/sync';
 import { createFileCommand, ITarget } from '../helper/createCommand';
+import checkRequire from '../helper/checkRequire';
 
 // item:
 // fsPath:"/Users/mymomo/workspace/lanyilv/src/htdocs/lanyicj_platform/environments"
@@ -31,6 +32,7 @@ const getAllProjects = () =>
       .then(
         selection =>
           resolve({
+            // TODO selection will be undefined when user cancel
             fsPath: (selection as any).value,
           }),
         reject
@@ -69,8 +71,8 @@ const getFolderTarget = item => {
   return getAllProjects();
 };
 
-export const sync2RemoteCommand = createFileCommand(sync2Remote, getFolderTarget);
-export const sync2LocalCommand = createFileCommand(sync2Local, getFolderTarget);
+export const sync2RemoteCommand = checkRequire(createFileCommand(sync2Remote, getFolderTarget));
+export const sync2LocalCommand = checkRequire(createFileCommand(sync2Local, getFolderTarget));
 
-export const uploadCommand = createFileCommand(upload, getTarget);
-export const downloadCommand = createFileCommand(download, getTarget);
+export const uploadCommand = checkRequire(createFileCommand(upload, getTarget));
+export const downloadCommand = checkRequire(createFileCommand(download, getTarget));

@@ -1,5 +1,8 @@
 import { newConfig } from '../modules/config';
+import checkRequire from '../helper/checkRequire';
 
-export default function editConfig() {
+function editConfig() {
   newConfig();
 }
+
+export default checkRequire(editConfig);
