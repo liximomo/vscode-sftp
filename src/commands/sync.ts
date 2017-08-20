@@ -30,11 +30,17 @@ const getAllProjects = () =>
         placeHolder: 'Select a folder...',
       })
       .then(
-        selection =>
-          resolve({
-            // TODO selection will be undefined when user cancel
-            fsPath: (selection as any).value,
-          }),
+        selection => {
+          if (selection) {
+            resolve({
+              fsPath: (selection as any).value,
+            });
+            return;
+          }
+
+          // cancel selection
+          return null;
+        },
         reject
       );
   });
@@ -52,10 +58,12 @@ const getActiveTarget = () =>
   });
 
 const getTarget = item => {
+  // command palette
   if (item === undefined) {
     return getAllProjects();
   }
 
+  // short cut
   if (!item.fsPath) {
     return getActiveTarget();
   }
@@ -64,6 +72,7 @@ const getTarget = item => {
 };
 
 const getFolderTarget = item => {
+  // context menu
   if (item && item.fsPath) {
     return Promise.resolve(item);
   }

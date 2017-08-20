@@ -1,3 +1,7 @@
+## [0.7.8] - 2017-08-20
+### Bugfix
+* Fix `command not found error` when no folder opened.
+
 ## [0.7.7] - 2017-07-25
 ### Bugfix
 * Fix folder match of ignore.
