@@ -19,7 +19,7 @@ export default class LocalFileSystem extends FileSystem {
         resolve({
           ...stat,
           type: FileSystem.getFileTypecharacter(stat),
-        });
+        } as IStats);
       });
     });
   }
@@ -36,7 +36,7 @@ export default class LocalFileSystem extends FileSystem {
     });
   }
 
-  put(input: fs.ReadStream | Buffer, path, option): Promise<null> {
+  put(input: fs.ReadStream | Buffer, path, option): Promise<void> {
     return new Promise((resolve, reject) => {
       const stream = fs.createWriteStream(path, option);
 
@@ -65,7 +65,7 @@ export default class LocalFileSystem extends FileSystem {
     });
   }
 
-  symlink(targetPath: string, path: string): Promise<null> {
+  symlink(targetPath: string, path: string): Promise<void> {
     return new Promise((resolve, reject) => {
       fs.symlink(targetPath, path, null, err => {
         if (err) {
@@ -77,7 +77,7 @@ export default class LocalFileSystem extends FileSystem {
     });
   }
 
-  mkdir(dir: string): Promise<null> {
+  mkdir(dir: string): Promise<void> {
     return new Promise((resolve, reject) => {
       fs.mkdir(dir, err => {
         if (err) {
@@ -89,7 +89,7 @@ export default class LocalFileSystem extends FileSystem {
     });
   }
 
-  ensureDir(dir: string): Promise<null> {
+  ensureDir(dir: string): Promise<void> {
     return fse.ensureDir(dir);
   }
 
@@ -124,7 +124,7 @@ export default class LocalFileSystem extends FileSystem {
     });
   }
 
-  unlink(path: string): Promise<null> {
+  unlink(path: string): Promise<void> {
     return new Promise((resolve, reject) => {
       fs.unlink(path, err => {
         if (err) {
@@ -137,7 +137,7 @@ export default class LocalFileSystem extends FileSystem {
     });
   }
 
-  rmdir(path: string, recursive: boolean): Promise<null> {
+  rmdir(path: string, recursive: boolean): Promise<void> {
     if (recursive) {
       return fse.remove(path);
     }

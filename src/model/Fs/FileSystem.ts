@@ -45,13 +45,13 @@ export default abstract class FileSystem {
   }
 
   abstract get(path, option?: IStreamOption): Promise<fs.ReadStream>;
-  abstract put(input: fs.ReadStream | Buffer, path, option?: IStreamOption): Promise<null>;
-  abstract mkdir(dir: string): Promise<null>;
-  abstract ensureDir(dir: string): Promise<null>;
+  abstract put(input: fs.ReadStream | Buffer, path, option?: IStreamOption): Promise<void>;
+  abstract mkdir(dir: string): Promise<void>;
+  abstract ensureDir(dir: string): Promise<void>;
   abstract list(dir: string): Promise<IFileEntry[]>;
   abstract lstat(path: string): Promise<IStats>;
   abstract readlink(path: string): Promise<string>;
-  abstract symlink(targetPath: string, path: string): Promise<null>;
-  abstract unlink(path: string): Promise<null>;
-  abstract rmdir(path: string, recursive: boolean): Promise<null>;
+  abstract symlink(targetPath: string, path: string): Promise<void>;
+  abstract unlink(path: string): Promise<void>;
+  abstract rmdir(path: string, recursive: boolean): Promise<void>;
 }

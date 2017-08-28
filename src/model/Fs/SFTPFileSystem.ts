@@ -26,7 +26,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
         resolve({
           ...stat,
           type: FileSystem.getFileTypecharacter(stat),
-        });
+        } as IStats);
       });
     });
   }
@@ -43,7 +43,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
     });
   }
 
-  put(input: fs.ReadStream | Buffer, path, option?: IStreamOption): Promise<null> {
+  put(input: fs.ReadStream | Buffer, path, option?: IStreamOption): Promise<void> {
     return new Promise((resolve, reject) => {
       const stream = this.sftp.createWriteStream(path, option);
 
@@ -72,7 +72,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
     });
   }
 
-  symlink(targetPath: string, path: string): Promise<null> {
+  symlink(targetPath: string, path: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.sftp.symlink(targetPath, path, err => {
         if (err) {
@@ -83,7 +83,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
     });
   }
 
-  mkdir(dir: string): Promise<null> {
+  mkdir(dir: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.sftp.mkdir(dir, err => {
         if (err) {
@@ -95,7 +95,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
     });
   }
 
-  ensureDir(dir: string): Promise<null> {
+  ensureDir(dir: string): Promise<void> {
     return new Promise((resolve, reject) => {
       const tokens = dir.split('/');
       const root = tokens.shift();
@@ -150,7 +150,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
     });
   }
 
-  unlink(path: string): Promise<null> {
+  unlink(path: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.sftp.unlink(path, err => {
         if (err) {
@@ -163,7 +163,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
     });
   }
 
-  rmdir(path: string, recursive: boolean): Promise<null> {
+  rmdir(path: string, recursive: boolean): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!recursive) {
         this.sftp.rmdir(path, err => {

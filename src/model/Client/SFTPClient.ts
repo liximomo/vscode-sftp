@@ -13,7 +13,7 @@ export default class SFTPClient extends RemoteClient {
     return new Client();
   }
 
-  connect(readline) {
+  connect(readline): Promise<void> {
     const {
       interactiveAuth,
       password,

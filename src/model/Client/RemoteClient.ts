@@ -22,7 +22,7 @@ export default abstract class RemoteClient {
   }
 
   abstract initClient(): any;
-  abstract connect(readline?: (text: string) => Promise<string | undefined> ): Promise<null>;
+  abstract connect(readline?: (text: string) => Promise<string | undefined> ): Promise<void>;
   abstract end(): void;
   abstract getFsClient(): any;
 

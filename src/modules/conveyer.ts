@@ -144,7 +144,7 @@ function transportFile(
     });
   }
 
-  output.status.msg(`uploading ${fileName2Show(src)}`);
+  output.status.msg(`transfer ${fileName2Show(src)}`);
   return srcFs
     .get(src)
     .then(inputStream => desFs.put(inputStream, des))
@@ -173,7 +173,7 @@ function transportSymlink(
     });
   }
 
-  output.status.msg(`uploading ${fileName2Show(src)}`);
+  output.status.msg(`transfer ${fileName2Show(src)}`);
   return srcFs
     .readlink(src)
     .then(targetPath => {

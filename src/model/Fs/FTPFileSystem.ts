@@ -60,7 +60,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
     });
   }
 
-  put(input: fs.ReadStream | Buffer, path, option?: IStreamOption): Promise<null> {
+  put(input: fs.ReadStream | Buffer, path, option?: IStreamOption): Promise<void> {
     return new Promise((resolve, reject) => {
       this.ftp.put(input, path, err => {
         if (err) {
@@ -78,12 +78,12 @@ export default class FTPFileSystem extends RemoteFileSystem {
       .then(stat => stat.target)
   }
 
-  symlink(targetPath: string, path: string): Promise<null> {
+  symlink(targetPath: string, path: string): Promise<void> {
     // TO-DO implement
     return Promise.resolve();
   }
 
-  mkdir(dir: string): Promise<null> {
+  mkdir(dir: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.ftp.mkdir(dir, err => {
         if (err) {
@@ -95,9 +95,9 @@ export default class FTPFileSystem extends RemoteFileSystem {
     });
   }
 
-  ensureDir(dir: string): Promise<null> {
+  ensureDir(dir: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      const tokens = dir.split(this.pathResolver.sep);
+      const tokens = dir.split('/');
 
       const root = tokens.shift();
       let dirPath = root === '' ? '/' : root;
@@ -151,7 +151,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
     });
   }
 
-  unlink(path: string): Promise<null> {
+  unlink(path: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.ftp.delete(path, err => {
         if (err) {
@@ -164,7 +164,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
     });
   }
 
-  rmdir(path: string, recursive: boolean): Promise<null> {
+  rmdir(path: string, recursive: boolean): Promise<void> {
     return new Promise((resolve, reject) => {
       this.ftp.rmdir(path, recursive, err => {
         if (err) {
