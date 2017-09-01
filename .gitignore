@@ -1,4 +1,4 @@
 out
 node_modules
-npm-debug.log
+*.log
 test/test.js
