@@ -1,3 +1,7 @@
+## [0.7.9] - 2017-09-01
+### Bugfix
+* change tip text from uploading to sync when download and upload
+
 ## [0.7.8] - 2017-08-20
 ### Bugfix
 * Fix `command not found error` when no folder opened.
