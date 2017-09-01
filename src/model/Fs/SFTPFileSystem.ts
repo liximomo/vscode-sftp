@@ -44,7 +44,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
   }
 
   put(input: fs.ReadStream | Buffer, path, option?: IStreamOption): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const stream = this.sftp.createWriteStream(path, option);
 
       stream.on('error', reject);
@@ -73,7 +73,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
   }
 
   symlink(targetPath: string, path: string): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.sftp.symlink(targetPath, path, err => {
         if (err) {
           reject(err);
@@ -84,7 +84,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
   }
 
   mkdir(dir: string): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.sftp.mkdir(dir, err => {
         if (err) {
           reject(err);
@@ -96,7 +96,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
   }
 
   ensureDir(dir: string): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const tokens = dir.split('/');
       const root = tokens.shift();
       let dirPath = root === '' ? '/' : root;
@@ -151,7 +151,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
   }
 
   unlink(path: string): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.sftp.unlink(path, err => {
         if (err) {
           reject(err);
@@ -164,7 +164,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
   }
 
   rmdir(path: string, recursive: boolean): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       if (!recursive) {
         this.sftp.rmdir(path, err => {
           if (err) {

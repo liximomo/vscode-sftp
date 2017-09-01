@@ -37,7 +37,7 @@ export default class LocalFileSystem extends FileSystem {
   }
 
   put(input: fs.ReadStream | Buffer, path, option): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const stream = fs.createWriteStream(path, option);
 
       stream.on('error', reject);
@@ -66,7 +66,7 @@ export default class LocalFileSystem extends FileSystem {
   }
 
   symlink(targetPath: string, path: string): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       fs.symlink(targetPath, path, null, err => {
         if (err) {
           reject(err);
@@ -78,7 +78,7 @@ export default class LocalFileSystem extends FileSystem {
   }
 
   mkdir(dir: string): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       fs.mkdir(dir, err => {
         if (err) {
           reject(err);
@@ -125,7 +125,7 @@ export default class LocalFileSystem extends FileSystem {
   }
 
   unlink(path: string): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       fs.unlink(path, err => {
         if (err) {
           reject(err);
@@ -142,7 +142,7 @@ export default class LocalFileSystem extends FileSystem {
       return fse.remove(path);
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       fs.rmdir(path, err => {
         if (err) {
           reject(err);

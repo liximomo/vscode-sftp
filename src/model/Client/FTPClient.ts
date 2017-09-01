@@ -12,7 +12,7 @@ export default class FTPClient extends RemoteClient {
 
   connect(): Promise<void> {
     const option = this.getOption();
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.client
         .on('ready', () => {
           if (option.passive) {

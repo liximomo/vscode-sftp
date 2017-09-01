@@ -20,7 +20,7 @@ export default class SFTPClient extends RemoteClient {
       privateKeyPath,
       ...option,
     } = this.getOption();
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const connectWithCredential = (passwd?, privateKey?) => this.client
         .on('ready', () => {
           this.client.sftp((err, sftp) => {
