@@ -104,14 +104,14 @@ Very simple and intuitive and works.
    *  glob pattern that will be append to `config root` and `remotePath`
    */ 
   ignore: [
-    "**/.vscode",
-    "**/.git",
+    "**/.vscode/**",
+    "**/.git/**",
     "**/.DS_Store"
   ],
 
   /**
    *  Watching external file changes(create and remove only). Such as compile/build output or git branch switching.
-   *  Watcher will be disable when files set to null or both autoDelete and autoUpload set to false,
+   *  Watcher will be disable when files set to false or both autoDelete and autoUpload set to false,
    */
   watcher: {
     // avaliable value: false or glob pattern
