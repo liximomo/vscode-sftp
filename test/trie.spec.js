@@ -2,7 +2,6 @@ const Trie = require('../src/model/Trie').default;
 
 describe('Trie Tests', () => {
   describe('find all values', () => {
-    // Defines a Mocha unit test
     test('multiple branch', () => {
       const tire = new Trie({
         'a/b/c': 1,
@@ -52,7 +51,6 @@ describe('Trie Tests', () => {
   });
 
   describe('find values with shortest branch', () => {
-    // Defines a Mocha unit test
     test('multiple branch', () => {
       const tire = new Trie({
         'a/b/c': 1,
@@ -102,7 +100,27 @@ describe('Trie Tests', () => {
   });
 
   describe('find value with shortest branch', () => {
-    // Defines a Mocha unit test
+    test('single branch', () => {
+      const tire = new Trie({
+        'a/b/c/d': 1,
+      });
+
+      let result = tire.findPrefix('a/test.js');
+      expect(result).toEqual(null);
+
+      result = tire.findPrefix('a/b/test.js');
+      expect(result).toEqual(null);
+
+      result = tire.findPrefix('a/b/c/test.js');
+      expect(result).toEqual(null);
+
+      result = tire.findPrefix('a/b/c/d/test.js');
+      expect(result).toEqual(1);
+
+      result = tire.findPrefix('a/b/c/d/e/test.js');
+      expect(result).toEqual(1);
+    });
+
     test('deep branch', () => {
       const tire = new Trie({
         'a': 1,

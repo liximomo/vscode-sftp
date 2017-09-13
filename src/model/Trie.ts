@@ -114,17 +114,18 @@ export default class Trie {
   }
 
   findPrefixNode(parent: TrieNode, tokens: string[]): TrieNode | null {
-    if (tokens.length < 0) {
-      return parent;
-    }
+    let result = parent;
 
     const tokensQueue = tokens.slice().reverse();
-    let result;
 
     let curentNode = this.root;
     do {
       curentNode = curentNode.getChild(tokensQueue.pop())
-      if (curentNode !== undefined && curentNode.isLoaded()) {
+      if (curentNode === undefined) {
+        break;
+      }
+
+      if (curentNode.isLoaded()) {
         result = curentNode;
       }
     } while (tokensQueue.length > 0)

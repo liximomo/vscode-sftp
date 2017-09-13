@@ -1,3 +1,7 @@
+## [0.7.11] - 2017-09-13
+### Bugfix
+* fix tribe retrive
+
 ## [0.7.10] - 2017-09-13
 ### Bugfix
 * fix config not found when have multiple config files in workspace
