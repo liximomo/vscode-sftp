@@ -1,6 +1,7 @@
-## [0.7.9] - 2017-09-01
+## [0.7.9] - 2017-09-13
 ### Bugfix
 * change tip text from uploading to sync when download and upload
+* fix config not found when have multiple config files in workspace
 
 ## [0.7.8] - 2017-08-20
 ### Bugfix

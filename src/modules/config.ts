@@ -176,7 +176,7 @@ export function getShortestDistinctConfigs() {
     return [];
   }
 
-  return configTrie.findValueWithShortestBranch();
+  return configTrie.findValuesWithShortestBranch();
 }
 
 export function newConfig() {

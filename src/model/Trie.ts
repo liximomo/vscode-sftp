@@ -114,16 +114,22 @@ export default class Trie {
   }
 
   findPrefixNode(parent: TrieNode, tokens: string[]): TrieNode | null {
-    const [top, ...rest] = tokens;
-    if (top === undefined) {
+    if (tokens.length < 0) {
       return parent;
     }
 
-    const childNode = parent.getChild(top);
-    if (childNode !== undefined) {
-      return this.findPrefixNode(childNode, rest);
-    }
-    return parent;
+    const tokensQueue = tokens.slice().reverse();
+    let result;
+
+    let curentNode = this.root;
+    do {
+      curentNode = curentNode.getChild(tokensQueue.pop())
+      if (curentNode !== undefined && curentNode.isLoaded()) {
+        result = curentNode;
+      }
+    } while (tokensQueue.length > 0)
+
+    return result;
   }
 
   findNode(parent: TrieNode, tokens: string[]): TrieNode | null {
@@ -156,7 +162,7 @@ export default class Trie {
     return result;
   }
 
-  findValueWithShortestBranch(): any[] {
+  findValuesWithShortestBranch(): any[] {
     const nodeQueue = [this.root];
     const result = [];
 
