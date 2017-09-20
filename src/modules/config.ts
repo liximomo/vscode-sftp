@@ -7,9 +7,12 @@ import * as Joi from 'joi';
 import rpath, { normalize } from './remotePath';
 import * as output from './output';
 import Trie from '../model/Trie';
-import { WORKSPACE_TRIE_TOKEN } from '../constants';
 
-const configTrie = new Trie({});
+const TRIE_DELIMITER = '/';
+
+const configTrie = new Trie({}, {
+  delimiter: TRIE_DELIMITER,
+});
 
 const vscodeFolder = '.vscode';
 
@@ -72,22 +75,21 @@ export const defaultConfig = {
 const configGlobPattern = `/**/${vscodeFolder}/${configFileName}`;
 // const fallbackConfigGlobPattern = `/**/${configFileName}`;
 
-export function getPathRelativeWorkspace(filePath) {
-  const normalizedWorkspacePath = normalize(vscode.workspace.rootPath);
+function toTriePath(basePath, filePath) {
+  // reduce search deepth
+  const root = basePath.replace('/', '_');
+
+  const normalizedBasePath = normalize(basePath);
   const normalizePath = normalize(filePath);
-  if (normalizePath === normalizedWorkspacePath) {
-    return WORKSPACE_TRIE_TOKEN;
+  if (normalizePath === normalizedBasePath) {
+    return root;
   }
-  const relativePath = rpath.relative(normalizedWorkspacePath, normalizePath);
-  return `${WORKSPACE_TRIE_TOKEN}/${relativePath}`;
+  const relativePath = rpath.relative(normalizedBasePath, normalizePath);
+  return `${root}/${relativePath}`;
 }
 
-export function getDefaultConfigFolder() {
-  return `${vscode.workspace.rootPath}/${vscodeFolder}`;
-}
-
-export function getDefaultConfigPath() {
-  return `${getDefaultConfigFolder()}/${configFileName}`;
+export function getDefaultConfigPath(basePath) {
+  return rpath.join(basePath, configFileName);
 }
 
 export function fillGlobPattern(pattern, rootPath) {
@@ -120,20 +122,19 @@ export function addConfig(configPath) {
       ignore: localIgnore.concat(remoteIgnore),
       configRoot,
     };
-    const triePath = getPathRelativeWorkspace(configRoot);
-    configTrie.add(triePath, fullConfig);
-    output.info(`config at ${triePath}`, fullConfig);
+    configTrie.add(configRoot, fullConfig);
+    output.info(`config at ${configRoot}`, fullConfig);
     return fullConfig;
   });
 }
 
-export function initConfigs(): Promise<Trie> {
+export function initConfigs(basePath): Promise<Trie> {
   return new Promise((resolve, reject) => {
     glob(
       configGlobPattern,
       {
-        cwd: vscode.workspace.rootPath,
-        root: vscode.workspace.rootPath,
+        cwd: basePath,
+        root: basePath,
         nodir: true,
       },
       (error, files) => {
@@ -149,13 +150,12 @@ export function initConfigs(): Promise<Trie> {
 }
 
 export function getConfig(activityPath: string) {
-  const config = configTrie.findPrefix(getPathRelativeWorkspace(activityPath));
+  const config = configTrie.findPrefix(activityPath);
   if (!config) {
     throw new Error('config file not found');
   }
   return {
     ...config,
-    //  TO-DO rpath.relative('c:/a/b/c', 'c:\a\b\c\d.txt')
     remotePath: rpath.join(
       config.remotePath,
       normalize(path.relative(config.configRoot, activityPath))
@@ -179,12 +179,8 @@ export function getShortestDistinctConfigs() {
   return configTrie.findValuesWithShortestBranch();
 }
 
-export function newConfig() {
-  if (!vscode.workspace.rootPath) {
-    output.onError('Cannot run this command without opened folder', 'config');
-  }
-
-  const defaultConfigPath = getDefaultConfigPath();
+export function newConfig(basePath) {
+  const defaultConfigPath = getDefaultConfigPath(basePath);
 
   const showConfigFile = () =>
     vscode.workspace.openTextDocument(defaultConfigPath).then(vscode.window.showTextDocument);
@@ -197,7 +193,7 @@ export function newConfig() {
       }
 
       return fse
-        .ensureDir(getDefaultConfigFolder())
+        .ensureDir(basePath)
         .then(_ => fse.writeJson(defaultConfigPath, defaultConfig, { spaces: 4 }))
         .then(showConfigFile);
     })

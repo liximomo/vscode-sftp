@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 
 import { isValidFile } from '../helper/documentFilter';
+import throttle from '../helper/throttle';
 import { upload } from './sync';
 import { getConfig, fillGlobPattern } from './config';
 import { removeRemote } from './sync';
@@ -10,7 +11,7 @@ const watchers = {};
 const uploadQueue = [];
 const deleteQueue = [];
 
-const PROCESS__DALEY = 300;
+const ACTION_INTEVAL = 500;
 
 function fileError(event, file, showErrorWindow = true) {
   return error => {
@@ -60,6 +61,9 @@ function doDelete() {
   });
 }
 
+const throttledUpload = throttle(doUpload, ACTION_INTEVAL);
+const throttledDelete = throttle(doDelete, ACTION_INTEVAL);
+
 function clearWatcher(fileWatcher) {
   fileWatcher.dispose();
 }
@@ -94,7 +98,7 @@ function setUpWatcher(config) {
       }
 
       uploadQueue.push(uri);
-      doUpload();
+      throttledUpload();
     });
   }
 
@@ -109,12 +113,12 @@ function setUpWatcher(config) {
       }
 
       deleteQueue.push(uri);
-      doDelete();
+      throttledDelete();
     });
   }
 }
 
-let workspaceWatcher = null;
+const workspaceWatchers = [];
 
 let disableWatch = false;
 
@@ -132,17 +136,16 @@ export function enableWatcher() {
   }, 300); // delay because change happens after task finish.
 }
 
-export function onFileChange(cb: (uri: vscode.Uri) => void) {
-  if (!workspaceWatcher) {
-    workspaceWatcher = vscode.workspace.createFileSystemWatcher(
-      `${vscode.workspace.rootPath}/**`,
-      true,
-      false,
-      true
-    );
-  }
+export function onFileChange(directory, cb: (uri: vscode.Uri) => void) {
+  const watcher = vscode.workspace.createFileSystemWatcher(
+    `${directory}/**`,
+    true,
+    false,
+    true
+  );
+  workspaceWatchers.push(watcher);
 
-  workspaceWatcher.onDidChange(uri => {
+  watcher.onDidChange(uri => {
     if (disableWatch) {
       return;
     }
@@ -161,8 +164,8 @@ export function watchFiles(config) {
 }
 
 export function clearAllWatcher() {
-  if (workspaceWatcher) {
-    clearWatcher(workspaceWatcher);
-  }
-  Object.keys(watchers).forEach(key => clearWatcher(watchers[key]));
+  Object
+    .keys(watchers)
+    .concat(workspaceWatchers)
+    .forEach(key => clearWatcher(watchers[key]));
 }

@@ -5,7 +5,7 @@
   "version": "0.7.11",
   "publisher": "liximomo",
   "engines": {
-    "vscode": "^1.13.0"
+    "vscode": "^1.15.0"
   },
   "bugs": {
     "url": "https://github.com/liximomo/vscode-sftp/issues",
@@ -115,7 +115,7 @@
     "mocha": "^2.3.3",
     "tslint": "^5.4.3",
     "typescript": "^2.0.3",
-    "vscode": "^1.0.0"
+    "vscode": "^1.1.5"
   },
   "dependencies": {
     "fs-extra": "^3.0.1",

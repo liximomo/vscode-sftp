@@ -3,10 +3,6 @@ import * as vscode from 'vscode';
 import * as output from '../modules/output';
 import { getConfig } from '../modules/config';
 
-const workspaceItem: ITarget = {
-  fsPath: vscode.workspace.rootPath,
-};
-
 export interface ITarget {
   fsPath: string;
 }

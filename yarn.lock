@@ -2269,6 +2269,10 @@ qs@~6.4.0:
   version "6.4.0"
   resolved "http://registry.npm.taobao.org/qs/download/qs-6.4.0.tgz#13e26d28ad6b0ffaa91312cd3bf708ed351e7233"
 
+querystringify@~1.0.0:
+  version "1.0.0"
+  resolved "http://registry.npm.taobao.org/querystringify/download/querystringify-1.0.0.tgz#6286242112c5b712fa654e526652bf6a13ff05cb"
+
 queue@^3.0.10, queue@^3.1.0:
   version "3.1.0"
   resolved "http://registry.npm.taobao.org/queue/download/queue-3.1.0.tgz#6c49d01f009e2256788789f2bffac6b8b9990585"
@@ -2423,6 +2427,10 @@ require-directory@^2.1.1:
 require-main-filename@^1.0.1:
   version "1.0.1"
   resolved "http://registry.npm.taobao.org/require-main-filename/download/require-main-filename-1.0.1.tgz#97f717b69d48784f5f526a6c5aa8ffdda055a4d1"
+
+requires-port@1.0.x:
+  version "1.0.0"
+  resolved "http://registry.npm.taobao.org/requires-port/download/requires-port-1.0.0.tgz#925d2601d39ac485e091cf0da5c6e694dc3dcaff"
 
 resolve@1.1.7:
   version "1.1.7"
@@ -2839,6 +2847,13 @@ upath@^1.0.0:
     lodash "3.x"
     underscore.string "2.3.x"
 
+url-parse@^1.1.9:
+  version "1.1.9"
+  resolved "http://registry.npm.taobao.org/url-parse/download/url-parse-1.1.9.tgz#c67f1d775d51f0a18911dd7b3ffad27bb9e5bd19"
+  dependencies:
+    querystringify "~1.0.0"
+    requires-port "1.0.x"
+
 util-deprecate@~1.0.1:
   version "1.0.2"
   resolved "http://registry.npm.taobao.org/util-deprecate/download/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
@@ -2928,9 +2943,9 @@ vinyl@~2.0.1:
     remove-trailing-separator "^1.0.1"
     replace-ext "^1.0.0"
 
-vscode@^1.0.0:
-  version "1.1.0"
-  resolved "http://registry.npm.taobao.org/vscode/download/vscode-1.1.0.tgz#b04c2399b6ec768135c9688e7873d776e28dcb95"
+vscode@^1.1.5:
+  version "1.1.5"
+  resolved "http://registry.npm.taobao.org/vscode/download/vscode-1.1.5.tgz#10eb104001840c3dd0813815fd4a05f8fc882d14"
   dependencies:
     glob "^7.1.1"
     gulp-chmod "^2.0.0"
@@ -2944,6 +2959,7 @@ vscode@^1.0.0:
     request "^2.79.0"
     semver "^5.3.0"
     source-map-support "^0.4.11"
+    url-parse "^1.1.9"
     vinyl-source-stream "^1.1.0"
 
 walker@~1.0.5:

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as output from '../modules/output';
-import { getPathRelativeWorkspace, getConfig, getAllConfigs } from '../modules/config';
+import { getConfig, getAllConfigs } from '../modules/config';
 import { upload, download, sync2Remote, sync2Local } from '../modules/sync';
 import { createFileCommand, ITarget } from '../helper/createCommand';
 import checkRequire from '../helper/checkRequire';
@@ -19,15 +19,15 @@ const getAllProjects = () =>
     const projectsList = configs
       .map(cfg => ({
         value: cfg.configRoot,
-        label: getPathRelativeWorkspace(cfg.configRoot),
-        description: cfg.configRoot,
+        label: cfg.configRoot,
+        description: '',
       }))
       .sort((l, r) => l.label.localeCompare(r.label));
 
     vscode.window
       .showQuickPick(projectsList as vscode.QuickPickItem[], {
         ignoreFocusOut: true,
-        placeHolder: 'Select a folder...',
+        placeHolder: 'Select a folder...(esc to cancel)',
       })
       .then(
         selection => {
