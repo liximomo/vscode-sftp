@@ -1,9 +1,6 @@
 # sftp sync extension for VS Code
 Very simple and intuitive and works.
 
-## Breaking Change
-**Since 0.7.0** config files are located in **.vscode** folder. Just move every .sftpConfig.json file into an .vscode folder.
-
 ## Features
 
 * dual authentication
