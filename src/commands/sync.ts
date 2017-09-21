@@ -17,23 +17,19 @@ const getAllProjects = () =>
     // getAllProjects
     const configs = getAllConfigs();
     const projectsList = configs
-      .map(cfg => ({
-        value: cfg.configRoot,
-        label: cfg.configRoot,
-        description: '',
-      }))
-      .sort((l, r) => l.label.localeCompare(r.label));
+      .map(cfg => cfg.configRoot)
+      .sort((l, r) => l.localeCompare(r));
 
     vscode.window
-      .showQuickPick(projectsList as vscode.QuickPickItem[], {
+      .showQuickPick(projectsList, {
         ignoreFocusOut: true,
-        placeHolder: 'Select a folder...(esc to cancel)',
+        placeHolder: 'Select a folder...(ESC to cancel)',
       })
       .then(
         selection => {
           if (selection) {
             resolve({
-              fsPath: (selection as any).value,
+              fsPath: selection,
             });
             return;
           }

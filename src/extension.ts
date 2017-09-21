@@ -6,6 +6,7 @@ import * as path from 'path';
 
 import * as output from './modules/output';
 import { initConfigs, addConfig, configFileName, getShortestDistinctConfigs } from './modules/config';
+// TODO
 import { invalidRemote, endRemote } from './modules/remoteFs';
 import { onFileChange, watchFiles, clearAllWatcher } from './modules/fileWatcher';
 // import traceFileActivities from './modules/fileActivities.js';
@@ -19,6 +20,7 @@ import {
   DOWNLOAD,
   CONFIG,
 } from './constants';
+import getTopFolders from './helper/getTopFolders';
 
 function registerCommand(
   context: vscode.ExtensionContext,
@@ -30,36 +32,9 @@ function registerCommand(
   context.subscriptions.push(disposable);
 }
 
-function isSubPath(source, target) {
-  return source.startsWith(target);
-}
-
-function removeSubPath(paths) {
-  const result = [];
-  const sortedPaths = paths.sort((a, b) => b.length - a.length);
-  for (let curIndex = 0; curIndex < sortedPaths.length; curIndex++) {
-    const curPath = sortedPaths[curIndex];
-    let isSub = false;
-    for (let targetIndex = curIndex + 1; targetIndex < sortedPaths.length; targetIndex++) {
-      const targetPath = sortedPaths[targetIndex];
-      if (isSubPath(curPath, targetPath)) {
-        isSub = true;
-        break;
-      }
-    }
-
-    if (!isSub) {
-      result.push(curPath);
-    }
-  }
-  return result;
-}
-
 function handleDocumentChange(uri: vscode.Uri) {
   if (path.basename(uri.fsPath) === configFileName) {
 
-    // make sure to re-conncet
-    invalidRemote();
     addConfig(uri.fsPath)
       .then(config => {
         watchFiles(config);
@@ -91,8 +66,7 @@ export function activate(context: vscode.ExtensionContext) {
     return;
   }
 
-  const rootPaths = vscode.workspace.workspaceFolders.map(folder => folder.uri.fsPath);
-  const meanfulRootPaths = removeSubPath(rootPaths);
+  const meanfulRootPaths = getTopFolders(vscode.workspace.workspaceFolders);
 
   const setUpFileChangeListenser = dir => onFileChange(dir, handleDocumentChange);
 

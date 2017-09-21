@@ -1,8 +1,12 @@
 # sftp sync extension for VS Code
 Very simple and intuitive and works.
 
+## Change
+Config file name is changing to `sftp.json` for concision. The old `.sftpConfig.json` still works until version 0.9.0.
+
 ## Features
 
+* support multi-root workspace
 * dual authentication
 * sync directory to remote
 * sync directory to local
@@ -30,7 +34,7 @@ Very simple and intuitive and works.
 | SFTP: Sync To Local  | sync remote directory to local              |
   
 ### Glossary
-`config root`: The directory where the `.vscode/.sftpConfig` file is located in.
+`config root`: The directory where the `.vscode/sftp.json` file is located in.
 
 **config root**: 
 
@@ -68,7 +72,7 @@ Very simple and intuitive and works.
    *  |-b
    *    |-d
    *      |-e.txt
-   *    |-.vscode/.sftpConfig.json
+   *    |-.vscode/sftp.json.json
    *  
    *  config file 
    *    {

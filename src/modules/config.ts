@@ -44,7 +44,8 @@ const configScheme = {
   ignore: Joi.array().min(0).items(Joi.string()),
 };
 
-export const configFileName = '.sftpConfig.json';
+export const deprecatedConfigFileName = '.sftpConfig.json';
+export const configFileName = 'sftp.json';
 
 export const defaultConfig = {
   host: 'host',
@@ -72,7 +73,7 @@ export const defaultConfig = {
   ignore: ['**/.vscode/**', '**/.git/**', '**/.DS_Store'],
 };
 
-const configGlobPattern = `/**/${vscodeFolder}/${configFileName}`;
+const configGlobPattern = `/**/${vscodeFolder}/{${configFileName},${deprecatedConfigFileName}}`;
 // const fallbackConfigGlobPattern = `/**/${configFileName}`;
 
 function toTriePath(basePath, filePath) {
@@ -88,8 +89,8 @@ function toTriePath(basePath, filePath) {
   return `${root}/${relativePath}`;
 }
 
-export function getDefaultConfigPath(basePath) {
-  return rpath.join(basePath, configFileName);
+export function getConfigPath(basePath) {
+  return rpath.join(basePath, vscodeFolder, deprecatedConfigFileName);
 }
 
 export function fillGlobPattern(pattern, rootPath) {
@@ -180,22 +181,19 @@ export function getShortestDistinctConfigs() {
 }
 
 export function newConfig(basePath) {
-  const defaultConfigPath = getDefaultConfigPath(basePath);
+  const configPath = getConfigPath(basePath);
 
   const showConfigFile = () =>
-    vscode.workspace.openTextDocument(defaultConfigPath).then(vscode.window.showTextDocument);
+    vscode.workspace.openTextDocument(configPath).then(vscode.window.showTextDocument);
 
   fse
-    .pathExists(defaultConfigPath)
+    .pathExists(configPath)
     .then(exist => {
       if (exist) {
         return showConfigFile();
       }
 
-      return fse
-        .ensureDir(basePath)
-        .then(_ => fse.writeJson(defaultConfigPath, defaultConfig, { spaces: 4 }))
-        .then(showConfigFile);
+      return fse.outputJson(configPath, defaultConfig, { spaces: 4 }).then(showConfigFile);
     })
     .catch(error => {
       output.onError(error, 'config');

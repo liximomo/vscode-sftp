@@ -98,7 +98,6 @@ export default class FTPFileSystem extends RemoteFileSystem {
   ensureDir(dir: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       const tokens = dir.split('/');
-
       const root = tokens.shift();
       let dirPath = root === '' ? '/' : root;
 
