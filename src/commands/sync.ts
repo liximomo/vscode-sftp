@@ -17,8 +17,13 @@ const getAllProjects = () =>
     // getAllProjects
     const configs = getAllConfigs();
     const projectsList = configs
-      .map(cfg => cfg.configRoot)
-      .sort((l, r) => l.localeCompare(r));
+      .map(cfg => ({
+        value: cfg.configRoot,
+        label: vscode.workspace.asRelativePath(cfg.configRoot),
+        description: '',
+        detail: cfg.configRoot,
+      }))
+      .sort((l, r) => l.label.localeCompare(r.label));
 
     vscode.window
       .showQuickPick(projectsList, {
@@ -29,7 +34,7 @@ const getAllProjects = () =>
         selection => {
           if (selection) {
             resolve({
-              fsPath: selection,
+              fsPath: selection.value,
             });
             return;
           }

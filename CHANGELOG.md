@@ -1,3 +1,11 @@
+## [0.8.0] - 2017-09-22
+### Feature
+* support multi-root workspace
+### Change
+Config file name is changing to `sftp.json` from `.sftpConfig.json` for concision.
+### Bugfix
+* fix a bug that always return the same ssh session when have multiple configs in workspace
+
 ## [0.7.11] - 2017-09-13
 ### Bugfix
 * fix tribe retrive

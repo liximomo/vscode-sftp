@@ -7,7 +7,7 @@ import * as path from 'path';
 import * as output from './modules/output';
 import { initConfigs, addConfig, configFileName, getShortestDistinctConfigs } from './modules/config';
 // TODO
-import { invalidRemote, endRemote } from './modules/remoteFs';
+import { endAllRemote } from './modules/remoteFs';
 import { onFileChange, watchFiles, clearAllWatcher } from './modules/fileWatcher';
 // import traceFileActivities from './modules/fileActivities.js';
 import { sync2RemoteCommand, sync2LocalCommand, uploadCommand, downloadCommand } from './commands/sync';
@@ -82,5 +82,5 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {
   clearAllWatcher();
-  endRemote();
+  endAllRemote();
 }
