@@ -1,3 +1,7 @@
+## [0.8.1] - 2017-09-22
+### Bugfix
+* WIN could not find config(path is not normalized)
+
 ## [0.8.0] - 2017-09-22
 ### Feature
 * support multi-root workspace

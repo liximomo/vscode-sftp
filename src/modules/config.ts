@@ -151,7 +151,7 @@ export function initConfigs(basePath): Promise<Trie> {
 }
 
 export function getConfig(activityPath: string) {
-  const config = configTrie.findPrefix(activityPath);
+  const config = configTrie.findPrefix(normalize(activityPath));
   if (!config) {
     throw new Error('config file not found');
   }
