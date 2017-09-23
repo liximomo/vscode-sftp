@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-// import * as memoize from 'fast-memoize';
+import { CONFIG_GLOB_PATTERN, VSCODE_FOLDER, CONGIF_FILENAME } from '../constants';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
@@ -13,8 +13,6 @@ const TRIE_DELIMITER = '/';
 const configTrie = new Trie({}, {
   delimiter: TRIE_DELIMITER,
 });
-
-const vscodeFolder = '.vscode';
 
 const nullable = schema => schema.optional().allow(null);
 
@@ -44,9 +42,6 @@ const configScheme = {
   ignore: Joi.array().min(0).items(Joi.string()),
 };
 
-export const deprecatedConfigFileName = '.sftpConfig.json';
-export const configFileName = 'sftp.json';
-
 export const defaultConfig = {
   host: 'host',
   port: 22,
@@ -73,9 +68,6 @@ export const defaultConfig = {
   ignore: ['**/.vscode/**', '**/.git/**', '**/.DS_Store'],
 };
 
-const configGlobPattern = `/**/${vscodeFolder}/{${configFileName},${deprecatedConfigFileName}}`;
-// const fallbackConfigGlobPattern = `/**/${configFileName}`;
-
 function toTriePath(basePath, filePath) {
   // reduce search deepth
   const root = basePath.replace('/', '_');
@@ -90,7 +82,7 @@ function toTriePath(basePath, filePath) {
 }
 
 export function getConfigPath(basePath) {
-  return rpath.join(basePath, vscodeFolder, deprecatedConfigFileName);
+  return rpath.join(basePath, VSCODE_FOLDER, CONGIF_FILENAME);
 }
 
 export function fillGlobPattern(pattern, rootPath) {
@@ -132,7 +124,7 @@ export function addConfig(configPath) {
 export function initConfigs(basePath): Promise<Trie> {
   return new Promise((resolve, reject) => {
     glob(
-      configGlobPattern,
+      `/${CONFIG_GLOB_PATTERN}`,
       {
         cwd: basePath,
         root: basePath,

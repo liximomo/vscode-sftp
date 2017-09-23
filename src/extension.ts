@@ -5,10 +5,12 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 
 import * as output from './modules/output';
-import { initConfigs, addConfig, configFileName, getShortestDistinctConfigs } from './modules/config';
+import { CONGIF_FILENAME, DEPRECATED_CONGIF_FILENAME } from './constants';
+
+import { initConfigs, addConfig, getShortestDistinctConfigs } from './modules/config';
 // TODO
 import { endAllRemote } from './modules/remoteFs';
-import { onFileChange, watchFiles, clearAllWatcher } from './modules/fileWatcher';
+import { onConfigChange, onFileChange, watchFiles, clearAllWatcher } from './modules/fileWatcher';
 // import traceFileActivities from './modules/fileActivities.js';
 import { sync2RemoteCommand, sync2LocalCommand, uploadCommand, downloadCommand } from './commands/sync';
 import editConfig from './commands/config';
@@ -32,19 +34,24 @@ function registerCommand(
   context.subscriptions.push(disposable);
 }
 
-function handleDocumentChange(uri: vscode.Uri) {
-  if (path.basename(uri.fsPath) === configFileName) {
+function handleConfilChange(uri: vscode.Uri) {
+  addConfig(uri.fsPath)
+    .then(config => {
+      watchFiles(config);
+    }, output.onError);
+}
 
-    addConfig(uri.fsPath)
-      .then(config => {
-        watchFiles(config);
-      }, output.onError);
+function handleDocumentChange(uri: vscode.Uri) {
+  const filename = path.basename(uri.fsPath);
+  if (filename === CONGIF_FILENAME || filename === DEPRECATED_CONGIF_FILENAME) {
+    // ignore
   } else {
     autoSave(uri);
   }
 };
 
 function setUpFileChangeListenser(dir) {
+  onConfigChange(dir, handleConfilChange);
   onFileChange(dir, handleDocumentChange);
 }
 

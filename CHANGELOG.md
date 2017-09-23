@@ -1,3 +1,8 @@
+## [0.8.2] - 2017-09-24
+### Enhance
+* Don't need to reload vscode after execute `SFTP: config` command.
+* `SFTP: config` creates `sftp.json` now.
+
 ## [0.8.1] - 2017-09-22
 ### Bugfix
 * WIN could not find config(path is not normalized)

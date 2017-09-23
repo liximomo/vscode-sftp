@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 
+import { CONFIG_GLOB_PATTERN } from '../constants';
 import { isValidFile } from '../helper/documentFilter';
 import throttle from '../helper/throttle';
 import { upload } from './sync';
@@ -156,6 +157,19 @@ export function onFileChange(directory, cb: (uri: vscode.Uri) => void) {
 
     cb(uri);
   });
+}
+
+export function onConfigChange(directory, cb: (uri: vscode.Uri) => void) {
+  const watcher = vscode.workspace.createFileSystemWatcher(
+    `${directory}/${CONFIG_GLOB_PATTERN}`,
+    false,
+    false,
+    true
+  );
+  workspaceWatchers.push(watcher);
+
+  watcher.onDidCreate(cb);
+  watcher.onDidChange(cb);
 }
 
 export function watchFiles(config) {

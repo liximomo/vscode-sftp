@@ -117,6 +117,13 @@ describe('Trie Tests', () => {
       result = tire.findPrefix('a/b/c/d/test.js');
       expect(result).toEqual(1);
 
+
+      result = tire.findPrefix('a/b/c/d/');
+      expect(result).toEqual(1);
+
+      result = tire.findPrefix('a/b/c/d');
+      expect(result).toEqual(1);
+
       result = tire.findPrefix('a/b/c/d/e/test.js');
       expect(result).toEqual(1);
     });
