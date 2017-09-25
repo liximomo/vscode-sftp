@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 
-import { CONFIG_GLOB_PATTERN } from '../constants';
+import { CONGIF_FILENAME, DEPRECATED_CONGIF_FILENAME } from '../constants';
 import { isValidFile } from '../helper/documentFilter';
 import throttle from '../helper/throttle';
 import { upload } from './sync';
@@ -13,6 +14,11 @@ const uploadQueue = [];
 const deleteQueue = [];
 
 const ACTION_INTEVAL = 500;
+
+function isConfigFile(uri: vscode.Uri) {
+  const filename = path.basename(uri.fsPath);
+  return filename === CONGIF_FILENAME || filename === DEPRECATED_CONGIF_FILENAME;
+}
 
 function fileError(event, file, showErrorWindow = true) {
   return error => {
@@ -132,19 +138,34 @@ export function enableWatcher() {
     return;
   }
 
+  // delay because change happens after this, need make sure this execute after change event
   setTimeout(() => {
     disableWatch = false;
-  }, 300); // delay because change happens after task finish.
+  }, 300);
 }
 
-export function onFileChange(directory, cb: (uri: vscode.Uri) => void) {
+export function watchFolder(directory, {
+  onConfigChange,
+  onConfigDelete,
+  onFileChange,
+}: {
+  onConfigChange: (uri: vscode.Uri) => void,
+  onConfigDelete: (uri: vscode.Uri) => void,
+  onFileChange: (uri: vscode.Uri) => void,
+}) {
   const watcher = vscode.workspace.createFileSystemWatcher(
     `${directory}/**`,
-    true,
     false,
-    true
+    false,
+    false
   );
   workspaceWatchers.push(watcher);
+
+  watcher.onDidCreate(uri => {
+    if (isConfigFile(uri)) {
+      onConfigChange(uri);
+    }
+  });
 
   watcher.onDidChange(uri => {
     if (disableWatch) {
@@ -155,21 +176,19 @@ export function onFileChange(directory, cb: (uri: vscode.Uri) => void) {
       return;
     }
 
-    cb(uri);
+    if (isConfigFile(uri)) {
+      onConfigChange(uri);
+      return;
+    }
+
+    onFileChange(uri);
   });
-}
 
-export function onConfigChange(directory, cb: (uri: vscode.Uri) => void) {
-  const watcher = vscode.workspace.createFileSystemWatcher(
-    `${directory}/${CONFIG_GLOB_PATTERN}`,
-    false,
-    false,
-    true
-  );
-  workspaceWatchers.push(watcher);
-
-  watcher.onDidCreate(cb);
-  watcher.onDidChange(cb);
+  watcher.onDidDelete(uri => {
+    if (isConfigFile(uri)) {
+      onConfigDelete(uri);
+    }
+  });
 }
 
 export function watchFiles(config) {

@@ -156,6 +156,10 @@ export function getConfig(activityPath: string) {
   };
 }
 
+export function removeConfig(activityPath: string) {
+  configTrie.clearPrefix(normalize(activityPath));
+}
+
 export function getAllConfigs() {
   if (configTrie === undefined) {
     return [];

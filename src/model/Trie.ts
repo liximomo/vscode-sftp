@@ -113,6 +113,12 @@ export default class Trie {
     return node.getValue();
   }
 
+  clearPrefix(path: string | string[]): any {
+    const tokens = Array.isArray(path) ? path : this.splitPath(path);
+    const node = this.findPrefixNode(this.root, tokens);
+    return node.clearValue();
+  }
+
   findPrefixNode(parent: TrieNode, tokens: string[]): TrieNode | null {
     let result = parent;
 

@@ -7,10 +7,10 @@ import * as path from 'path';
 import * as output from './modules/output';
 import { CONGIF_FILENAME, DEPRECATED_CONGIF_FILENAME } from './constants';
 
-import { initConfigs, addConfig, getShortestDistinctConfigs } from './modules/config';
+import { initConfigs, addConfig, removeConfig, getShortestDistinctConfigs } from './modules/config';
 // TODO
 import { endAllRemote } from './modules/remoteFs';
-import { onConfigChange, onFileChange, watchFiles, clearAllWatcher } from './modules/fileWatcher';
+import { watchFolder, watchFiles, clearAllWatcher } from './modules/fileWatcher';
 // import traceFileActivities from './modules/fileActivities.js';
 import { sync2RemoteCommand, sync2LocalCommand, uploadCommand, downloadCommand } from './commands/sync';
 import editConfig from './commands/config';
@@ -34,25 +34,27 @@ function registerCommand(
   context.subscriptions.push(disposable);
 }
 
-function handleConfilChange(uri: vscode.Uri) {
+function handleConfigChange(uri: vscode.Uri) {
   addConfig(uri.fsPath)
     .then(config => {
       watchFiles(config);
     }, output.onError);
 }
 
+function handleConfigDelete(uri: vscode.Uri) {
+  removeConfig(uri.fsPath);
+}
+
 function handleDocumentChange(uri: vscode.Uri) {
-  const filename = path.basename(uri.fsPath);
-  if (filename === CONGIF_FILENAME || filename === DEPRECATED_CONGIF_FILENAME) {
-    // ignore
-  } else {
-    autoSave(uri);
-  }
+  autoSave(uri);
 };
 
 function setUpFileChangeListenser(dir) {
-  onConfigChange(dir, handleConfilChange);
-  onFileChange(dir, handleDocumentChange);
+  watchFolder(dir, {
+    onConfigChange: handleConfigChange,
+    onConfigDelete: handleConfigDelete,
+    onFileChange: handleDocumentChange,
+  });
 }
 
 function setUpFolder(dir) {
@@ -74,8 +76,6 @@ export function activate(context: vscode.ExtensionContext) {
   }
 
   const meanfulRootPaths = getTopFolders(vscode.workspace.workspaceFolders);
-
-  const setUpFileChangeListenser = dir => onFileChange(dir, handleDocumentChange);
 
   output.status.msg('SFTP init...');
   const pendingInits = meanfulRootPaths.map(setUpFolder);
