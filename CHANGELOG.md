@@ -1,3 +1,7 @@
+## [0.8.3] - 2017-09-26
+### Bugfix
+* fix couldn't create config through file picker when no sub files in the directory.
+
 ## [0.8.2] - 2017-09-24
 ### Enhance
 * Don't need to reload vscode after execute `SFTP: config` command.
