@@ -8,7 +8,8 @@ interface IFileLookUp {
 };
 
 interface IFilePickerOption {
-  type: FileType,
+  type?: FileType,
+  filter?: (file: IFilePickerItem) => boolean,
 };
 
 interface IFilePickerItem {
@@ -19,17 +20,24 @@ interface IFilePickerItem {
 function showFiles(
   fileLookUp: IFileLookUp,
   isTop: (x: string) => boolean,
+  parent: string | null,
   files: IFilePickerItem[],
   fs: FileSystem,
-  option?: IFilePickerOption
+  option: IFilePickerOption = {}
 ) {
   let avalibleFiles = files.slice();
+  const filterCreator = filter => file => filter(file) && option.filter ? option.filter(file) : true;
+  let fileFilter;
   if (option.type !== undefined && option.type === FileType.Directory) {
-    avalibleFiles = avalibleFiles.filter(file => file.type === FileType.Directory);
+    fileFilter = filterCreator(file => file.type === FileType.Directory);
   }
 
-  const afile = avalibleFiles[0];
-  const isRoot = isTop(afile.fspath);
+  if (fileFilter) {
+    avalibleFiles = avalibleFiles.filter(fileFilter);
+  }
+
+  const isRoot = parent === ROOT;
+
   const items = avalibleFiles.map(file => ({
     value: file,
     label: file.fspath,
@@ -38,12 +46,11 @@ function showFiles(
   .sort((l, r) => l.label.localeCompare(r.label));
 
   if (!isRoot) {
-    const current = fs.pathResolver.dirname(afile.fspath);
-    const parent = isTop(current) ? ROOT : fs.pathResolver.resolve(current, '..');
+    const parentLookup = isTop(parent) ? ROOT : fs.pathResolver.resolve(parent, '..');
 
     items.unshift({
       value: {
-        fspath: parent,
+        fspath: parentLookup,
         type: FileType.Directory,
       },
       label: '..',
@@ -51,7 +58,7 @@ function showFiles(
     });
     items.unshift({
       value: {
-        fspath: current,
+        fspath: parent,
         type: FileType.Directory,
       },
       label: '.',
@@ -65,6 +72,10 @@ function showFiles(
       placeHolder: 'Select a folder...(ESC to cancel)',
     })
     .then(result => {
+      if (result === undefined) {
+        return;
+      }
+
       if (option.type === FileType.Directory) {
         if (result.label === '.') {
           return result.value;
@@ -78,7 +89,7 @@ function showFiles(
       const targetPath = result.value.fspath;
       const nextItems = fileLookUp[targetPath];
       if (nextItems !== undefined) {
-        return  showFiles(fileLookUp, isTop, nextItems, fs, option);
+        return  showFiles(fileLookUp, isTop, targetPath, nextItems, fs, option);
       }
 
       return fs.list(targetPath)
@@ -88,7 +99,7 @@ function showFiles(
             type: file.type,
           }));
           fileLookUp[targetPath] = subItems;
-          return showFiles(fileLookUp, isTop, subItems, fs, option);
+          return showFiles(fileLookUp, isTop, targetPath, subItems, fs, option);
         });
     });
 }
@@ -98,5 +109,5 @@ export default function filePicker(baseFile: IFilePickerItem[], fs: FileSystem, 
     [ROOT]: baseFile,
   };
   const isTop = file => baseFile.some(item => item.fspath === file);
-  return showFiles(filelookup, isTop, baseFile, fs, option);
+  return showFiles(filelookup, isTop, ROOT, baseFile, fs, option);
 }

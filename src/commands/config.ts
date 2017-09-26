@@ -14,6 +14,7 @@ function editConfig() {
   }));
   dirPicker(initDirs, localFs, {
     type: FileType.Directory,
+    filter: file => !file.fspath.endsWith('.vscode'),
   }).then(result => {
     newConfig(result.fspath);
   });
