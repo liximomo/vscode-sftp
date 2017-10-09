@@ -10,9 +10,9 @@
   1.
   1.
 
-## Requisites
+## Requisites (**important to diagnose the problem!**)
 
-  ### Extension Logs 
+  ### Extension Logs
   [set option `sftp.printDebugLog` to true, then reload vscode, reproduce the problem, get the logs(view -> output-> sftp)]
  
 
