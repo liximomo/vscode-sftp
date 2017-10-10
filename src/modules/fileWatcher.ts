@@ -141,9 +141,12 @@ export function enableWatcher() {
   // delay because change happens after this, need make sure this execute after change event
   setTimeout(() => {
     disableWatch = false;
-  }, 300);
+  }, 2000);
 }
 
+/**
+ * implement upload on save
+ */
 export function watchFolder(directory, {
   onConfigChange,
   onConfigDelete,

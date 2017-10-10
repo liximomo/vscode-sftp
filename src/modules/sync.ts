@@ -49,6 +49,9 @@ function printResult(msg, result, silent) {
       }
     );
 
+  // log space between each activity
+  output.print('\n');
+
   ignored.forEach(logIgnored);
 
   const availableResult = success.length + fails.length;
@@ -56,7 +59,10 @@ function printResult(msg, result, silent) {
     return;
   }
 
-  output.debug(`${msg} at ${new Date()}`);
+  success.forEach((item) => {
+    output.debug(`${msg} ${item.target} at ${new Date()}`);
+  });
+  
   if (fails.length) {
     fails.forEach(printFailTask);
     output.showOutPutChannel();
