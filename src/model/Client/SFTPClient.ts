@@ -1,4 +1,5 @@
 import { Client } from 'ssh2';
+import * as vscode from 'vscode';
 import * as fs from 'fs';
 import RemoteClient, { IClientOption } from './RemoteClient';
 
@@ -67,7 +68,17 @@ export default class SFTPClient extends RemoteClient {
       }
 
       if (!privateKeyPath) {
-        connectWithCredential(password);
+        if(!password) {
+          vscode.window.showInputBox({
+            prompt: 'Enter Password (Press ENTER for blank)',
+            password: true
+          })
+          .then(val => {
+            connectWithCredential(val);
+          });
+        } else {
+          connectWithCredential(password);
+        }
         return;
       }
 
