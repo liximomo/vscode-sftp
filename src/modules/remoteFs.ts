@@ -30,7 +30,30 @@ class KeepAliveRemoteFs {
     if (!this.pendingPromise) {
       output.debug('conncet to remote');
       if (option.protocol === 'sftp') {
-        this.fs = new SFTPFileSystem(rpath, option);
+        const willFullCiphers = {
+          algorithms: {
+            cipher: [
+              'aes128-ctr',
+              'aes192-ctr',
+              'aes256-ctr',
+              'aes128-gcm',
+              'aes128-gcm@openssh.com',
+              'aes256-gcm',
+              'aes256-gcm@openssh.com',
+              'aes256-cbc',
+              'aes192-cbc',
+              'aes128-cbc',
+              'blowfish-cbc',
+              '3des-cbc',
+              'arcfour256',
+              'arcfour128',
+              'cast128-cbc',
+              'arcfour',
+            ],
+          },
+          ...option,
+        };
+        this.fs = new SFTPFileSystem(rpath, willFullCiphers);
       } else if (option.protocol === 'ftp') {
         this.fs = new FTPFileSystem(rpath, option);
       } else {

@@ -1,3 +1,7 @@
+## [0.8.5] - 2017-10-18
+### Improvement
+* support more cipher algorithms.
+
 ## [0.8.4] - 2017-10-10
 ### Improvement
 * log more infos to output pannel.
