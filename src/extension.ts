@@ -7,10 +7,10 @@ import * as path from 'path';
 import * as output from './modules/output';
 import { CONGIF_FILENAME, DEPRECATED_CONGIF_FILENAME } from './constants';
 
-import { initConfigs, addConfig, removeConfig, getShortestDistinctConfigs } from './modules/config';
+import { initConfigs, addConfig } from './modules/config';
 // TODO
 import { endAllRemote } from './modules/remoteFs';
-import { watchFolder, watchFiles, clearAllWatcher } from './modules/fileWatcher';
+import { watchWorkspace, watchFiles, clearAllWatcher } from './modules/fileWatcher';
 // import traceFileActivities from './modules/fileActivities.js';
 import { sync2RemoteCommand, sync2LocalCommand, uploadCommand, downloadCommand } from './commands/sync';
 import editConfig from './commands/config';
@@ -34,32 +34,33 @@ function registerCommand(
   context.subscriptions.push(disposable);
 }
 
-function handleConfigChange(uri: vscode.Uri) {
+function handleConfigSave(uri: vscode.Uri) {
   addConfig(uri.fsPath)
     .then(config => {
       watchFiles(config);
     }, output.onError);
 }
 
-function handleConfigDelete(uri: vscode.Uri) {
-  removeConfig(uri.fsPath);
-}
-
-function handleDocumentChange(uri: vscode.Uri) {
+function handleDocumentSave(uri: vscode.Uri) {
   autoSave(uri);
 };
 
-function setUpFileChangeListenser(dir) {
-  watchFolder(dir, {
-    onConfigChange: handleConfigChange,
-    onConfigDelete: handleConfigDelete,
-    onFileChange: handleDocumentChange,
+function setupWorkspaceFolder(dir) {
+  return initConfigs(dir).then(configs => {
+    watchFiles(configs);
   });
 }
 
-function setUpFolder(dir) {
-  setUpFileChangeListenser(dir);
-  return initConfigs(dir);
+function setup() {
+  watchWorkspace({
+    onDidSaveFile: handleDocumentSave,
+    onDidSaveSftpConfig: handleConfigSave,
+  });
+
+  const meanfulRootPaths = getTopFolders(vscode.workspace.workspaceFolders);
+  const pendingInits = meanfulRootPaths.map(setupWorkspaceFolder);
+
+  return Promise.all(pendingInits);
 }
 
 // this method is called when your extension is activated
@@ -75,13 +76,9 @@ export function activate(context: vscode.ExtensionContext) {
     return;
   }
 
-  const meanfulRootPaths = getTopFolders(vscode.workspace.workspaceFolders);
-
   output.status.msg('SFTP init...');
-  const pendingInits = meanfulRootPaths.map(setUpFolder);
-  return Promise.all(pendingInits)
+  setup()
     .then(_ => {
-      watchFiles(getShortestDistinctConfigs());
       output.status.msg('SFTP Ready', 1000 * 8);
     })
     .catch(output.onError);

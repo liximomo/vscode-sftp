@@ -121,7 +121,7 @@ export function addConfig(configPath) {
   });
 }
 
-export function initConfigs(basePath): Promise<Trie> {
+export function initConfigs(basePath): Promise<Array<{}>> {
   return new Promise((resolve, reject) => {
     glob(
       `/${CONFIG_GLOB_PATTERN}`,
@@ -136,7 +136,7 @@ export function initConfigs(basePath): Promise<Trie> {
           return;
         }
 
-        return Promise.all(files.map(addConfig)).then(() => resolve(configTrie), reject);
+        return Promise.all(files.map(addConfig)).then(configs => resolve(configs), reject);
       }
     );
   });

@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-
-import { CONGIF_FILENAME, DEPRECATED_CONGIF_FILENAME } from '../constants';
+import { CONFIG_GLOB_PATTERN, CONGIF_FILENAME, DEPRECATED_CONGIF_FILENAME } from '../constants';
 import { isValidFile } from '../helper/documentFilter';
 import throttle from '../helper/throttle';
 import { upload } from './sync';
@@ -9,7 +8,12 @@ import { getConfig, fillGlobPattern } from './config';
 import { removeRemote } from './sync';
 import * as output from './output';
 
-const watchers = {};
+let workspaceWatcher: vscode.Disposable;
+const configWatchers: vscode.Disposable[] = [];
+const watchers: {
+  [x: string]: vscode.FileSystemWatcher,
+} = {};
+
 const uploadQueue = [];
 const deleteQueue = [];
 
@@ -71,17 +75,13 @@ function doDelete() {
 const throttledUpload = throttle(doUpload, ACTION_INTEVAL);
 const throttledDelete = throttle(doDelete, ACTION_INTEVAL);
 
-function clearWatcher(fileWatcher) {
-  fileWatcher.dispose();
-}
-
 function setUpWatcher(config) {
   const watchConfig = config.watcher !== undefined ? config.watcher : {};
 
   let watcher = watchers[config.configRoot];
   if (watcher) {
     // clear old watcher
-    clearWatcher(watcher);
+    watcher.dispose();
   }
 
   const shouldAddListenser = watchConfig.autoUpload || watchConfig.autoDelete;
@@ -125,8 +125,6 @@ function setUpWatcher(config) {
   }
 }
 
-const workspaceWatchers = [];
-
 let disableWatch = false;
 
 export function disableWatcher() {
@@ -144,53 +142,30 @@ export function enableWatcher() {
   }, 2000);
 }
 
-/**
- * implement upload on save
- */
-export function watchFolder(directory, {
-  onConfigChange,
-  onConfigDelete,
-  onFileChange,
+export function watchWorkspace({
+  onDidSaveFile,
+  onDidSaveSftpConfig,
 }: {
-  onConfigChange: (uri: vscode.Uri) => void,
-  onConfigDelete: (uri: vscode.Uri) => void,
-  onFileChange: (uri: vscode.Uri) => void,
+  onDidSaveFile: (uri: vscode.Uri) => void,
+  onDidSaveSftpConfig: (uri: vscode.Uri) => void,
 }) {
-  const watcher = vscode.workspace.createFileSystemWatcher(
-    `${directory}/**`,
-    false,
-    false,
-    false
-  );
-  workspaceWatchers.push(watcher);
+  if (workspaceWatcher) {
+    workspaceWatcher.dispose();
+  }
 
-  watcher.onDidCreate(uri => {
-    if (isConfigFile(uri)) {
-      onConfigChange(uri);
-    }
-  });
-
-  watcher.onDidChange(uri => {
-    if (disableWatch) {
-      return;
-    }
-
+  workspaceWatcher = vscode.workspace.onDidSaveTextDocument((doc: vscode.TextDocument) => {
+    const uri = doc.uri;
     if (!isValidFile(uri)) {
       return;
     }
 
+    // let configWatcher do this
     if (isConfigFile(uri)) {
-      onConfigChange(uri);
+      onDidSaveSftpConfig(uri);
       return;
     }
 
-    onFileChange(uri);
-  });
-
-  watcher.onDidDelete(uri => {
-    if (isConfigFile(uri)) {
-      onConfigDelete(uri);
-    }
+    onDidSaveFile(uri);
   });
 }
 
@@ -200,8 +175,10 @@ export function watchFiles(config) {
 }
 
 export function clearAllWatcher() {
-  Object
-    .keys(watchers)
-    .concat(workspaceWatchers)
-    .forEach(key => clearWatcher(watchers[key]));
+  const disposable = vscode.Disposable.from(
+    ...Object.keys(watchers).map(key => watchers[key]),
+    ...configWatchers,
+    workspaceWatcher
+  );
+  disposable.dispose();
 }
