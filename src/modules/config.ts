@@ -7,6 +7,9 @@ import * as Joi from 'joi';
 import rpath, { normalize } from './remotePath';
 import * as output from './output';
 import Trie from '../model/Trie';
+import isDeprecatedConfigFile from '../helper/isDeprecatedConfigFile';
+
+let isWarnShowed = false;
 
 const TRIE_DELIMITER = '/';
 
@@ -90,6 +93,13 @@ export function fillGlobPattern(pattern, rootPath) {
 }
 
 export function addConfig(configPath) {
+  if (!isWarnShowed && isDeprecatedConfigFile(configPath)) {
+    isWarnShowed = true;
+    vscode.window.showWarningMessage(
+      '[sftp]: The \'.sftpConfig.json\' config file will be deprecated soon. Please use \'sftp.json\' instead.'
+    );
+  }
+
   return fse.readJson(configPath).then(config => {
     const { error: validationError } = Joi.validate(config, configScheme, {
       convert: false,

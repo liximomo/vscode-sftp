@@ -1,3 +1,10 @@
+## [0.8.6] - 2017-11-xx
+* Performance improvement.
+* Show a waring to the old `.sftpConfig.json` file.
+
+### Behaviour Change
+Now `uploadOnSave` only happens on a vscode save opetarion. It used to happen on a disk save opetarion caused by anything. 
+
 ## [0.8.5] - 2017-10-18
 ### Improvement
 * support more cipher algorithms.

@@ -8,8 +8,9 @@ import { getConfig, fillGlobPattern } from './config';
 import { removeRemote } from './sync';
 import * as output from './output';
 
+let disableWatch = false;
+
 let workspaceWatcher: vscode.Disposable;
-const configWatchers: vscode.Disposable[] = [];
 const watchers: {
   [x: string]: vscode.FileSystemWatcher,
 } = {};
@@ -75,6 +76,19 @@ function doDelete() {
 const throttledUpload = throttle(doUpload, ACTION_INTEVAL);
 const throttledDelete = throttle(doDelete, ACTION_INTEVAL);
 
+function uploadHandler(uri: vscode.Uri) {
+  if (disableWatch) {
+     return;
+  }
+
+  if (!isValidFile(uri)) {
+    return;
+  }
+
+  uploadQueue.push(uri);
+  throttledUpload();
+}
+
 function setUpWatcher(config) {
   const watchConfig = config.watcher !== undefined ? config.watcher : {};
 
@@ -91,22 +105,12 @@ function setUpWatcher(config) {
   }
 
   const pattern = fillGlobPattern(watchConfig.files, config.configRoot);
-  watcher = vscode.workspace.createFileSystemWatcher(pattern, false, true, false);
+  watcher = vscode.workspace.createFileSystemWatcher(pattern, false, false, false);
   watchers[config.configRoot] = watcher;
 
   if (watchConfig.autoUpload) {
-    watcher.onDidCreate(uri => {
-      if (disableWatch) {
-        return;
-      }
-
-      if (!isValidFile(uri)) {
-        return;
-      }
-
-      uploadQueue.push(uri);
-      throttledUpload();
-    });
+    watcher.onDidCreate(uploadHandler);
+    watcher.onDidChange(uploadHandler);
   }
 
   if (watchConfig.autoDelete) {
@@ -124,8 +128,6 @@ function setUpWatcher(config) {
     });
   }
 }
-
-let disableWatch = false;
 
 export function disableWatcher() {
   disableWatch = true;
@@ -177,7 +179,6 @@ export function watchFiles(config) {
 export function clearAllWatcher() {
   const disposable = vscode.Disposable.from(
     ...Object.keys(watchers).map(key => watchers[key]),
-    ...configWatchers,
     workspaceWatcher
   );
   disposable.dispose();

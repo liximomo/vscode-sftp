@@ -2,7 +2,7 @@
   "name": "sftp",
   "displayName": "sftp",
   "description": "SFTP/FTP sync",
-  "version": "0.8.5",
+  "version": "0.8.6",
   "publisher": "liximomo",
   "author": "liximomo <liximomo@gmail.com> (https://liximomo.github.io/)",
   "engines": {
@@ -17,14 +17,8 @@
     "type": "git",
     "url": "https://github.com/liximomo/vscode-sftp.git"
   },
-  "categories": [
-    "Other"
-  ],
-  "keywords": [
-    "sftp",
-    "sync",
-    "remote"
-  ],
+  "categories": ["Other"],
+  "keywords": ["sftp", "sync", "remote"],
   "activationEvents": [
     "onCommand:sftp.config.default",
     "onCommand:sftp.trans.remote",
@@ -130,15 +124,10 @@
     "upath": "^1.0.0"
   },
   "jest": {
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
+    "moduleFileExtensions": ["ts", "js"],
     "transform": {
       "^.+\\.ts$": "<rootDir>/test/preprocessor.js"
     },
-    "testMatch": [
-      "**/test/*.spec.js"
-    ]
+    "testMatch": ["**/test/*.spec.js"]
   }
 }

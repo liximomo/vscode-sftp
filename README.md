@@ -1,9 +1,6 @@
 # sftp sync extension for VS Code
 Very simple and intuitive and works.
 
-## Change
-Config file name is changing to `sftp.json` for concision. The old `.sftpConfig.json` still works until version 0.9.0.
-
 ## Features
 
 * support multi-root workspace
