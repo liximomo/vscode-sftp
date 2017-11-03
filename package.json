@@ -18,7 +18,7 @@
     "url": "https://github.com/liximomo/vscode-sftp.git"
   },
   "categories": ["Other"],
-  "keywords": ["sftp", "sync", "remote"],
+  "keywords": ["ftp", "sftp", "sync", "remote"],
   "activationEvents": [
     "onCommand:sftp.config.default",
     "onCommand:sftp.trans.remote",
