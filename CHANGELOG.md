@@ -1,4 +1,8 @@
-## [0.8.6] - 2017-11-xx
+## [0.8.7] - 2017-11-07
+### Bugfix
+* Config setup not work for directories whose name does end with `.vscode`.
+
+## [0.8.6] - 2017-11-06
 * Performance improvement.
 * Show a waring to the old `.sftpConfig.json` file.
 
