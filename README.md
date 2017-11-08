@@ -78,13 +78,14 @@ Very simple and intuitive and works.
    *      ...
    *    }
    *    
-   *  run command 'sync to remote' to file with result
-   *  {config file path} => /b/.sftp-config.json
-   *  {local file path} => /b/d/e.txt
-   *  {local Path relative to `config root`} => d/e.txt
-   *  {configed remotePath} => '/home/test'
-   *  {final remotePath} => '/home/test/d/e.txt'
-   *  that is /b/d/e.txt => /home/test/d/e.txt
+   *  run command 'sync to remote' at `e.txt` will result that is /b/d/e.txt => /home/test/d/e.txt
+   *  procedure:
+   *    {config file path} => /b/.sftp-config.json
+   *    {local file path} => /b/d/e.txt
+   *    {local Path relative to `config root`} => d/e.txt
+   *    {configed remotePath} => '/home/test'
+   *    {final remotePath} => '/home/test/d/e.txt'
+   *    that is /b/d/e.txt => /home/test/d/e.txt
    */ 
   remotePath: "./", 
   uploadOnSave: false,
