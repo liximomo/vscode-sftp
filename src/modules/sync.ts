@@ -59,10 +59,10 @@ function printResult(msg, result, silent) {
     return;
   }
 
-  success.forEach((item) => {
+  success.forEach(item => {
     output.debug(`${msg} ${item.target} at ${new Date()}`);
   });
-  
+
   if (fails.length) {
     fails.forEach(printFailTask);
     output.showOutPutChannel();
@@ -101,16 +101,16 @@ export const upload = createTask('upload', (source, config, remotefs) =>
 );
 
 export const download = createTask('download', (source, config, remotefs) => {
-  disableWatcher();
+  disableWatcher(config);
   return transport(config.remotePath, source, remotefs, localFs, {
     ignore: config.ignore,
   }).then(
     r => {
-      enableWatcher();
+      enableWatcher(config);
       return r;
     },
     e => {
-      enableWatcher();
+      enableWatcher(config);
       throw e;
     }
   );
@@ -124,17 +124,17 @@ export const sync2Remote = createTask('sync remote', (source, config, remotefs) 
 );
 
 export const sync2Local = createTask('sync local', (source, config, remotefs) => {
-  disableWatcher();
+  disableWatcher(config);
   return sync(config.remotePath, source, remotefs, localFs, {
     ignore: config.ignore,
     model: config.syncMode,
   }).then(
     r => {
-      enableWatcher();
+      enableWatcher(config);
       return r;
     },
     e => {
-      enableWatcher();
+      enableWatcher(config);
       throw e;
     }
   );

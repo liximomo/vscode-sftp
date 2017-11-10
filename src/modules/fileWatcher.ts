@@ -8,8 +8,6 @@ import { getConfig, fillGlobPattern } from './config';
 import { removeRemote } from './sync';
 import * as output from './output';
 
-let disableWatch = false;
-
 let workspaceWatcher: vscode.Disposable;
 const watchers: {
   [x: string]: vscode.FileSystemWatcher,
@@ -77,16 +75,16 @@ const throttledUpload = throttle(doUpload, ACTION_INTEVAL);
 const throttledDelete = throttle(doDelete, ACTION_INTEVAL);
 
 function uploadHandler(uri: vscode.Uri) {
-  if (disableWatch) {
-     return;
-  }
-
   if (!isValidFile(uri)) {
     return;
   }
 
   uploadQueue.push(uri);
   throttledUpload();
+}
+
+function getWatcherByConfig(config) {
+  return watchers[config.configRoot];
 }
 
 function setUpWatcher(config) {
@@ -115,10 +113,6 @@ function setUpWatcher(config) {
 
   if (watchConfig.autoDelete) {
     watcher.onDidDelete(uri => {
-      if (disableWatch) {
-        return;
-      }
-
       if (!isValidFile(uri)) {
         return;
       }
@@ -129,19 +123,19 @@ function setUpWatcher(config) {
   }
 }
 
-export function disableWatcher() {
-  disableWatch = true;
+export function disableWatcher(config) {
+  const watcher = getWatcherByConfig(config);
+  if (watcher) {
+    watcher.dispose();
+  }
 }
 
-export function enableWatcher() {
-  if (!disableWatch) {
+export function enableWatcher(config) {
+  if (getWatcherByConfig(config) !== undefined) {
     return;
   }
 
-  // delay because change happens after this, need make sure this execute after change event
-  setTimeout(() => {
-    disableWatch = false;
-  }, 2000);
+  setUpWatcher(config);
 }
 
 export function watchWorkspace({
