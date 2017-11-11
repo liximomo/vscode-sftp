@@ -1,3 +1,7 @@
+## [0.8.8] - 2017-11-11
+### Bugfix
+* Files is not correctly filtered at config setup.
+
 ## [0.8.7] - 2017-11-07
 ### Bugfix
 * Config setup not work for directories whose name does end with `.vscode`.
