@@ -26,10 +26,14 @@ function showFiles(
   option: IFilePickerOption = {}
 ) {
   let avalibleFiles = files.slice();
-  const filterCreator = filter => file => filter(file) && option.filter ? option.filter(file) : true;
   let fileFilter;
-  if (option.type !== undefined && option.type === FileType.Directory) {
-    fileFilter = filterCreator(file => file.type === FileType.Directory);
+  if (option.type !== undefined) {
+    fileFilter = file => file.type ===  option.type;
+  }
+
+  if (option.filter !== undefined) {
+    const preFilter = fileFilter ? fileFilter : a => true;
+    fileFilter = file => preFilter(file) && option.filter(file);
   }
 
   if (fileFilter) {

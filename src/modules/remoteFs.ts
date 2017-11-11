@@ -1,7 +1,10 @@
+import * as path from 'path';
 import * as vscode from 'vscode';
 import rpath from './remotePath';
 import * as output from '../modules/output';
+import FileSystem from '../model/Fs/FileSystem';
 import RemoteFileSystem from '../model/Fs/RemoteFileSystem';
+import LocalFileSystem from '../model/Fs/LocalFileSystem';
 import SFTPFileSystem from '../model/Fs/SFTPFileSystem';
 import FTPFileSystem from '../model/Fs/FTPFileSystem';
 import RemoteClient from '../model/Client/RemoteClient';
@@ -97,11 +100,24 @@ class KeepAliveRemoteFs {
   }
 }
 
+let testFs;
+function getTestFs() {
+  if (!testFs) {
+    testFs = new LocalFileSystem(path);
+  }
+
+  return Promise.resolve(testFs);
+}
+
 const fsTable: {
   [x: string]: KeepAliveRemoteFs,
 } = {};
 
-export default function getRemoteFs(option): Promise<RemoteFileSystem> {
+export default function getFileSystem(option): Promise<FileSystem> {
+  if (option.protocol === 'test') {
+    return getTestFs();
+  }
+
   const identity = hashOption(option);
   const fs = fsTable[identity];
   if (fs !== undefined) {

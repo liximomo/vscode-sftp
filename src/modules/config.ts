@@ -24,7 +24,7 @@ const configScheme = {
   port: Joi.number().integer(),
   username: Joi.string().required(),
   password: nullable(Joi.string()),
-  protocol: Joi.any().valid('sftp', 'ftp'),
+  protocol: Joi.any().valid('sftp', 'ftp', 'test'),
   agent: nullable(Joi.string()),
   privateKeyPath: nullable(Joi.string()),
   passphrase: nullable(Joi.string()),
