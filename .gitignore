@@ -2,3 +2,4 @@ out
 node_modules
 *.log
 test/test.js
+_debug
