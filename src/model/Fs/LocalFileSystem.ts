@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
+import * as output from '../../modules/output';
 import * as FileStatus from 'stat-mode';
 import FileSystem, { IFileEntry, IStats } from './FileSystem';
 
@@ -38,16 +39,27 @@ export default class LocalFileSystem extends FileSystem {
 
   put(input: fs.ReadStream | Buffer, path, option): Promise<void> {
     return new Promise<void>((resolve, reject) => {
+      output.debug(`fs createWriteStream ${path}`);
       const stream = fs.createWriteStream(path, option);
 
-      stream.on('error', reject);
-      stream.on('finish', resolve);
+      stream.on('error', err => {
+        output.error(`fs write to stream ${path}`, err);
+        reject(err);
+      });
+      stream.on('finish', _ => {
+        output.debug(`fs finish write to stream ${path}`);
+        resolve();
+      });
 
       if (input instanceof Buffer) {
         stream.end(input);
         return;
       }
 
+      input.on('error', err => {
+        output.error(`fs read from ReadStream when piping to ${path}`, err);
+        reject(err);
+      });
       input.pipe(stream);
     });
   }
