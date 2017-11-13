@@ -4,7 +4,7 @@ import * as minimatch from 'minimatch';
 import * as output from '../modules/output';
 import FileSystem, { IFileEntry, FileType } from '../model/Fs/FileSystem';
 import remotePath, { normalize } from './remotePath';
-import flatMap from '../helper/flatMap';
+import flatten from '../helper/flatten';
 
 type SyncModel = 'full' | 'update';
 
@@ -24,6 +24,13 @@ interface ITransportResult {
   op?: string;
 }
 
+interface ITask {
+  file: string;
+  call: () => Promise<ITransportResult[] | ITransportResult> | ITransportResult[] | ITransportResult,
+}
+
+const MAX_CONCURRENCE = 512;
+
 const defaultTransportOption = {
   ignore: [],
 };
@@ -32,6 +39,10 @@ const defaultSyncOption = {
   ignore: [],
   model: 'update' as SyncModel,
 };
+
+function fileDepth(file: string) {
+  return normalize(file).split('/').length;
+}
 
 function fileName2Show(filePath) {
   return vscode.workspace.asRelativePath(filePath);
@@ -56,78 +67,16 @@ const toHash = (items: any[], key: string, transform?: (a: any) => any): { [key:
     return hash;
   }, {});
 
-function transportDir(
-  src: string,
-  des: string,
-  srcFs: FileSystem,
-  desFs: FileSystem,
-  option: ITransportOption
-): Promise<ITransportResult[]> {
-  if (shouldSkip(remotePath.join(src, '/'), option.ignore)) {
-    return Promise.resolve([
-      {
-        target: src,
-        ignored: true,
-      },
-    ]);
+async function taskBatchProcess(queue, result) {
+  queue.sort((a, b) => fileDepth(b.file) - fileDepth(a.file));
+
+  while (queue.length > 0) {
+    const batch = queue.splice(0, MAX_CONCURRENCE);
+    const mixResult = await Promise.all(batch.map(task => task.call()));
+    result.push(...flatten(mixResult));
   }
 
-  const listFiles = () => {
-    output.status.msg(`retriving directory ${fileName2Show(src)}`);
-    return srcFs.list(src);
-  };
-
-  const uploadItem = (item: IFileEntry) => {
-    if (item.type === FileType.Directory) {
-      return transportDir(
-        item.fspath,
-        desFs.pathResolver.join(des, item.name),
-        srcFs,
-        desFs,
-        option
-      );
-    } else if (item.type === FileType.SymbolicLink) {
-      return transportSymlink(
-        item.fspath,
-        desFs.pathResolver.join(des, item.name),
-        srcFs,
-        desFs,
-        option
-      );
-    } else if (item.type === FileType.File) {
-      return transportFile(
-        item.fspath,
-        desFs.pathResolver.join(des, item.name),
-        srcFs,
-        desFs,
-        option
-      );
-    }
-
-    return [
-      {
-        target: item.fspath,
-        error: true,
-        op: 'transmission',
-        payload: new Error('unsupport file type'),
-      },
-    ];
-  };
-
-  return desFs
-    .ensureDir(des)
-    .then(listFiles)
-    .then(items => items.map(uploadItem))
-    .then(tasks => Promise.all<ITransportResult[] | ITransportResult>(tasks))
-    .then(result => flatMap(result, a => a))
-    .catch(err => [
-      {
-        target: src,
-        error: true,
-        op: 'transmission dir',
-        payload: err,
-      },
-    ]);
+  return result;
 }
 
 function transportFile(
@@ -240,18 +189,128 @@ function removeDir(path: string, fs: FileSystem, option): Promise<ITransportResu
     }));
 }
 
-export function sync(
+function _transportDir(
+  src: string,
+  des: string,
+  srcFs: FileSystem,
+  desFs: FileSystem,
+  option: ITransportOption
+): Promise<ITask[]> {
+  if (shouldSkip(remotePath.join(src, '/'), option.ignore)) {
+    return Promise.resolve([
+      {
+        file: src,
+        call: () => Promise.resolve([
+          {
+            target: src,
+            ignored: true,
+          },
+        ]),
+      },
+    ]);
+  }
+
+  const listFiles = () => {
+    output.status.msg(`retriving directory ${fileName2Show(src)}`);
+    return srcFs.list(src);
+  };
+
+  const createUploadTask = (item: IFileEntry) => {
+    if (item.type === FileType.Directory) {
+      return _transportDir(
+        item.fspath,
+        desFs.pathResolver.join(des, item.name),
+        srcFs,
+        desFs,
+        option
+      );
+    }
+
+    const task: ITask = {
+      file: item.fspath,
+      call: undefined,
+    };
+    if (item.type === FileType.SymbolicLink) {
+      task.call = () => transportSymlink(
+        item.fspath,
+        desFs.pathResolver.join(des, item.name),
+        srcFs,
+        desFs,
+        option
+      );
+    } else if (item.type === FileType.File) {
+      task.call = () => transportFile(
+        item.fspath,
+        desFs.pathResolver.join(des, item.name),
+        srcFs,
+        desFs,
+        option
+      );
+    } else {
+      task.call = () => ({
+        target: item.fspath,
+        error: true,
+        op: 'transmission',
+        payload: new Error('unsupport file type'),
+      });
+    }
+    return task;
+  };
+
+  return desFs
+    .ensureDir(des)
+    .then(listFiles)
+    .then(items => items.map(createUploadTask))
+    .then(tasks => Promise.all<ITask | ITask[]>(tasks))
+    .then(result => flatten(result));
+}
+
+export async function transportDir(
+  src: string,
+  des: string,
+  srcFs: FileSystem,
+  desFs: FileSystem,
+  option: ITransportOption
+): Promise<ITransportResult[]> {
+  const result = [];
+  try {
+    const tasks = await _transportDir(src, des, srcFs, desFs, option);
+    await taskBatchProcess(tasks, result);
+    // tasks.sort((a, b) => fileDepth(b.file) - fileDepth(a.file));
+    // while (tasks.length > 0) {
+    //   const batch = tasks.splice(0, MAX_CONCURRENCE);
+    //   const mixResult = await Promise.all(batch.map(task => task.call()));
+    //   result.push(...flatten(mixResult));
+    // }
+  } catch (err) {
+    result.push({
+      target: src,
+      error: true,
+      op: 'transmission dir',
+      payload: err,
+    });
+  }
+
+  return result;
+}
+
+export function _sync(
   srcDir: string,
   desDir: string,
   srcFs: FileSystem,
   desFs: FileSystem,
   option: ISyncOption = defaultSyncOption
-): Promise<ITransportResult[]> {
+): Promise<ITask[]> {
   if (shouldSkip(srcDir, option.ignore)) {
     return Promise.resolve([
       {
-        target: srcDir,
-        ignored: true,
+        file: srcDir,
+        call: () => Promise.resolve([
+          {
+            target: srcDir,
+            ignored: true,
+          },
+        ]),
       },
     ]);
   }
@@ -336,46 +395,69 @@ export function sync(
       });
     }
 
-    const transFileTasks = file2trans.map(([srcfile, desFile]) =>
-      transportFile(srcfile.fspath, desFile.fspath, srcFs, desFs, option)
-    );
-    const transSymlinkTasks = symlink2trans.map(([srcfile, desFile]) =>
-      transportSymlink(srcfile.fspath, desFile.fspath, srcFs, desFs, option)
-    );
+    const transFileTasks = file2trans.map(([srcfile, desFile]) => ({
+      file: srcfile.fspath,
+      call: () => transportFile(srcfile.fspath, desFile.fspath, srcFs, desFs, option),
+    }));
+
+    const transSymlinkTasks = symlink2trans.map(([srcfile, desFile]) => ({
+      file: srcfile.fspath,
+      call: () => transportSymlink(srcfile.fspath, desFile.fspath, srcFs, desFs, option),
+    }));
+
     const transDirTasks = dir2trans.map(([srcfile, desFile]) =>
-      transportDir(srcfile.fspath, desFile.fspath, srcFs, desFs, option)
+      _transportDir(srcfile.fspath, desFile.fspath, srcFs, desFs, option)
     );
+
     const syncDirTasks = dir2sync.map(([srcfile, desFile]) =>
-      sync(srcfile.fspath, desFile.fspath, srcFs, desFs, option)
+      _sync(srcfile.fspath, desFile.fspath, srcFs, desFs, option)
     );
 
-    const clearFileTasks = fileMissed.map(file => removeFile(file.fspath, desFs, option));
-    const clearDirTasks = dirMissed.map(file => removeDir(file.fspath, desFs, option));
+    const clearFileTasks = fileMissed.map(file => ({
+      file: file.fspath,
+      call: () => removeFile(file.fspath, desFs, option),
+    }));
 
-    return Promise.all<ITransportResult[] | ITransportResult>([
+    const clearDirTasks = dirMissed.map(file => ({
+      file: file.fspath,
+      call: () => removeDir(file.fspath, desFs, option),
+    }));
+
+    return Promise.all<ITask | ITask[]>([
+      ...syncDirTasks,
       ...transFileTasks,
       ...transSymlinkTasks,
       ...transDirTasks,
       ...clearFileTasks,
-      ...syncDirTasks,
       ...clearDirTasks,
-    ]);
+    ]).then(flatten);
   };
 
   return Promise.all([srcFs.list(srcDir).catch(err => []), desFs.list(desDir).catch(err => [])])
-    .then(syncFiles)
-    .then(result => {
-      output.status.msg(`sync finish ${fileName2Show(srcDir)}`);
-      return flatMap(result, a => a);
-    })
-    .catch(err => [
-      {
-        target: srcDir,
-        error: true,
-        op: 'sync',
-        payload: err,
-      },
-    ]);
+    .then(syncFiles);
+}
+
+export async function sync(
+  srcDir: string,
+  desDir: string,
+  srcFs: FileSystem,
+  desFs: FileSystem,
+  option: ISyncOption = defaultSyncOption
+): Promise<ITransportResult[]> {
+  const result = [];
+  try {
+    const tasks = await _sync(srcDir, desDir, srcFs, desFs, option);
+    await taskBatchProcess(tasks, result);
+  } catch (err) {
+    result.push({
+      target: srcDir,
+      error: true,
+      op: 'sync',
+      payload: err,
+    });
+  }
+
+  return result;
 }
 
 export function transport(

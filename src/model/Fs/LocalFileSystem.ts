@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
-import * as output from '../../modules/output';
 import * as FileStatus from 'stat-mode';
 import FileSystem, { IFileEntry, IStats } from './FileSystem';
 
@@ -52,10 +51,7 @@ export default class LocalFileSystem extends FileSystem {
         return;
       }
 
-      input.on('error', err => {
-        output.error(`fs read from ReadStream when piping to ${path}`, err);
-        reject(err);
-      });
+      input.on('error', reject);
       input.pipe(stream);
     });
   }

@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import * as FileStatus from 'stat-mode';
-import * as output from '../../modules/output';
 import FileSystem, { IFileEntry, FileType, IStats, IStreamOption } from './FileSystem';
 import RemoteFileSystem from './RemoteFileSystem';
 import { IClientOption } from '../Client/RemoteClient';
@@ -55,10 +54,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
         return;
       }
 
-      input.on('error', err => {
-        output.error(`fs read from ReadStream when piping to ${path}`, err);
-        reject(err);
-      });
+      input.on('error', reject);
       input.pipe(stream);
     });
   }

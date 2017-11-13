@@ -28,53 +28,53 @@ function printFailTask(result) {
 }
 
 function printResult(msg, result, silent) {
-  return;
-  // const { success, fails, ignored } = []
-  //   .concat(result)
-  //   .filter(resultItem => typeof resultItem === 'object')
-  //   .reduce(
-  //     (classification, resultItem) => {
-  //       if (resultItem.error) {
-  //         classification.fails.push(resultItem);
-  //       } else if (resultItem.ignored) {
-  //         classification.ignored.push(resultItem);
-  //       } else {
-  //         classification.success.push(resultItem);
-  //       }
-  //       return classification;
-  //     },
-  //     {
-  //       success: [],
-  //       fails: [],
-  //       ignored: [],
-  //     }
-  //   );
+  // return;
+  const { success, fails, ignored } = []
+    .concat(result)
+    .filter(resultItem => typeof resultItem === 'object')
+    .reduce(
+      (classification, resultItem) => {
+        if (resultItem.error) {
+          classification.fails.push(resultItem);
+        } else if (resultItem.ignored) {
+          classification.ignored.push(resultItem);
+        } else {
+          classification.success.push(resultItem);
+        }
+        return classification;
+      },
+      {
+        success: [],
+        fails: [],
+        ignored: [],
+      }
+    );
 
-  // // log space between each activity
-  // output.print('\n');
+  // log space between each activity
+  output.print('\n');
 
-  // ignored.forEach(logIgnored);
+  ignored.forEach(logIgnored);
 
-  // const availableResult = success.length + fails.length;
-  // if (availableResult <= 0) {
-  //   return;
-  // }
+  const availableResult = success.length + fails.length;
+  if (availableResult <= 0) {
+    return;
+  }
 
-  // success.forEach(item => {
-  //   output.debug(`${msg} ${item.target} at ${new Date()}`);
-  // });
+  success.forEach(item => {
+    output.debug(`${msg} ${item.target} at ${new Date()}`);
+  });
 
-  // if (fails.length) {
-  //   fails.forEach(printFailTask);
-  //   output.showOutPutChannel();
-  //   output.status.msg(`${msg} done (${fails.length} fails)`, 2000);
-  // } else {
-  //   if (silent) {
-  //     output.status.msg('', 0);
-  //   } else {
-  //     output.status.msg(`${msg} done`, 2000);
-  //   }
-  // }
+  if (fails.length) {
+    fails.forEach(printFailTask);
+    output.showOutPutChannel();
+    output.status.msg(`${msg} done (${fails.length} fails)`, 2000);
+  } else {
+    if (silent) {
+      output.status.msg('', 0);
+    } else {
+      output.status.msg(`${msg} done`, 2000);
+    }
+  }
 }
 
 const getHostInfo = config => ({
