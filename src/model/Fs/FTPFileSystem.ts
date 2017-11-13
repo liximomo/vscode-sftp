@@ -5,6 +5,26 @@ import RemoteFileSystem from './RemoteFileSystem';
 import { IClientOption } from '../Client/RemoteClient';
 import FTPClient from '../Client/FTPClient';
 
+const numMap = {
+  r: 4,
+  w: 2,
+  x: 1,
+}
+
+function toNumMode(rightObj) {
+  // tslint:disable-next-line:no-shadowed-variable
+  const modeStr = Object.keys(rightObj).reduce((modeStr, key) => {
+    const rightStr = rightObj[key];
+    let cur = 0;
+    for (const char of rightStr) {
+      cur += numMap[char];
+    }
+    return modeStr + cur;
+  }, '');
+
+  return parseInt(modeStr, 8);
+}
+
 export default class FTPFileSystem extends RemoteFileSystem {
   static getFileType(type) {
     if (type === 'd') {
@@ -37,6 +57,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
         resolve({
           ...stat,
           type: FTPFileSystem.getFileType(stat.type),
+          mode: toNumMode(stat.rights),
         });
       });
     });
@@ -60,6 +81,20 @@ export default class FTPFileSystem extends RemoteFileSystem {
     });
   }
 
+  chmod(path: string, mode: number): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      const command = `CHMOD ${mode.toString(8)} ${path}`;
+      this.ftp.site(command, err => {
+        if (err) {
+          reject(err);
+          return;
+        };
+
+        resolve();
+      });
+    });
+  }
+
   put(input: fs.ReadStream | Buffer, path, option?: IStreamOption): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.ftp.put(input, path, err => {
@@ -67,6 +102,14 @@ export default class FTPFileSystem extends RemoteFileSystem {
           reject(err);
           return;
         };
+
+        if (option.mode) {
+          return this.chmod(path, option.mode)
+            .then(resolve)
+            .catch(_ => {
+              // ignore error;
+            });
+        }
 
         resolve();
       });
