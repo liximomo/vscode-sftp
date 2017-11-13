@@ -29,7 +29,6 @@ export default class LocalFileSystem extends FileSystem {
     return new Promise((resolve, reject) => {
       try {
         const stream = fs.createReadStream(path, option);
-        stream.on('error', reject);
         resolve(stream);
       } catch (err) {
         reject(err);
@@ -39,15 +38,12 @@ export default class LocalFileSystem extends FileSystem {
 
   put(input: fs.ReadStream | Buffer, path, option): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      output.debug(`fs createWriteStream ${path}`);
       const stream = fs.createWriteStream(path, option);
 
       stream.on('error', err => {
-        output.error(`fs write to stream ${path}`, err);
         reject(err);
       });
       stream.on('finish', _ => {
-        output.debug(`fs finish write to stream ${path}`);
         resolve();
       });
 

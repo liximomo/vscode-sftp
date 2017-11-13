@@ -74,7 +74,6 @@ function transportDir(
 
   const listFiles = () => {
     output.status.msg(`retriving directory ${fileName2Show(src)}`);
-    output.debug('transportDir', `scan directory ${fileName2Show(src)}`);
     return srcFs.list(src);
   };
 
@@ -146,7 +145,6 @@ function transportFile(
   }
 
   output.status.msg(`transfer ${fileName2Show(src)}`);
-  output.debug(`transfer file from ${fileName2Show(src)} to ${fileName2Show(des)}`);
   return srcFs
     .get(src)
     .then(inputStream => desFs.put(inputStream, des))
@@ -176,7 +174,6 @@ function transportSymlink(
   }
 
   output.status.msg(`transfer ${fileName2Show(src)}`);
-  output.debug(`transfer Symbollink from ${fileName2Show(src)} to ${fileName2Show(des)}`);
   return srcFs
     .readlink(src)
     .then(targetPath => {
@@ -208,7 +205,6 @@ function removeFile(path: string, fs: FileSystem, option): Promise<ITransportRes
   }
 
   output.status.msg(`remove ${fileName2Show(path)}`);
-  output.debug(`remove file ${fileName2Show(path)}`);
   return fs
     .unlink(path)
     .then(() => ({
@@ -231,7 +227,6 @@ function removeDir(path: string, fs: FileSystem, option): Promise<ITransportResu
   }
 
   output.status.msg(`remove dir ${fileName2Show(path)}`);
-  output.debug(`remove dir ${fileName2Show(path)}`);
   return fs
     .rmdir(path, true)
     .then(() => ({
@@ -262,10 +257,8 @@ export function sync(
   }
 
   output.status.msg(`collect files ${fileName2Show(srcDir)}...`);
-  output.debug(`scan files from ${fileName2Show(srcDir)}`);
   const syncFiles = ([srcFileEntries, desFileEntries]: IFileEntry[][]) => {
     output.status.msg('diff files...');
-    output.debug(`diff files in ${fileName2Show(srcDir)}`);
     const srcFileTable = toHash(srcFileEntries, 'id', fileEntry => ({
       ...fileEntry,
       id: normalize(srcFs.pathResolver.relative(srcDir, fileEntry.fspath)),
@@ -373,7 +366,6 @@ export function sync(
     .then(syncFiles)
     .then(result => {
       output.status.msg(`sync finish ${fileName2Show(srcDir)}`);
-      output.debug(`sync finish between ${fileName2Show(srcDir)} and ${fileName2Show(desDir)}`);
       return flatMap(result, a => a);
     })
     .catch(err => [
@@ -402,7 +394,6 @@ export function transport(
     ]);
   }
 
-  output.debug(`tansform file from ${fileName2Show(src)} to ${des}`);
   return srcFs.lstat(src).then(
     stat => {
       let result;
@@ -436,7 +427,6 @@ export function remove(path: string, fs: FileSystem, option): Promise<ITransport
     });
   }
 
-  output.debug(`remove file ${path}`);
   return fs.lstat(path).then(
     stat => {
       let result;

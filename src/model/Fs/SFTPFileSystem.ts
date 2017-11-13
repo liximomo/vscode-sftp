@@ -35,11 +35,9 @@ export default class SFTPFileSystem extends RemoteFileSystem {
   get(path, option?: IStreamOption): Promise<fs.ReadStream> {
     return new Promise((resolve, reject) => {
       try {
-        output.debug(`fs createReadStream ${path}`);
         const stream = this.sftp.createReadStream(path, option);
         resolve(stream);
       } catch (err) {
-        output.error(`fs createReadStream ${path}`, err);
         reject(err);
       }
     });
@@ -57,6 +55,10 @@ export default class SFTPFileSystem extends RemoteFileSystem {
         return;
       }
 
+      input.on('error', err => {
+        output.error(`fs read from ReadStream when piping to ${path}`, err);
+        reject(err);
+      });
       input.pipe(stream);
     });
   }
@@ -99,8 +101,6 @@ export default class SFTPFileSystem extends RemoteFileSystem {
 
   ensureDir(dir: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      output.debug(`fs ensure dir exist ${dir}`);
-
       const tokens = dir.split('/');
       const root = tokens.shift();
       let dirPath = root === '' ? '/' : root;
@@ -108,20 +108,17 @@ export default class SFTPFileSystem extends RemoteFileSystem {
       const mkdir = () => {
         let token = tokens.shift();
         if (!token && !tokens.length) {
-          output.debug(`fs ensure dir exist ${dir}`, `done`);
           resolve();
           return;
         }
         token += '/';
         dirPath = this.pathResolver.join(dirPath, token);
-        output.debug(`fs ensure dir exist ${dir}`, `mkdir ${dirPath}`);
         return this.mkdir(dirPath)
           .then(mkdir, err => {
             if (err.code === 4) {
               // ignore already exist
               mkdir();
             } else {
-              output.error(`fs ensure dir exist ${dir}`, err);
               reject(err);
             }
           });
