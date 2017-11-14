@@ -101,6 +101,7 @@ Very simple and intuitive and works.
 
   /**
    *  glob pattern that will be appended to `config root` and `remotePath`
+   *  FIXMEEE explain the ** - what does it mean, when to put it and when not
    */ 
   ignore: [
     "**/.vscode/**",
@@ -116,6 +117,7 @@ Very simple and intuitive and works.
     // available value: false or glob pattern
     // false: disable watcher
     // glob pattern: same logic as ignore
+    // FIXME: same logic means it *ignores* files that match the pattern, or *selects* files that match the pattern?
     files: false, 
 
     // avaliable value: true or false
