@@ -99,11 +99,11 @@ Very simple and intuitive and works.
    */ 
   syncMode: 'update',
 
-// FIXMEEE: creating/deleting a file locally in vscode doesn't make changes on the server unless the watcher is on?
+// FIXMEEEEEEE: creating/deleting a file locally in vscode doesn't automatically make changes on the server unless the watcher is on? New files get created on either side only when syncing to that side and using syncMode full. Same with deletions.
 
   /**
    *  glob pattern that will be appended to `config root` and `remotePath`
-   *  FIXMEEE explain the ** - what does it mean, when to put it and when not
+   *  FIXMEEEEEEE explain the ** - what does it mean, when to put it and when not
    */ 
   ignore: [
     "**/.vscode/**",
@@ -120,8 +120,8 @@ Very simple and intuitive and works.
     // available value: false or glob pattern
     // false: disable watcher
     // glob pattern: same logic as ignore
-    // FIXME: same logic means it *ignores* files that match the pattern, or *selects* files that match the pattern?
-    // FIXMEEE the value of files is not an array like in ignore, but a string!
+    // FIXMEEEEEEE: same logic means it *ignores* files that match the pattern, or *selects* files that match the pattern?
+    // FIXMEEEEEEE the value of files is not an array like in ignore, but a string!
     files: false, 
 
     // avaliable value: true or false
