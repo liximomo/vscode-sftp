@@ -121,6 +121,7 @@ Very simple and intuitive and works.
     // false: disable watcher
     // glob pattern: same logic as ignore
     // FIXME: same logic means it *ignores* files that match the pattern, or *selects* files that match the pattern?
+    // FIXMEEE the value of files is not an array like in ignore, but a string!
     files: false, 
 
     // avaliable value: true or false
