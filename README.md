@@ -99,6 +99,8 @@ Very simple and intuitive and works.
    */ 
   syncMode: 'update',
 
+// FIXMEEE: creating/deleting a file locally in vscode doesn't make changes on the server unless the watcher is on?
+
   /**
    *  glob pattern that will be appended to `config root` and `remotePath`
    *  FIXMEEE explain the ** - what does it mean, when to put it and when not
@@ -109,7 +111,6 @@ Very simple and intuitive and works.
     "**/.DS_Store"
   ],
 
-  // FIXMEEE: creating/deleting a file locally in vscode doesn't make changes on the server unless the watcher is on?
 
   /**
    *  Watching external file changes(create and remove only). Such as compile/build output or git branch switching.
