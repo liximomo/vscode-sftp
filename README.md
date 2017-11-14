@@ -109,10 +109,11 @@ Very simple and intuitive and works.
     "**/.DS_Store"
   ],
 
+  // FIXMEEE: creating/deleting a file locally in vscode doesn't make changes on the server unless the watcher is on?
+
   /**
    *  Watching external file changes(create and remove only). Such as compile/build output or git branch switching.
    *  Watcher will be disabled when files is set to false or both autoDelete and autoUpload are set to false,
-   *  FIXMEEE: creating/deleting a file locally doesn't make changes on the server unless the watcher is on!
    */
   watcher: {
     // available value: false or glob pattern
