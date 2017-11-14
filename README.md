@@ -92,15 +92,15 @@ Very simple and intuitive and works.
 
 
   /**
-   *  avaliable value: update | full
-   *  update: sync exist file only
-   *  full: sync exist file, remove deleted file, add missed file
-   *  if you want sync exist file and add missed file, use "upload" commond!
+   *  available value: update | full
+   *  update: sync existing files only
+   *  full: sync existing files, remove deleted files, add missing files
+   *  if you want to sync existing files and add missing files, use the "upload" command!
    */ 
   syncMode: 'update',
 
   /**
-   *  glob pattern that will be append to `config root` and `remotePath`
+   *  glob pattern that will be appended to `config root` and `remotePath`
    */ 
   ignore: [
     "**/.vscode/**",
@@ -110,20 +110,20 @@ Very simple and intuitive and works.
 
   /**
    *  Watching external file changes(create and remove only). Such as compile/build output or git branch switching.
-   *  Watcher will be disable when files set to false or both autoDelete and autoUpload set to false,
+   *  Watcher will be disabled when files is set to false or both autoDelete and autoUpload are set to false,
    */
   watcher: {
-    // avaliable value: false or glob pattern
+    // available value: false or glob pattern
     // false: disable watcher
     // glob pattern: same logic as ignore
     files: false, 
 
     // avaliable value: true or false
-    // whether or not auto upload created files
+    // whether or not to auto upload created files
     autoUpload: true,
 
     // avaliable value: true or false
-    // whether or not auto delete removed files
+    // whether or not to auto delete removed files
     autoDelete: true,
   }
 
