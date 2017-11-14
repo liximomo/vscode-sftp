@@ -125,11 +125,11 @@ Very simple and intuitive and works.
     // FIXMEEEEEEE the value of files is not an array like in ignore, but a string!
     files: false, 
 
-    // avaliable value: true or false
+    // available value: true or false
     // whether or not to auto upload created files
     autoUpload: true,
 
-    // avaliable value: true or false
+    // available value: true or false
     // whether or not to auto delete removed files
     autoDelete: true,
   }
