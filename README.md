@@ -3,13 +3,14 @@ Very simple and intuitive and works.
 
 ## Features
 
-* support multi-root workspace
+* supports multi-root workspace
 * dual authentication
 * sync directory to remote
 * sync directory to local
 * download file/directory to local
 * upload file/directory to remote
 * upload to remote on save
+* watch project directory for external changes and automatically update remote
 * multiple file format support(file, directory, symbolic link)
 * multiple config(anywhere under workspace)
 
@@ -21,14 +22,14 @@ Very simple and intuitive and works.
 
 *Note2* ：Sync commands will only be available to a directory. Try not to bind shortcut to those commands because there is no way to figure out the target directory.
 
-### Command
-| Command              | Description                                 |
-| -------------------- |---------------------------------------------|
-| SFTP: Config         | create a new config file at workspace root  |
-| SFTP: Upload         | upload file/directory                       |
-| SFTP: Download       | download file/directory                     |
-| SFTP: Sync To Remote | sync local directory to remote              |
-| SFTP: Sync To Local  | sync remote directory to local              |
+### Commands
+| Command              | Description                                  |Detailed description|
+| -------------------- |----------------------------------------------|---------------|
+| SFTP: Config         | create a new config file at workspace root  | - |
+| SFTP: Upload         | upload file/directory                       | copies all files from the local to the remote directory, overwriting the remote ones. Files that are only present on the remote side won't be affected. \
+| SFTP: Download       | download file/directory                     | copies all files from the remote to the local directory, overwriting the local ones. Files that are only present on the local side won't be affected.
+| SFTP: Sync To Remote | sync local directory to remote               |-|
+| SFTP: Sync To Local  | sync remote directory to local               |-|
   
 ### Glossary
 `config root`: The directory where the `.vscode/sftp.json` file is located in.
