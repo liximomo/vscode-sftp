@@ -22,7 +22,7 @@ Very simple and intuitive and works.
 *Note2* ：Sync commands will only be available to a directory. Try not to bind shortcut to those commands because there is no way to figure out the target directory.
 
 ### Command
-| Command              | describe                                    |
+| Command              | Description                                 |
 | -------------------- |---------------------------------------------|
 | SFTP: Config         | create a new config file at workspace root  |
 | SFTP: Upload         | upload file/directory                       |
