@@ -28,7 +28,7 @@ Very simple and intuitive and works.
 | `SFTP: Config`         | create a new config file at workspace root  | - |
 | `SFTP: Upload`         | upload file/directory                       | copies selected files from the local to the remote directory, overwriting the remote ones. Files that are only present on the remote side won't be affected. Files that are only present on the local side will be created remotely|
 | `SFTP: Download`       | download file/directory                     | same as above, but in the opposite direction |
-| `SFTP: Sync To Remote` | sync local directory to remote               | only available for directories. Copies all files from local dir to remote, overwriting destination. |
+| `SFTP: Sync To Remote` | sync local directory to remote               | only available for directories. Copies common files (that exist on both soides) from local dir to remote, overwriting destination. If syncMode is set to full, files that exist only on the local side will be created remotely, and files that exist only on the remote side will be deleted|
 | `SFTP: Sync To Local`  | sync remote directory to local               | same as above, but in the opposite direction|
   
 *Note3* : FIXMEEE difference between sync to local/download etc etc
