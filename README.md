@@ -35,10 +35,6 @@ Very simple and intuitive and works.
 ### Glossary
 `config root`: The directory where the `.vscode/sftp.json` file is located in.
 
-**config root**: 
-
-**config root**: 
-
 ## config
 ```js
 // default config
