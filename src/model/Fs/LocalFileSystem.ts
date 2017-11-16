@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
-import * as FileStatus from 'stat-mode';
-import FileSystem, { IFileEntry, IStats } from './FileSystem';
+import FileSystem, { IFileEntry, IStats, IStreamOption } from './FileSystem';
 
 export default class LocalFileSystem extends FileSystem {
   constructor(pathResolver: any) {
@@ -19,7 +18,7 @@ export default class LocalFileSystem extends FileSystem {
         resolve({
           ...stat,
           type: FileSystem.getFileTypecharacter(stat),
-          mode: stat.mode & parseInt('777', 8), // tslint:disable-line:no-bitwise
+          permissionMode: stat.mode & parseInt('777', 8), // tslint:disable-line:no-bitwise
         } as IStats);
       });
     });
@@ -36,7 +35,7 @@ export default class LocalFileSystem extends FileSystem {
     });
   }
 
-  put(input: fs.ReadStream | Buffer, path, option): Promise<void> {
+  put(input: fs.ReadStream | Buffer, path, option?: IStreamOption): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       const stream = fs.createWriteStream(path, option);
 
@@ -99,11 +98,10 @@ export default class LocalFileSystem extends FileSystem {
   }
 
   toFileEntry(fullPath, stat) {
-    const statModel = new FileStatus(stat);
     return {
       fspath: fullPath,
-      type: FileSystem.getFileTypecharacter(statModel),
       name: this.pathResolver.basename(fullPath),
+      type: stat.type,
       size: stat.size,
       modifyTime: stat.mtime.getTime() / 1000,
       accessTime: stat.atime.getTime() / 1000,

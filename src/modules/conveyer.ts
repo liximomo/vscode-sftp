@@ -67,6 +67,15 @@ const toHash = (items: any[], key: string, transform?: (a: any) => any): { [key:
     return hash;
   }, {});
 
+async function getFileMode(path: string, fs: FileSystem) {
+  try {
+    const stat = await fs.lstat(path);
+    return stat.permissionMode;
+  } catch (err) {
+    return 0o666;
+  }
+}
+
 async function taskBatchProcess(queue, result) {
   queue.sort((a, b) => fileDepth(b.file) - fileDepth(a.file));
 
@@ -94,9 +103,11 @@ function transportFile(
   }
 
   output.status.msg(`transfer ${fileName2Show(src)}`);
-  return srcFs
-    .get(src)
-    .then(inputStream => desFs.put(inputStream, des))
+  return Promise.all([
+      srcFs.get(src),
+      getFileMode(src, srcFs),
+    ])
+    .then(([inputStream, mode]) => desFs.put(inputStream, des, { mode }))
     .then(() => ({
       target: src,
     }))
@@ -265,35 +276,6 @@ function _transportDir(
     .then(result => flatten(result));
 }
 
-export async function transportDir(
-  src: string,
-  des: string,
-  srcFs: FileSystem,
-  desFs: FileSystem,
-  option: ITransportOption
-): Promise<ITransportResult[]> {
-  const result = [];
-  try {
-    const tasks = await _transportDir(src, des, srcFs, desFs, option);
-    await taskBatchProcess(tasks, result);
-    // tasks.sort((a, b) => fileDepth(b.file) - fileDepth(a.file));
-    // while (tasks.length > 0) {
-    //   const batch = tasks.splice(0, MAX_CONCURRENCE);
-    //   const mixResult = await Promise.all(batch.map(task => task.call()));
-    //   result.push(...flatten(mixResult));
-    // }
-  } catch (err) {
-    result.push({
-      target: src,
-      error: true,
-      op: 'transmission dir',
-      payload: err,
-    });
-  }
-
-  return result;
-}
-
 export function _sync(
   srcDir: string,
   desDir: string,
@@ -435,6 +417,35 @@ export function _sync(
 
   return Promise.all([srcFs.list(srcDir).catch(err => []), desFs.list(desDir).catch(err => [])])
     .then(syncFiles);
+}
+
+export async function transportDir(
+  src: string,
+  des: string,
+  srcFs: FileSystem,
+  desFs: FileSystem,
+  option: ITransportOption
+): Promise<ITransportResult[]> {
+  const result = [];
+  try {
+    const tasks = await _transportDir(src, des, srcFs, desFs, option);
+    await taskBatchProcess(tasks, result);
+    // tasks.sort((a, b) => fileDepth(b.file) - fileDepth(a.file));
+    // while (tasks.length > 0) {
+    //   const batch = tasks.splice(0, MAX_CONCURRENCE);
+    //   const mixResult = await Promise.all(batch.map(task => task.call()));
+    //   result.push(...flatten(mixResult));
+    // }
+  } catch (err) {
+    result.push({
+      target: src,
+      error: true,
+      op: 'transmission dir',
+      payload: err,
+    });
+  }
+
+  return result;
 }
 
 export async function sync(

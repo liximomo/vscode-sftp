@@ -57,7 +57,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
         resolve({
           ...stat,
           type: FTPFileSystem.getFileType(stat.type),
-          mode: toNumMode(stat.rights),
+          permissionMode: toNumMode(stat.rights),
         });
       });
     });

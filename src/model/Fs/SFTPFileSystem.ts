@@ -26,6 +26,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
         resolve({
           ...stat,
           type: FileSystem.getFileTypecharacter(stat),
+          permissionMode: stat.mode & parseInt('777', 8), // tslint:disable-line:no-bitwise
         } as IStats);
       });
     });
