@@ -19,6 +19,7 @@ export default class LocalFileSystem extends FileSystem {
         resolve({
           ...stat,
           type: FileSystem.getFileTypecharacter(stat),
+          mode: stat.mode & parseInt('777', 8), // tslint:disable-line:no-bitwise
         } as IStats);
       });
     });
