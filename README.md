@@ -62,7 +62,8 @@ Very simple and intuitive and works.
   passphrase: null,
   passive: false, // ftp passive mode
 
-  // try interactive authentication, useful for dual auth. (requires the server to have keyboard-interactive authentication enabled)
+  // try interactive authentication, useful for dual auth. 
+  // (requires the server to have keyboard-interactive authentication enabled)
   interactiveAuth: true, 
 
  /*******************************
@@ -70,10 +71,11 @@ Very simple and intuitive and works.
  *******************************/
  
   /**
-   * The final remotePath of a selected file or directory is {remotePath in config file} + {local file Path relative to `config root`}.
-   * example:
+   * The final remotePath of a selected file or directory is 
+   *  {remotePath in config file} + {local file Path relative to `config root`}.
+   * Example:
    *
-   * local directory structure:
+   * Local directory structure:
    *  |-a
    *    |-c.txt
    *  |-b
@@ -81,15 +83,15 @@ Very simple and intuitive and works.
    *      |-e.txt
    *    |-.vscode/sftp.json.json
    *  
-   *  config file 
+   *  Config file 
    *    {
    *      ...
    *      remotePath: '/home/test',
    *      ...
    *    }
    *    
-   *  run command 'sync to remote' at `e.txt` will result that is /b/d/e.txt => /home/test/d/e.txt
-   *  procedure:
+   *  Running command 'sync to remote' at `e.txt` will result in copying /b/d/e.txt => /home/test/d/e.txt
+   *  Explanation:
    *    {config file path} => /b/.sftp-config.json
    *    {local file path} => /b/d/e.txt
    *    {local Path relative to `config root`} => d/e.txt
@@ -104,13 +106,14 @@ Very simple and intuitive and works.
   /**
    *  available values: update | full
    *  update: sync existing files only (it only affects files that exist on both sides)
-   *  full: sync existing files + remove files deleted from the source and are still present at the destination + create files that exist on the source and are missing at the destination
-   *  if you want just to sync existing files and add missing files, use the `upload` command!
-   *  Note: this option only affects the `Sync to remote` and `Sync to local` commands, not `Download` or `Upload`
+   *  full: sync existing files + remove files deleted from the source that are still present at 
+   *    the destination + create files that exist on the source and are missing at the destination
+   *  If you want just to sync existing files and add missing files, use the `upload` command!
+   *  Note: this option only affects the `Sync to remote/local` commands, not `Download` or `Upload`
    */ 
   syncMode: 'update',
 
-  /** detailed example of how sync/upload/download work. Assume we have the following directories:
+  /** Detailed example of how sync/upload/download work. Assume we have the following directories:
   *
   * source-dir
   * |-s1.txt (file that exists only at source)
@@ -149,11 +152,12 @@ Very simple and intuitive and works.
   /**
    *  array of glob patterns that will be appended to `config root` and `remotePath`
    *  Note: the ** sequence matches a sequence of zero or more files and directories
-   *  examples: */
+   *  examples:
+   */
    //    "**/.vscode" means every file or directory with name .vscode, at any depth in the file tree
    //     'a/b/.vscode' matches
    //     'a/b/.vscode/c.txt' does NOT match
-   //    "**/.vscode/**" means every file or directory under a .vscode directory, at any depth in the file tree
+   //    "**/.vscode/**" means every file or directory under a .vscode dir, at any depth in the file tree
    //     'a/b/.vscode/c.txt' matches
    //     'a/b/.vscode/c/d.txt' matches
    //     'a/b/.vscode/e' matches 
