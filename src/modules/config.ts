@@ -7,9 +7,10 @@ import * as Joi from 'joi';
 import rpath, { normalize } from './remotePath';
 import * as output from './output';
 import Trie from '../model/Trie';
-import isDeprecatedConfigFile from '../helper/isDeprecatedConfigFile';
+import { isDeprecatedConfigFile, isNoneRootConfigFile } from '../helper/deprecated';
 
 let isWarnShowed = false;
+let isMultiConfigWarnShowed = false;
 
 const TRIE_DELIMITER = '/';
 
@@ -96,7 +97,7 @@ export function addConfig(configPath) {
   if (!isWarnShowed && isDeprecatedConfigFile(configPath)) {
     isWarnShowed = true;
     vscode.window.showWarningMessage(
-      '[sftp]: The \'.sftpConfig.json\' config file will be deprecated soon. Please use \'sftp.json\' instead.'
+      '[sftp]: The \'.sftpConfig.json\' config file will be deprecated next update. Please use \'sftp.json\' instead.'
     );
   }
 
@@ -116,6 +117,15 @@ export function addConfig(configPath) {
     const normalizeConfigPath = normalize(configPath);
     let configRoot = rpath.dirname(normalizeConfigPath);
     configRoot = rpath.dirname(configRoot);
+
+    if (!isMultiConfigWarnShowed && isNoneRootConfigFile(configRoot)) {
+      isMultiConfigWarnShowed = true;
+      vscode.window.showWarningMessage(
+        '[sftp]: You have a config file not located in workspace root folder. ' +
+        'This multi-config feature will be deprecated next update for better performance. ' +
+        'You could use vscode \'multi-root workspace\' to reach the same goal.'
+      );
+    }
 
     const localIgnore = config.ignore.map(pattern => fillGlobPattern(pattern, configRoot));
     const remoteIgnore = config.ignore.map(pattern => fillGlobPattern(pattern, config.remotePath));
