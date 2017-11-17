@@ -12,7 +12,6 @@ Very simple and intuitive and works.
 * upload to remote on save
 * watch project directory for external changes and automatically update remote
 * multiple file format support(file, directory, symbolic link)
-* multiple config(anywhere under workspace)
 
 ## Usage
 1. `Ctrl+Shift+P` on Windows/Linux open command palette, run `SFTP: config` command.
@@ -73,11 +72,9 @@ Very simple and intuitive and works.
    *
    * Local directory structure:
    *  |-a
-   *    |-c.txt
-   *  |-b
-   *    |-d
-   *      |-e.txt
-   *    |-.vscode/sftp.json.json
+   *    |-.vscode/sftp.json
+   *    |-b
+   *      |-c.txt
    *  
    *  Config file 
    *    {
@@ -86,14 +83,14 @@ Very simple and intuitive and works.
    *      ...
    *    }
    *    
-   *  Running command 'sync to remote' at `e.txt` will result in copying /b/d/e.txt => /home/test/d/e.txt
+   *  Running command 'sync to remote' at `c.txt` will result in copying /a/b/c.txt => /home/test/b/c.txt
    *  Explanation:
-   *    {config file path} => /b/.sftp-config.json
-   *    {local file path} => /b/d/e.txt
-   *    {local Path relative to `config root`} => d/e.txt
+   *    {config file path} => /a/.vscode/sftp.json
+   *    {config root} => /a
+   *    {local file path} => /a/b/c.txt
+   *    {local Path relative to `config root`} => b/c.txt
    *    {configed remotePath} => '/home/test'
-   *    {final remotePath} => '/home/test/d/e.txt'
-   *    that is /b/d/e.txt => /home/test/d/e.txt
+   *    {final remotePath} => '/home/test/b/c.txt'
    */ 
   remotePath: "./", 
   uploadOnSave: false,
