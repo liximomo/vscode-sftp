@@ -25,6 +25,9 @@ function removeSubPath(paths) {
   return result;
 }
 
+/**
+ * remove folder which is a child of other folders
+ */
 export default function getTopFolders(workspacsFolders: vscode.WorkspaceFolder[]) {
   const paths = workspacsFolders.map(folder => folder.uri.fsPath);
   return removeSubPath(paths);

@@ -46,7 +46,7 @@ const configScheme = {
   ignore: Joi.array().min(0).items(Joi.string()),
 };
 
-export const defaultConfig = {
+const defaultConfig = {
   host: 'host',
   port: 22,
   username: 'username',
@@ -202,7 +202,7 @@ export function newConfig(basePath) {
   const showConfigFile = () =>
     vscode.workspace.openTextDocument(configPath).then(vscode.window.showTextDocument);
 
-  fse
+  return fse
     .pathExists(configPath)
     .then(exist => {
       if (exist) {
