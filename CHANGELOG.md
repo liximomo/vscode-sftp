@@ -1,8 +1,11 @@
+## 0.8.10 - 2017-11-20
+* Disable create config at none-workspace-root-folder
+
 ## 0.8.9 - 2017-11-17
+* Perserve file permissions.
 * Better README thanks [kataklys](https://github.com/kataklys).
 * Fix Empty (0kb) files when download and uplaod. Thanks for [kataklys](https://github.com/kataklys)'s help. ([#33](https://github.com/liximomo/vscode-sftp/issues/33))
 * Show a waring for existing none-worksapce-root config files. Previously you can create multiple config files anywhere under workspace. So you won't need to open multiple vscode instances to make `sftp` working in different folders. Sincle vscode support [Multi-root Workspaces](https://code.visualstudio.com/docs/editor/multi-root-workspaces). There is no necessary to support multiple config now. This will make `sftp` both simple and a bettern starup performace.
-
 
 ## 0.8.8 - 2017-11-11
 ### Bugfix
