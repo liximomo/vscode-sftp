@@ -17,8 +17,15 @@
     "type": "git",
     "url": "https://github.com/liximomo/vscode-sftp.git"
   },
-  "categories": ["Other"],
-  "keywords": ["ftp", "sftp", "sync", "remote"],
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "ftp",
+    "sftp",
+    "sync",
+    "remote"
+  ],
   "activationEvents": [
     "onCommand:sftp.config.default",
     "onCommand:sftp.trans.remote",
@@ -116,6 +123,7 @@
     "vscode": "^1.1.5"
   },
   "dependencies": {
+    "async": "^2.6.0",
     "fs-extra": "^3.0.1",
     "ftp": "^0.3.10",
     "glob": "^7.1.2",
@@ -126,10 +134,15 @@
     "upath": "^1.0.0"
   },
   "jest": {
-    "moduleFileExtensions": ["ts", "js"],
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
     "transform": {
       "^.+\\.ts$": "<rootDir>/test/preprocessor.js"
     },
-    "testMatch": ["**/test/*.spec.js"]
+    "testMatch": [
+      "**/test/*.spec.js"
+    ]
   }
 }

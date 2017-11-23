@@ -51,7 +51,7 @@ function printResult(msg, result, silent) {
     );
 
   // log space between each activity
-  output.print('\n');
+  output.print(`\n$`);
 
   ignored.forEach(logIgnored);
 
@@ -61,7 +61,7 @@ function printResult(msg, result, silent) {
   }
 
   success.forEach(item => {
-    output.debug(`${msg} ${item.target} at ${new Date()}`);
+    output.debug(`${item.op} ${item.target} at ${new Date()}`);
   });
 
   if (fails.length) {

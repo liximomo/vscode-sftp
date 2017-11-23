@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as minimatch from 'minimatch';
 
+import * as concatLimit from 'async/concatLimit';
 import * as output from '../modules/output';
 import FileSystem, { IFileEntry, FileType } from '../model/Fs/FileSystem';
 import remotePath, { normalize } from './remotePath';
@@ -76,16 +77,21 @@ async function getFileMode(path: string, fs: FileSystem) {
   }
 }
 
-async function taskBatchProcess(queue, result) {
+async function taskBatchProcess(queue) {
   queue.sort((a, b) => fileDepth(b.file) - fileDepth(a.file));
-
-  while (queue.length > 0) {
-    const batch = queue.splice(0, MAX_CONCURRENCE);
-    const mixResult = await Promise.all(batch.map(task => task.call()));
-    result.push(...flatten(mixResult));
-  }
-
-  return result;
+  return new Promise((resolve, reject) => {
+    concatLimit(queue, MAX_CONCURRENCE, (task, callback) => {
+      // the task will never throw, so don't need catch;
+      // $todo extract error handle to top level
+      Promise.resolve(task.call()).then(r => callback(null, r));
+    }, (error, result) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve(result);
+    });
+  });
 }
 
 function transportFile(
@@ -110,6 +116,7 @@ function transportFile(
     .then(([inputStream, mode]) => desFs.put(inputStream, des, { mode }))
     .then(() => ({
       target: src,
+      op: 'transmission file',
     }))
     .catch(err => ({
       target: src,
@@ -147,6 +154,7 @@ function transportSymlink(
     })
     .then(() => ({
       target: src,
+      op: 'transmission Symlink',
     }))
     .catch(err => ({
       target: src,
@@ -169,6 +177,7 @@ function removeFile(path: string, fs: FileSystem, option): Promise<ITransportRes
     .unlink(path)
     .then(() => ({
       target: path,
+      op: 'remove file',
     }))
     .catch(err => ({
       target: path,
@@ -191,6 +200,7 @@ function removeDir(path: string, fs: FileSystem, option): Promise<ITransportResu
     .rmdir(path, true)
     .then(() => ({
       target: path,
+      op: 'remove dir',
     }))
     .catch(err => ({
       target: path,
@@ -419,30 +429,24 @@ export function _sync(
     .then(syncFiles);
 }
 
-export async function transportDir(
+async function transportDir(
   src: string,
   des: string,
   srcFs: FileSystem,
   desFs: FileSystem,
   option: ITransportOption
 ): Promise<ITransportResult[]> {
-  const result = [];
+  let result;
   try {
     const tasks = await _transportDir(src, des, srcFs, desFs, option);
-    await taskBatchProcess(tasks, result);
-    // tasks.sort((a, b) => fileDepth(b.file) - fileDepth(a.file));
-    // while (tasks.length > 0) {
-    //   const batch = tasks.splice(0, MAX_CONCURRENCE);
-    //   const mixResult = await Promise.all(batch.map(task => task.call()));
-    //   result.push(...flatten(mixResult));
-    // }
+    result = await taskBatchProcess(tasks);
   } catch (err) {
-    result.push({
+    result = [{
       target: src,
       error: true,
       op: 'transmission dir',
       payload: err,
-    });
+    }];
   }
 
   return result;
@@ -455,17 +459,17 @@ export async function sync(
   desFs: FileSystem,
   option: ISyncOption = defaultSyncOption
 ): Promise<ITransportResult[]> {
-  const result = [];
+  let result;
   try {
     const tasks = await _sync(srcDir, desDir, srcFs, desFs, option);
-    await taskBatchProcess(tasks, result);
+    result = await taskBatchProcess(tasks);
   } catch (err) {
-    result.push({
+    result = [{
       target: srcDir,
       error: true,
       op: 'sync',
       payload: err,
-    });
+    }];
   }
 
   return result;
