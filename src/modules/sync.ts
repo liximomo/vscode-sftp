@@ -51,7 +51,7 @@ function printResult(msg, result, silent) {
     );
 
   // log space between each activity
-  output.print(`\n$`);
+  output.print('\n');
 
   ignored.forEach(logIgnored);
 

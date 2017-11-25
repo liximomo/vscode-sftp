@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as FileStatus from 'stat-mode';
+import * as output from '../../modules/output';
 import FileSystem, { IFileEntry, FileType, IStats, IStreamOption } from './FileSystem';
 import RemoteFileSystem from './RemoteFileSystem';
 import { IClientOption } from '../Client/RemoteClient';
@@ -104,11 +105,15 @@ export default class FTPFileSystem extends RemoteFileSystem {
         };
 
         if (option.mode) {
-          return this.chmod(path, option.mode)
+          this.chmod(path, option.mode)
             .then(resolve)
-            .catch(_ => {
+            .catch(error => {
               // ignore error;
+              // $todo throw this error and ignore this error at up level.
+              output.error(`change ${path} mode to ${option.mode.toString(8)}`, error);
+              resolve();
             });
+          return;
         }
 
         resolve();

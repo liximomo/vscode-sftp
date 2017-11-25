@@ -72,7 +72,8 @@ async function getFileMode(path: string, fs: FileSystem) {
   try {
     const stat = await fs.lstat(path);
     return stat.permissionMode;
-  } catch (err) {
+  } catch (error) {
+    output.error(`getFileMode ${path}`, error);
     return 0o666;
   }
 }
