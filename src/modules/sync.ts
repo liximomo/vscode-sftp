@@ -100,6 +100,7 @@ const createTask = (name, func) => (source, config, silent: boolean = false) => 
 export const upload = createTask('upload', (source, config, remotefs) =>
   transport(source, config.remotePath, localFs, remotefs, {
     ignore: config.ignore,
+    perserveTargetMode: true,
   })
 );
 
@@ -107,6 +108,7 @@ export const download = createTask('download', (source, config, remotefs) => {
   disableWatcher(config);
   return transport(config.remotePath, source, remotefs, localFs, {
     ignore: config.ignore,
+    perserveTargetMode: false,
   }).then(
     r => {
       enableWatcher(config);
@@ -123,6 +125,7 @@ export const sync2Remote = createTask('sync remote', (source, config, remotefs) 
   sync(source, config.remotePath, localFs, remotefs, {
     ignore: config.ignore,
     model: config.syncMode,
+    perserveTargetMode: true,
   })
 );
 
@@ -131,6 +134,7 @@ export const sync2Local = createTask('sync local', (source, config, remotefs) =>
   return sync(config.remotePath, source, remotefs, localFs, {
     ignore: config.ignore,
     model: config.syncMode,
+    perserveTargetMode: false,
   }).then(
     r => {
       enableWatcher(config);

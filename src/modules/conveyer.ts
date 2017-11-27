@@ -11,10 +11,12 @@ type SyncModel = 'full' | 'update';
 
 interface ITransportOption {
   ignore: string[];
+  perserveTargetMode: boolean;
 }
 
 interface ISyncOption {
   ignore: string[];
+  perserveTargetMode: boolean;
   model: SyncModel;
 }
 
@@ -34,10 +36,12 @@ const MAX_CONCURRENCE = 512;
 
 const defaultTransportOption = {
   ignore: [],
+  perserveTargetMode: false,
 };
 
 const defaultSyncOption = {
   ignore: [],
+  perserveTargetMode: false,
   model: 'update' as SyncModel,
 };
 
@@ -110,11 +114,17 @@ function transportFile(
   }
 
   output.status.msg(`transfer ${fileName2Show(src)}`);
-  return Promise.all([
-      srcFs.get(src),
-      getFileMode(src, srcFs),
-    ])
-    .then(([inputStream, mode]) => desFs.put(inputStream, des, { mode }))
+  const transPromise = option.perserveTargetMode
+    // $caution with ftp, mutilple remote cmd will cause previously opened inputstream to be closed.
+    ? Promise.all([
+        srcFs.get(src),
+        getFileMode(des, desFs),
+      ])
+      .then(([inputStream, mode]) => desFs.put(inputStream, des, { mode }))
+    : srcFs.get(src)
+      .then(inputStream => desFs.put(inputStream, des));
+
+  return transPromise
     .then(() => ({
       target: src,
       op: 'transmission file',

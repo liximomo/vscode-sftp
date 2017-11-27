@@ -46,20 +46,22 @@ export default class FTPFileSystem extends RemoteFileSystem {
     return this.getClient().getFsClient();
   }
 
+  // $caution windows will always get 0666
   lstat(path: string): Promise<IStats> {
     return new Promise((resolve, reject) => {
-      this.ftp.list(path, (err, stats) => {
+      this.ftp.list(this.pathResolver.resolve(path, '..'), (err, stats) => {
         if (err) {
           reject(err);
           return;
         }
 
-        const stat = stats[0];
-        resolve({
-          ...stat,
-          type: FTPFileSystem.getFileType(stat.type),
-          permissionMode: toNumMode(stat.rights),
-        });
+        const fileStat = stats.map(stat => ({
+            ...stat,
+            type: FTPFileSystem.getFileType(stat.type),
+            permissionMode: toNumMode(stat.rights),
+          })).find(ns => ns.name === this.pathResolver.basename(path));
+
+        resolve(fileStat);
       });
     });
   }
