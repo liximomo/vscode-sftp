@@ -91,7 +91,7 @@ const getHostInfo = config => ({
 });
 
 const createTask = (name, func) => (source, config, silent: boolean = false) => {
-  output.debug(`task: ${name}`);
+  output.debug(`task: ${name} ${source}`);
   return getRemoteFs(getHostInfo(config))
     .then(remotefs => func(source, config, remotefs))
     .then(result => printResult(name, result, silent));
@@ -100,7 +100,7 @@ const createTask = (name, func) => (source, config, silent: boolean = false) => 
 export const upload = createTask('upload', (source, config, remotefs) =>
   transport(source, config.remotePath, localFs, remotefs, {
     ignore: config.ignore,
-    perserveTargetMode: true,
+    perserveTargetMode: config.protocol === 'sftp',
   })
 );
 

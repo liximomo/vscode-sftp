@@ -77,7 +77,7 @@ async function getFileMode(path: string, fs: FileSystem) {
     const stat = await fs.lstat(path);
     return stat.permissionMode;
   } catch (error) {
-    output.error(`getFileMode ${path}`, error);
+    output.debug(`try to get ${path} mode fail, default to 0666`);
     return 0o666;
   }
 }
@@ -522,7 +522,12 @@ export function transport(
     err => {
       // ignore file or directory not exist
       if (err.code === 'ENOENT') return;
-      throw err;
+      return [{
+        target: src,
+        error: true,
+        op: 'transport',
+        payload: err,
+      }];
     }
   );
 }
@@ -563,7 +568,12 @@ export function remove(path: string, fs: FileSystem, option): Promise<ITransport
     err => {
       // ignore file or directory not exist
       if (err.code === 'ENOENT') return;
-      throw err;
+      return [{
+        target: path,
+        error: true,
+        op: 'remove',
+        payload: err,
+      }];
     }
   );
 }
