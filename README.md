@@ -186,7 +186,7 @@ Very simple and intuitive and works.
     *  available value: true or false
     *  whether or not to auto delete removed files (e.g. removed manually from vscode or the command line)
     */
-    autoDelete: true,
+    autoDelete: true
   }
 
 }
