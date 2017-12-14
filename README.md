@@ -40,7 +40,7 @@ Very simple and intuitive and works.
 {
   /************************
   * CONNECTION PARAMETERS *
-  *************************
+  ************************/
   
   host: "host",
   port: 22,
