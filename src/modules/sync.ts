@@ -15,13 +15,15 @@ function logIgnored(result) {
 }
 
 function printFailTask(result) {
+  const error = result.payload;
+  const errorMsg = error.stack !== undefined ? error.stack : error.toString();
   output.debug(
     [
       '',
       '------',
       `target: ${result.target}`,
       `context: ${result.op}`,
-      `error: ${result.payload}`,
+      `error: ${errorMsg}`,
       '------',
     ].join('\n')
   );
@@ -49,9 +51,6 @@ function printResult(msg, result, silent) {
         ignored: [],
       }
     );
-
-  // log space between each activity
-  output.print('\n');
 
   ignored.forEach(logIgnored);
 
@@ -91,6 +90,7 @@ const getHostInfo = config => ({
 });
 
 const createTask = (name, func) => (source, config, silent: boolean = false) => {
+  output.print(`\n`);
   output.debug(`task: ${name} ${source}`);
   return getRemoteFs(getHostInfo(config))
     .then(remotefs => func(source, config, remotefs))

@@ -5,9 +5,9 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 
 import * as output from './modules/output';
-import { CONGIF_FILENAME, DEPRECATED_CONGIF_FILENAME } from './constants';
+import { CONGIF_FILENAME } from './constants';
 
-import { initConfigs, addConfig } from './modules/config';
+import { initConfigs, loadConfig } from './modules/config';
 // TODO
 import { endAllRemote } from './modules/remoteFs';
 import { watchWorkspace, watchFiles, clearAllWatcher } from './modules/fileWatcher';
@@ -22,7 +22,7 @@ import {
   DOWNLOAD,
   CONFIG,
 } from './constants';
-import getTopFolders from './helper/getTopFolders';
+import { getWorkspaceFolders } from './host';
 
 function registerCommand(
   context: vscode.ExtensionContext,
@@ -35,10 +35,8 @@ function registerCommand(
 }
 
 function handleConfigSave(uri: vscode.Uri) {
-  addConfig(uri.fsPath)
-    .then(config => {
-      watchFiles(config);
-    }, output.onError);
+  loadConfig(uri.fsPath)
+    .then(watchFiles, output.onError);
 }
 
 function handleDocumentSave(uri: vscode.Uri) {
@@ -46,9 +44,7 @@ function handleDocumentSave(uri: vscode.Uri) {
 };
 
 function setupWorkspaceFolder(dir) {
-  return initConfigs(dir).then(configs => {
-    watchFiles(configs);
-  });
+  return initConfigs(dir).then(watchFiles);
 }
 
 function setup() {
@@ -57,8 +53,8 @@ function setup() {
     onDidSaveSftpConfig: handleConfigSave,
   });
 
-  const meanfulRootPaths = getTopFolders(vscode.workspace.workspaceFolders);
-  const pendingInits = meanfulRootPaths.map(setupWorkspaceFolder);
+  const workspaceFolders = getWorkspaceFolders();
+  const pendingInits = workspaceFolders.map(folder => setupWorkspaceFolder(folder.uri.fsPath));
 
   return Promise.all(pendingInits);
 }
@@ -72,7 +68,8 @@ export function activate(context: vscode.ExtensionContext) {
   registerCommand(context, UPLOAD, uploadCommand);
   registerCommand(context, DOWNLOAD, downloadCommand);
 
-  if (!vscode.workspace.workspaceFolders) {
+  const workspaceFolders = getWorkspaceFolders();
+  if (!workspaceFolders) {
     return;
   }
 

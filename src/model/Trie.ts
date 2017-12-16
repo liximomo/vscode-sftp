@@ -74,6 +74,10 @@ export default class Trie {
     Object.keys(dict).forEach(key => this.add(key, dict[key]));
   }
 
+  empty() {
+    this.root = new TrieNode('@root');
+  }
+
   isEmpty() {
     return this.root.getChildrenNum() <= 0;
   }
