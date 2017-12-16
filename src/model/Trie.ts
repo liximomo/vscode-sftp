@@ -4,7 +4,7 @@ const defaultOption = {
 };
 
 interface ITrieNodeChildren {
-  [key: string]: TrieNode,
+  [key: string]: TrieNode;
 }
 
 class TrieNode {
@@ -130,7 +130,7 @@ export default class Trie {
 
     let curentNode = this.root;
     do {
-      curentNode = curentNode.getChild(tokensQueue.pop())
+      curentNode = curentNode.getChild(tokensQueue.pop());
       if (curentNode === undefined) {
         break;
       }
@@ -138,7 +138,7 @@ export default class Trie {
       if (curentNode.isLoaded()) {
         result = curentNode;
       }
-    } while (tokensQueue.length > 0)
+    } while (tokensQueue.length > 0);
 
     return result;
   }
@@ -168,7 +168,7 @@ export default class Trie {
 
       const childrenNodes = curentNode.getChildren();
       nodeQueue.push(...childrenNodes);
-    } while (nodeQueue.length > 0)
+    } while (nodeQueue.length > 0);
 
     return result;
   }
@@ -185,18 +185,18 @@ export default class Trie {
         const childrenNodes = curentNode.getChildren();
         nodeQueue.push(...childrenNodes);
       }
-    } while (nodeQueue.length > 0)
+    } while (nodeQueue.length > 0);
 
     return result;
   }
 
   splitPath(path: string): string[] {
     let normalizePath = path;
-    if (path[0] === this.option.delimiter) {
-      normalizePath = normalizePath.substr(1)
+    if (normalizePath[0] === this.option.delimiter) {
+      normalizePath = normalizePath.substr(1);
     }
-    if (path[path.length - 1] === this.option.delimiter) {
-      normalizePath = normalizePath.substr(0, path.length - 1)
+    if (normalizePath[normalizePath.length - 1] === this.option.delimiter) {
+      normalizePath = normalizePath.substr(0, normalizePath.length - 1);
     }
     return normalizePath.split(this.option.delimiter);
   }

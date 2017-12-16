@@ -76,19 +76,6 @@ const defaultConfig = {
   ignore: ['**/.vscode/**', '**/.git/**', '**/.DS_Store'],
 };
 
-function toTriePath(basePath, filePath) {
-  // reduce search deepth
-  const root = basePath.replace('/', '_');
-
-  const normalizedBasePath = normalize(basePath);
-  const normalizePath = normalize(filePath);
-  if (normalizePath === normalizedBasePath) {
-    return root;
-  }
-  const relativePath = rpath.relative(normalizedBasePath, normalizePath);
-  return `${root}/${relativePath}`;
-}
-
 function addConfig(config, defaultContext) {
   const { error: validationError } = Joi.validate(config, configScheme, {
     convert: false,
@@ -103,7 +90,16 @@ function addConfig(config, defaultContext) {
   }
 
   // tslint:disable triple-equals
-  const context = normalize(config.context != undefined ? config.context : defaultContext);
+  let context = normalize(config.context != undefined ? config.context : defaultContext);
+  const isWindows = process.platform === 'win32';
+  if (isWindows || true) {
+    const device = context.substr(0, 2);
+    if (device.charAt(1) === ':') {
+      // lowercase drive letter
+      // becasue vscode will always give us path with lowercase drive letter
+      context = context[0].toLowerCase() + context.substr(1);
+    }
+  }
 
   const localIgnore = config.ignore.map(pattern => fillGlobPattern(pattern, context));
   const remoteIgnore = config.ignore.map(pattern => fillGlobPattern(pattern, config.remotePath));
@@ -142,13 +138,15 @@ export function loadConfig(configPath) {
 
 export function initConfigs(basePath): Promise<Array<{}>> {
   const configPath = getConfigPath(basePath);
-  return fse.pathExists(configPath)
-  .then(exist => {
-    if (exist) {
-      return loadConfig(configPath);
-    }
-    return [];
-  }, _ => []);
+  return fse.pathExists(configPath).then(
+    exist => {
+      if (exist) {
+        return loadConfig(configPath);
+      }
+      return [];
+    },
+    _ => []
+  );
 }
 
 export function getConfig(activityPath: string) {
