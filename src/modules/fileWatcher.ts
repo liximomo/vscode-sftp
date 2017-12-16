@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { CONFIG_GLOB_PATTERN, CONGIF_FILENAME, DEPRECATED_CONGIF_FILENAME } from '../constants';
+import { CONGIF_FILENAME } from '../constants';
 import { isValidFile } from '../helper/documentFilter';
 import throttle from '../helper/throttle';
 import { upload } from './sync';
@@ -20,7 +20,7 @@ const ACTION_INTEVAL = 500;
 
 function isConfigFile(uri: vscode.Uri) {
   const filename = path.basename(uri.fsPath);
-  return filename === CONGIF_FILENAME || filename === DEPRECATED_CONGIF_FILENAME;
+  return filename === CONGIF_FILENAME;
 }
 
 function fileError(event, file, showErrorWindow = true) {
@@ -84,13 +84,17 @@ function uploadHandler(uri: vscode.Uri) {
 }
 
 function getWatcherByConfig(config) {
-  return watchers[config.configRoot];
+  return watchers[config.context];
+}
+
+function getWatchs() {
+  return Object.keys(watchers).map(key => watchers[key]);
 }
 
 function setUpWatcher(config) {
   const watchConfig = config.watcher !== undefined ? config.watcher : {};
 
-  let watcher = watchers[config.configRoot];
+  let watcher = watchers[config.context];
   if (watcher) {
     // clear old watcher
     watcher.dispose();
@@ -102,9 +106,9 @@ function setUpWatcher(config) {
     return;
   }
 
-  const pattern = fillGlobPattern(watchConfig.files, config.configRoot);
+  const pattern = fillGlobPattern(watchConfig.files, config.context);
   watcher = vscode.workspace.createFileSystemWatcher(pattern, false, false, false);
-  watchers[config.configRoot] = watcher;
+  watchers[config.context] = watcher;
 
   if (watchConfig.autoUpload) {
     watcher.onDidCreate(uploadHandler);
@@ -130,6 +134,7 @@ export function disableWatcher(config) {
   }
 }
 
+// $todo remove this is unnessary
 export function enableWatcher(config) {
   if (getWatcherByConfig(config) !== undefined) {
     return;
@@ -171,9 +176,6 @@ export function watchFiles(config) {
 }
 
 export function clearAllWatcher() {
-  const disposable = vscode.Disposable.from(
-    ...Object.keys(watchers).map(key => watchers[key]),
-    workspaceWatcher
-  );
+  const disposable = vscode.Disposable.from(...getWatchs(), workspaceWatcher);
   disposable.dispose();
 }

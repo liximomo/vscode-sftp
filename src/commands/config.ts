@@ -4,15 +4,16 @@ import { newConfig } from '../modules/config';
 import localFs from '../modules/localFs';
 import { FileType } from '../model/Fs/FileSystem';
 import checkRequire from '../helper/checkRequire';
-import getTopFolders from '../helper/getTopFolders';
+import { getWorkspaceFolders } from '../host';
 
 function editConfig() {
-  if (vscode.workspace.workspaceFolders.length === 1) {
-    newConfig(vscode.workspace.workspaceFolders[0].uri.fsPath);
+  const workspaceFolders = getWorkspaceFolders();
+  if (workspaceFolders.length === 1) {
+    newConfig(workspaceFolders[0].uri.fsPath);
     return;
   }
 
-  const initDirs = vscode.workspace.workspaceFolders.map(folder => ({
+  const initDirs = workspaceFolders.map(folder => ({
     value: folder.uri.fsPath,
     label: folder.name,
     description: folder.uri.fsPath,

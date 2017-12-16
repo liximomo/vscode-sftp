@@ -3,7 +3,7 @@ Very simple and intuitive and works.
 
 ## Features
 
-* supports multi-root workspace
+* multiple config
 * dual authentication
 * sync directory to remote
 * sync directory to local
@@ -30,14 +30,13 @@ Very simple and intuitive and works.
 | `SFTP: Sync To Remote` | sync local directory to remote               | only available for directories. Copies common files (that exist on both sides) from local dir to remote, overwriting destination. If syncMode is set to full, files that exist only on the local side will be created remotely, and files that exist only on the remote side will be deleted|
 | `SFTP: Sync To Local`  | sync remote directory to local               | same as above, but in the opposite direction|
   
-
-### Glossary
-`config root`: The directory where the `.vscode/sftp.json` file is located in.
-
 ## config
 ```js
 // default config
 {
+  // an absolute local path, default to the root path of a vsode workspace
+  context: '/an/absolute/localpath',
+ 
   /************************
   * CONNECTION PARAMETERS *
   ************************/
@@ -66,8 +65,7 @@ Very simple and intuitive and works.
  *******************************/
  
   /**
-   * The final remotePath of a selected file or directory is 
-   *  {remotePath in config file} + {local file Path relative to `config root`}.
+   * The corresponding remote path of the context
    * Example:
    *
    * Local directory structure:
@@ -86,13 +84,13 @@ Very simple and intuitive and works.
    *  Running command 'sync to remote' at `c.txt` will result in copying /a/b/c.txt => /home/test/b/c.txt
    *  Explanation:
    *    {config file path} => /a/.vscode/sftp.json
-   *    {config root} => /a
+   *    {context} => /a
    *    {local file path} => /a/b/c.txt
-   *    {local Path relative to `config root`} => b/c.txt
+   *    {local Path relative to `context`} => b/c.txt
    *    {configed remotePath} => '/home/test'
    *    {final remotePath} => '/home/test/b/c.txt'
    */ 
-  remotePath: "./", 
+  remotePath: "/", 
   uploadOnSave: false,
 
 
@@ -106,44 +104,45 @@ Very simple and intuitive and works.
    */ 
   syncMode: 'update',
 
-  /** Detailed example of how sync/upload/download work. Assume we have the following directories:
-  *
-  * source-dir
-  * |-s1.txt (file that exists only at source)
-  * |-common.txt
-  * dest-dir
-  * |-d1.txt (file that exists only at destination)
-  * |-common.txt (common file between source-dir and dest-dir)
-  * 
-  * DOWNLOAD and UPLOAD are copy operations from one side to the other. They only overwrite and create
-  *   files on the destination, without deleting anything.
-  *
-  * If we download source-dir to dest-dir, the dest-dir will be:
-  * dest-dir
-  * |-s1.txt (copied from source)
-  * |-d1.txt
-  * |-common.txt (overwritten with the contents of the same file from source-dir)
-  *
-  * The effect of SYNC operations depends on the value of syncMode. With syncMode: 'update', only common 
-  *   files are copied from one side to the other. With syncMode: 'full', the destination will be modified
-  *   to have the same set of files as the source (which implies deleting files that only exist on the 
-  *   destination and creating files that only exist at source).
-  * 
-  * If we sync source-dir to dest-dir using syncMode: 'update', dest-dir wil be:
-  * dest-dir
-  * |-d1.txt
-  * |-common.txt (overwritten with the contents of the same file from source-dir)
-  * 
-  * If we sync source-dir to dest-dir using syncMode: 'full', dest-dir wil be:
-  * dest-dir
-  * |-s1.txt (created, because it didn't exist on destination)
-  * |-common.txt (overwritten with the contents of the same file from source-dir)
-  * and d1.txt is deleted because it didn't exist at source
-  */
+  /** 
+   * Detailed example of how sync/upload/download work. Assume we have the following directories:
+   *
+   * source-dir
+   * |-s1.txt (file that exists only at source)
+   * |-common.txt
+   * dest-dir
+   * |-d1.txt (file that exists only at destination)
+   * |-common.txt (common file between source-dir and dest-dir)
+   * 
+   * DOWNLOAD and UPLOAD are copy operations from one side to the other. They only overwrite and create
+   *   files on the destination, without deleting anything.
+   *
+   * If we download source-dir to dest-dir, the dest-dir will be:
+   * dest-dir
+   * |-s1.txt (copied from source)
+   * |-d1.txt
+   * |-common.txt (overwritten with the contents of the same file from source-dir)
+   *
+   * The effect of SYNC operations depends on the value of syncMode. With syncMode: 'update', only common 
+   *   files are copied from one side to the other. With syncMode: 'full', the destination will be modified
+   *   to have the same set of files as the source (which implies deleting files that only exist on the 
+   *   destination and creating files that only exist at source).
+   * 
+   * If we sync source-dir to dest-dir using syncMode: 'update', dest-dir wil be:
+   * dest-dir
+   * |-d1.txt
+   * |-common.txt (overwritten with the contents of the same file from source-dir)
+   * 
+   * If we sync source-dir to dest-dir using syncMode: 'full', dest-dir wil be:
+   * dest-dir
+   * |-s1.txt (created, because it didn't exist on destination)
+   * |-common.txt (overwritten with the contents of the same file from source-dir)
+   * and d1.txt is deleted because it didn't exist at source
+   */
 
 
   /**
-   *  array of glob patterns that will be appended to `config root` and `remotePath`
+   *  array of glob patterns that will be appended to `context` and `remotePath`
    *  Note: the ** sequence matches a sequence of zero or more files and directories
    *  examples:
    */
@@ -169,16 +168,16 @@ Very simple and intuitive and works.
    */
   watcher: {
     /**
-    *  available value: false or a glob pattern
-    *   - false: disable watcher
-    *   - string containing a glob pattern: describes files that will be watched
-    */
+     *  available value: false or a glob pattern
+     *   - false: disable watcher
+     *   - string containing a glob pattern: describes files that will be watched
+     */
     files: false, 
 
     /**
-    *  available value: true or false
-    *  whether or not to auto upload created files (e.g. created in vscode or other external apps)
-    */
+     *  available value: true or false
+     *  whether or not to auto upload  created files (e.g. created in vscode  or other external apps)
+     */
     autoUpload: true,
 
 
@@ -190,6 +189,21 @@ Very simple and intuitive and works.
   }
 
 }
+```
+
+### multiple config
+You can also use an array of configs in the config file.
+```js
+[
+  {
+    "context": "/workspace/a"，
+    ...
+  },
+  {
+    "context": "/workspace/b"，
+    ...
+  }
+]
 ```
 
 -----------------------------------------------------------------------------------------------------------
