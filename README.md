@@ -3,7 +3,7 @@ Very simple and intuitive and works.
 
 ## Features
 
-* multiple config
+* multiple configs
 * dual authentication
 * sync directory to remote
 * sync directory to local
@@ -30,12 +30,42 @@ Very simple and intuitive and works.
 | `SFTP: Sync To Remote` | sync local directory to remote               | only available for directories. Copies common files (that exist on both sides) from local dir to remote, overwriting destination. If syncMode is set to full, files that exist only on the local side will be created remotely, and files that exist only on the remote side will be deleted|
 | `SFTP: Sync To Local`  | sync remote directory to local               | same as above, but in the opposite direction|
   
-## config
+## Config
+
+### Example
+```json
+{
+  "host": "host",
+  "username": "username",
+  "password": "password",
+  "remotePath": "/remote/workspace", 
+}
+```
+You can also use an array of configs in the config file.
+```json
+[
+  {
+    "context": "/workspace/a",
+    "host": "host",
+    "username": "username",
+    "password": "password",
+    "remotePath": "/remote/workspace/a", 
+  },
+  {
+    "context": "/workspace/b",
+    "host": "host",
+    "username": "username",
+    "password": "password",
+    "remotePath": "/remote/workspace/b", 
+  }
+]
+```
+
+### Full Config
 ```js
-// default config
 {
   // an absolute local path, default to the root path of a vsode workspace
-  context: '/an/absolute/localpath',
+  context: '/an/absolute/path',
  
   /************************
   * CONNECTION PARAMETERS *
@@ -64,32 +94,8 @@ Very simple and intuitive and works.
  * SYNCING, UPLOAD AND DOWNLOAD *
  *******************************/
  
-  /**
-   * The corresponding remote path of the context
-   * Example:
-   *
-   * Local directory structure:
-   *  |-a
-   *    |-.vscode/sftp.json
-   *    |-b
-   *      |-c.txt
-   *  
-   *  Config file 
-   *    {
-   *      ...
-   *      remotePath: '/home/test',
-   *      ...
-   *    }
-   *    
-   *  Running command 'sync to remote' at `c.txt` will result in copying /a/b/c.txt => /home/test/b/c.txt
-   *  Explanation:
-   *    {config file path} => /a/.vscode/sftp.json
-   *    {context} => /a
-   *    {local file path} => /a/b/c.txt
-   *    {local Path relative to `context`} => b/c.txt
-   *    {configed remotePath} => '/home/test'
-   *    {final remotePath} => '/home/test/b/c.txt'
-   */ 
+  
+  // The corresponding remote path of the context
   remotePath: "/", 
   uploadOnSave: false,
 
@@ -189,21 +195,6 @@ Very simple and intuitive and works.
   }
 
 }
-```
-
-### multiple config
-You can also use an array of configs in the config file.
-```js
-[
-  {
-    "context": "/workspace/a"，
-    ...
-  },
-  {
-    "context": "/workspace/b"，
-    ...
-  }
-]
 ```
 
 -----------------------------------------------------------------------------------------------------------

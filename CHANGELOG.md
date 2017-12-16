@@ -1,3 +1,9 @@
+## 0.9.0 - 2017-12-16
+* Add a option to config a local path that correspond to a remote path.
+* Support multiple configs in one config file.
+* Remove `.sftpConfig.json` config file support.
+* Remove none-worksapce-root config files support.
+
 ## 0.8.11 - 2017-11-30
 * Fix ftp can't preserve file permissions.
 
