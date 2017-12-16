@@ -142,7 +142,13 @@ export function loadConfig(configPath) {
 
 export function initConfigs(basePath): Promise<Array<{}>> {
   const configPath = getConfigPath(basePath);
-  return loadConfig(configPath);
+  return fse.pathExists(configPath)
+  .then(exist => {
+    if (exist) {
+      return loadConfig(configPath);
+    }
+    return [];
+  }, _ => []);
 }
 
 export function getConfig(activityPath: string) {
