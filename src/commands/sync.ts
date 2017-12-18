@@ -18,10 +18,10 @@ const getAllProjects = () =>
     const configs = getAllConfigs();
     const projectsList = configs
       .map(cfg => ({
-        value: cfg.configRoot,
-        label: vscode.workspace.asRelativePath(cfg.configRoot),
+        value: cfg.context,
+        label: vscode.workspace.asRelativePath(cfg.context),
         description: '',
-        detail: cfg.configRoot,
+        detail: cfg.context,
       }))
       .sort((l, r) => l.label.localeCompare(r.label));
 

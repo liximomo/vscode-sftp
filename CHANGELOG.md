@@ -1,3 +1,7 @@
+## 0.9.4 - 2017-12-18
+* `Context` now receives a relative path.
+* Fix [#69](https://github.com/liximomo/vscode-sftp/issues/69), [#70](https://github.com/liximomo/vscode-sftp/issues/70)
+
 ## 0.9.0 - 2017-12-16
 * Add a option to config a local path that correspond to a remote path.
 * Support multiple configs in one config file.

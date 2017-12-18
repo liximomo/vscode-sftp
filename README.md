@@ -64,8 +64,8 @@ You can also use an array of configs in the config file.
 ### Full Config
 ```js
 {
-  // an absolute local path, default to the root path of a vsode workspace
-  context: '/an/absolute/path',
+  // an path relative to the root path of a vsode workspace, default to '.'
+  context: '.',
  
   /************************
   * CONNECTION PARAMETERS *

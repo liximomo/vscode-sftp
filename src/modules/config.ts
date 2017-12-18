@@ -91,6 +91,8 @@ function addConfig(config, defaultContext) {
 
   // tslint:disable triple-equals
   let context = normalize(config.context != undefined ? config.context : defaultContext);
+  context = path.resolve(defaultContext, context);
+
   const isWindows = process.platform === 'win32';
   if (isWindows || true) {
     const device = context.substr(0, 2);
