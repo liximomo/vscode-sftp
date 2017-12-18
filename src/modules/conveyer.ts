@@ -243,7 +243,7 @@ function _transportDir(
   }
 
   const listFiles = () => {
-    output.status.msg(`retriving directory ${fileName2Show(src)}`);
+    output.status.msg(`retrieving directory ${fileName2Show(src)}`);
     return srcFs.list(src);
   };
 
