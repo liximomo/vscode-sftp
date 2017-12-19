@@ -31,7 +31,7 @@ class KeepAliveRemoteFs {
     }
 
     if (!this.pendingPromise) {
-      output.debug('conncet to remote');
+      output.debug('connect to remote');
       if (option.protocol === 'sftp') {
         const willFullCiphers = {
           algorithms: {
