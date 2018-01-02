@@ -103,17 +103,18 @@ function addConfig(config, defaultContext) {
     }
   }
 
-  const localIgnore = config.ignore.map(pattern => fillGlobPattern(pattern, context));
-  const remoteIgnore = config.ignore.map(pattern => fillGlobPattern(pattern, config.remotePath));
-  const fullConfig = {
+  const withDefault = {
     ...defaultConfig,
     ...config,
-    ignore: localIgnore.concat(remoteIgnore),
     context,
   };
-  configTrie.add(context, fullConfig);
-  output.info(`config at ${context}`, fullConfig);
-  return fullConfig;
+  const localIgnore = withDefault.ignore.map(pattern => fillGlobPattern(pattern, context));
+  const remoteIgnore = withDefault.ignore.map(pattern => fillGlobPattern(pattern, withDefault.remotePath));
+  withDefault.ignore = localIgnore.concat(remoteIgnore);
+
+  configTrie.add(context, withDefault);
+  output.info(`config at ${context}`, withDefault);
+  return withDefault;
 }
 
 function getRemotePath(config, localPath) {
