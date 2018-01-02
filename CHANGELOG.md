@@ -172,7 +172,7 @@ Now `uploadOnSave` only happens on a vscode save opetarion. It used to happen on
 ### Bugfix
 * Fix `SFTPFileSystem.rmdir` doesn't resolve correctly.
 * Disable watcher on pulling files.
-* Make true re-conncet when it need to.
+* Make true re-connect when it need to.
 
 ## 0.5.4 - 2017-05-30
 ### Feedback
@@ -200,7 +200,7 @@ Now `uploadOnSave` only happens on a vscode save opetarion. It used to happen on
 
 ## 0.5.0 - 2017-05-19
 ### Feature
-* Keep ssh conncet alive (re conncet only when needed)
+* Keep ssh connect alive (re-connect only when needed)
 
 ## 0.4.12 - 2017-05-18
 ### Bugfix
