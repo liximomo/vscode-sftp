@@ -54,6 +54,10 @@
         "title": "SFTP: Config"
       },
       {
+        "command": "sftp.list.all",
+        "title": "SFTP: List All"
+      },
+      {
         "command": "sftp.trans.remote",
         "title": "SFTP: Upload"
       },

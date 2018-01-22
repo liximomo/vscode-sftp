@@ -155,7 +155,7 @@ export function initConfigs(basePath): Promise<Array<{}>> {
 export function getConfig(activityPath: string) {
   const config = configTrie.findPrefix(normalize(activityPath));
   if (!config) {
-    throw new Error('config file not found');
+    throw new Error(`(${activityPath}) config file not found`);
   }
 
   return {
@@ -206,11 +206,15 @@ export function newConfig(basePath) {
 
 export function getHostInfo(config) {
   return {
+    protocol: config.protocol,
     host: config.host,
     port: config.port,
     username: config.username,
     password: config.password,
     privateKeyPath: config.privateKeyPath,
     passphrase: config.passphrase,
+    passive: config.passive,
+    interactiveAuth: config.interactiveAuth,
+    agent: config.agent,
   };
 }

@@ -16,3 +16,6 @@ export const SYNC_TO_LOCAL = 'sftp.sync.local';
 
 export const UPLOAD = 'sftp.trans.remote';
 export const DOWNLOAD = 'sftp.trans.local';
+
+export const LIST_DEFAULT = 'sftp.list.default';
+export const LIST_ALL = 'sftp.list.all';

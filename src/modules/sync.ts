@@ -1,6 +1,7 @@
 import * as path from 'path';
 
 import * as output from './output';
+import { getHostInfo } from './config';
 import { transport, sync, remove } from './conveyer';
 import getRemoteFs from './remoteFs';
 import localFs from './localFs';
@@ -75,19 +76,6 @@ function printResult(msg, result, silent) {
     }
   }
 }
-
-const getHostInfo = config => ({
-  protocol: config.protocol,
-  host: config.host,
-  port: config.port,
-  username: config.username,
-  password: config.password,
-  privateKeyPath: config.privateKeyPath,
-  passphrase: config.passphrase,
-  passive: config.passive,
-  interactiveAuth: config.interactiveAuth,
-  agent: config.agent,
-});
 
 const createTask = (name, func) => (source, config, silent: boolean = false) => {
   output.print(`\n`);
