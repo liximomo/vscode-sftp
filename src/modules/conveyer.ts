@@ -4,7 +4,8 @@ import * as minimatch from 'minimatch';
 import * as concatLimit from 'async/concatLimit';
 import * as output from '../modules/output';
 import FileSystem, { IFileEntry, FileType } from '../model/Fs/FileSystem';
-import remotePath, { normalize } from './remotePath';
+import remotePath from './remotePath';
+import * as paths from '../helper/paths';
 import flatten from '../helper/flatten';
 
 type SyncModel = 'full' | 'update';
@@ -46,20 +47,19 @@ const defaultSyncOption = {
 };
 
 function fileDepth(file: string) {
-  return normalize(file).split('/').length;
+  return paths.normalize(file).split('/').length;
 }
 
 function fileName2Show(filePath) {
   return vscode.workspace.asRelativePath(filePath);
 }
 
-function testIgnore(target, pattern) {
-  return target.indexOf(pattern) === 0 || minimatch(target, pattern, { dot: true });
-}
-
 function shouldSkip(path, ignore) {
-  const normalizedPath = normalize(path);
-  return ignore.some(pattern => testIgnore(normalizedPath, pattern));
+  if (ignore) {
+    return ignore(path);
+  }
+
+  return true;
 }
 
 const toHash = (items: any[], key: string, transform?: (a: any) => any): { [key: string]: any } =>
@@ -199,7 +199,7 @@ function removeFile(path: string, fs: FileSystem, option): Promise<ITransportRes
 }
 
 function removeDir(path: string, fs: FileSystem, option): Promise<ITransportResult> {
-  if (shouldSkip(remotePath.join(path, '/'), option.ignore)) {
+  if (shouldSkip(path, option.ignore)) {
     return Promise.resolve({
       target: path,
       ignored: true,
@@ -228,7 +228,7 @@ function _transportDir(
   desFs: FileSystem,
   option: ITransportOption
 ): Promise<ITask[]> {
-  if (shouldSkip(remotePath.join(src, '/'), option.ignore)) {
+  if (shouldSkip(src, option.ignore)) {
     return Promise.resolve([
       {
         file: src,
@@ -323,12 +323,12 @@ export function _sync(
     output.status.msg('diff files...');
     const srcFileTable = toHash(srcFileEntries, 'id', fileEntry => ({
       ...fileEntry,
-      id: normalize(srcFs.pathResolver.relative(srcDir, fileEntry.fspath)),
+      id: paths.normalize(srcFs.pathResolver.relative(srcDir, fileEntry.fspath)),
     }));
 
     const desFileTable = toHash(desFileEntries, 'id', fileEntry => ({
       ...fileEntry,
-      id: normalize(desFs.pathResolver.relative(desDir, fileEntry.fspath)),
+      id: paths.normalize(desFs.pathResolver.relative(desDir, fileEntry.fspath)),
     }));
 
     const file2trans = [];

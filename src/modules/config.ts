@@ -4,16 +4,16 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
 import * as Joi from 'joi';
-import rpath, { normalize } from './remotePath';
+import * as paths from '../helper/paths';
+import rpath from './remotePath';
 import * as output from './output';
-import Trie from '../model/Trie';
-
-const TRIE_DELIMITER = '/';
+import Trie from './Trie';
+import Ignore from './Ignore';
 
 const configTrie = new Trie(
   {},
   {
-    delimiter: TRIE_DELIMITER,
+    delimiter: paths.sep,
   }
 );
 
@@ -91,7 +91,7 @@ function addConfig(config, defaultContext) {
 
   // tslint:disable triple-equals
   let context = config.context != undefined ? config.context : defaultContext;
-  context = normalize(path.resolve(defaultContext, context));
+  context = paths.normalize(path.resolve(defaultContext, context));
 
   const isWindows = process.platform === 'win32';
   if (isWindows || true) {
@@ -108,9 +108,6 @@ function addConfig(config, defaultContext) {
     ...config,
     context,
   };
-  const localIgnore = withDefault.ignore.map(pattern => fillGlobPattern(pattern, context));
-  const remoteIgnore = withDefault.ignore.map(pattern => fillGlobPattern(pattern, withDefault.remotePath));
-  withDefault.ignore = localIgnore.concat(remoteIgnore);
 
   configTrie.add(context, withDefault);
   output.info(`config at ${context}`, withDefault);
@@ -118,15 +115,11 @@ function addConfig(config, defaultContext) {
 }
 
 function getRemotePath(config, localPath) {
-  return rpath.join(config.remotePath, normalize(path.relative(config.context, localPath)));
+  return rpath.join(config.remotePath, paths.normalize(path.relative(config.context, localPath)));
 }
 
 export function getConfigPath(basePath) {
   return path.join(basePath, CONFIG_PATH);
-}
-
-export function fillGlobPattern(pattern, rootPath) {
-  return rpath.join(rootPath, pattern);
 }
 
 export function loadConfig(configPath) {
@@ -153,19 +146,35 @@ export function initConfigs(basePath): Promise<Array<{}>> {
 }
 
 export function getConfig(activityPath: string) {
-  const config = configTrie.findPrefix(normalize(activityPath));
+  const config = configTrie.findPrefix(paths.normalize(activityPath));
   if (!config) {
     throw new Error(`(${activityPath}) config file not found`);
   }
 
+  const ignore = Ignore.from(config.ignore);
+  const localContext = config.context;
+  const remoteContext = config.remotePath;
   return {
     ...config,
     remotePath: getRemotePath(config, activityPath),
+    ignore(fsPath) {
+      let relativePath;
+      if (fsPath.indexOf(config.context) === 0) {
+        // local path
+        relativePath = paths.relativeWithLocal(localContext, fsPath);
+      } else {
+        // remote path
+        relativePath = paths.relativeWithRemote(remoteContext, fsPath);
+      }
+
+      // skip root
+      return relativePath !== '' && ignore.ignores(relativePath);
+    },
   };
 }
 
 export function removeConfig(activityPath: string) {
-  configTrie.clearPrefix(normalize(activityPath));
+  configTrie.clearPrefix(paths.normalize(activityPath));
 }
 
 export function getAllConfigs() {

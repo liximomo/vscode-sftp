@@ -3,7 +3,7 @@ import * as path from 'path';
 import { newConfig } from '../modules/config';
 import localFs from '../modules/localFs';
 import { FileType } from '../model/Fs/FileSystem';
-import checkRequire from '../helper/checkRequire';
+import createCommand from '../helper/createCommand';
 import { getWorkspaceFolders } from '../host';
 
 function editConfig() {
@@ -31,4 +31,4 @@ function editConfig() {
     });
 }
 
-export default checkRequire(editConfig);
+export default createCommand(editConfig);
