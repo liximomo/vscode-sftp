@@ -2,10 +2,10 @@ import * as vscode from 'vscode';
 import { CONFIG_PATH } from '../constants';
 import * as fse from 'fs-extra';
 import * as path from 'path';
+import * as paths from '../helper/paths';
+import upath from './upath';
 import * as glob from 'glob';
 import * as Joi from 'joi';
-import * as paths from '../helper/paths';
-import rpath from './remotePath';
 import * as output from './output';
 import Trie from './Trie';
 import Ignore from './Ignore';
@@ -13,7 +13,7 @@ import Ignore from './Ignore';
 const configTrie = new Trie(
   {},
   {
-    delimiter: paths.sep,
+    delimiter: path.sep,
   }
 );
 
@@ -76,6 +76,19 @@ const defaultConfig = {
   ignore: ['**/.vscode/**', '**/.git/**', '**/.DS_Store'],
 };
 
+function normalizeTriePath(pathname) {
+  const isWindows = process.platform === 'win32';
+  if (isWindows) {
+    const device = pathname.substr(0, 2);
+    if (device.charAt(1) === ':') {
+      // lowercase drive letter
+      return pathname[0].toLowerCase() + pathname.substr(1);
+    }
+  }
+
+  return pathname;
+}
+
 function addConfig(config, defaultContext) {
   const { error: validationError } = Joi.validate(config, configScheme, {
     convert: false,
@@ -91,17 +104,7 @@ function addConfig(config, defaultContext) {
 
   // tslint:disable triple-equals
   let context = config.context != undefined ? config.context : defaultContext;
-  context = paths.normalize(path.resolve(defaultContext, context));
-
-  const isWindows = process.platform === 'win32';
-  if (isWindows || true) {
-    const device = context.substr(0, 2);
-    if (device.charAt(1) === ':') {
-      // lowercase drive letter
-      // becasue vscode will always give us path with lowercase drive letter
-      context = context[0].toLowerCase() + context.substr(1);
-    }
-  }
+  context = normalizeTriePath(path.resolve(defaultContext, context));
 
   const withDefault = {
     ...defaultConfig,
@@ -112,10 +115,6 @@ function addConfig(config, defaultContext) {
   configTrie.add(context, withDefault);
   output.info(`config at ${context}`, withDefault);
   return withDefault;
-}
-
-function getRemotePath(config, localPath) {
-  return rpath.join(config.remotePath, paths.normalize(path.relative(config.context, localPath)));
 }
 
 export function getConfigPath(basePath) {
@@ -146,7 +145,7 @@ export function initConfigs(basePath): Promise<Array<{}>> {
 }
 
 export function getConfig(activityPath: string) {
-  const config = configTrie.findPrefix(paths.normalize(activityPath));
+  const config = configTrie.findPrefix(normalizeTriePath(activityPath));
   if (!config) {
     throw new Error(`(${activityPath}) config file not found`);
   }
@@ -154,27 +153,26 @@ export function getConfig(activityPath: string) {
   const ignore = Ignore.from(config.ignore);
   const localContext = config.context;
   const remoteContext = config.remotePath;
+
   return {
     ...config,
-    remotePath: getRemotePath(config, activityPath),
+    remotePath: paths.toRemote(path.relative(localContext, activityPath), remoteContext),
     ignore(fsPath) {
+      // vscode will always return path with / as separator
+      const normalizedPath = path.normalize(fsPath);
       let relativePath;
-      if (fsPath.indexOf(config.context) === 0) {
+      if (normalizedPath.indexOf(localContext) === 0) {
         // local path
-        relativePath = paths.relativeWithLocal(localContext, fsPath);
+        relativePath = path.relative(localContext, fsPath);
       } else {
         // remote path
-        relativePath = paths.relativeWithRemote(remoteContext, fsPath);
+        relativePath = upath.relative(remoteContext, fsPath);
       }
 
       // skip root
       return relativePath !== '' && ignore.ignores(relativePath);
     },
   };
-}
-
-export function removeConfig(activityPath: string) {
-  configTrie.clearPrefix(paths.normalize(activityPath));
 }
 
 export function getAllConfigs() {

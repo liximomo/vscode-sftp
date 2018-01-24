@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import FileSystem, { IFileEntry, FileType } from '../model/Fs/FileSystem';
 import { getAllConfigs } from '../modules/config';
+import * as path from 'path';
 
 const ROOT = '@root';
 
@@ -14,9 +15,11 @@ interface IFilePickerOption {
 }
 
 interface IFilePickerItem {
+  name: string;
   fsPath: string;
+  parentFsPath: string;
   type: FileType;
-  isTop?: boolean;
+  description: string,
   getFs?: () => Promise<FileSystem>;
 }
 
@@ -24,11 +27,11 @@ async function showFiles(
   fileLookUp: IFileLookUp,
   parent: IFilePickerItem | null,
   files: IFilePickerItem[],
-  fs: FileSystem | null,
   option: IFilePickerOption = {}
 ) {
   let avalibleFiles = files.slice();
-  let fileFilter;
+  let filter;
+  let fileFilter
   if (option.type === FileType.Directory) {
     fileFilter = file => file.type === FileType.Directory;
   } else {
@@ -37,45 +40,22 @@ async function showFiles(
   }
 
   if (option.filter !== undefined) {
-    fileFilter = file => fileFilter(file) && option.filter(file);
+    filter = file => {
+      return fileFilter(file) && option.filter(file);
+    };
+  } else {
+    filter = fileFilter;
   }
 
-  avalibleFiles = avalibleFiles.filter(fileFilter);
-
-  const isRoot = parent === null || parent.fsPath === ROOT;
+  avalibleFiles = avalibleFiles.filter(filter);
 
   const items = avalibleFiles
     .map(file => ({
       value: file,
-      label: file.fsPath,
-      description: '',
+      label: file.name,
+      description: file.description,
     }))
     .sort((l, r) => l.label.localeCompare(r.label));
-
-  // no limit or limit to dir, so we can choose current folder
-  const allowChooseFolder = option.type === undefined || option.type === FileType.Directory;
-
-  if (!isRoot) {
-    // fs will nerver be null if current is not root
-    const parentLookup = parent.isTop ? ROOT : fs.pathResolver.resolve(parent.fsPath, '..');
-
-    items.unshift({
-      value: {
-        fsPath: parentLookup,
-        type: FileType.Directory,
-      },
-      label: '..',
-      description: 'go back',
-    });
-
-    if (allowChooseFolder) {
-      items.unshift({
-        value: parent,
-        label: '.',
-        description: ' choose current foler',
-      });
-    }
-  }
 
   const result = await vscode.window.showQuickPick(items, {
     ignoreFocusOut: true,
@@ -85,6 +65,9 @@ async function showFiles(
   if (result === undefined) {
     return;
   }
+
+  // no limit or limit to dir, so we can choose current folder
+  const allowChooseFolder = option.type === undefined || option.type === FileType.Directory;
 
   if (allowChooseFolder) {
     if (result.label === '.') {
@@ -97,22 +80,48 @@ async function showFiles(
     return result.value;
   }
 
-  const targetPath = result.value.fsPath;
+  const selectedValue = result.value;
+  const selectedPath = selectedValue.fsPath;
   // fs will be nerver be null if current is root, so get fs from picker item
-  const fileSystem = fs ? fs : await result.value.getFs();
+  const fileSystem = await selectedValue.getFs();
 
-  const nextItems = fileLookUp[targetPath];
+  const nextItems = fileLookUp[selectedPath];
   if (nextItems !== undefined) {
-    return showFiles(fileLookUp, result.value, nextItems, fileSystem, option);
+    return showFiles(fileLookUp, selectedValue, nextItems, option);
   }
 
-  return fileSystem.list(targetPath).then(subFiles => {
+  return fileSystem.list(selectedPath).then(subFiles => {
     const subItems = subFiles.map(file => ({
+      name: path.basename(file.fspath),
       fsPath: file.fspath,
+      parentFsPath: selectedPath,
       type: file.type,
+      description: '',
+      getFs: selectedValue.getFs,
     }));
-    fileLookUp[targetPath] = subItems;
-    return showFiles(fileLookUp, result.value, subItems, fileSystem, option);
+
+    subItems.unshift({
+      name: '..',
+      fsPath: selectedValue.parentFsPath,
+      parentFsPath: '#will never reach here, cause the dir has alreay be cached#',
+      type: FileType.Directory,
+      description: 'go back',
+      getFs: selectedValue.getFs,
+    });
+
+    if (allowChooseFolder) {
+      subItems.unshift({
+        name: '.',
+        fsPath: selectedPath,
+        parentFsPath: selectedValue.parentFsPath,
+        type: FileType.Directory,
+        description: ' choose current foler',
+        getFs: selectedValue.getFs,
+      });
+    }
+
+    fileLookUp[selectedPath] = subItems;
+    return showFiles(fileLookUp, selectedValue, subItems, option);
   });
 }
 
@@ -121,15 +130,17 @@ export function listFiles(
   option: IFilePickerOption
 ) {
   const baseItems = items.map(item => ({
+    name: path.basename(item.fsPath),
     fsPath: item.fsPath,
+    parentFsPath: ROOT,
     type: FileType.Directory,
-    isTop: true,
+    description: item.fsPath,
     getFs: item.getFs,
   }));
   const fileLookUp = {
     [ROOT]: baseItems,
   };
-  return showFiles(fileLookUp, null, baseItems, null, option);
+  return showFiles(fileLookUp, null, baseItems, option);
 }
 
 export function selectContext(): Promise<string> {

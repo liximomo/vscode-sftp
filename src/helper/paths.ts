@@ -1,21 +1,14 @@
-import * as upath from 'upath';
+import upath from '../modules/upath';
 import * as path from 'path';
-import remotePath from '../modules/remotePath';
 
-export const sep = path.posix.sep;
-
-export function join(rootPath, pattern) {
-  return upath.join(rootPath, pattern);
+export function toRemote(relativePath, remoteContext) {
+  return upath.join(remoteContext, relativePath);
 }
 
-export function normalize(path) {
-  return upath.toUnix(path);
+export function toLocal(relativePath, localContext) {
+  return path.join(localContext, relativePath);
 }
 
-export function relativeWithLocal(from, target) {
-  return path.relative(from, target);
-}
-
-export function relativeWithRemote(from, target) {
-  return remotePath.relative(from, target);
+export function isSubpathOf(subpath, pathname) {
+  return path.normalize(pathname).indexOf(path.normalize(subpath)) === 0;
 }

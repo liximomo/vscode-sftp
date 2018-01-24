@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
-import rpath from './remotePath';
+import upath from './upath';
 import * as output from '../modules/output';
 import FileSystem from '../model/Fs/FileSystem';
 import RemoteFileSystem from '../model/Fs/RemoteFileSystem';
@@ -56,9 +56,9 @@ class KeepAliveRemoteFs {
           },
           ...option,
         };
-        this.fs = new SFTPFileSystem(rpath, willFullCiphers);
+        this.fs = new SFTPFileSystem(upath, willFullCiphers);
       } else if (option.protocol === 'ftp') {
-        this.fs = new FTPFileSystem(rpath, option);
+        this.fs = new FTPFileSystem(upath, option);
       } else {
         return Promise.reject(new Error(`unsupported protocol ${option.protocol}`));
       }

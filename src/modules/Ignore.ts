@@ -1,4 +1,3 @@
-import * as paths from '../helper/paths';
 import GitIgnore = require('ignore');
 
 export default class Ignore {

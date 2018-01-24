@@ -54,6 +54,10 @@
         "title": "SFTP: Config"
       },
       {
+        "command": "sftp.list.default",
+        "title": "SFTP: List"
+      },
+      {
         "command": "sftp.list.all",
         "title": "SFTP: List All"
       },

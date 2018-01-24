@@ -3,10 +3,9 @@ import * as path from 'path';
 import { CONGIF_FILENAME } from '../constants';
 import { isValidFile } from '../helper/documentFilter';
 import throttle from '../helper/throttle';
-import * as paths from '../helper/paths';
-import { upload } from './sync';
+import upath from '../modules/upath';
+import { upload, removeRemote } from './sync';
 import { getConfig } from './config';
-import { removeRemote } from './sync';
 import * as output from './output';
 
 let workspaceWatcher: vscode.Disposable;
@@ -107,7 +106,7 @@ function setUpWatcher(config) {
     return;
   }
 
-  const pattern = paths.join(config.context, watchConfig.files);
+  const pattern = upath.join(config.context, watchConfig.files);
   watcher = vscode.workspace.createFileSystemWatcher(pattern, false, false, false);
   watchers[config.context] = watcher;
 

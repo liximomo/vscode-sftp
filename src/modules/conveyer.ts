@@ -4,8 +4,7 @@ import * as minimatch from 'minimatch';
 import * as concatLimit from 'async/concatLimit';
 import * as output from '../modules/output';
 import FileSystem, { IFileEntry, FileType } from '../model/Fs/FileSystem';
-import remotePath from './remotePath';
-import * as paths from '../helper/paths';
+import upath from '../modules/upath';
 import flatten from '../helper/flatten';
 
 type SyncModel = 'full' | 'update';
@@ -47,7 +46,7 @@ const defaultSyncOption = {
 };
 
 function fileDepth(file: string) {
-  return paths.normalize(file).split('/').length;
+  return upath.normalize(file).split('/').length;
 }
 
 function fileName2Show(filePath) {
@@ -59,7 +58,7 @@ function shouldSkip(path, ignore) {
     return ignore(path);
   }
 
-  return true;
+  return false;
 }
 
 const toHash = (items: any[], key: string, transform?: (a: any) => any): { [key: string]: any } =>
@@ -323,12 +322,12 @@ export function _sync(
     output.status.msg('diff files...');
     const srcFileTable = toHash(srcFileEntries, 'id', fileEntry => ({
       ...fileEntry,
-      id: paths.normalize(srcFs.pathResolver.relative(srcDir, fileEntry.fspath)),
+      id: upath.normalize(srcFs.pathResolver.relative(srcDir, fileEntry.fspath)),
     }));
 
     const desFileTable = toHash(desFileEntries, 'id', fileEntry => ({
       ...fileEntry,
-      id: paths.normalize(desFs.pathResolver.relative(desDir, fileEntry.fspath)),
+      id: upath.normalize(desFs.pathResolver.relative(desDir, fileEntry.fspath)),
     }));
 
     const file2trans = [];
@@ -520,8 +519,6 @@ export function transport(
       return result;
     },
     err => {
-      // ignore file or directory not exist
-      if (err.code === 'ENOENT') return;
       return [{
         target: src,
         error: true,
@@ -566,8 +563,6 @@ export function remove(path: string, fs: FileSystem, option): Promise<ITransport
       return result;
     },
     err => {
-      // ignore file or directory not exist
-      if (err.code === 'ENOENT') return;
       return [{
         target: path,
         error: true,
