@@ -1,8 +1,6 @@
 import * as vscode from 'vscode';
-import * as output from '../modules/output';
-import { getConfig, getAllConfigs } from '../modules/config';
 import { upload, download, sync2Remote, sync2Local } from '../modules/sync';
-import { createFileCommand, ITarget } from '../helper/createCommand';
+import { createFileCommand } from '../helper/createCommand';
 import { selectContext } from '../helper/select';
 
 const getActiveTarget = () =>

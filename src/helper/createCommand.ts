@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 import * as output from '../modules/output';
 import { getConfig } from '../modules/config';
-import { getWorkspaceFolders } from '../host';
+import { getWorkspaceFolders, refreshExplorer } from '../host';
 
 export interface ITarget {
   fsPath: string;
@@ -29,9 +29,8 @@ export function createFileCommand(fileTask, getTarget: (item) => Promise<ITarget
     const activityPath = target.fsPath;
     // todo swallow error from getConfig, so don't interrupt other target
     const config = getConfig(activityPath);
-    fileTask(activityPath, config).catch(output.onError);
+    fileTask(activityPath, config).catch(output.onError).then(refreshExplorer);
   };
-  const runTasks = (target: ITarget[] | ITarget) => [].concat(target).forEach(runTask);
 
   const cmdFn = async item => {
     const target = await getTarget(item);
@@ -39,7 +38,8 @@ export function createFileCommand(fileTask, getTarget: (item) => Promise<ITarget
       return;
     }
 
-    runTasks(target);
+    const pendingTasks = [].concat(target).map(runTask);
+    return await Promise.all(pendingTasks);
   };
 
   return createCommand(cmdFn);

@@ -1,14 +1,13 @@
-import * as vscode from 'vscode';
 import { CONFIG_PATH } from '../constants';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as paths from '../helper/paths';
 import upath from './upath';
-import * as glob from 'glob';
 import * as Joi from 'joi';
 import * as output from './output';
 import Trie from './Trie';
 import Ignore from './Ignore';
+import { showTextDocument } from '../host';
 
 const configTrie = new Trie(
   {},
@@ -86,7 +85,7 @@ function normalizeTriePath(pathname) {
     }
   }
 
-  return pathname;
+  return path.normalize(pathname);
 }
 
 function addConfig(config, defaultContext) {
@@ -194,17 +193,14 @@ export function getShortestDistinctConfigs() {
 export function newConfig(basePath) {
   const configPath = getConfigPath(basePath);
 
-  const showConfigFile = () =>
-    vscode.workspace.openTextDocument(configPath).then(vscode.window.showTextDocument);
-
   return fse
     .pathExists(configPath)
     .then(exist => {
       if (exist) {
-        return showConfigFile();
+        return showTextDocument(configPath);
       }
 
-      return fse.outputJson(configPath, defaultConfig, { spaces: 4 }).then(showConfigFile);
+      return fse.outputJson(configPath, defaultConfig, { spaces: 4 }).then(showTextDocument);
     })
     .catch(error => {
       output.onError(error, 'config');

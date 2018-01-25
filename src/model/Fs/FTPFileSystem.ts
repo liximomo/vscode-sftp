@@ -190,9 +190,9 @@ export default class FTPFileSystem extends RemoteFileSystem {
     };
   }
 
-  list(dir: string): Promise<IFileEntry[]> {
+  list(dir: string, { showHiddenFiles = true } = {}): Promise<IFileEntry[]> {
     return new Promise((resolve, reject) => {
-      this.ftp.list(dir, (err, result = []) => {
+      this.ftp.list(showHiddenFiles ? `-al ${dir}` : dir, (err, result = []) => {
         if (err) {
           reject(err);
           return;

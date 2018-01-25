@@ -8,8 +8,6 @@ import LocalFileSystem from '../model/Fs/LocalFileSystem';
 import SFTPFileSystem from '../model/Fs/SFTPFileSystem';
 import FTPFileSystem from '../model/Fs/FTPFileSystem';
 import RemoteClient from '../model/Client/RemoteClient';
-import SFTPClient from '../model/Client/SFTPClient';
-import FTPClient from '../model/Client/FTPClient';
 
 function hashOption(opiton) {
   return Object.keys(opiton).map(key => opiton[key]).join('');

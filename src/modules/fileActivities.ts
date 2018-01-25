@@ -1,4 +1,4 @@
-import { Event, TextDocument } from 'vscode';
+import { TextDocument } from 'vscode';
 import { isValidDocument } from '../helper/documentFilter';
 
 const openFiles = {

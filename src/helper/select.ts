@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import FileSystem, { IFileEntry, FileType } from '../model/Fs/FileSystem';
+import FileSystem, { FileType } from '../model/Fs/FileSystem';
 import { getAllConfigs } from '../modules/config';
 import * as path from 'path';
 
@@ -55,7 +55,16 @@ async function showFiles(
       label: file.name,
       description: file.description,
     }))
-    .sort((l, r) => l.label.localeCompare(r.label));
+    .sort((l, r) => {
+      if (l.value.type === r.value.type) {
+        return l.label.localeCompare(r.label);
+      } else if (l.value.type === FileType.Directory) {
+        // dir goes to first
+        return -1;
+      } else {
+        return 1;
+      }
+    });
 
   const result = await vscode.window.showQuickPick(items, {
     ignoreFocusOut: true,
@@ -92,7 +101,7 @@ async function showFiles(
 
   return fileSystem.list(selectedPath).then(subFiles => {
     const subItems = subFiles.map(file => ({
-      name: path.basename(file.fspath),
+      name: path.basename(file.fspath) + (file.type === FileType.Directory ? '/' : ''),
       fsPath: file.fspath,
       parentFsPath: selectedPath,
       type: file.type,

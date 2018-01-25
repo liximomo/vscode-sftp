@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as minimatch from 'minimatch';
 
 import * as concatLimit from 'async/concatLimit';
 import * as output from '../modules/output';

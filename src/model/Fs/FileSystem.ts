@@ -49,7 +49,7 @@ export default abstract class FileSystem {
   abstract put(input: fs.ReadStream | Buffer, path, option?: IStreamOption): Promise<void>;
   abstract mkdir(dir: string): Promise<void>;
   abstract ensureDir(dir: string): Promise<void>;
-  abstract list(dir: string): Promise<IFileEntry[]>;
+  abstract list(dir: string, option?): Promise<IFileEntry[]>;
   abstract lstat(path: string): Promise<IStats>;
   abstract readlink(path: string): Promise<string>;
   abstract symlink(targetPath: string, path: string): Promise<void>;

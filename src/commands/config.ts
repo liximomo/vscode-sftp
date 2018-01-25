@@ -1,7 +1,5 @@
 import * as vscode from 'vscode';
 import { newConfig } from '../modules/config';
-import localFs from '../modules/localFs';
-import { FileType } from '../model/Fs/FileSystem';
 import createCommand from '../helper/createCommand';
 import { getWorkspaceFolders } from '../host';
 

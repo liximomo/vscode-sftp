@@ -1,15 +1,9 @@
-import * as path from 'path';
-
 import * as output from './output';
 import { getHostInfo } from './config';
 import { transport, sync, remove } from './conveyer';
 import getRemoteFs from './remoteFs';
 import localFs from './localFs';
 import { disableWatcher, enableWatcher } from './fileWatcher';
-
-function failedTask(result, index, array) {
-  return result && result.error;
-}
 
 function logIgnored(result) {
   output.debug(['', `ignore: ${result.target}`].join('\n'));
