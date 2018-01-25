@@ -49,11 +49,6 @@ function printResult(msg, result, silent) {
 
   ignored.forEach(logIgnored);
 
-  const availableResult = success.length + fails.length;
-  if (availableResult <= 0) {
-    return;
-  }
-
   success.forEach(item => {
     output.debug(`${item.op} ${item.target} at ${new Date()}`);
   });
