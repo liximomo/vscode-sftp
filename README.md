@@ -1,17 +1,17 @@
 # sftp sync extension for VS Code
-Very simple and intuitive and works.
+Very fast and simple.
 
 ## Features
 
 * multiple configs
-* dual authentication
+* browser remote files
 * sync directory to remote
 * sync directory to local
 * download file/directory to local
 * upload file/directory to remote
 * upload to remote on save
+* dual authentication
 * watch project directory for external changes and automatically update remote
-* multiple file format support(file, directory, symbolic link)
 
 ## Usage
 1. `Ctrl+Shift+P` on Windows/Linux open command palette, run `SFTP: config` command.
@@ -148,21 +148,12 @@ You can also use an array of configs in the config file.
 
 
   /**
-   *  array of glob patterns that will be appended to `context` and `remotePath`
-   *  Note: the ** sequence matches a sequence of zero or more files and directories
-   *  examples:
+   * same behavior as gitignore, all path reltative to context of the current config
    */
-   //    "**/.vscode" means every file or directory with name .vscode, at any depth in the file tree
-   //     'a/b/.vscode' matches
-   //     'a/b/.vscode/c.txt' does NOT match
-   //    "**/.vscode/**" means every file or directory under a .vscode dir, at any depth in the file tree
-   //     'a/b/.vscode/c.txt' matches
-   //     'a/b/.vscode/c/d.txt' matches
-   //     'a/b/.vscode/e' matches 
   ignore: [
-    "**/.vscode/**",
-    "**/.git/**",
-    "**/.DS_Store"
+    ".vscode",
+    ".git",
+    ".DS_Store"
   ],
 
 

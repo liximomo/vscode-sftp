@@ -72,7 +72,7 @@ const defaultConfig = {
     autoDelete: false,
   },
 
-  ignore: ['**/.vscode/**', '**/.git/**', '**/.DS_Store'],
+  ignore: ['.vscode', '.git', '.DS_Store'],
 };
 
 function normalizeTriePath(pathname) {
