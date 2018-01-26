@@ -1,3 +1,18 @@
+## 1.0.0 - 2017-01-26
+🎉🎉🎉This release include some new features, bugfixs and improvements. It may be bring some new bugs, welcome to feedback.
+
+### New Features
+* `list` and `list all` command. 
+  * `list` will list all remote files except those match your ignore rules.
+  * `list all` will list all remote files.
+  
+  The target will be dowmload after you select. And it will be open in vscode if the target is a file.
+* When you download a folder through a command, the vscode explorer will be refreshed when the command finish.
+
+### Breaking Changes
+* Change to git ignore [spec](https://git-scm.com/docs/gitignore). It's more powerful and concise. You may need to change your ignore config.
+
+
 ## 0.9.4 - 2017-12-18
 * `Context` now receives a relative path.
 * Fix [#69](https://github.com/liximomo/vscode-sftp/issues/69), [#70](https://github.com/liximomo/vscode-sftp/issues/70)
