@@ -64,127 +64,82 @@ You can also use an array of configs in the config file.
 ### Full Config
 ```js
 {
-  // an path relative to the root path of a vsode workspace, default to '.'
+  // string - An path relative to the root path of a vsode workspace.
   context: '.',
  
-  /************************
-  * CONNECTION PARAMETERS *
-  ************************/
-  
-  host: "host",
-  port: 22,
-  username: "username",
-  password: "password",
-  protocol: "sftp", // sftp or ftp
-
-  /**
-   * string - Path to ssh-agent's UNIX socket for ssh-agent-based user authentication.
-   * Windows users: set to 'pageant' for authenticating with Pageant or (actual) path to a cygwin "UNIX socket.
-   */
-  agent: null, 
-  privateKeyPath: null, // absolute path to user private key
-  passphrase: null,
-  passive: false, // ftp passive mode
-
-  // try interactive authentication, useful for dual auth. 
-  // (requires the server to have keyboard-interactive authentication enabled)
-  interactiveAuth: true, 
-
- /*******************************
- * SYNCING, UPLOAD AND DOWNLOAD *
- *******************************/
+  // string - sftp or ftp
+  protocol: "sftp", 
  
-  
-  // The corresponding remote path of the context
+  // string - Hostname or IP address of the server.
+  host: "host",
+
+  // integer - Port number of the server.
+  port: 22,
+
+  // string - Username for authentication.
+  username: "username",
+
+   // string - Password for password-based user authentication.
+  password: "password",
+
+  // string - The absolute path on remote
   remotePath: "/", 
+
+  // boolean - Uplaod on every save operation of VS code 
   uploadOnSave: false,
 
-
-  /**
-   *  available values: update | full
-   *  update: sync existing files only (it only affects files that exist on both sides)
-   *  full: sync existing files + remove files deleted from the source that are still present at 
-   *    the destination + create files that exist on the source and are missing at the destination
-   *  If you want just to sync existing files and add missing files, use the `upload` command!
-   *  Note: this option only affects the `Sync to remote/local` commands, not `Download` or `Upload`
-   */ 
+ 
+  // string - Set to 'update' so 'sync command' will only affect thoes files exist in both local and server. Set to 'full', 'sync' will be same as 'download/uplaod' besides deleting file not exist in origin from target.
   syncMode: 'update',
 
-  /** 
-   * Detailed example of how sync/upload/download work. Assume we have the following directories:
-   *
-   * source-dir
-   * |-s1.txt (file that exists only at source)
-   * |-common.txt
-   * dest-dir
-   * |-d1.txt (file that exists only at destination)
-   * |-common.txt (common file between source-dir and dest-dir)
-   * 
-   * DOWNLOAD and UPLOAD are copy operations from one side to the other. They only overwrite and create
-   *   files on the destination, without deleting anything.
-   *
-   * If we download source-dir to dest-dir, the dest-dir will be:
-   * dest-dir
-   * |-s1.txt (copied from source)
-   * |-d1.txt
-   * |-common.txt (overwritten with the contents of the same file from source-dir)
-   *
-   * The effect of SYNC operations depends on the value of syncMode. With syncMode: 'update', only common 
-   *   files are copied from one side to the other. With syncMode: 'full', the destination will be modified
-   *   to have the same set of files as the source (which implies deleting files that only exist on the 
-   *   destination and creating files that only exist at source).
-   * 
-   * If we sync source-dir to dest-dir using syncMode: 'update', dest-dir wil be:
-   * dest-dir
-   * |-d1.txt
-   * |-common.txt (overwritten with the contents of the same file from source-dir)
-   * 
-   * If we sync source-dir to dest-dir using syncMode: 'full', dest-dir wil be:
-   * dest-dir
-   * |-s1.txt (created, because it didn't exist on destination)
-   * |-common.txt (overwritten with the contents of the same file from source-dir)
-   * and d1.txt is deleted because it didn't exist at source
-   */
-
-
-  /**
-   * same behavior as gitignore, all path reltative to context of the current config
-   */
+  // string[] - Same behavior as gitignore, all path reltative to context of the current config
   ignore: [
     ".vscode",
     ".git",
     ".DS_Store"
   ],
 
-
-  /**
-   *  Watching external file changes(create and remove only), such as compile/build output 
-   *    or git branch switching. Also useful for automatically creating/deleting remote files when
-   *    creating/deleting them in vscode
-   *  Watcher will be disabled when files is set to false or both autoDelete and autoUpload are set to false
-   */
   watcher: {
-    /**
-     *  available value: false or a glob pattern
-     *   - false: disable watcher
-     *   - string containing a glob pattern: describes files that will be watched
-     */
+    //  mixed - glob patterns that are watched and when edited outside of the VS cdoe editor are processed. Set false to disable.
     files: false, 
-
-    /**
-     *  available value: true or false
-     *  whether or not to auto upload  created files (e.g. created in vscode  or other external apps)
-     */
+  
+    // boolean - upload when file changed
     autoUpload: true,
 
-
-    /**
-    *  available value: true or false
-    *  whether or not to auto delete removed files (e.g. removed manually from vscode or the command line)
-    */
+    // boolean - delete when file removed
     autoDelete: true
   }
+}
+```
+#### SFTP only Config
+```js
+{
+  // string - Path to ssh-agent's UNIX socket for ssh-agent-based user authentication.  Windows users: set to 'pageant' for authenticating with Pageant or (actual) path to a cygwin "UNIX socket."
+  agent: null, 
 
+  // string - Absolute path to user private key.
+  privateKeyPath: null, 
+
+   // string - For an encrypted private key, this is the passphrase used to decrypt it.
+  passphrase: null,
+
+  // boolean - Set to true for enable verifyCode dialog. Keyboard interaction authentication mechanism. For example using Google Authentication (Multi factor)
+  // (requires the server to have keyboard-interactive authentication enabled)
+  interactiveAuth: true, 
+}
+```
+
+#### FTP only Config
+```js
+{
+  // mixed - Set to true for both control and data connection encryption, 'control' for control connection encryption only, or 'implicit' for implicitly encrypted control connection (this mode is deprecated in modern times, but usually uses port 990)
+  secure: false,
+  
+  // object - Additional options to be passed to tls.connect(). Default: (null) see https://nodejs.org/api/tls.html#tls_tls_connect_options_callback
+  secureOptions: null, 
+
+  // boolean - ftp passive mode
+  passive: false, 
 }
 ```
 

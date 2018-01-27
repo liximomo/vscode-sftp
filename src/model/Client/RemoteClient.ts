@@ -9,6 +9,8 @@ export interface IClientOption {
   passphrase?: string,  // ssh-only
   interactiveAuth?: boolean, // ssh-only
   agent?: string, // ssh-only
+  secure?: any // ftp-only
+  secureOptions?: object // ftp-only
   passive?: boolean, // ftp-only
 };
 

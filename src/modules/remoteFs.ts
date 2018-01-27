@@ -23,13 +23,15 @@ class KeepAliveRemoteFs {
   private option: any;
 
   getFs(option): Promise<RemoteFileSystem> {
-    if (this.isValid && this.option === option) {
+    if (this.isValid) {
       this.pendingPromise = null;
       return Promise.resolve(this.fs);
     }
 
     if (!this.pendingPromise) {
       output.debug('connect to remote');
+      // $todo implement promptForPass
+
       if (option.protocol === 'sftp') {
         const willFullCiphers = {
           algorithms: {
@@ -52,11 +54,28 @@ class KeepAliveRemoteFs {
               'arcfour',
             ],
           },
-          ...option,
+          ...{
+            host: option.host,
+            port: option.port,
+            username: option.username,
+            password: option.password,
+            agent: option.agent,
+            privateKeyPath: option.privateKeyPath,
+            passphrase: option.passphrase,
+            interactiveAuth: option.interactiveAuth,
+          },
         };
         this.fs = new SFTPFileSystem(upath, willFullCiphers);
       } else if (option.protocol === 'ftp') {
-        this.fs = new FTPFileSystem(upath, option);
+        this.fs = new FTPFileSystem(upath, {
+          host: option.host,
+          port: option.port,
+          username: option.username,
+          password: option.password,
+          secure: option.secure,
+          secureOptions: option.secureOptions,
+          passive: option.passive,
+        });
       } else {
         return Promise.reject(new Error(`unsupported protocol ${option.protocol}`));
       }

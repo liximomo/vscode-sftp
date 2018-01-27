@@ -20,22 +20,29 @@ const nullable = schema => schema.optional().allow(null);
 
 const configScheme = {
   context: Joi.string(),
+  protocol: Joi.any().valid('sftp', 'ftp', 'test'),
+
   host: Joi.string().required(),
   port: Joi.number().integer(),
   username: Joi.string().required(),
   password: nullable(Joi.string()),
-  protocol: Joi.any().valid('sftp', 'ftp', 'test'),
+  promptForPass: Joi.boolean().optional(),
+
   agent: nullable(Joi.string()),
   privateKeyPath: nullable(Joi.string()),
   passphrase: nullable(Joi.string()),
-  passive: Joi.boolean().optional(),
   interactiveAuth: Joi.boolean().optional(),
+
+  secure: Joi.any().valid(true, false, 'control', 'implicit').optional(),
+  secureOptions: nullable(Joi.object()),
+  passive: Joi.boolean().optional(),
 
   remotePath: Joi.string().required(),
   uploadOnSave: Joi.boolean().optional(),
-
   syncMode: Joi.any().valid('update', 'full'),
-
+  ignore: Joi.array()
+    .min(0)
+    .items(Joi.string()),
   watcher: {
     files: Joi.string()
       .allow(false, null)
@@ -43,36 +50,35 @@ const configScheme = {
     autoUpload: Joi.boolean().optional(),
     autoDelete: Joi.boolean().optional(),
   },
-
-  ignore: Joi.array()
-    .min(0)
-    .items(Joi.string()),
 };
 
 const defaultConfig = {
+  protocol: 'sftp',
+
   host: 'host',
   port: 22,
   username: 'username',
   password: null,
-  protocol: 'sftp',
+  promptForPass: false,
+
   agent: null,
   privateKeyPath: null,
   passphrase: null,
-  passive: false,
   interactiveAuth: false,
+
+  secure: false,
+  secureOptions: null,
+  passive: false,
 
   remotePath: '/',
   uploadOnSave: false,
-
   syncMode: 'update',
-
+  ignore: ['.vscode', '.git', '.DS_Store'],
   watcher: {
     files: false,
     autoUpload: false,
     autoDelete: false,
   },
-
-  ignore: ['.vscode', '.git', '.DS_Store'],
 };
 
 function normalizeTriePath(pathname) {
@@ -214,10 +220,17 @@ export function getHostInfo(config) {
     port: config.port,
     username: config.username,
     password: config.password,
+    promptForPass: config.promptForPass,
+
+    // sftp
+    agent: config.agent,
     privateKeyPath: config.privateKeyPath,
     passphrase: config.passphrase,
-    passive: config.passive,
     interactiveAuth: config.interactiveAuth,
-    agent: config.agent,
+
+    // ftp
+    secure: config.secure,
+    secureOptions: config.secureOptions,
+    passive: config.passive,
   };
 }
