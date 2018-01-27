@@ -1,4 +1,4 @@
-## 1.0.0 - 2017-01-26
+## 1.0.0 - 2018-01-26
 🎉🎉🎉This release include some new features, bugfixs and improvements. It may be bring some new bugs, welcome to feedback.
 
 ### New Features
