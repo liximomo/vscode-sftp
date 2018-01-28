@@ -32,6 +32,8 @@
     "onCommand:sftp.trans.local",
     "onCommand:sftp.sync.remote",
     "onCommand:sftp.sync.local",
+    "onCommand:sftp.list.default",
+    "onCommand:sftp.list.all",
     "workspaceContains:.vscode/sftp.json"
   ],
   "icon": "icon.png",
