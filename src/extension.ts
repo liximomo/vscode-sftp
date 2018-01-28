@@ -39,7 +39,11 @@ function registerCommand(
 
 function handleConfigSave(uri: vscode.Uri) {
   loadConfig(uri.fsPath)
-    .then(watchFiles, output.onError);
+    .then(config => {
+      // close connected remote, cause the remote may changed
+      endAllRemote();
+      watchFiles(config);
+    }, output.onError);
 }
 
 function handleDocumentSave(uri: vscode.Uri) {

@@ -26,11 +26,10 @@ const configScheme = {
   port: Joi.number().integer(),
   username: Joi.string().required(),
   password: nullable(Joi.string()),
-  promptForPass: Joi.boolean().optional(),
 
   agent: nullable(Joi.string()),
   privateKeyPath: nullable(Joi.string()),
-  passphrase: nullable(Joi.string()),
+  passphrase: nullable(Joi.string().allow(true)),
   interactiveAuth: Joi.boolean().optional(),
 
   secure: Joi.any().valid(true, false, 'control', 'implicit').optional(),
@@ -59,7 +58,6 @@ const defaultConfig = {
   port: 22,
   username: 'username',
   password: null,
-  promptForPass: false,
 
   agent: null,
   privateKeyPath: null,
@@ -220,7 +218,6 @@ export function getHostInfo(config) {
     port: config.port,
     username: config.username,
     password: config.password,
-    promptForPass: config.promptForPass,
 
     // sftp
     agent: config.agent,

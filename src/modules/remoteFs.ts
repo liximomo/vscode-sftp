@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { promptForPassword } from '../host';
 import upath from './upath';
 import * as output from '../modules/output';
 import FileSystem from '../model/Fs/FileSystem';
@@ -10,7 +11,9 @@ import FTPFileSystem from '../model/Fs/FTPFileSystem';
 import RemoteClient from '../model/Client/RemoteClient';
 
 function hashOption(opiton) {
-  return Object.keys(opiton).map(key => opiton[key]).join('');
+  return Object.keys(opiton)
+    .map(key => opiton[key])
+    .join('');
 }
 
 class KeepAliveRemoteFs {
@@ -22,7 +25,7 @@ class KeepAliveRemoteFs {
 
   private option: any;
 
-  getFs(option): Promise<RemoteFileSystem> {
+  async getFs(option): Promise<RemoteFileSystem> {
     if (this.isValid) {
       this.pendingPromise = null;
       return Promise.resolve(this.fs);
@@ -32,8 +35,11 @@ class KeepAliveRemoteFs {
       output.debug('connect to remote');
       // $todo implement promptForPass
 
+      let shouldPromptForPass = false;
+      let connectOption;
+      let FsConstructor;
       if (option.protocol === 'sftp') {
-        const willFullCiphers = {
+        connectOption = {
           algorithms: {
             cipher: [
               'aes128-ctr',
@@ -65,9 +71,21 @@ class KeepAliveRemoteFs {
             interactiveAuth: option.interactiveAuth,
           },
         };
-        this.fs = new SFTPFileSystem(upath, willFullCiphers);
+
+        // tslint:disable triple-equals
+        shouldPromptForPass =
+          connectOption.password == undefined &&
+          connectOption.agent == undefined &&
+          connectOption.privateKeyPath == undefined;
+        // tslint:enable
+
+        // explict compare to true, cause we want to distinct between string and true
+        if (option.passphrase === true) {
+          connectOption.passphrase = await promptForPassword('Enter your passphrase');
+        }
+        FsConstructor = SFTPFileSystem;
       } else if (option.protocol === 'ftp') {
-        this.fs = new FTPFileSystem(upath, {
+        connectOption = {
           host: option.host,
           port: option.port,
           username: option.username,
@@ -75,33 +93,31 @@ class KeepAliveRemoteFs {
           secure: option.secure,
           secureOptions: option.secureOptions,
           passive: option.passive,
-        });
+        };
+        // tslint:disable-next-line triple-equals
+        shouldPromptForPass = connectOption.password == undefined;
+        FsConstructor = FTPFileSystem;
       } else {
         return Promise.reject(new Error(`unsupported protocol ${option.protocol}`));
       }
+
+      if (shouldPromptForPass) {
+        connectOption.password = await promptForPassword('Enter your password');
+      }
+      this.fs = new FsConstructor(upath, connectOption);
       const client = this.fs.getClient();
       client.onDisconnected(this.invalid.bind(this));
       output.status.msg('connecting...');
-      this.pendingPromise = client.connect(prompt => {
-        // tslint:disable-next-line prefer-const
-        let password = true;
-        // if (/password/i.test(prompt)) {
-        //   password = true;
-        // }
-
-        return vscode.window.showInputBox({
-          ignoreFocusOut: true,
-          password,
-          prompt,
-        }) as Promise<string | null>;
-      })
-      .then(() => {
-        this.isValid = true;
-        return this.fs;
-      }, err => {
-        this.invalid();
-        throw err;
-      });
+      this.pendingPromise = client.connect(promptForPassword).then(
+        () => {
+          this.isValid = true;
+          return this.fs;
+        },
+        err => {
+          this.invalid();
+          throw err;
+        }
+      );
     }
     return this.pendingPromise;
   }
@@ -127,7 +143,7 @@ function getTestFs() {
 }
 
 const fsTable: {
-  [x: string]: KeepAliveRemoteFs,
+  [x: string]: KeepAliveRemoteFs;
 } = {};
 
 export default function getFileSystem(option): Promise<FileSystem> {
@@ -146,10 +162,10 @@ export default function getFileSystem(option): Promise<FileSystem> {
   return fsInstance.getFs(option);
 }
 
-// TODO
 export function endAllRemote() {
   Object.keys(fsTable).forEach(key => {
     const fs = fsTable[key];
     fs.end();
+    delete fsTable[key];
   });
 }

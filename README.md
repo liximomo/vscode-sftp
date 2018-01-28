@@ -1,5 +1,5 @@
 # sftp sync extension for VS Code
-Very fast and simple.
+Very simple reuqire just three lines of config! Very fast finished in a blink.
 
 ## Features
 
@@ -33,11 +33,11 @@ Very fast and simple.
 ## Config
 
 ### Example
+You are even not required to config a password!
 ```json
 {
   "host": "host",
   "username": "username",
-  "password": "password",
   "remotePath": "/remote/workspace", 
 }
 ```
@@ -120,7 +120,7 @@ You can also use an array of configs in the config file.
   // string - Absolute path to user private key.
   privateKeyPath: null, 
 
-   // string - For an encrypted private key, this is the passphrase used to decrypt it.
+  // mixed - For an encrypted private key, this is the passphrase string used to decrypt it. Set to true for enable passphrase dialog. This will prevent from using cleartext passphrase in this config.
   passphrase: null,
 
   // boolean - Set to true for enable verifyCode dialog. Keyboard interaction authentication mechanism. For example using Google Authentication (Multi factor)

@@ -1,4 +1,4 @@
-const Trie = require('../src/model/Trie').default;
+const Trie = require('../src/modules/Trie').default;
 
 describe('Trie Tests', () => {
   describe('find all values', () => {
