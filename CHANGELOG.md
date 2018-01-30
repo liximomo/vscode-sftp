@@ -1,3 +1,9 @@
+## 1.0.2 - 2017-01-30
+* Add FTPS support.
+* Add passphrase/password dialog support.
+* Fix config not found error after config file changed.
+* Fix `sftp config` failed to show created config file in vscode.
+
 ## 1.0.0 - 2017-01-26
 🎉🎉🎉This release include some new features, bugfixs and improvements. It may be bring some new bugs, welcome to feedback.
 
