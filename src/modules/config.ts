@@ -32,7 +32,9 @@ const configScheme = {
   passphrase: nullable(Joi.string().allow(true)),
   interactiveAuth: Joi.boolean().optional(),
 
-  secure: Joi.any().valid(true, false, 'control', 'implicit').optional(),
+  secure: Joi.any()
+    .valid(true, false, 'control', 'implicit')
+    .optional(),
   secureOptions: nullable(Joi.object()),
   passive: Joi.boolean().optional(),
 
@@ -125,8 +127,7 @@ export function getConfigPath(basePath) {
 }
 
 export function loadConfig(configPath) {
-  configTrie.empty();
-
+  // $todo trie per workspace, so we can remove unused config
   return fse.readJson(configPath).then(config => {
     const configs = [].concat(config);
     const configContext = path.resolve(configPath, '../../');
@@ -204,7 +205,9 @@ export function newConfig(basePath) {
         return showTextDocument(configPath);
       }
 
-      return fse.outputJson(configPath, defaultConfig, { spaces: 4 }).then(showTextDocument);
+      return fse
+        .outputJson(configPath, defaultConfig, { spaces: 4 })
+        .then(() => showTextDocument(configPath));
     })
     .catch(error => {
       output.onError(error, 'config');

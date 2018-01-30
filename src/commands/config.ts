@@ -24,6 +24,7 @@ function editConfig() {
       if (item === undefined) {
         return;
       }
+
       newConfig(item.value);
     });
 }
