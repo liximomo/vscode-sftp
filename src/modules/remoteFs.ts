@@ -1,5 +1,4 @@
 import * as path from 'path';
-import * as vscode from 'vscode';
 import { promptForPassword } from '../host';
 import upath from './upath';
 import * as output from '../modules/output';
@@ -22,8 +21,6 @@ class KeepAliveRemoteFs {
   private pendingPromise: Promise<RemoteFileSystem>;
 
   private fs: RemoteFileSystem;
-
-  private option: any;
 
   async getFs(option): Promise<RemoteFileSystem> {
     if (this.isValid) {

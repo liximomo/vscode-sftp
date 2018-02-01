@@ -3,6 +3,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as util from 'util';
 
 import * as output from './modules/output';
 import { CONGIF_FILENAME } from './constants';

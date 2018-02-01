@@ -3,14 +3,13 @@ import * as path from 'path';
 import { CONGIF_FILENAME } from '../constants';
 import { isValidFile } from '../helper/documentFilter';
 import throttle from '../helper/throttle';
-import upath from '../modules/upath';
 import { upload, removeRemote } from './sync';
 import { getConfig } from './config';
 import * as output from './output';
 
 let workspaceWatcher: vscode.Disposable;
 const watchers: {
-  [x: string]: vscode.FileSystemWatcher,
+  [x: string]: vscode.FileSystemWatcher;
 } = {};
 
 const uploadQueue = [];
@@ -33,7 +32,10 @@ function fileError(event, file, showErrorWindow = true) {
 }
 
 function doUpload() {
-  const files = uploadQueue.slice().map(uri => uri.fsPath).sort();
+  const files = uploadQueue
+    .slice()
+    .map(uri => uri.fsPath)
+    .sort();
   uploadQueue.length = 0;
   files.forEach(file => {
     let config;
@@ -49,7 +51,10 @@ function doUpload() {
 }
 
 function doDelete() {
-  const files = deleteQueue.slice().map(uri => uri.fsPath).sort();
+  const files = deleteQueue
+    .slice()
+    .map(uri => uri.fsPath)
+    .sort();
   deleteQueue.length = 0;
   let config;
   files.forEach(file => {
@@ -106,8 +111,12 @@ function setUpWatcher(config) {
     return;
   }
 
-  const pattern = upath.join(config.context, watchConfig.files);
-  watcher = vscode.workspace.createFileSystemWatcher(pattern, false, false, false);
+  watcher = vscode.workspace.createFileSystemWatcher(
+    new vscode.RelativePattern(config.context, watchConfig.files),
+    false,
+    false,
+    false
+  );
   watchers[config.context] = watcher;
 
   if (watchConfig.autoUpload) {
@@ -147,8 +156,8 @@ export function watchWorkspace({
   onDidSaveFile,
   onDidSaveSftpConfig,
 }: {
-  onDidSaveFile: (uri: vscode.Uri) => void,
-  onDidSaveSftpConfig: (uri: vscode.Uri) => void,
+  onDidSaveFile: (uri: vscode.Uri) => void;
+  onDidSaveSftpConfig: (uri: vscode.Uri) => void;
 }) {
   if (workspaceWatcher) {
     workspaceWatcher.dispose();

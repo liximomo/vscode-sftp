@@ -6,7 +6,7 @@
   "publisher": "liximomo",
   "author": "liximomo <liximomo@gmail.com> (https://liximomo.github.io/)",
   "engines": {
-    "vscode": "^1.15.0"
+    "vscode": "^1.17.0"
   },
   "bugs": {
     "url": "https://github.com/liximomo/vscode-sftp/issues",
@@ -130,7 +130,7 @@
     "mocha": "^2.3.3",
     "tslint": "^5.4.3",
     "typescript": "^2.0.3",
-    "vscode": "^1.1.5"
+    "vscode": "^1.1.10"
   },
   "dependencies": {
     "async": "^2.6.0",
