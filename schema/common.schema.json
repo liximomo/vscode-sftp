@@ -1,0 +1,70 @@
+{
+  "type": "object",
+  "properties": {
+    "context": {
+      "type": "string",
+      "description": "A path relative to the vsode workspace root folder."
+    },
+    "host": {
+      "type": "string",
+      "description": "Hostname or IP address of the server.",
+      "default": "host"
+    },
+    "port": {
+      "type": "number",
+      "description": "Port number of the server.",
+      "default": 22
+    },
+    "username": {
+      "type": "string",
+      "description": "Username for authentication."
+    },
+    "password": {
+      "type": "string",
+      "description": "Password for password-based user authentication.",
+      "default": ""
+    },
+    "remotePath": {
+      "type": "string",
+      "description": "The absolute path on remote.",
+      "default": "/"
+    },
+    "uploadOnSave": {
+      "type": "boolean",
+      "description": "True to uplaod on every save operation of VS code.",
+      "default": false
+    },
+    "syncMode": {
+      "enum": ["update", "full"],
+      "description": "The Strategy `sync` commnad to use.",
+      "default": "update"
+    },
+    "ignore": {
+      "type": "array",
+      "description": "Ignore files. Same behavior as gitignore.",
+      "items": {
+        "type": "string",
+        "description": "Ignore pattern."
+      },
+      "default": [".vscode", ".git", ".DS_Store"]
+    },
+    "watcher": {
+      "type": "object",
+      "description": "Ignore files. Same behavior as gitignore.",
+      "properties": {
+        "files": {
+          "type": "string",
+          "description": "A glob pattern."
+        },
+        "autoUpload": {
+          "type": "boolean",
+          "description": "upload when file changed."
+        },
+        "autoDelete": {
+          "type": "boolean",
+          "description": "delete when file changed."
+        }
+      }
+    }
+  }
+}

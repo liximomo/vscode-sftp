@@ -64,7 +64,7 @@ You can also use an array of configs in the config file.
 ### Full Config
 ```js
 {
-  // string - An path relative to the root path of a vsode workspace.
+  // string - A path relative to the vsode workspace root folder.
   context: '.',
  
   // string - sftp or ftp
@@ -80,7 +80,7 @@ You can also use an array of configs in the config file.
   username: "username",
 
    // string - Password for password-based user authentication.
-  password: "password",
+  password: null,
 
   // string - The absolute path on remote
   remotePath: "/", 
@@ -99,9 +99,10 @@ You can also use an array of configs in the config file.
     ".DS_Store"
   ],
 
+  // object - Default: null. 
   watcher: {
-    //  mixed - glob patterns that are watched and when edited outside of the VS cdoe editor are processed. Set false to disable.
-    files: false, 
+    //  string - glob patterns that are watched and when edited outside of the VS cdoe editor are processed.
+    files: "", 
   
     // boolean - upload when file changed
     autoUpload: true,
@@ -114,7 +115,7 @@ You can also use an array of configs in the config file.
 #### SFTP only Config
 ```js
 {
-  // string - Path to ssh-agent's UNIX socket for ssh-agent-based user authentication.  Windows users: set to 'pageant' for authenticating with Pageant or (actual) path to a cygwin "UNIX socket."
+  // string - Path to ssh-agent's UNIX socket for ssh-agent-based user authentication.  Windows users: set to 'pageant' for authenticating with Pageant or (actual) path to a cygwin "UNIX socket".
   agent: null, 
 
   // string - Absolute path to user private key.
@@ -125,7 +126,7 @@ You can also use an array of configs in the config file.
 
   // boolean - Set to true for enable verifyCode dialog. Keyboard interaction authentication mechanism. For example using Google Authentication (Multi factor)
   // (requires the server to have keyboard-interactive authentication enabled)
-  interactiveAuth: true, 
+  interactiveAuth: false, 
 }
 ```
 

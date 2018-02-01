@@ -111,7 +111,13 @@
           "group": "sftp.trans@2"
         }
       ]
-    }
+    },
+    "jsonValidation": [
+      {
+        "fileMatch": ".vscode/sftp.json",
+        "url": "./schema/config.schema.json"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "tsc -p ./",

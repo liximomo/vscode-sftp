@@ -1,0 +1,13 @@
+{
+  "oneOf": [
+    {
+      "type": "array",
+      "items": {
+        "$ref": "simple-config.schema.json"
+      }
+    },
+    {
+      "$ref": "simple-config.schema.json"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "allOf": [{ "$ref": "common.schema.json" }],
+  "type": "object",
+  "properties": {
+    "context": {},
+    "host": {},
+    "port": {},
+    "username": {},
+    "password": {},
+    "remotePath": {},
+    "uploadOnSave": {},
+    "syncMode": {},
+    "ignore": {},
+    "watcher": {},
+
+    "protocol": {
+      "enum": ["sftp"],
+      "description": "sftp Connection protocol."
+    },
+    "agent": {
+      "type": "string",
+      "description":
+        "Path to ssh-agent's UNIX socket for ssh-agent-based user authentication.  Windows users: set to 'pageant' for authenticating with Pageant or (actual) path to a cygwin \"UNIX socket\"."
+    },
+    "privateKeyPath": {
+      "type": "string",
+      "description": "Absolute path to user private key."
+    },
+    "passphrase": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "enum": [true]
+        }
+      ],
+      "description": "For an encrypted private key, this is the passphrase string used to decrypt it. Set to true for enable passphrase dialog. This will prevent from using cleartext passphrase in this config."
+    },
+    "interactiveAuth": {
+      "type": "boolean",
+      "description": "True to enable verifyCode dialog. Keyboard interaction authentication mechanism. For example using Google Authentication.",
+      "default": false
+    }
+  },
+  "additionalProperties": false
+}
