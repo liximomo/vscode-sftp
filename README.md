@@ -85,7 +85,7 @@ You can also use an array of configs in the config file.
   // string - The absolute path on remote
   remotePath: "/", 
 
-  // boolean - Uplaod on every save operation of VS code 
+  // boolean - Upload on every save operation of VS code 
   uploadOnSave: false,
 
  
