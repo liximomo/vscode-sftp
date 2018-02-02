@@ -31,7 +31,7 @@
     },
     "uploadOnSave": {
       "type": "boolean",
-      "description": "True to uplaod on every save operation of VS code.",
+      "description": "True to upload on every save operation of VS code.",
       "default": false
     },
     "syncMode": {
