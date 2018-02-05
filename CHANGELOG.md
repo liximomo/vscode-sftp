@@ -1,3 +1,8 @@
+## 1.0.3 - 2018-02-05
+* Simplify default config file's content when exec `sftp: config`.
+* Cconfig autocomplete.
+* Fix watcher stop work after 'download' or 'sync to local'.
+
 ## 1.0.2 - 2018-01-30
 * Add FTPS support.
 * Add passphrase/password dialog support.
