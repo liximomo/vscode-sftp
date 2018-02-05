@@ -206,7 +206,12 @@ export function newConfig(basePath) {
       }
 
       return fse
-        .outputJson(configPath, defaultConfig, { spaces: 4 })
+        .outputJson(configPath, {
+          protocol: defaultConfig.protocol,
+          host: defaultConfig.host,
+          username: defaultConfig.username,
+          remotePath: defaultConfig.remotePath,
+        }, { spaces: 4 })
         .then(() => showTextDocument(configPath));
     })
     .catch(error => {

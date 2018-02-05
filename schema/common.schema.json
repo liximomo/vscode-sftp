@@ -50,20 +50,28 @@
     },
     "watcher": {
       "type": "object",
-      "description": "Ignore files. Same behavior as gitignore.",
+      "description": "Watch external modification.",
       "properties": {
         "files": {
           "type": "string",
-          "description": "A glob pattern."
+          "description": "A glob pattern.",
+          "default": "**/*"
         },
         "autoUpload": {
           "type": "boolean",
-          "description": "upload when file changed."
+          "description": "upload when file changed.",
+          "default": true
         },
         "autoDelete": {
           "type": "boolean",
-          "description": "delete when file changed."
+          "description": "delete when file changed.",
+          "default": false
         }
+      },
+      "default": {
+        "files": "**/*",
+        "autoUpload": true,
+        "autoDelete": false
       }
     }
   }

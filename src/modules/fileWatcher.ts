@@ -92,6 +92,10 @@ function getWatcherByConfig(config) {
   return watchers[config.context];
 }
 
+function removeWatcherByConfig(config) {
+  return delete watchers[config.context];
+}
+
 function getWatchs() {
   return Object.keys(watchers).map(key => watchers[key]);
 }
@@ -99,7 +103,7 @@ function getWatchs() {
 function setUpWatcher(config) {
   const watchConfig = config.watcher !== undefined ? config.watcher : {};
 
-  let watcher = watchers[config.context];
+  let watcher = getWatcherByConfig(config);
   if (watcher) {
     // clear old watcher
     watcher.dispose();
@@ -140,10 +144,10 @@ export function disableWatcher(config) {
   const watcher = getWatcherByConfig(config);
   if (watcher) {
     watcher.dispose();
+    removeWatcherByConfig(config);
   }
 }
 
-// $todo remove this is unnessary
 export function enableWatcher(config) {
   if (getWatcherByConfig(config) !== undefined) {
     return;
