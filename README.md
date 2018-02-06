@@ -89,7 +89,7 @@ You can also use an array of configs in the config file.
   uploadOnSave: false,
 
  
-  // string - Set to 'update' so 'sync command' will only affect thoes files exist in both local and server. Set to 'full', 'sync' will be same as 'download/uplaod' besides deleting file not exist in origin from target.
+  // string - Set to 'update' so 'sync command' will only affect thoes files exist in both local and server. Set to 'full', 'sync' will be same as 'download/upload' besides deleting file not exist in origin from target.
   syncMode: 'update',
 
   // string[] - Same behavior as gitignore, all path reltative to context of the current config
