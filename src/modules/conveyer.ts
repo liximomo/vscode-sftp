@@ -9,13 +9,12 @@ import flatten from '../helper/flatten';
 type SyncModel = 'full' | 'update';
 
 interface ITransportOption {
+  concurrency: number;
   ignore: string[];
   perserveTargetMode: boolean;
 }
 
-interface ISyncOption {
-  ignore: string[];
-  perserveTargetMode: boolean;
+interface ISyncOption extends ITransportOption {
   model: SyncModel;
 }
 
@@ -28,17 +27,20 @@ interface ITransportResult {
 
 interface ITask {
   file: string;
-  call: () => Promise<ITransportResult[] | ITransportResult> | ITransportResult[] | ITransportResult,
+  call: () =>
+    | Promise<ITransportResult[] | ITransportResult>
+    | ITransportResult[]
+    | ITransportResult;
 }
 
-const MAX_CONCURRENCE = 512;
-
 const defaultTransportOption = {
+  concurrency: 512,
   ignore: [],
   perserveTargetMode: false,
 };
 
 const defaultSyncOption = {
+  concurrency: 512,
   ignore: [],
   perserveTargetMode: false,
   model: 'update' as SyncModel,
@@ -80,20 +82,25 @@ async function getFileMode(path: string, fs: FileSystem) {
   }
 }
 
-async function taskBatchProcess(queue) {
+async function taskBatchProcess(queue, { concurrency }) {
   queue.sort((a, b) => fileDepth(b.file) - fileDepth(a.file));
   return new Promise((resolve, reject) => {
-    concatLimit(queue, MAX_CONCURRENCE, (task, callback) => {
-      // the task will never throw, so don't need catch;
-      // $todo extract error handle to top level
-      Promise.resolve(task.call()).then(r => callback(null, r));
-    }, (error, result) => {
-      if (error) {
-        reject(error);
-        return;
+    concatLimit(
+      queue,
+      concurrency,
+      (task, callback) => {
+        // the task will never throw, so don't need catch;
+        // $todo extract error handle to top level
+        Promise.resolve(task.call()).then(r => callback(null, r));
+      },
+      (error, result) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        resolve(result);
       }
-      resolve(result);
-    });
+    );
   });
 }
 
@@ -113,14 +120,11 @@ function transportFile(
 
   output.status.msg(`transfer ${fileName2Show(src)}`);
   const transPromise = option.perserveTargetMode
-    // $caution with ftp, mutilple remote cmd will cause previously opened inputstream to be closed.
-    ? Promise.all([
-        srcFs.get(src),
-        getFileMode(des, desFs),
-      ])
-      .then(([inputStream, mode]) => desFs.put(inputStream, des, { mode }))
-    : srcFs.get(src)
-      .then(inputStream => desFs.put(inputStream, des));
+    ? // $caution with ftp, mutilple remote cmd will cause previously opened inputstream to be closed.
+      Promise.all([srcFs.get(src), getFileMode(des, desFs)]).then(([inputStream, mode]) =>
+        desFs.put(inputStream, des, { mode })
+      )
+    : srcFs.get(src).then(inputStream => desFs.put(inputStream, des));
 
   return transPromise
     .then(() => ({
@@ -230,12 +234,13 @@ function _transportDir(
     return Promise.resolve([
       {
         file: src,
-        call: () => Promise.resolve([
-          {
-            target: src,
-            ignored: true,
-          },
-        ]),
+        call: () =>
+          Promise.resolve([
+            {
+              target: src,
+              ignored: true,
+            },
+          ]),
       },
     ]);
   }
@@ -261,21 +266,17 @@ function _transportDir(
       call: undefined,
     };
     if (item.type === FileType.SymbolicLink) {
-      task.call = () => transportSymlink(
-        item.fspath,
-        desFs.pathResolver.join(des, item.name),
-        srcFs,
-        desFs,
-        option
-      );
+      task.call = () =>
+        transportSymlink(
+          item.fspath,
+          desFs.pathResolver.join(des, item.name),
+          srcFs,
+          desFs,
+          option
+        );
     } else if (item.type === FileType.File) {
-      task.call = () => transportFile(
-        item.fspath,
-        desFs.pathResolver.join(des, item.name),
-        srcFs,
-        desFs,
-        option
-      );
+      task.call = () =>
+        transportFile(item.fspath, desFs.pathResolver.join(des, item.name), srcFs, desFs, option);
     } else {
       task.call = () => ({
         target: item.fspath,
@@ -300,18 +301,19 @@ export function _sync(
   desDir: string,
   srcFs: FileSystem,
   desFs: FileSystem,
-  option: ISyncOption = defaultSyncOption
+  option: ISyncOption
 ): Promise<ITask[]> {
   if (shouldSkip(srcDir, option.ignore)) {
     return Promise.resolve([
       {
         file: srcDir,
-        call: () => Promise.resolve([
-          {
-            target: srcDir,
-            ignored: true,
-          },
-        ]),
+        call: () =>
+          Promise.resolve([
+            {
+              target: srcDir,
+              ignored: true,
+            },
+          ]),
       },
     ]);
   }
@@ -434,8 +436,10 @@ export function _sync(
     ]).then(flatten);
   };
 
-  return Promise.all([srcFs.list(srcDir).catch(err => []), desFs.list(desDir).catch(err => [])])
-    .then(syncFiles);
+  return Promise.all([
+    srcFs.list(srcDir).catch(err => []),
+    desFs.list(desDir).catch(err => []),
+  ]).then(syncFiles);
 }
 
 async function transportDir(
@@ -445,17 +449,24 @@ async function transportDir(
   desFs: FileSystem,
   option: ITransportOption
 ): Promise<ITransportResult[]> {
+  const fullOption = {
+    ...defaultSyncOption,
+    ...option,
+  };
+
   let result;
   try {
-    const tasks = await _transportDir(src, des, srcFs, desFs, option);
-    result = await taskBatchProcess(tasks);
+    const tasks = await _transportDir(src, des, srcFs, desFs, fullOption);
+    result = await taskBatchProcess(tasks, { concurrency: fullOption.concurrency });
   } catch (err) {
-    result = [{
-      target: src,
-      error: true,
-      op: 'transmission dir',
-      payload: err,
-    }];
+    result = [
+      {
+        target: src,
+        error: true,
+        op: 'transmission dir',
+        payload: err,
+      },
+    ];
   }
 
   return result;
@@ -466,19 +477,26 @@ export async function sync(
   desDir: string,
   srcFs: FileSystem,
   desFs: FileSystem,
-  option: ISyncOption = defaultSyncOption
+  option: ISyncOption
 ): Promise<ITransportResult[]> {
+  const fullOption = {
+    ...defaultSyncOption,
+    ...option,
+  };
+
   let result;
   try {
-    const tasks = await _sync(srcDir, desDir, srcFs, desFs, option);
-    result = await taskBatchProcess(tasks);
+    const tasks = await _sync(srcDir, desDir, srcFs, desFs, fullOption);
+    result = await taskBatchProcess(tasks, { concurrency: fullOption.concurrency });
   } catch (err) {
-    result = [{
-      target: srcDir,
-      error: true,
-      op: 'sync',
-      payload: err,
-    }];
+    result = [
+      {
+        target: srcDir,
+        error: true,
+        op: 'sync',
+        payload: err,
+      },
+    ];
   }
 
   return result;
@@ -489,9 +507,14 @@ export function transport(
   des: string,
   srcFs: FileSystem,
   desFs: FileSystem,
-  option: ITransportOption = defaultTransportOption
+  option: ITransportOption
 ): Promise<ITransportResult[]> {
-  if (shouldSkip(src, option.ignore)) {
+  const fullOption = {
+    ...defaultTransportOption,
+    ...option,
+  };
+
+  if (shouldSkip(src, fullOption.ignore)) {
     return Promise.resolve([
       {
         target: src,
@@ -505,25 +528,27 @@ export function transport(
       let result;
 
       if (stat.type === FileType.Directory) {
-        result = transportDir(src, des, srcFs, desFs, option);
+        result = transportDir(src, des, srcFs, desFs, fullOption);
       } else if (stat.type === FileType.File) {
         result = desFs
           .ensureDir(desFs.pathResolver.dirname(des))
-          .then(() => transportFile(src, des, srcFs, desFs, option));
+          .then(() => transportFile(src, des, srcFs, desFs, fullOption));
       } else if (stat.type === FileType.SymbolicLink) {
         result = desFs
           .ensureDir(desFs.pathResolver.dirname(des))
-          .then(() => transportSymlink(src, des, srcFs, desFs, option));
+          .then(() => transportSymlink(src, des, srcFs, desFs, fullOption));
       }
       return result;
     },
     err => {
-      return [{
-        target: src,
-        error: true,
-        op: 'transport',
-        payload: err,
-      }];
+      return [
+        {
+          target: src,
+          error: true,
+          op: 'transport',
+          payload: err,
+        },
+      ];
     }
   );
 }
@@ -562,12 +587,14 @@ export function remove(path: string, fs: FileSystem, option): Promise<ITransport
       return result;
     },
     err => {
-      return [{
-        target: path,
-        error: true,
-        op: 'remove',
-        payload: err,
-      }];
+      return [
+        {
+          target: path,
+          error: true,
+          op: 'remove',
+          payload: err,
+        },
+      ];
     }
   );
 }

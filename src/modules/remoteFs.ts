@@ -29,9 +29,6 @@ class KeepAliveRemoteFs {
     }
 
     if (!this.pendingPromise) {
-      output.debug('connect to remote');
-      // $todo implement promptForPass
-
       let shouldPromptForPass = false;
       let connectOption;
       let FsConstructor;
@@ -83,7 +80,8 @@ class KeepAliveRemoteFs {
       this.fs = new FsConstructor(upath, connectOption);
       const client = this.fs.getClient();
       client.onDisconnected(this.invalid.bind(this));
-      output.status.msg('connecting...');
+      output.debug('connect to remote');
+      output.status.msg('connecting...', 10 * 1000);
       this.pendingPromise = client.connect(promptForPassword).then(
         () => {
           this.isValid = true;

@@ -76,6 +76,7 @@ const createTask = (name, func) => (source, config, silent: boolean = false) => 
 
 export const upload = createTask('upload', (source, config, remotefs) =>
   transport(source, config.remotePath, localFs, remotefs, {
+    concurrency: config.concurrency,
     ignore: config.ignore,
     perserveTargetMode: config.protocol === 'sftp',
   })
@@ -84,6 +85,7 @@ export const upload = createTask('upload', (source, config, remotefs) =>
 export const download = createTask('download', (source, config, remotefs) => {
   disableWatcher(config);
   return transport(config.remotePath, source, remotefs, localFs, {
+    concurrency: config.concurrency,
     ignore: config.ignore,
     perserveTargetMode: false,
   }).then(
@@ -100,6 +102,7 @@ export const download = createTask('download', (source, config, remotefs) => {
 
 export const sync2Remote = createTask('sync remote', (source, config, remotefs) =>
   sync(source, config.remotePath, localFs, remotefs, {
+    concurrency: config.concurrency,
     ignore: config.ignore,
     model: config.syncMode,
     perserveTargetMode: true,
@@ -109,6 +112,7 @@ export const sync2Remote = createTask('sync remote', (source, config, remotefs) 
 export const sync2Local = createTask('sync local', (source, config, remotefs) => {
   disableWatcher(config);
   return sync(config.remotePath, source, remotefs, localFs, {
+    concurrency: config.concurrency,
     ignore: config.ignore,
     model: config.syncMode,
     perserveTargetMode: false,

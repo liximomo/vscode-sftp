@@ -73,6 +73,10 @@
         "autoUpload": true,
         "autoDelete": false
       }
+    },
+    "concurrency": {
+      "type": "number",
+      "description": "Lower concurrency could get more stability."
     }
   }
 }

@@ -12,6 +12,7 @@
     "syncMode": {},
     "ignore": {},
     "watcher": {},
+    "concurrency": {},
 
     "protocol": {
       "enum": ["ftp"],

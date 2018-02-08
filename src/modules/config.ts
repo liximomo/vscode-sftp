@@ -31,6 +31,7 @@ const configScheme = {
   privateKeyPath: nullable(Joi.string()),
   passphrase: nullable(Joi.string().allow(true)),
   interactiveAuth: Joi.boolean().optional(),
+  algorithms: Joi.any(),
 
   secure: Joi.any()
     .valid(true, false, 'control', 'implicit')
@@ -51,6 +52,7 @@ const configScheme = {
     autoUpload: Joi.boolean().optional(),
     autoDelete: Joi.boolean().optional(),
   },
+  concurrency: Joi.number().integer(),
 };
 
 const defaultConfig = {
@@ -79,6 +81,7 @@ const defaultConfig = {
     autoUpload: false,
     autoDelete: false,
   },
+  concurrency: 512,
 };
 
 function normalizeTriePath(pathname) {
