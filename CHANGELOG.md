@@ -1,3 +1,8 @@
+## 1.0.4 - 2018-02-08
+* New config option `concurrency`.
+* New config option `algorithms`.
+* Fix [#103](https://github.com/liximomo/vscode-sftp/issues/103).
+
 ## 1.0.3 - 2018-02-05
 * Simplify default config file's content when exec `sftp: config`.
 * Cconfig autocomplete.
