@@ -20,6 +20,9 @@ interface IFilePickerItem {
   parentFsPath: string;
   type: FileType;
   description: string,
+
+  // config index
+  index: number,
   getFs?: () => Promise<FileSystem>;
 }
 
@@ -107,6 +110,7 @@ async function showFiles(
       type: file.type,
       description: '',
       getFs: selectedValue.getFs,
+      index: selectedValue.index,
     }));
 
     subItems.unshift({
@@ -116,6 +120,7 @@ async function showFiles(
       type: FileType.Directory,
       description: 'go back',
       getFs: selectedValue.getFs,
+      index: selectedValue.index,
     });
 
     if (allowChooseFolder) {
@@ -126,6 +131,7 @@ async function showFiles(
         type: FileType.Directory,
         description: ' choose current foler',
         getFs: selectedValue.getFs,
+        index: selectedValue.index,
       });
     }
 
@@ -135,16 +141,17 @@ async function showFiles(
 }
 
 export function listFiles(
-  items: Array<{ fsPath: string; getFs?: () => Promise<FileSystem> }>,
+  items: Array<{ description: string, fsPath: string; getFs?: () => Promise<FileSystem>, index: number }>,
   option: IFilePickerOption
 ) {
   const baseItems = items.map(item => ({
-    name: path.basename(item.fsPath),
+    name: item.fsPath,
     fsPath: item.fsPath,
     parentFsPath: ROOT,
     type: FileType.Directory,
-    description: item.fsPath,
+    description: item.description,
     getFs: item.getFs,
+    index: item.index,
   }));
   const fileLookUp = {
     [ROOT]: baseItems,

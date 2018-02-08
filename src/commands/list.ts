@@ -42,9 +42,11 @@ function createList({
 } = {}) {
   return async () => {
     const configs = getAllConfigs();
-    const remoteItems = configs.map(config => ({
+    const remoteItems = configs.map((config, index) => ({
+      description: config.host,
       fsPath: config.remotePath,
       getFs: () => getRemoteFs(getHostInfo(config)),
+      index,
     }));
 
     const selected = await listFiles(remoteItems, {
@@ -55,7 +57,7 @@ function createList({
       return;
     }
 
-    const config = configs.find(cfg => paths.isSubpathOf(cfg.remotePath, selected.fsPath));
+    const config = configs[selected.index];
     const localTarget = paths.toLocal(
       path.relative(config.remotePath, selected.fsPath),
       config.context
