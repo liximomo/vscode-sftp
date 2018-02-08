@@ -109,7 +109,10 @@ You can also use an array of configs in the config file.
 
     // boolean - delete when file removed
     autoDelete: true
-  }
+  }，
+ 
+  // number - Lower concurrency could get more stability because some client/server have some sort of configured/hard coded limit. 
+  concurrency: 512
 }
 ```
 #### SFTP only Config

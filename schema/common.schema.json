@@ -76,7 +76,7 @@
     },
     "concurrency": {
       "type": "number",
-      "description": "Lower concurrency could get more stability."
+      "description": "Lower concurrency could get more stability because some client/server have some sort of configured/hard coded limit."
     }
   }
 }
