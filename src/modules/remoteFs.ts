@@ -37,36 +37,15 @@ class KeepAliveRemoteFs {
       let FsConstructor;
       if (option.protocol === 'sftp') {
         connectOption = {
-          algorithms: {
-            cipher: [
-              'aes128-ctr',
-              'aes192-ctr',
-              'aes256-ctr',
-              'aes128-gcm',
-              'aes128-gcm@openssh.com',
-              'aes256-gcm',
-              'aes256-gcm@openssh.com',
-              'aes256-cbc',
-              'aes192-cbc',
-              'aes128-cbc',
-              'blowfish-cbc',
-              '3des-cbc',
-              'arcfour256',
-              'arcfour128',
-              'cast128-cbc',
-              'arcfour',
-            ],
-          },
-          ...{
-            host: option.host,
-            port: option.port,
-            username: option.username,
-            password: option.password,
-            agent: option.agent,
-            privateKeyPath: option.privateKeyPath,
-            passphrase: option.passphrase,
-            interactiveAuth: option.interactiveAuth,
-          },
+          host: option.host,
+          port: option.port,
+          username: option.username,
+          password: option.password,
+          agent: option.agent,
+          privateKeyPath: option.privateKeyPath,
+          passphrase: option.passphrase,
+          interactiveAuth: option.interactiveAuth,
+          algorithms: option.algorithms,
         };
 
         // tslint:disable triple-equals
