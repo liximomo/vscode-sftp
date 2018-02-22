@@ -105,7 +105,7 @@ export const sync2Remote = createTask('sync remote', (source, config, remotefs) 
     concurrency: config.concurrency,
     ignore: config.ignore,
     model: config.syncMode,
-    perserveTargetMode: true,
+    perserveTargetMode: config.protocol === 'sftp',
   })
 );
 

@@ -153,7 +153,10 @@ export function enableWatcher(config) {
     return;
   }
 
-  setUpWatcher(config);
+  // delay setup watcher to avoid download event
+  setTimeout(() => {
+    setUpWatcher(config);
+  }, 1000 * 3);
 }
 
 export function watchWorkspace({
