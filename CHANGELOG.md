@@ -1,3 +1,7 @@
+## 1.0.5 - 2018-02-24
+* Support [multi select in the Explorer](https://code.visualstudio.com/updates/v1_20#_multi-select-in-the-explorer).
+* Fix some bugs.
+
 ## 1.0.4 - 2018-02-08
 * New config option `concurrency`.
 * New config option `algorithms`.
