@@ -24,16 +24,16 @@ export default function createCommand(cmdFn) {
   };
 }
 
-export function createFileCommand(fileTask, getTarget: (item) => Promise<ITarget[] | ITarget>) {
+export function createFileCommand(fileTask, getTarget: (item, items?) => Promise<ITarget[] | ITarget>) {
   const runTask = (target: ITarget) => {
     const activityPath = target.fsPath;
     // todo swallow error from getConfig, so don't interrupt other target
     const config = getConfig(activityPath);
-    fileTask(activityPath, config).catch(output.onError).then(refreshExplorer);
+    return fileTask(activityPath, config).catch(output.onError).then(refreshExplorer);
   };
 
-  const cmdFn = async item => {
-    const target = await getTarget(item);
+  const cmdFn = async (item, items) => {
+    const target = await getTarget(item, items);
     if (!target) {
       return;
     }

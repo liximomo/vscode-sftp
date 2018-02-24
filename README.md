@@ -87,7 +87,6 @@ You can also use an array of configs in the config file.
 
   // boolean - Upload on every save operation of VS code 
   uploadOnSave: false,
-
  
   // string - Set to 'update' so 'sync command' will only affect thoes files exist in both local and server. Set to 'full', 'sync' will be same as 'download/upload' besides deleting file not exist in origin from target.
   syncMode: 'update',
@@ -101,7 +100,7 @@ You can also use an array of configs in the config file.
 
   // object - Default: null. 
   watcher: {
-    //  string - glob patterns that are watched and when edited outside of the VS cdoe editor are processed.
+    //  string - glob patterns that are watched and when edited outside of the VS cdoe editor are processed. Set `uploadOnSave` to false when you watch everything.
     files: "", 
   
     // boolean - upload when file changed

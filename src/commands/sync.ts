@@ -15,7 +15,7 @@ const getActiveTarget = () =>
     });
   });
 
-const getTarget = item => {
+const getTarget = (item, items) => {
   // command palette
   if (item === undefined) {
     return selectContext().then(path => ({ fsPath: path }));
@@ -26,13 +26,13 @@ const getTarget = item => {
     return getActiveTarget();
   }
 
-  return Promise.resolve(item);
+  return Promise.resolve(items ? items : item);
 };
 
-const getFolderTarget = item => {
+const getFolderTarget = (item, items) => {
   // context menu
   if (item && item.fsPath) {
-    return Promise.resolve(item);
+    return Promise.resolve(items ? items : item);
   }
 
   return selectContext().then(path => ({ fsPath: path }));

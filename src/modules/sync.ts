@@ -6,7 +6,7 @@ import localFs from './localFs';
 import { disableWatcher, enableWatcher } from './fileWatcher';
 
 function logIgnored(result) {
-  output.debug(['', `ignore: ${result.target}`].join('\n'));
+  output.debug(`ignore: ${result.target}`);
 }
 
 function printFailTask(result) {
@@ -67,7 +67,6 @@ function printResult(msg, result, silent) {
 }
 
 const createTask = (name, func) => (source, config, silent: boolean = false) => {
-  output.print(`\n`);
   output.debug(`task: ${name} ${source}`);
   return getRemoteFs(getHostInfo(config))
     .then(remotefs => func(source, config, remotefs))
