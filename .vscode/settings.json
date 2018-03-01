@@ -6,8 +6,8 @@
     "search.exclude": {
         "out": true // set this to false to include "out" folder in search results
     },
-    "gotoSymbolStack.currentStackPosition": 12,
-    "gotoSymbolStack.maxStackPosition": 13,
+    "gotoSymbolStack.currentStackPosition": 14,
+    "gotoSymbolStack.maxStackPosition": 14,
     "gotoSymbolStack.filePositionInfo": [
         {
             "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/commands/config.ts",
@@ -101,7 +101,7 @@
             "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/modules/Trie.ts",
             "viewColumn": 1,
             "textPosition": {
-                "line": 115,
+                "line": 116,
                 "character": 30
             }
         },
@@ -109,8 +109,16 @@
             "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/modules/config.ts",
             "viewColumn": 1,
             "textPosition": {
-                "line": 168,
-                "character": 31
+                "line": 129,
+                "character": 15
+            }
+        },
+        {
+            "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/modules/config.ts",
+            "viewColumn": 1,
+            "textPosition": {
+                "line": 129,
+                "character": 13
             }
         }
     ]
