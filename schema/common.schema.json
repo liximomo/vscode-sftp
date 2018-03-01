@@ -1,6 +1,10 @@
 {
   "type": "object",
   "properties": {
+    "virname": {
+      "type": "string",
+      "description": "A virtual name for distinguish context."
+    },
     "context": {
       "type": "string",
       "description": "A path relative to the vsode workspace root folder."

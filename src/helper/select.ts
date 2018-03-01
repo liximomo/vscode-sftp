@@ -1,3 +1,4 @@
+import { removeRemote } from './../modules/sync';
 import * as vscode from 'vscode';
 import FileSystem, { FileType } from '../model/Fs/FileSystem';
 import { getAllConfigs } from '../modules/config';
@@ -164,9 +165,9 @@ export function selectContext(): Promise<string> {
     const configs = getAllConfigs();
     const projectsList = configs
       .map(cfg => ({
-        value: cfg.context,
-        label: vscode.workspace.asRelativePath(cfg.context),
-        description: '',
+        value: cfg.virname,
+        label: cfg.virname,
+        description: "to "+cfg.host+":"+cfg.remotePath,
         detail: cfg.context,
       }))
       .sort((l, r) => l.label.localeCompare(r.label));

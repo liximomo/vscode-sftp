@@ -5,5 +5,105 @@
     },
     "search.exclude": {
         "out": true // set this to false to include "out" folder in search results
-    }
+    },
+    "gotoSymbolStack.currentStackPosition": 12,
+    "gotoSymbolStack.maxStackPosition": 12,
+    "gotoSymbolStack.filePositionInfo": [
+        {
+            "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/commands/config.ts",
+            "viewColumn": 1,
+            "textPosition": {
+                "line": 32,
+                "character": 35
+            }
+        },
+        {
+            "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/host.ts",
+            "viewColumn": 1,
+            "textPosition": {
+                "line": 17,
+                "character": 33
+            }
+        },
+        {
+            "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/commands/config.ts",
+            "viewColumn": 1,
+            "textPosition": {
+                "line": 6,
+                "character": 41
+            }
+        },
+        {
+            "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/helper/select.ts",
+            "viewColumn": 1,
+            "textPosition": {
+                "line": 163,
+                "character": 25
+            }
+        },
+        {
+            "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/modules/config.ts",
+            "viewColumn": 1,
+            "textPosition": {
+                "line": 203,
+                "character": 27
+            }
+        },
+        {
+            "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/helper/select.ts",
+            "viewColumn": 1,
+            "textPosition": {
+                "line": 163,
+                "character": 26
+            }
+        },
+        {
+            "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/modules/config.ts",
+            "viewColumn": 1,
+            "textPosition": {
+                "line": 203,
+                "character": 28
+            }
+        },
+        {
+            "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/commands/config.ts",
+            "viewColumn": 1,
+            "textPosition": {
+                "line": 6,
+                "character": 36
+            }
+        },
+        {
+            "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/commands/config.ts",
+            "viewColumn": 1,
+            "textPosition": {
+                "line": 8,
+                "character": 8
+            }
+        },
+        {
+            "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/modules/config.ts",
+            "viewColumn": 1,
+            "textPosition": {
+                "line": 221,
+                "character": 23
+            }
+        },
+        {
+            "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/modules/config.ts",
+            "viewColumn": 1,
+            "textPosition": {
+                "line": 167,
+                "character": 35
+            }
+        },
+        {
+            "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/modules/Trie.ts",
+            "viewColumn": 1,
+            "textPosition": {
+                "line": 115,
+                "character": 30
+            }
+        }
+    ]
 }

@@ -1,4 +1,5 @@
 import { CONFIG_PATH } from '../constants';
+import * as vscode from 'vscode'
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as paths from '../helper/paths';
@@ -20,6 +21,7 @@ const nullable = schema => schema.optional().allow(null);
 
 const configScheme = {
   context: Joi.string(),
+  virname: nullable(Joi.string()),
   protocol: Joi.any().valid('sftp', 'ftp', 'test'),
 
   host: Joi.string().required(),
@@ -54,6 +56,8 @@ const configScheme = {
   },
   concurrency: Joi.number().integer(),
 };
+
+
 
 const defaultConfig = {
   protocol: 'sftp',
@@ -112,16 +116,19 @@ function addConfig(config, defaultContext) {
 
   // tslint:disable triple-equals
   let context = config.context != undefined ? config.context : defaultContext;
+  let virname = config.virname != undefined ? 
+    config.virname : vscode.workspace.asRelativePath(context);
   context = normalizeTriePath(path.resolve(defaultContext, context));
 
   const withDefault = {
     ...defaultConfig,
     ...config,
     context,
+    virname,
   };
 
-  configTrie.add(context, withDefault);
-  output.info(`config at ${context}`, withDefault);
+  configTrie.add(virname, withDefault);
+  output.info(`config at ${virname}`, withDefault);
   return withDefault;
 }
 
@@ -151,10 +158,18 @@ export function initConfigs(basePath): Promise<Array<{}>> {
   );
 }
 
-export function getConfig(activityPath: string) {
-  const config = configTrie.findPrefix(normalizeTriePath(activityPath));
-  if (!config) {
-    throw new Error(`(${activityPath}) config file not found`);
+export function getConfig(activityPath: string, useVirname: Boolean=false) {
+  let config = null;
+  if(useVirname){
+    config = configTrie.findNodeEx(activityPath);
+    if (!config) {
+      throw new Error(`(${activityPath}) config file not found`);
+    }
+  }else{
+    config = configTrie.findPrefix(normalizeTriePath(activityPath));
+    if (!config) {
+      throw new Error(`(${activityPath}) config file not found`);
+    }
   }
 
   const ignore = Ignore.from(config.ignore);

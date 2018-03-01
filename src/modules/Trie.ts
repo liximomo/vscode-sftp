@@ -156,10 +156,22 @@ export default class Trie {
     return null;
   }
 
+  findNodeEx(virname: string){
+    let result = this.root;
+    let curentNode = this.root;
+    let find = false;
+      let nodes = curentNode.getChildren();
+      nodes.forEach(element => {
+          if(element.token===virname){
+            result = element.getValue();
+          }
+      });
+      return result; 
+  }
+
   getAllValues(): any[] {
     const nodeQueue = [this.root];
     const result = [];
-
     do {
       const curentNode = nodeQueue.shift();
       if (curentNode.isLoaded()) {
