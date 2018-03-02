@@ -2761,19 +2761,19 @@ sprintf-js@~1.0.2:
   version "1.0.3"
   resolved "http://registry.npm.taobao.org/sprintf-js/download/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
 
-ssh2-streams@~0.1.15:
-  version "0.1.16"
-  resolved "http://registry.npm.taobao.org/ssh2-streams/download/ssh2-streams-0.1.16.tgz#ac9d3ce9e062f8cf08fcce5b3a274b6d5cecdc54"
+ssh2-streams@~0.1.18:
+  version "0.1.20"
+  resolved "http://registry.npm.taobao.org/ssh2-streams/download/ssh2-streams-0.1.20.tgz#51118d154555df5469ee1f67e0cf1e7e8a2c0e3a"
   dependencies:
     asn1 "~0.2.0"
     semver "^5.1.0"
     streamsearch "~0.1.2"
 
-ssh2@^0.5.4:
-  version "0.5.4"
-  resolved "http://registry.npm.taobao.org/ssh2/download/ssh2-0.5.4.tgz#1bf6b6b28c96eaef267f4d6c46a5a2517a599e27"
+ssh2@^0.5.5:
+  version "0.5.5"
+  resolved "http://registry.npm.taobao.org/ssh2/download/ssh2-0.5.5.tgz#c7781ecd2ece7304a253cf620fab5a5c22bb2235"
   dependencies:
-    ssh2-streams "~0.1.15"
+    ssh2-streams "~0.1.18"
 
 sshpk@^1.7.0:
   version "1.13.0"
