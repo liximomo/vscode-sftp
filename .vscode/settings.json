@@ -6,8 +6,8 @@
     "search.exclude": {
         "out": true // set this to false to include "out" folder in search results
     },
-    "gotoSymbolStack.currentStackPosition": 14,
-    "gotoSymbolStack.maxStackPosition": 14,
+    "gotoSymbolStack.currentStackPosition": 23,
+    "gotoSymbolStack.maxStackPosition": 23,
     "gotoSymbolStack.filePositionInfo": [
         {
             "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/commands/config.ts",
@@ -45,7 +45,7 @@
             "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/modules/config.ts",
             "viewColumn": 1,
             "textPosition": {
-                "line": 203,
+                "line": 223,
                 "character": 27
             }
         },
@@ -61,7 +61,7 @@
             "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/modules/config.ts",
             "viewColumn": 1,
             "textPosition": {
-                "line": 203,
+                "line": 223,
                 "character": 28
             }
         },
@@ -85,7 +85,7 @@
             "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/modules/config.ts",
             "viewColumn": 1,
             "textPosition": {
-                "line": 221,
+                "line": 241,
                 "character": 23
             }
         },
@@ -93,7 +93,7 @@
             "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/modules/config.ts",
             "viewColumn": 1,
             "textPosition": {
-                "line": 167,
+                "line": 184,
                 "character": 35
             }
         },
@@ -109,7 +109,7 @@
             "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/modules/config.ts",
             "viewColumn": 1,
             "textPosition": {
-                "line": 129,
+                "line": 136,
                 "character": 15
             }
         },
@@ -117,8 +117,80 @@
             "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/modules/config.ts",
             "viewColumn": 1,
             "textPosition": {
-                "line": 129,
+                "line": 136,
                 "character": 13
+            }
+        },
+        {
+            "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/commands/auto-save.ts",
+            "viewColumn": 1,
+            "textPosition": {
+                "line": 8,
+                "character": 20
+            }
+        },
+        {
+            "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/modules/config.ts",
+            "viewColumn": 1,
+            "textPosition": {
+                "line": 187,
+                "character": 30
+            }
+        },
+        {
+            "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/modules/Trie.ts",
+            "viewColumn": 1,
+            "textPosition": {
+                "line": 120,
+                "character": 33
+            }
+        },
+        {
+            "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/modules/config.ts",
+            "viewColumn": 1,
+            "textPosition": {
+                "line": 157,
+                "character": 41
+            }
+        },
+        {
+            "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/commands/auto-save.ts",
+            "viewColumn": 1,
+            "textPosition": {
+                "line": 8,
+                "character": 16
+            }
+        },
+        {
+            "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/modules/config.ts",
+            "viewColumn": 1,
+            "textPosition": {
+                "line": 180,
+                "character": 34
+            }
+        },
+        {
+            "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/helper/createCommand.ts",
+            "viewColumn": 1,
+            "textPosition": {
+                "line": 31,
+                "character": 21
+            }
+        },
+        {
+            "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/modules/config.ts",
+            "viewColumn": 1,
+            "textPosition": {
+                "line": 180,
+                "character": 45
+            }
+        },
+        {
+            "textFile": "/Users/linchuanjie/Projects/vscode-plugin/vscode-sftp/src/modules/config.ts",
+            "viewColumn": 1,
+            "textPosition": {
+                "line": 224,
+                "character": 24
             }
         }
     ]

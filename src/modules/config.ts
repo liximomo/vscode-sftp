@@ -9,13 +9,15 @@ import * as output from './output';
 import Trie from './Trie';
 import Ignore from './Ignore';
 import { showTextDocument } from '../host';
+import config from '../commands/config';
 
-const configTrie = new Trie(
-  {},
-  {
-    delimiter: path.sep,
-  }
-);
+// const configTrie = new Trie(
+//   {},
+//   {
+//     delimiter: path.sep,
+//   }
+// );
+var configTries = {};
 
 const nullable = schema => schema.optional().allow(null);
 
@@ -124,10 +126,19 @@ function addConfig(config, defaultContext) {
     ...defaultConfig,
     ...config,
     context,
-    virname,
+    virname
   };
-
-  configTrie.add(virname, withDefault);
+  const configTrie = new Trie(
+      {},
+      {
+        delimiter: path.sep,
+      }
+    );
+  configTrie.add(context, withDefault);
+  configTries[virname]={
+    context,
+    configTrie
+  };
   output.info(`config at ${virname}`, withDefault);
   return withDefault;
 }
@@ -141,7 +152,8 @@ export function loadConfig(configPath) {
   return fse.readJson(configPath).then(config => {
     const configs = [].concat(config);
     const configContext = path.resolve(configPath, '../../');
-    return configs.map(cfg => addConfig(cfg, configContext));
+    configs.map(cfg => addConfig(cfg, configContext));
+    return configs;
   });
 }
 
@@ -159,58 +171,70 @@ export function initConfigs(basePath): Promise<Array<{}>> {
 }
 
 export function getConfig(activityPath: string, useVirname: Boolean=false) {
-  let config = null;
+  let configs = [];
   if(useVirname){
-    config = configTrie.findNodeEx(activityPath);
+    let config = configTries[activityPath].configTrie.
+      findPrefix(normalizeTriePath(configTries[activityPath].context));
     if (!config) {
       throw new Error(`(${activityPath}) config file not found`);
     }
+    configs.push(config);
   }else{
-    config = configTrie.findPrefix(normalizeTriePath(activityPath));
-    if (!config) {
-      throw new Error(`(${activityPath}) config file not found`);
-    }
+    for(var key in configTries){
+      configs.push(configTries[key].configTrie.findPrefix(normalizeTriePath(activityPath)));
+    }    
   }
 
-  const ignore = Ignore.from(config.ignore);
-  const localContext = config.context;
-  const remoteContext = config.remotePath;
+  function initconfig(config,localContext,remoteContext,ignore){
+    return {
+      ...config,
+      remotePath: paths.toRemote(path.relative(localContext, activityPath), remoteContext),
+      ignore(fsPath) {
+        // vscode will always return path with / as separator
+        const normalizedPath = path.normalize(fsPath);
+        let relativePath;
+        if (normalizedPath.indexOf(localContext) === 0) {
+          // local path
+          relativePath = path.relative(localContext, fsPath);
+        } else {
+          // remote path
+          relativePath = upath.relative(remoteContext, fsPath);
+        }
+  
+        // skip root
+        return relativePath !== '' && ignore.ignores(relativePath);
+      },
+    };
+  }
 
-  return {
-    ...config,
-    remotePath: paths.toRemote(path.relative(localContext, activityPath), remoteContext),
-    ignore(fsPath) {
-      // vscode will always return path with / as separator
-      const normalizedPath = path.normalize(fsPath);
-      let relativePath;
-      if (normalizedPath.indexOf(localContext) === 0) {
-        // local path
-        relativePath = path.relative(localContext, fsPath);
-      } else {
-        // remote path
-        relativePath = upath.relative(remoteContext, fsPath);
-      }
+  // const ignore = Ignore.from(config.ignore);
+  // const localContext = config.context;
+  // const remoteContext = config.remotePath;
 
-      // skip root
-      return relativePath !== '' && ignore.ignores(relativePath);
-    },
-  };
+  return configs.map(config=>
+    initconfig(config,config.context,config.remotePath,Ignore.from(config.ignore)));
 }
 
 export function getAllConfigs() {
-  if (configTrie === undefined) {
+  if (configTries === undefined) {
     return [];
   }
-
-  return configTrie.getAllValues();
+  let configs = [];
+  for(let key in configTries){
+    configs.push.apply(configs,configTries[key].configTrie.getAllValues());
+  }
+  return configs;
 }
 
 export function getShortestDistinctConfigs() {
-  if (configTrie === undefined) {
+  if (configTries === undefined) {
     return [];
   }
-
-  return configTrie.findValuesWithShortestBranch();
+  let configs = [];
+  for(let key in configTries){
+    configs.push.apply(configs,configTries[key].configTrie.findValuesWithShortestBranch());
+  }
+  return configs;
 }
 
 export function newConfig(basePath) {

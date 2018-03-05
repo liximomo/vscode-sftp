@@ -1,18 +1,23 @@
 import { getConfig } from '../modules/config';
 import { upload } from '../modules/sync';
 import * as output from '../modules/output';
+import config from './config';
 
 export default function autoSave(uri) {
   const activityPath = uri.fsPath;
-  let config;
+  let configs;
   try {
-    config = getConfig(activityPath);
+    configs = getConfig(activityPath);
   } catch (error) {
     // ignore config error
     return;
   }
+  
+  configs.forEach(config => {
+    if (config.uploadOnSave) {
+      upload(activityPath, config).catch(output.onError);
+    }
+  });
 
-  if (config.uploadOnSave) {
-    upload(activityPath, config).catch(output.onError);
-  }
+  
 }

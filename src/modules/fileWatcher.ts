@@ -6,6 +6,7 @@ import throttle from '../helper/throttle';
 import { upload, removeRemote } from './sync';
 import { getConfig } from './config';
 import * as output from './output';
+import config from '../commands/config';
 
 let workspaceWatcher: vscode.Disposable;
 const watchers: {
@@ -38,15 +39,16 @@ function doUpload() {
     .sort();
   uploadQueue.length = 0;
   files.forEach(file => {
-    let config;
+    let configs;
     try {
-      config = getConfig(file);
+      configs = getConfig(file);
     } catch (error) {
       output.onError(error);
       return;
     }
-
-    upload(file, config, true).catch(fileError('upload', file));
+    configs.forEach(config => {
+      upload(file, config, true).catch(fileError('upload', file));
+    });
   });
 }
 
@@ -56,23 +58,26 @@ function doDelete() {
     .map(uri => uri.fsPath)
     .sort();
   deleteQueue.length = 0;
-  let config;
+  let configs;
   files.forEach(file => {
     try {
-      config = getConfig(file);
+      configs = getConfig(file);
     } catch (error) {
       output.onError(error);
       return;
     }
 
-    removeRemote(
-      config.remotePath,
-      {
-        ...config,
-        skipDir: true,
-      },
-      true
-    ).catch(fileError('delete', config.remotePath, false));
+    configs.forEach(config => {
+      removeRemote(
+        config.remotePath,
+        {
+          ...config,
+          skipDir: true,
+        },
+        true
+      ).catch(fileError('delete', config.remotePath, false)); 
+    });
+
   });
 }
 
