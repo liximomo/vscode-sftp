@@ -4,5 +4,5 @@ node_modules
 test/test.js
 _debug
 *.vsix
-.vscode/setting.json
+.vscode/settings.json
 .vscode/bookmarks.json

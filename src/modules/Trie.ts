@@ -84,11 +84,8 @@ export default class Trie {
 
   add(path: string | string[], value): void {
     let tokens = null;
-    if(value.virname != path){ // not set the virname
-      tokens = Array.isArray(path) ? path : this.splitPath(path);
-    }else{
-      tokens = [path];
-    }
+    tokens = Array.isArray(path) ? path : this.splitPath(path);
+    
     const bottomNode = tokens.reduce((parent, token) => {
       let node = parent.getChild(token);
       if (node === undefined) {

@@ -28,8 +28,7 @@ export function createFileCommand(fileTask, getTarget: (item, items?) => Promise
   const runTask = (target: ITarget) => {
     const activityPath = target.fsPath;
     // todo swallow error from getConfig, so don't interrupt other target
-    const useVirname = activityPath != vscode.workspace.workspaceFolders[0].uri.fsPath ? true : false;
-    const configs = getConfig(activityPath,useVirname);
+    const configs = getConfig(activityPath,true);
     return fileTask(activityPath, configs[0]).catch(output.onError).then(refreshExplorer);
   };
 
