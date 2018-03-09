@@ -195,7 +195,7 @@ export function getConfig(activityPath: string, useVirname: Boolean=false) {
     const remoteContext = config.remotePath;
     return {
       ...config,
-      remotePath: paths.toRemote(path.relative(localContext, activityPath), remoteContext),
+      remotePath: paths.toRemote(path.relative(localContext, remoteContext), remoteContext),
       ignore(fsPath) {
         // vscode will always return path with / as separator
         const normalizedPath = path.normalize(fsPath);

@@ -1,7 +1,6 @@
 import { getConfig } from '../modules/config';
 import { upload } from '../modules/sync';
 import * as output from '../modules/output';
-import config from './config';
 
 export default function autoSave(uri) {
   const activityPath = uri.fsPath;
