@@ -29,7 +29,7 @@ export function createFileCommand(fileTask, getTarget: (item, items?) => Promise
     const activityPath = target.fsPath;
     // todo swallow error from getConfig, so don't interrupt other target
     const configs = getConfig(activityPath,true);
-    return fileTask(activityPath, configs[0]).catch(output.onError).then(refreshExplorer);
+    return fileTask(configs[0].context, configs[0]).catch(output.onError).then(refreshExplorer);
   };
 
   const cmdFn = async (item, items) => {

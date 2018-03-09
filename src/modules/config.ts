@@ -181,11 +181,18 @@ export function getConfig(activityPath: string, useVirname: Boolean=false) {
     configs.push(config);
   }else{
     for(var key in configTries){
-      configs.push(configTries[key].configTrie.findPrefix(normalizeTriePath(activityPath)));
+      let normalizedPath= normalizeTriePath(activityPath);
+      let config = configTries[key].configTrie.findPrefix(normalizedPath);
+      if(config!=null){
+        configs.push(config);
+      }
     }    
   }
 
-  function initconfig(config,localContext,remoteContext,ignore){
+  function initconfig(config){
+    const ignore = Ignore.from(config.ignore);
+    const localContext = config.context;
+    const remoteContext = config.remotePath;
     return {
       ...config,
       remotePath: paths.toRemote(path.relative(localContext, activityPath), remoteContext),
@@ -207,12 +214,7 @@ export function getConfig(activityPath: string, useVirname: Boolean=false) {
     };
   }
 
-  // const ignore = Ignore.from(config.ignore);
-  // const localContext = config.context;
-  // const remoteContext = config.remotePath;
-
-  return configs.map(config=>
-    initconfig(config,config.context,config.remotePath,Ignore.from(config.ignore)));
+  return configs.map(config=> initconfig(config));
 }
 
 export function getAllConfigs() {
