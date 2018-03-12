@@ -1,5 +1,9 @@
 import * as vscode from 'vscode';
 
+export function getActiveTextEditor() {
+  return vscode.window.activeTextEditor;
+}
+
 export function getWorkspaceFolders() {
   return vscode.workspace.workspaceFolders;
 }

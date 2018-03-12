@@ -1,12 +1,9 @@
 import { CONFIG_PATH } from '../constants';
 import * as fse from 'fs-extra';
 import * as path from 'path';
-import * as paths from '../helper/paths';
-import upath from './upath';
 import * as Joi from 'joi';
 import * as output from './output';
 import Trie from './Trie';
-import Ignore from './Ignore';
 import { showTextDocument } from '../host';
 
 const configTrie = new Trie(
@@ -157,29 +154,7 @@ export function getConfig(activityPath: string) {
     throw new Error(`(${activityPath}) config file not found`);
   }
 
-  const ignore = Ignore.from(config.ignore);
-  const localContext = config.context;
-  const remoteContext = config.remotePath;
-
-  return {
-    ...config,
-    remotePath: paths.toRemote(path.relative(localContext, activityPath), remoteContext),
-    ignore(fsPath) {
-      // vscode will always return path with / as separator
-      const normalizedPath = path.normalize(fsPath);
-      let relativePath;
-      if (normalizedPath.indexOf(localContext) === 0) {
-        // local path
-        relativePath = path.relative(localContext, fsPath);
-      } else {
-        // remote path
-        relativePath = upath.relative(remoteContext, fsPath);
-      }
-
-      // skip root
-      return relativePath !== '' && ignore.ignores(relativePath);
-    },
-  };
+  return config;
 }
 
 export function getAllConfigs() {

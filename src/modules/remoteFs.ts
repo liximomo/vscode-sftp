@@ -7,7 +7,6 @@ import RemoteFileSystem from '../model/Fs/RemoteFileSystem';
 import LocalFileSystem from '../model/Fs/LocalFileSystem';
 import SFTPFileSystem from '../model/Fs/SFTPFileSystem';
 import FTPFileSystem from '../model/Fs/FTPFileSystem';
-import RemoteClient from '../model/Client/RemoteClient';
 
 function hashOption(opiton) {
   return Object.keys(opiton)

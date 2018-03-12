@@ -127,15 +127,15 @@
     "test:spec": "jest",
     "package": "vsce package",
     "pub:debug": "rm -rf _debug && mkdir _debug && vsce package --out _debug/sftp-debug.vsix && cd _debug && git init && git commit --allow-empty -m 'update debug package' && git checkout -b debug-pacakge && cp ../INSTALL_DEBUG.md README.md  && git add . && git commit -am 'update debug package' && git push git@github.com:liximomo/vscode-sftp.git debug-pacakge --force",
-    "lint": "tslint --type-check --project tsconfig.json src/**/*.ts"
+    "lint": "tslint --project tsconfig.json src/**/*.ts"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.40",
     "jest": "^20.0.4",
     "mocha": "^2.3.3",
-    "tslint": "^5.4.3",
-    "typescript": "^2.0.3",
+    "tslint": "^5.9.1",
+    "typescript": "^2.7.2",
     "vscode": "^1.1.10"
   },
   "dependencies": {

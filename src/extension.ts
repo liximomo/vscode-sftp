@@ -5,27 +5,15 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as util from 'util';
 
-import * as output from './modules/output';
 import { CONGIF_FILENAME } from './constants';
+import commands from './commands';
+import editConfig from './commands/config';
 
+import * as output from './modules/output';
 import { initConfigs, loadConfig } from './modules/config';
-// TODO
 import { endAllRemote } from './modules/remoteFs';
 import { watchWorkspace, watchFiles, clearAllWatcher } from './modules/fileWatcher';
-// import traceFileActivities from './modules/fileActivities.js';
-import { sync2RemoteCommand, sync2LocalCommand, uploadCommand, downloadCommand } from './commands/sync';
-import { listCommand, listAllCommand } from './commands/list';
-import editConfig from './commands/config';
-import autoSave from './commands/auto-save';
-import {
-  SYNC_TO_REMOTE,
-  SYNC_TO_LOCAL,
-  UPLOAD,
-  DOWNLOAD,
-  CONFIG,
-  LIST_DEFAULT,
-  LIST_ALL,
-} from './constants';
+import autoSave from './modules/autoSave';
 import { getWorkspaceFolders } from './host';
 
 function registerCommand(
@@ -39,17 +27,16 @@ function registerCommand(
 }
 
 function handleConfigSave(uri: vscode.Uri) {
-  loadConfig(uri.fsPath)
-    .then(config => {
-      // close connected remote, cause the remote may changed
-      endAllRemote();
-      watchFiles(config);
-    }, output.onError);
+  loadConfig(uri.fsPath).then(config => {
+    // close connected remote, cause the remote may changed
+    endAllRemote();
+    watchFiles(config);
+  }, output.onError);
 }
 
 function handleDocumentSave(uri: vscode.Uri) {
   autoSave(uri);
-};
+}
 
 function setupWorkspaceFolder(dir) {
   return initConfigs(dir).then(watchFiles);
@@ -70,13 +57,7 @@ function setup() {
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-  registerCommand(context, CONFIG, editConfig);
-  registerCommand(context, LIST_DEFAULT, listCommand);
-  registerCommand(context, LIST_ALL, listAllCommand);
-  registerCommand(context, SYNC_TO_REMOTE, sync2RemoteCommand);
-  registerCommand(context, SYNC_TO_LOCAL, sync2LocalCommand);
-  registerCommand(context, UPLOAD, uploadCommand);
-  registerCommand(context, DOWNLOAD, downloadCommand);
+  commands.forEach(cmd => cmd.register(context));
 
   const workspaceFolders = getWorkspaceFolders();
   if (!workspaceFolders) {

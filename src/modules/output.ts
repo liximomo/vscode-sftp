@@ -15,6 +15,12 @@ class StatusBarItem {
     this.name = name;
     this.isShow = false;
     this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+
+    this.hide = this.hide.bind(this);
+  }
+
+  getName() {
+    return this.name;
   }
 
   msg(text: string, varient?: number | Promise<any>) {
@@ -34,10 +40,10 @@ class StatusBarItem {
     }
   }
 
-  hide = () => {
+  hide() {
     this.statusBarItem.hide();
     this.isShow = false;
-  };
+  }
 }
 
 export const status = new StatusBarItem('info');

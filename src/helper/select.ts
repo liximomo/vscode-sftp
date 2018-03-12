@@ -19,10 +19,10 @@ interface IFilePickerItem {
   fsPath: string;
   parentFsPath: string;
   type: FileType;
-  description: string,
+  description: string;
 
   // config index
-  index: number,
+  index: number;
   getFs?: () => Promise<FileSystem>;
 }
 
@@ -34,7 +34,7 @@ async function showFiles(
 ) {
   let avalibleFiles = files.slice();
   let filter;
-  let fileFilter
+  let fileFilter;
   if (option.type === FileType.Directory) {
     fileFilter = file => file.type === FileType.Directory;
   } else {
@@ -141,7 +141,12 @@ async function showFiles(
 }
 
 export function listFiles(
-  items: Array<{ description: string, fsPath: string; getFs?: () => Promise<FileSystem>, index: number }>,
+  items: Array<{
+    description: string;
+    fsPath: string;
+    getFs?: () => Promise<FileSystem>;
+    index: number;
+  }>,
   option: IFilePickerOption
 ) {
   const baseItems = items.map(item => ({

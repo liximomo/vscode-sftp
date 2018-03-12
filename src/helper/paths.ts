@@ -9,6 +9,6 @@ export function toLocal(relativePath, localContext) {
   return path.join(localContext, relativePath);
 }
 
-export function isSubpathOf(subpath, pathname) {
-  return path.normalize(pathname).indexOf(path.normalize(subpath)) === 0;
+export function isSubpathOf(possiableParentPath, pathname) {
+  return path.normalize(pathname).indexOf(path.normalize(possiableParentPath)) === 0;
 }

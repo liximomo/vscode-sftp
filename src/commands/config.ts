@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
+import { COMMAND_CONFIG } from '../constants';
+import createCommand from './createCommand';
 import { newConfig } from '../modules/config';
-import createCommand from '../helper/createCommand';
 import { getWorkspaceFolders } from '../host';
 
 function editConfig() {
@@ -20,7 +21,8 @@ function editConfig() {
     .showQuickPick(initDirs, {
       ignoreFocusOut: true,
       placeHolder: 'Select a folder...(ESC to cancel)',
-    }).then(item => {
+    })
+    .then(item => {
       if (item === undefined) {
         return;
       }
@@ -29,4 +31,4 @@ function editConfig() {
     });
 }
 
-export default createCommand(editConfig);
+export default createCommand(COMMAND_CONFIG, 'config', editConfig);

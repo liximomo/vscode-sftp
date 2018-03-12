@@ -3,7 +3,7 @@ import * as path from 'path';
 import { CONGIF_FILENAME } from '../constants';
 import { isValidFile } from '../helper/documentFilter';
 import throttle from '../helper/throttle';
-import { upload, removeRemote } from './sync';
+import { upload, removeRemote } from '../actions';
 import { getConfig } from './config';
 import * as output from './output';
 
@@ -46,7 +46,7 @@ function doUpload() {
       return;
     }
 
-    upload(file, config, true).catch(fileError('upload', file));
+    upload(file, config).catch(fileError('upload', file));
   });
 }
 
@@ -65,14 +65,10 @@ function doDelete() {
       return;
     }
 
-    removeRemote(
-      config.remotePath,
-      {
-        ...config,
-        skipDir: true,
-      },
-      true
-    ).catch(fileError('delete', config.remotePath, false));
+    removeRemote(config.remotePath, {
+      ...config,
+      skipDir: true,
+    }).catch(fileError('delete', config.remotePath, false));
   });
 }
 

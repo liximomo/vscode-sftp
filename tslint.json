@@ -1,12 +1,13 @@
 {
   "extends": "tslint:recommended",
   "rules": {
+    "interface-name": false,
     "no-unused-expression": true,
     "no-duplicate-variable": true,
     "no-unused-variable": true,
     "curly": [true, "ignore-same-line"],
     "class-name": true,
-    "semicolon": ["always"],
+    "semicolon": true,
     "triple-equals": true,
     "quotemark": [true, "single"],
     "arrow-parens": [true, "ban-single-arg-parens"],
