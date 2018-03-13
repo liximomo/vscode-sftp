@@ -51,6 +51,9 @@ export default class FileCommand extends Command {
 
       const targets = await this.getFileTarget(item, items);
       if (!targets) {
+        vscode.window.showWarningMessage(
+          `The "${this.getName()}" command can not find a target.`
+        );
         return;
       }
 

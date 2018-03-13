@@ -78,10 +78,19 @@
       {
         "command": "sftp.sync.local",
         "title": "SFTP: Sync To Local"
+      },
+      {
+        "command": "sftp.diff",
+        "title": "SFTP: Diff"
       }
     ],
     "menus": {
       "explorer/context": [
+        {
+          "command": "sftp.diff",
+          "group": "3_compare",
+          "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsFolder"
+        },
         {
           "command": "sftp.sync.remote",
           "group": "sftp.sync@1",
@@ -102,6 +111,10 @@
         }
       ],
       "editor/context": [
+        {
+          "command": "sftp.diff",
+          "group": "3_compare"
+        },
         {
           "command": "sftp.trans.remote",
           "group": "sftp.trans@1"

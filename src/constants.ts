@@ -19,3 +19,5 @@ export const COMMAND_DOWNLOAD = 'sftp.trans.local';
 
 export const COMMAND_LIST_DEFAULT = 'sftp.list.default';
 export const COMMAND_LIST_ALL = 'sftp.list.all';
+
+export const COMMAND_DIFF = 'sftp.diff';

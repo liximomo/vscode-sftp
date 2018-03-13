@@ -107,3 +107,22 @@ export const selectFileFromAll = createFileSelector();
 export const selectFile = createFileSelector({
   filterCreator: configIngoreFilterCreator,
 });
+
+// selected file from remote files expect ignored
+export function selectFileOnly(item, items): Promise<FileTarget> {
+  if (item === undefined) {
+    return null;
+  }
+
+  // context menu
+  if (item && item.fsPath) {
+    return Promise.resolve(items ? items : item);
+  }
+
+  // short cut
+  if (!item.fsPath) {
+    return getActiveTarget();
+  }
+
+  return null;
+}

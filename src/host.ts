@@ -1,5 +1,9 @@
 import * as vscode from 'vscode';
 
+export function simplifyPath(localPath) {
+  return vscode.workspace.asRelativePath(localPath);
+}
+
 export function getActiveTextEditor() {
   return vscode.window.activeTextEditor;
 }
