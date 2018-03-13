@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import Command from './Command';
 import * as output from '../modules/output';
 import { getConfig } from '../modules/config';
-import { getWorkspaceFolders, refreshExplorer } from '../host';
+import { getWorkspaceFolders } from '../host';
 import logger from '../logger';
 
 export interface FileTarget {
@@ -20,6 +20,10 @@ export default class FileCommand extends Command {
   ) {
     super(id, name, handler);
     this.getFileTarget = getFileTarget;
+
+    this.onCommandDone(() => {
+      output.status.msg(`${this.getName()} done`, 2000);
+    });
   }
 
   async handleFile(fileTarget, handler) {
@@ -32,10 +36,8 @@ export default class FileCommand extends Command {
       logger.error(error);
       output.onError(error);
     }
-    logger.info(`${this.getName()} ${fileTarget} done`);
-    output.status.msg(`${this.getName()} done`, 2000);
+    logger.info(`${this.getName()} ${fileTarget.fsPath}`);
 
-    refreshExplorer();
     return;
   }
 

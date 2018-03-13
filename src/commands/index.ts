@@ -18,69 +18,73 @@ import {
 import localFs from '../modules/localFs';
 import { FileType } from '../model/Fs/FileSystem';
 import { sync2Local, sync2Remote, upload, download, downloadWithoutIgnore, diff } from '../actions';
-import { refreshExplorer, focusOpenEditors, showTextDocument } from '../host';
+import { showTextDocument, refreshExplorer } from '../host';
 
-const commands = [];
-
-commands.push(
-  createFileCommand(
-    COMMAND_SYNC_TO_REMOTE,
-    'sync to remote',
-    sync2Remote,
-    selectFolderFallbackToConfigContext
-  )
-);
-commands.push(
-  createFileCommand(
-    COMMAND_SYNC_TO_LOCAL,
-    'sync to local',
-    sync2Local,
-    selectFolderFallbackToConfigContext
-  )
+const sync2remoteCmd = createFileCommand(
+  COMMAND_SYNC_TO_REMOTE,
+  'sync to remote',
+  sync2Remote,
+  selectFolderFallbackToConfigContext
 );
 
-commands.push(
-  createFileCommand(COMMAND_UPLOAD, 'upload', upload, selectFileFallbackToConfigContext)
+const sync2localCmd = createFileCommand(
+  COMMAND_SYNC_TO_LOCAL,
+  'sync to local',
+  sync2Local,
+  selectFolderFallbackToConfigContext
 );
-commands.push(
-  createFileCommand(COMMAND_DOWNLOAD, 'download', download, selectFileFallbackToConfigContext)
-);
+sync2localCmd.onCommandDone(refreshExplorer);
 
-commands.push(
-  createFileCommand(
-    COMMAND_LIST_ALL,
-    '(list) download',
-    async (fsPath, config) => {
-      await downloadWithoutIgnore(fsPath, config);
-      const fileEntry = await localFs.lstat(fsPath);
-      if (fileEntry.type === FileType.Directory) {
-        await refreshExplorer();
-        await focusOpenEditors();
-      } else {
-        showTextDocument(fsPath);
-      }
-    },
-    selectFileFromAll
-  )
+const uploadCmd = createFileCommand(
+  COMMAND_UPLOAD,
+  'upload',
+  upload,
+  selectFileFallbackToConfigContext
 );
-commands.push(
-  createFileCommand(
-    COMMAND_LIST_DEFAULT,
-    '(list) download',
-    async (fsPath, config) => {
-      await download(fsPath, config);
-      const fileEntry = await localFs.lstat(fsPath);
-      if (fileEntry.type === FileType.Directory) {
-        await refreshExplorer();
-        await focusOpenEditors();
-      } else {
-        showTextDocument(fsPath);
-      }
-    },
-    selectFile
-  )
+const downloadCmd = createFileCommand(
+  COMMAND_DOWNLOAD,
+  'download',
+  download,
+  selectFileFallbackToConfigContext
 );
+downloadCmd.onCommandDone(refreshExplorer);
 
-commands.push(createFileCommand(COMMAND_DIFF, 'diff', diff, selectFileOnly));
+const listAllCmd = createFileCommand(
+  COMMAND_LIST_ALL,
+  '(list) download',
+  async (fsPath, config) => {
+    await downloadWithoutIgnore(fsPath, config);
+    const fileEntry = await localFs.lstat(fsPath);
+    if (fileEntry.type !== FileType.Directory) {
+      await showTextDocument(fsPath);
+    }
+  },
+  selectFileFromAll
+);
+listAllCmd.onCommandDone(refreshExplorer);
 
-export default commands;
+const listCmd = createFileCommand(
+  COMMAND_LIST_DEFAULT,
+  '(list) download',
+  async (fsPath, config) => {
+    await download(fsPath, config);
+    const fileEntry = await localFs.lstat(fsPath);
+    if (fileEntry.type === FileType.Directory) {
+      await showTextDocument(fsPath);
+    }
+  },
+  selectFile
+);
+listCmd.onCommandDone(refreshExplorer);
+
+const diffCmd = createFileCommand(COMMAND_DIFF, 'diff', diff, selectFileOnly);
+
+export default [
+  sync2remoteCmd,
+  sync2localCmd,
+  uploadCmd,
+  downloadCmd,
+  listAllCmd,
+  listCmd,
+  diffCmd,
+];

@@ -10,11 +10,26 @@ export default class Command {
   protected handler: (...args: any[]) => any;
   private name: string;
   private id: string;
+  private commandDoneListeners: Array<() => void>;
 
   constructor(id, name, handler) {
     this.id = id;
     this.name = name;
     this.handler = handler;
+    this.commandDoneListeners = [];
+  }
+
+  onCommandDone(listener) {
+    this.commandDoneListeners.push(listener);
+
+    return () => {
+      const index = this.commandDoneListeners.indexOf(listener);
+      if (index > -1) this.commandDoneListeners.splice(index, 1);
+    };
+  }
+
+  commitCommandDone() {
+    this.commandDoneListeners.forEach(listener => listener());
   }
 
   getName() {
@@ -38,6 +53,8 @@ export default class Command {
       logger.error(error);
       output.onError(error);
     }
+
+    this.commitCommandDone();
   }
 
   register(context: vscode.ExtensionContext) {

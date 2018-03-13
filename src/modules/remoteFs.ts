@@ -79,14 +79,15 @@ class KeepAliveRemoteFs {
       this.fs = new FsConstructor(upath, connectOption);
       const client = this.fs.getClient();
       client.onDisconnected(this.invalid.bind(this));
-      output.debug('connect to remote');
       output.status.msg('connecting...', 10 * 1000);
       this.pendingPromise = client.connect(promptForPassword).then(
         () => {
+          output.status.msg('connected', 2 * 1000);
           this.isValid = true;
           return this.fs;
         },
         err => {
+          output.status.msg('fail to connect', 2 * 1000);
           this.invalid();
           throw err;
         }

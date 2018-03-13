@@ -1,6 +1,5 @@
 import { transfer } from '../modules/fileTransferTask';
 import createFileAction from './createFileAction';
-import { disableWatcher, enableWatcher } from '../modules/fileWatcher';
 
 export const upload = createFileAction((source, config, { localFs, remoteFs, onProgress }) =>
   transfer(source, config.remotePath, localFs, remoteFs, {

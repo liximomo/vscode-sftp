@@ -1,6 +1,5 @@
 import { sync } from '../modules/fileTransferTask';
 import createFileAction from './createFileAction';
-import { disableWatcher, enableWatcher } from '../modules/fileWatcher';
 
 export const sync2Remote = createFileAction((source, config, { localFs, remoteFs, onProgress }) =>
   sync(source, config.remotePath, localFs, remoteFs, {

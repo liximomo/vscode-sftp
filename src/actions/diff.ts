@@ -1,7 +1,5 @@
 import * as path from 'path';
-import { downloadWithoutIgnore } from './transfer';
 import createFileAction from './createFileAction';
-import logger from '../logger';
 import { diffFiles, simplifyPath } from '../host';
 import { EXTENSION_NAME } from '../constants';
 import { transfer } from '../modules/fileTransferTask';
