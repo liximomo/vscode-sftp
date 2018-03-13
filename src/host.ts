@@ -20,6 +20,13 @@ export function showTextDocument(filepath: string) {
   return vscode.window.showTextDocument(vscode.Uri.file(filepath));
 }
 
+export function diffFiles(leftFsPath, rightFsPath, title, option?) {
+  const leftUri = vscode.Uri.file(leftFsPath);
+  const rightUri = vscode.Uri.file(rightFsPath);
+
+  return vscode.commands.executeCommand('vscode.diff', leftUri, rightUri, title);
+}
+
 export function promptForPassword(prompt: string): Promise<string | null> {
   return vscode.window.showInputBox({
     ignoreFocusOut: true,

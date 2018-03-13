@@ -32,6 +32,7 @@ export default class FileCommand extends Command {
       logger.error(error);
       output.onError(error);
     }
+    logger.info(`${this.getName()} ${fileTarget} done`);
     output.status.msg(`${this.getName()} done`, 2000);
 
     refreshExplorer();

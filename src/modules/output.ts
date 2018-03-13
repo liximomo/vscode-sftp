@@ -82,7 +82,7 @@ export function print(...args) {
       if (arg instanceof Error) {
         return arg.stack;
       } else if (typeof arg === 'object') {
-        return JSON.stringify(arg, null, 4);
+        return JSON.stringify(arg);
       }
       return arg;
     })

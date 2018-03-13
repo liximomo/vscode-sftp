@@ -6,6 +6,7 @@ import throttle from '../helper/throttle';
 import { upload, removeRemote } from '../actions';
 import { getConfig } from './config';
 import * as output from './output';
+import logger from '../logger';
 
 let workspaceWatcher: vscode.Disposable;
 const watchers: {
@@ -46,7 +47,9 @@ function doUpload() {
       return;
     }
 
-    upload(file, config).catch(fileError('upload', file));
+    upload(file, config).then(() => {
+      logger.info('[watcher]', `upload ${file}`);
+    }, fileError('upload', file));
   });
 }
 
@@ -68,7 +71,9 @@ function doDelete() {
     removeRemote(config.remotePath, {
       ...config,
       skipDir: true,
-    }).catch(fileError('delete', config.remotePath, false));
+    }).then(() => {
+      logger.info('[watcher]', `delete ${file}`);
+    }, fileError('delete', config.remotePath, false));
   });
 }
 

@@ -16,9 +16,8 @@ import flatten from '../helper/flatten';
 type SyncModel = 'full' | 'update';
 
 interface TransferTaskOption extends TransferOption {
-  onSuccess?: (task: FileTask) => void;
-  onFail?: (error: Error, task: FileTask) => void;
-  concurrency: number;
+  onProgress?: (error, task: FileTask) => void;
+  concurrency?: number;
   ignore?: (fsPath: string) => boolean;
 }
 
@@ -29,7 +28,7 @@ interface SyncTransferTaskOption extends TransferTaskOption {
 type FileTaskType = 'transfer' | 'remove';
 type FileLocation = 'src' | 'des';
 
-interface FileTask {
+export interface FileTask {
   type: FileTaskType;
   file: {
     fsPath: string;
@@ -101,9 +100,9 @@ const toHash = (items: any[], key: string, transform?: (a: any) => any): { [key:
     return hash;
   }, {});
 
-async function taskBatchProcess(taskQueue: FileTask[], srcFs, desFs, option) {
+async function taskBatchProcess(taskQueue: FileTask[], srcFs, desFs, option: TransferTaskOption) {
   return new Promise((resolve, reject) => {
-    const { concurrency, onSuccess, onFail, ...transferOption } = option;
+    const { concurrency, onProgress, ...transferOption } = option;
 
     taskQueue.sort((a, b) => fileDepth(b.file.fsPath) - fileDepth(a.file.fsPath));
 
@@ -158,10 +157,10 @@ async function taskBatchProcess(taskQueue: FileTask[], srcFs, desFs, option) {
         }
         pendingPromise
           .then(_ => {
-            if (onSuccess) onSuccess(task);
+            if (onProgress) onProgress(null, task);
           })
           .catch(error => {
-            if (onFail) onFail(error, task);
+            if (onProgress) onProgress(error, task);
           })
           .then(callback);
       },
@@ -246,21 +245,21 @@ async function getFileTaskListFromDirectorBySync(
       switch (srcFile.type) {
         case FileType.Directory:
           if (file) {
-            dir2sync.push([srcFile, file]);
+            dir2sync.push([srcFile.fspath, file.fspath]);
           } else if (option.model === 'full') {
             dir2trans.push([srcFile.fspath, desFs.pathResolver.join(des, srcFile.name)]);
           }
           break;
         case FileType.File:
           if (file) {
-            file2trans.push([srcFile, file]);
+            file2trans.push([srcFile.fspath, file.fspath]);
           } else if (option.model === 'full') {
             file2trans.push([srcFile.fspath, desFs.pathResolver.join(des, srcFile.name)]);
           }
           break;
         case FileType.SymbolicLink:
           if (file) {
-            symlink2trans.push([srcFile, file]);
+            symlink2trans.push([srcFile.fspath, file.fspath]);
           } else if (option.model === 'full') {
             symlink2trans.push([srcFile.fspath, desFs.pathResolver.join(des, srcFile.name)]);
           }

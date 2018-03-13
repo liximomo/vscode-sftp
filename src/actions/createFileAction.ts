@@ -1,11 +1,25 @@
 import * as path from 'path';
 import upath from '../modules/upath';
 import { getHostInfo } from '../modules/config';
+import localFs from '../modules/localFs';
 import getRemoteFs from '../modules/remoteFs';
 import Ignore from '../modules/Ignore';
+import { FileTask } from '../modules/fileTransferTask';
 import * as paths from '../helper/paths';
+import * as output from '../modules/output';
+import logger from '../logger';
+import { disableWatcher, enableWatcher } from '../modules/fileWatcher';
 
-export default function createFileAction(func) {
+function onProgress(error, task: FileTask) {
+  if (error) {
+    logger.error(error, `${task.type} ${task.file.fsPath}`);
+  }
+
+  logger.info(`${task.type} ${task.file.fsPath}`);
+  output.status.msg(`${task.type} ${task.file.fsPath}`);
+}
+
+export default function createFileAction(func, { doNotTriggerWatcher = false } = {}) {
   return async (localFilePath, config) => {
     const localContext = config.context;
     const remoteContext = config.remotePath;
@@ -28,10 +42,36 @@ export default function createFileAction(func) {
     };
 
     const remoteFs = await getRemoteFs(getHostInfo(config));
-    return await func(localFilePath, {
-      ...config,
-      remotePath: paths.toRemote(path.relative(localContext, localFilePath), remoteContext),
-      ignore: ignoreFunc,
-    }, remoteFs);
+
+    if (doNotTriggerWatcher) {
+      logger.debug('disable watcher');
+      disableWatcher(config);
+    }
+
+    let retValue;
+    try {
+      retValue = await func(
+        localFilePath,
+        {
+          ...config,
+          remotePath: paths.toRemote(path.relative(localContext, localFilePath), remoteContext),
+          ignore: ignoreFunc,
+        },
+        {
+          localFs,
+          remoteFs,
+          onProgress,
+        }
+      );
+    } catch (error) {
+      throw error;
+    } finally {
+      if (doNotTriggerWatcher) {
+        logger.debug('enable watcher');
+        enableWatcher(config);
+      }
+    }
+
+    return retValue;
   };
 }

@@ -210,6 +210,7 @@ export function getHostInfo(config) {
     privateKeyPath: config.privateKeyPath,
     passphrase: config.passphrase,
     interactiveAuth: config.interactiveAuth,
+    algorithms: config.algorithms,
 
     // ftp
     secure: config.secure,
