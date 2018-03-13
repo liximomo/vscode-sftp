@@ -193,7 +193,7 @@ export function newConfig(basePath) {
         .then(() => showTextDocument(configPath));
     })
     .catch(error => {
-      output.onError(error, 'config');
+      output.onError(error);
     });
 }
 

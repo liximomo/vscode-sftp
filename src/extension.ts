@@ -7,7 +7,6 @@ import * as util from 'util';
 
 import { CONGIF_FILENAME } from './constants';
 import commands from './commands';
-import editConfig from './commands/config';
 
 import * as output from './modules/output';
 import { initConfigs, loadConfig } from './modules/config';

@@ -52,16 +52,16 @@ export function success(msg: string, event?: string) {
   return vscode.window.showInformationMessage(`[${event || EXTENSION_NAME}] ${msg}`);
 }
 
-export function onError(err: Error | string, event?: string) {
+export function onError(err: Error | string) {
   let errorString = err;
   if (err instanceof Error) {
     errorString = err.message;
-    error(`context: ${event} reason: ${err.stack}`);
+    error(`${err.stack}`);
   }
 
   status.msg('fail', 2000);
 
-  return vscode.window.showErrorMessage(`[${event || EXTENSION_NAME}] ${errorString}`);
+  return vscode.window.showErrorMessage(`[${EXTENSION_NAME}] ${errorString}`);
 }
 
 let outputChannel;

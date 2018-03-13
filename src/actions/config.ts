@@ -1,10 +1,8 @@
 import * as vscode from 'vscode';
-import { COMMAND_CONFIG } from '../constants';
-import createCommand from './createCommand';
 import { newConfig } from '../modules/config';
 import { getWorkspaceFolders } from '../host';
 
-function editConfig() {
+export function editConfig() {
   const workspaceFolders = getWorkspaceFolders();
   if (workspaceFolders.length === 1) {
     newConfig(workspaceFolders[0].uri.fsPath);
@@ -30,5 +28,3 @@ function editConfig() {
       newConfig(item.value);
     });
 }
-
-export default createCommand(COMMAND_CONFIG, 'config', editConfig);

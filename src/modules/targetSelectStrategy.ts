@@ -110,17 +110,13 @@ export const selectFile = createFileSelector({
 
 // selected file from remote files expect ignored
 export function selectFileOnly(item, items): Promise<FileTarget> {
-  if (item === undefined) {
-    return null;
-  }
-
   // context menu
   if (item && item.fsPath) {
     return Promise.resolve(items ? items : item);
   }
 
   // short cut
-  if (!item.fsPath) {
+  if (item === undefined || !item.fsPath) {
     return getActiveTarget();
   }
 

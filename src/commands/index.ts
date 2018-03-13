@@ -1,4 +1,5 @@
 import {
+  COMMAND_CONFIG,
   COMMAND_SYNC_TO_REMOTE,
   COMMAND_SYNC_TO_LOCAL,
   COMMAND_UPLOAD,
@@ -7,7 +8,7 @@ import {
   COMMAND_LIST_ALL,
   COMMAND_DIFF,
 } from '../constants';
-import { createFileCommand } from './createCommand';
+import createCommand, { createFileCommand } from './createCommand';
 import {
   selectFileFallbackToConfigContext,
   selectFolderFallbackToConfigContext,
@@ -17,8 +18,18 @@ import {
 } from '../modules/targetSelectStrategy';
 import localFs from '../modules/localFs';
 import { FileType } from '../model/Fs/FileSystem';
-import { sync2Local, sync2Remote, upload, download, downloadWithoutIgnore, diff } from '../actions';
+import {
+  editConfig,
+  sync2Local,
+  sync2Remote,
+  upload,
+  download,
+  downloadWithoutIgnore,
+  diff,
+} from '../actions';
 import { showTextDocument, refreshExplorer } from '../host';
+
+const configCmd = createCommand(COMMAND_CONFIG, 'config sftp', editConfig);
 
 const sync2remoteCmd = createFileCommand(
   COMMAND_SYNC_TO_REMOTE,
@@ -80,6 +91,7 @@ listCmd.onCommandDone(refreshExplorer);
 const diffCmd = createFileCommand(COMMAND_DIFF, 'diff', diff, selectFileOnly);
 
 export default [
+  configCmd,
   sync2remoteCmd,
   sync2localCmd,
   uploadCmd,
