@@ -3,15 +3,16 @@ Very simple reuqire just three lines of config! Very fast finished in a blink.
 
 ## Features
 
-* multiple configs
-* browser remote files
-* sync directory to remote
-* sync directory to local
-* download file/directory to local
-* upload file/directory to remote
-* upload to remote on save
-* dual authentication
-* watch project directory for external changes and automatically update remote
+* Multiple configs
+* Browser remote files
+* Compare a local file with remote file.
+* Sync directory to remote
+* Sync directory to local
+* Download file/directory to local
+* Upload file/directory to remote
+* Upload to remote on save
+* Dual authentication
+* Watch project directory for external changes and automatically update remote
 
 ## Usage
 1. `Ctrl+Shift+P` on Windows/Linux open command palette, run `SFTP: config` command.

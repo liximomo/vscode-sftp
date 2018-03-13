@@ -1,3 +1,8 @@
+## 1.1.0 - 2018-03-13
+* `diff` command. 
+* Fix [#113](https://github.com/liximomo/vscode-sftp/issues/113).
+* Fix [#124](https://github.com/liximomo/vscode-sftp/issues/124).
+
 ## 1.0.5 - 2018-02-24
 * Support [multi select in the Explorer](https://code.visualstudio.com/updates/v1_20#_multi-select-in-the-explorer).
 * Fix some bugs.
