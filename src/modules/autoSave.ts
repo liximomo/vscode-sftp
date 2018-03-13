@@ -1,8 +1,9 @@
 import { getConfig } from './config';
 import { upload } from '../actions';
 import * as output from './output';
+import logger from '../logger';
 
-export default function autoSave(uri) {
+export default async function autoSave(uri) {
   const activityPath = uri.fsPath;
   let config;
   try {
@@ -13,6 +14,8 @@ export default function autoSave(uri) {
   }
 
   if (config.uploadOnSave) {
-    upload(activityPath, config).catch(output.onError);
+    await upload(activityPath, config).catch(output.onError);
+    logger.info(`[audo-save] upload ${activityPath}`);
+    output.status.msg('upload done', 2 * 1000);
   }
 }

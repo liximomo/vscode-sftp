@@ -49,6 +49,7 @@ function doUpload() {
 
     upload(file, config).then(() => {
       logger.info('[watcher]', `upload ${file}`);
+      output.status.msg(`upload ${file}`, 2 * 1000);
     }, fileError('upload', file));
   });
 }
@@ -73,6 +74,7 @@ function doDelete() {
       skipDir: true,
     }).then(() => {
       logger.info('[watcher]', `delete ${file}`);
+      output.status.msg(`delete ${file}`, 2 * 1000);
     }, fileError('delete', config.remotePath, false));
   });
 }
