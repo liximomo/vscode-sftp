@@ -10,9 +10,12 @@ const numMap = {
   r: 4,
   w: 2,
   x: 1,
-}
+};
 
 function toNumMode(rightObj) {
+  // some ftp server would reusult rightObj undefined.
+  if (!rightObj) return 0o666;
+
   // tslint:disable-next-line:no-shadowed-variable
   const modeStr = Object.keys(rightObj).reduce((modeStr, key) => {
     const rightStr = rightObj[key];
@@ -46,7 +49,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
     return this.getClient().getFsClient();
   }
 
-  // $caution windows will always get 0666
+  // $caution windows will always get 0o666
   lstat(path: string): Promise<IStats> {
     return new Promise((resolve, reject) => {
       this.ftp.list(this.pathResolver.dirname(path), (err, stats) => {
@@ -55,11 +58,13 @@ export default class FTPFileSystem extends RemoteFileSystem {
           return;
         }
 
-        const fileStat = stats.map(stat => ({
+        const fileStat = stats
+          .map(stat => ({
             ...stat,
             type: FTPFileSystem.getFileType(stat.type),
             permissionMode: toNumMode(stat.rights),
-          })).find(ns => ns.name === this.pathResolver.basename(path));
+          }))
+          .find(ns => ns.name === this.pathResolver.basename(path));
 
         if (!fileStat) {
           reject(new Error('file not exist'));
@@ -77,7 +82,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
         if (err) {
           reject(err);
           return;
-        };
+        }
 
         if (!stream) {
           reject(new Error('create ReadStream failed'));
@@ -96,7 +101,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
         if (err) {
           reject(err);
           return;
-        };
+        }
 
         resolve();
       });
@@ -109,7 +114,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
         if (err) {
           reject(err);
           return;
-        };
+        }
 
         if (option && option.mode) {
           this.chmod(path, option.mode)
@@ -129,8 +134,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
   }
 
   readlink(path: string): Promise<string> {
-    return this.lstat(path)
-      .then(stat => stat.target)
+    return this.lstat(path).then(stat => stat.target);
   }
 
   symlink(targetPath: string, path: string): Promise<void> {
@@ -164,16 +168,15 @@ export default class FTPFileSystem extends RemoteFileSystem {
         }
         token += '/';
         dirPath = this.pathResolver.join(dirPath, token);
-        return this.mkdir(dirPath)
-          .then(mkdir, err => {
-            // if (err && err.message !== 'Cannot create a file when that file already exists.')
-            if (err.code === 550) {
-              // ignore already exist
-              mkdir();
-            } else {
-              reject(err);
-            }
-          });
+        return this.mkdir(dirPath).then(mkdir, err => {
+          // if (err && err.message !== 'Cannot create a file when that file already exists.')
+          if (err.code === 550) {
+            // ignore already exist
+            mkdir();
+          } else {
+            reject(err);
+          }
+        });
       };
       mkdir();
     });
@@ -199,7 +202,8 @@ export default class FTPFileSystem extends RemoteFileSystem {
         }
 
         const fileEntries = result.map(item =>
-          this.toFileEntry(this.pathResolver.join(dir, item.name), item));
+          this.toFileEntry(this.pathResolver.join(dir, item.name), item)
+        );
         resolve(fileEntries);
       });
     });
@@ -227,7 +231,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
         }
 
         resolve();
-      })
+      });
     });
   }
 }

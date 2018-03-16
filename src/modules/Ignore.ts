@@ -1,7 +1,6 @@
 import GitIgnore = require('ignore');
 
 export default class Ignore {
-
   static from(pattern) {
     return new Ignore(pattern);
   }

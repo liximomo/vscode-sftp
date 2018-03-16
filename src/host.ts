@@ -28,7 +28,7 @@ export function diffFiles(leftFsPath, rightFsPath, title, option?) {
   const leftUri = vscode.Uri.file(leftFsPath);
   const rightUri = vscode.Uri.file(rightFsPath);
 
-  return vscode.commands.executeCommand('vscode.diff', leftUri, rightUri, title);
+  return vscode.commands.executeCommand('vscode.diff', leftUri, rightUri, title, option);
 }
 
 export function promptForPassword(prompt: string): Promise<string | null> {

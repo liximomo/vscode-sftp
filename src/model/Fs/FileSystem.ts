@@ -4,29 +4,29 @@ export enum FileType {
   Directory = 1,
   File,
   SymbolicLink,
-};
+}
 
 export interface IFileEntry {
-  fspath: string,
-  type: FileType,
-  name: string,
-  size: number,
-  modifyTime: number,
-  accessTime: number,
-};
+  fspath: string;
+  type: FileType;
+  name: string;
+  size: number;
+  modifyTime: number;
+  accessTime: number;
+}
 
 export interface IStreamOption {
-  flags?: string,
-  encoding?: string | null,
-  mode?: number,
-  autoClose?: boolean,
-};
+  flags?: string;
+  encoding?: string | null;
+  mode?: number;
+  autoClose?: boolean;
+}
 
 export interface IStats {
-  type: FileType,
-  permissionMode: number
-  target?: string,
-};
+  type: FileType;
+  permissionMode: number;
+  target?: string;
+}
 
 export default abstract class FileSystem {
   static getFileTypecharacter(stat: fs.Stats): FileType {

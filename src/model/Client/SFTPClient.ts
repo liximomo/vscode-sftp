@@ -14,36 +14,32 @@ export default class SFTPClient extends RemoteClient {
   }
 
   connect(readline): Promise<void> {
-    const {
-      interactiveAuth,
-      password,
-      privateKeyPath,
-      ...option,
-    } = this.getOption();
+    const { interactiveAuth, password, privateKeyPath, ...option } = this.getOption();
     return new Promise<void>((resolve, reject) => {
-      const connectWithCredential = (passwd?, privateKey?) => this.client
-        .on('ready', () => {
-          this.client.sftp((err, sftp) => {
-            if (err) {
-              reject(err);
-            }
+      const connectWithCredential = (passwd?, privateKey?) =>
+        this.client
+          .on('ready', () => {
+            this.client.sftp((err, sftp) => {
+              if (err) {
+                reject(err);
+              }
 
-            this.sftp = sftp;
-            resolve();
+              this.sftp = sftp;
+              resolve();
+            });
+          })
+          .on('error', err => {
+            reject(err);
+          })
+          .connect({
+            keepaliveInterval: 1000 * 30,
+            keepaliveCountMax: 2,
+            ...(interactiveAuth ? { readyTimeout: 99999999 } : {}),
+            ...option,
+            privateKey,
+            password: passwd,
+            tryKeyboard: interactiveAuth,
           });
-        })
-        .on('error', err => {
-          reject(err);
-        })
-        .connect({
-          keepaliveInterval: 1000 * 30,
-          keepaliveCountMax: 2,
-          ...(interactiveAuth ? { readyTimeout: 99999999 } : {}),
-          ...option,
-          privateKey,
-          password: passwd,
-          tryKeyboard: interactiveAuth,
-        });
 
       if (interactiveAuth) {
         this.client.on('keyboard-interactive', function redo(

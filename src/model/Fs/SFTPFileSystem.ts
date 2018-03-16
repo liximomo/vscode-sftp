@@ -110,15 +110,14 @@ export default class SFTPFileSystem extends RemoteFileSystem {
         }
         token += '/';
         dirPath = this.pathResolver.join(dirPath, token);
-        return this.mkdir(dirPath)
-          .then(mkdir, err => {
-            if (err.code === 4) {
-              // ignore already exist
-              mkdir();
-            } else {
-              reject(err);
-            }
-          });
+        return this.mkdir(dirPath).then(mkdir, err => {
+          if (err.code === 4) {
+            // ignore already exist
+            mkdir();
+          } else {
+            reject(err);
+          }
+        });
       };
       mkdir();
     });
@@ -145,7 +144,8 @@ export default class SFTPFileSystem extends RemoteFileSystem {
         }
 
         const fileEntries = result.map(item =>
-          this.toFileEntry(this.pathResolver.join(dir, item.filename), item));
+          this.toFileEntry(this.pathResolver.join(dir, item.filename), item)
+        );
         resolve(fileEntries);
       });
     });
@@ -177,13 +177,12 @@ export default class SFTPFileSystem extends RemoteFileSystem {
         return;
       }
 
-      this.list(path)
-        .then(fileEntries => {
+      this.list(path).then(
+        fileEntries => {
           if (!fileEntries.length) {
-            this.rmdir(path, false)
-              .then(resolve, e => {
-                reject(e);
-              });
+            this.rmdir(path, false).then(resolve, e => {
+              reject(e);
+            });
             return;
           }
 
@@ -196,12 +195,15 @@ export default class SFTPFileSystem extends RemoteFileSystem {
 
           Promise.all(rmPromises)
             .then(() => this.rmdir(path, false))
-            .then(resolve, e => { // BUG just reject will occur weird bug.
+            .then(resolve, e => {
+              // BUG just reject will occur weird bug.
               reject(e);
             });
-        }, err => {
+        },
+        err => {
           reject(err);
-        });
+        }
+      );
     });
   }
 }

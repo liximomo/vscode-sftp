@@ -1,18 +1,18 @@
 import * as output from '../../modules/output';
 
 export interface IClientOption {
-  host: string,
-  port: number,
-  username: string,
-  password: string,
-  privateKeyPath?: string,  // ssh-only
-  passphrase?: string,  // ssh-only
-  interactiveAuth?: boolean, // ssh-only
-  agent?: string, // ssh-only
-  secure?: any // ftp-only
-  secureOptions?: object // ftp-only
-  passive?: boolean, // ftp-only
-};
+  host: string;
+  port: number;
+  username: string;
+  password: string;
+  privateKeyPath?: string; // ssh-only
+  passphrase?: string; // ssh-only
+  interactiveAuth?: boolean; // ssh-only
+  agent?: string; // ssh-only
+  secure?: any; // ftp-only
+  secureOptions?: object; // ftp-only
+  passive?: boolean; // ftp-only
+}
 
 export default abstract class RemoteClient {
   protected client: any;
@@ -24,7 +24,7 @@ export default abstract class RemoteClient {
   }
 
   abstract initClient(): any;
-  abstract connect(readline?: (text: string) => Promise<string | undefined> ): Promise<void>;
+  abstract connect(readline?: (text: string) => Promise<string | undefined>): Promise<void>;
   abstract end(): void;
   abstract getFsClient(): any;
 

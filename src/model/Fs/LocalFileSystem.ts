@@ -118,8 +118,7 @@ export default class LocalFileSystem extends FileSystem {
 
         const fileStatus = files.map(file => {
           const fspath = this.pathResolver.join(dir, file);
-          return this.lstat(fspath)
-            .then(stat => this.toFileEntry(fspath, stat));
+          return this.lstat(fspath).then(stat => this.toFileEntry(fspath, stat));
         });
 
         resolve(Promise.all(fileStatus));
