@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as output from '../modules/output';
 import logger from '../logger';
+import { getWorkspaceFolders } from '../host';
 
 export interface ITarget {
   fsPath: string;
@@ -46,6 +47,12 @@ export default class Command {
   }
 
   async run(...args) {
+    const workspaceFolders = getWorkspaceFolders();
+    if (!workspaceFolders) {
+      vscode.window.showErrorMessage('The SFTP extension requires to work with an opened folder.');
+      return;
+    }
+
     logger.debug(`run command ${this.getName()}`, ...args);
     try {
       await this.handler(...args);

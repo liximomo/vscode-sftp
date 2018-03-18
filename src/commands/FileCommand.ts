@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 import Command from './Command';
 import * as output from '../modules/output';
 import { getConfig } from '../modules/config';
-import { getWorkspaceFolders } from '../host';
 import logger from '../logger';
 
 export interface FileTarget {
@@ -43,19 +42,9 @@ export default class FileCommand extends Command {
 
   decorateHandler(handler) {
     return async (item, items) => {
-      const workspaceFolders = getWorkspaceFolders();
-      if (!workspaceFolders) {
-        vscode.window.showErrorMessage(
-          'The SFTP extension requires to work with an opened folder.'
-        );
-        return;
-      }
-
       const targets = await this.getFileTarget(item, items);
       if (!targets) {
-        vscode.window.showWarningMessage(
-          `The "${this.getName()}" command can not find a target.`
-        );
+        vscode.window.showWarningMessage(`The "${this.getName()}" command can not find a target.`);
         return;
       }
 
