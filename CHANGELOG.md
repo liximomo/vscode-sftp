@@ -1,3 +1,9 @@
+## 1.1.3 - 2018-03-18
+* Remove default ignore config. No files will be ignored if you don't explicitly config `ignore` option. Related isuse [#138](https://github.com/liximomo/vscode-sftp/issues/138).
+* Fix [#133](https://github.com/liximomo/vscode-sftp/issues/133).
+* Fix [#136](https://github.com/liximomo/vscode-sftp/issues/136).
+
+
 ## 1.1.0 - 2018-03-13
 * `diff` command. 
 * Fix [#113](https://github.com/liximomo/vscode-sftp/issues/113).
