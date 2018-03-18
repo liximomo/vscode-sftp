@@ -5,7 +5,6 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as util from 'util';
 
-import { CONGIF_FILENAME } from './constants';
 import commands from './commands';
 
 import * as output from './modules/output';

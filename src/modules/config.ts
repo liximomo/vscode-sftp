@@ -72,7 +72,7 @@ const defaultConfig = {
   remotePath: '/',
   uploadOnSave: false,
   syncMode: 'update',
-  ignore: ['.vscode', '.git', '.DS_Store'],
+  ignore: [],
   watcher: {
     files: false,
     autoUpload: false,

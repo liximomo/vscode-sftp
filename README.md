@@ -93,11 +93,7 @@ You can also use an array of configs in the config file.
   syncMode: 'update',
 
   // string[] - Same behavior as gitignore, all path reltative to context of the current config
-  ignore: [
-    ".vscode",
-    ".git",
-    ".DS_Store"
-  ],
+  ignore: [],
 
   // object - Default: null. 
   watcher: {

@@ -4,7 +4,6 @@ const VENDOR_FOLDER = '.vscode';
 
 export const EXTENSION_NAME = 'sftp';
 
-export const DEPRECATED_CONGIF_FILENAME = '.sftpConfig.json';
 export const CONGIF_FILENAME = 'sftp.json';
 
 export const CONFIG_PATH = path.join(VENDOR_FOLDER, CONGIF_FILENAME);
