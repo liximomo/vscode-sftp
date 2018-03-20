@@ -57,7 +57,6 @@ export default class Command {
     try {
       await this.handler(...args);
     } catch (error) {
-      logger.error(error);
       output.onError(error);
     }
 

@@ -2,8 +2,14 @@ import * as Client from 'ftp';
 import RemoteClient, { IClientOption } from './RemoteClient';
 
 export default class FTPClient extends RemoteClient {
+  private connected: boolean = false;
+
   constructor(option?: IClientOption) {
     super(option);
+
+    this.onDisconnected(() => {
+      this.connected = false;
+    });
   }
 
   initClient() {
@@ -11,10 +17,18 @@ export default class FTPClient extends RemoteClient {
   }
 
   connect(): Promise<void> {
-    const option = this.getOption();
+    const { username, connectTimeout, ...option } = this.getOption();
     return new Promise<void>((resolve, reject) => {
+      setTimeout(() => {
+        if (!this.connected) {
+          this.end();
+          reject(new Error('Timeout while connecting to server'));
+        }
+      }, connectTimeout);
+
       this.client
         .on('ready', () => {
+          this.connected = true;
           if (option.passive) {
             this.client._pasv(resolve);
           } else {
@@ -27,7 +41,9 @@ export default class FTPClient extends RemoteClient {
         .connect({
           keepalive: 1000 * 10,
           ...option,
-          user: option.username,
+          pasvTimeout: connectTimeout,
+          connTimeout: connectTimeout,
+          user: username,
         });
     });
   }

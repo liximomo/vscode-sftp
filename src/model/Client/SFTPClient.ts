@@ -14,7 +14,7 @@ export default class SFTPClient extends RemoteClient {
   }
 
   connect(readline): Promise<void> {
-    const { interactiveAuth, password, privateKeyPath, ...option } = this.getOption();
+    const { interactiveAuth, password, privateKeyPath, connectTimeout, ...option } = this.getOption();
     return new Promise<void>((resolve, reject) => {
       const connectWithCredential = (passwd?, privateKey?) =>
         this.client
@@ -36,6 +36,7 @@ export default class SFTPClient extends RemoteClient {
             keepaliveCountMax: 2,
             ...(interactiveAuth ? { readyTimeout: 99999999 } : {}),
             ...option,
+            readyTimeout: connectTimeout,
             privateKey,
             password: passwd,
             tryKeyboard: interactiveAuth,

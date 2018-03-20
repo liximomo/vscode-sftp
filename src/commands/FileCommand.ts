@@ -31,13 +31,10 @@ export default class FileCommand extends Command {
     try {
       const config = getConfig(activityPath);
       await handler(activityPath, config);
+      logger.info(`${this.getName()} ${fileTarget.fsPath}`);
     } catch (error) {
-      logger.error(error);
       output.onError(error);
     }
-    logger.info(`${this.getName()} ${fileTarget.fsPath}`);
-
-    return;
   }
 
   decorateHandler(handler) {

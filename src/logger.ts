@@ -22,7 +22,7 @@ class VSCodeLogger implements Logger {
 
   debug(message: string, ...args: any[]) {
     if (printDebugLog) {
-      output.print('[info]', message, ...args);
+      output.print('[debug]', message, ...args);
     }
   }
 

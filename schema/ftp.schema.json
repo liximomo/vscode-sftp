@@ -8,6 +8,7 @@
     "username": {},
     "password": {},
     "remotePath": {},
+    "connectTimeout": {},
     "uploadOnSave": {},
     "downloadOnOpen": {},
     "syncMode": {},

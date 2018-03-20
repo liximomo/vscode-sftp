@@ -22,6 +22,7 @@ const configScheme = {
 
   host: Joi.string().required(),
   port: Joi.number().integer(),
+  connectTimeout: Joi.number().integer(),
   username: Joi.string().required(),
   password: nullable(Joi.string()),
 
@@ -61,6 +62,7 @@ const defaultConfig = {
   port: 22,
   username: 'username',
   password: null,
+  connectTimeout: 10000,
 
   agent: null,
   privateKeyPath: null,
@@ -212,6 +214,7 @@ export function getHostInfo(config) {
     port: config.port,
     username: config.username,
     password: config.password,
+    connectTimeout: config.connectTimeout,
 
     // sftp
     agent: config.agent,

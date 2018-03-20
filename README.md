@@ -86,8 +86,14 @@ You can also use an array of configs in the config file.
   // string - The absolute path on remote
   remotePath: "/", 
 
+  // integer - How long (in milliseconds) to wait for the connect to complete. 
+  connectTimeout: 10000,
+
   // boolean - Upload on every save operation of VS code 
   uploadOnSave: false,
+
+  // boolean - Download when a file opens
+  downloadOnOpen: false,
  
   // string - Set to 'update' so 'sync command' will only affect thoes files exist in both local and server. Set to 'full', 'sync' will be same as 'download/upload' besides deleting file not exist in origin from target.
   syncMode: 'update',

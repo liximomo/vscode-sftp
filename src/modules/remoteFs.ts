@@ -30,14 +30,17 @@ class KeepAliveRemoteFs {
 
     if (!this.pendingPromise) {
       let shouldPromptForPass = false;
-      let connectOption;
+      let connectOption: any = {
+        host: option.host,
+        port: option.port,
+        username: option.username,
+        password: option.password,
+        connectTimeout: option.connectTimeout,
+      };
       let FsConstructor;
       if (option.protocol === 'sftp') {
         connectOption = {
-          host: option.host,
-          port: option.port,
-          username: option.username,
-          password: option.password,
+          ...connectOption,
           agent: option.agent,
           privateKeyPath: option.privateKeyPath,
           passphrase: option.passphrase,
@@ -59,13 +62,16 @@ class KeepAliveRemoteFs {
         FsConstructor = SFTPFileSystem;
       } else if (option.protocol === 'ftp') {
         connectOption = {
-          host: option.host,
-          port: option.port,
-          username: option.username,
-          password: option.password,
+          ...connectOption,
           secure: option.secure,
           secureOptions: option.secureOptions,
           passive: option.passive,
+          debug(str) {
+            const log = str.match(/^\[connection\] (>|<) '(.*?)(\\r\\n)?'$/);
+            if (!log) return;
+            if (log[2].match(/^PASS /)) log[2] = 'PASS ******';
+            logger.debug(`${log[1]} ${log[2]}`);
+          },
         };
         // tslint:disable-next-line triple-equals
         shouldPromptForPass = connectOption.password == undefined;
@@ -80,15 +86,12 @@ class KeepAliveRemoteFs {
       this.fs = new FsConstructor(upath, connectOption);
       const client = this.fs.getClient();
       client.onDisconnected(this.invalid.bind(this));
-      output.status.msg('connecting...', 10 * 1000);
       this.pendingPromise = client.connect(promptForPassword).then(
         () => {
-          output.status.msg('connected', 2 * 1000);
           this.isValid = true;
           return this.fs;
         },
         err => {
-          output.status.msg('fail to connect', 2 * 1000);
           this.invalid('error');
           throw err;
         }
@@ -98,7 +101,6 @@ class KeepAliveRemoteFs {
   }
 
   invalid(reason: string) {
-    logger.info(`connect end because ${reason}`);
     this.pendingPromise = null;
     this.isValid = false;
   }

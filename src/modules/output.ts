@@ -6,6 +6,7 @@ class StatusBarItem {
 
   private name: string;
   private statusBarItem: vscode.StatusBarItem;
+  private timer: any = null;
 
   constructor(name) {
     this.name = name;
@@ -20,6 +21,11 @@ class StatusBarItem {
   }
 
   msg(text: string, varient?: number | Promise<any>) {
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
+
     if (!this.isShow) {
       this.statusBarItem.show();
       this.isShow = true;
@@ -28,7 +34,8 @@ class StatusBarItem {
     this.statusBarItem.text = text;
 
     if (typeof varient === 'number') {
-      setTimeout(this.hide, varient);
+      this.timer = setTimeout(this.hide, varient);
+      return;
     }
 
     if (typeof varient === 'object' && typeof varient.then === 'function') {
