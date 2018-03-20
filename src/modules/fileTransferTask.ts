@@ -242,34 +242,42 @@ async function getFileTaskListFromDirectorBySync(
       const file = desFileTable[id];
       delete desFileTable[id];
 
-      switch (srcFile.type) {
-        case FileType.Directory:
-          if (file) {
+      if (file) {
+        // files exist on both side
+        switch (srcFile.type) {
+          case FileType.Directory:
             dir2sync.push([srcFile.fspath, file.fspath]);
-          } else if (option.model === 'full') {
-            dir2trans.push([srcFile.fspath, desFs.pathResolver.join(des, srcFile.name)]);
-          }
-          break;
-        case FileType.File:
-          if (file) {
+            break;
+          case FileType.File:
             file2trans.push([srcFile.fspath, file.fspath]);
-          } else if (option.model === 'full') {
-            file2trans.push([srcFile.fspath, desFs.pathResolver.join(des, srcFile.name)]);
-          }
-          break;
-        case FileType.SymbolicLink:
-          if (file) {
+            break;
+          case FileType.SymbolicLink:
             symlink2trans.push([srcFile.fspath, file.fspath]);
-          } else if (option.model === 'full') {
-            symlink2trans.push([srcFile.fspath, desFs.pathResolver.join(des, srcFile.name)]);
-          }
-          break;
-        default:
-        // do not process
+            break;
+          default:
+          // do not process
+        }
+      } else if (option.model === 'full') {
+        const desFsPath = desFs.pathResolver.join(des, srcFile.name);
+        // files exist only on src
+        switch (srcFile.type) {
+          case FileType.Directory:
+            dir2trans.push([srcFile.fspath, desFsPath]);
+            break;
+          case FileType.File:
+            file2trans.push([srcFile.fspath, file.fspath]);
+            break;
+          case FileType.SymbolicLink:
+            symlink2trans.push([srcFile.fspath, file.fspath]);
+            break;
+          default:
+          // do not process
+        }
       }
     });
 
     if (option.model === 'full') {
+      // for files exist only on destination
       Object.keys(desFileTable).forEach(id => {
         const file = desFileTable[id];
         switch (file.type) {
