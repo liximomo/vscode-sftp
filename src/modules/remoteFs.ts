@@ -1,6 +1,7 @@
 import * as path from 'path';
-import { promptForPassword } from '../host';
 import upath from './upath';
+import { promptForPassword } from '../host';
+import logger from '../logger';
 import * as output from '../modules/output';
 import FileSystem from '../model/Fs/FileSystem';
 import RemoteFileSystem from '../model/Fs/RemoteFileSystem';
@@ -88,7 +89,7 @@ class KeepAliveRemoteFs {
         },
         err => {
           output.status.msg('fail to connect', 2 * 1000);
-          this.invalid();
+          this.invalid('error');
           throw err;
         }
       );
@@ -96,13 +97,13 @@ class KeepAliveRemoteFs {
     return this.pendingPromise;
   }
 
-  invalid() {
+  invalid(reason: string) {
+    logger.info(`connect end because ${reason}`);
     this.pendingPromise = null;
     this.isValid = false;
   }
 
   end() {
-    this.invalid();
     this.fs.getClient().end();
   }
 }

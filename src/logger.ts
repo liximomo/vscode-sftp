@@ -1,5 +1,5 @@
 import * as output from './modules/output';
-import { getConfig } from './modules/editorConfig';
+import { getConfig } from './host';
 
 const config = getConfig();
 const printDebugLog = config.printDebugLog;

@@ -25,7 +25,7 @@ function isConfigFile(uri: vscode.Uri) {
 
 function fileError(event, file, showErrorWindow = true) {
   return error => {
-    output.error(`${event} ${file}`, '\n', error.stack);
+    logger.error(`${event} ${file}`, '\n', error.stack);
     if (showErrorWindow) {
       output.showOutPutChannel();
     }

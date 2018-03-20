@@ -9,6 +9,7 @@
     "password": {},
     "remotePath": {},
     "uploadOnSave": {},
+    "downloadOnOpen": {},
     "syncMode": {},
     "ignore": {},
     "watcher": {},

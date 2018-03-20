@@ -44,7 +44,6 @@ export default function createFileAction(func, { doNotTriggerWatcher = false } =
     const remoteFs = await getRemoteFs(getHostInfo(config));
 
     if (doNotTriggerWatcher) {
-      logger.debug('disable watcher');
       disableWatcher(config);
     }
 
@@ -67,7 +66,6 @@ export default function createFileAction(func, { doNotTriggerWatcher = false } =
       throw error;
     } finally {
       if (doNotTriggerWatcher) {
-        logger.debug('enable watcher');
         enableWatcher(config);
       }
     }

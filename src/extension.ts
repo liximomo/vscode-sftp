@@ -8,6 +8,7 @@ import * as util from 'util';
 import commands from './commands';
 
 import * as output from './modules/output';
+import fileActivityMonitor from './modules/fileActivityMonitor';
 import { initConfigs, loadConfig } from './modules/config';
 import { endAllRemote } from './modules/remoteFs';
 import { watchWorkspace, watchFiles, clearAllWatcher } from './modules/fileWatcher';
@@ -41,6 +42,8 @@ function setupWorkspaceFolder(dir) {
 }
 
 function setup() {
+  fileActivityMonitor();
+
   watchWorkspace({
     onDidSaveFile: handleDocumentSave,
     onDidSaveSftpConfig: handleConfigSave,

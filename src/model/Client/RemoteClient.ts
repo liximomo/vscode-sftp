@@ -1,5 +1,3 @@
-import * as output from '../../modules/output';
-
 export interface IClientOption {
   host: string;
   port: number;
@@ -31,16 +29,13 @@ export default abstract class RemoteClient {
   onDisconnected(cb) {
     this.client
       .on('end', () => {
-        output.debug('connect end');
-        cb();
+        cb('end');
       })
       .on('close', () => {
-        output.debug('connect close');
-        cb();
+        cb('close');
       })
       .on('error', err => {
-        output.debug('remote error', err);
-        cb();
+        cb('error');
       });
   }
 

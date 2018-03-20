@@ -15,7 +15,7 @@ export default async function autoSave(uri) {
 
   if (config.uploadOnSave) {
     await upload(activityPath, config).catch(output.onError);
-    logger.info(`[audo-save] upload ${activityPath}`);
+    logger.info(`[file-save] upload ${activityPath}`);
     output.status.msg('upload done', 2 * 1000);
   }
 }

@@ -5,6 +5,7 @@ import * as Joi from 'joi';
 import * as output from './output';
 import Trie from './Trie';
 import { showTextDocument } from '../host';
+import logger from '../logger';
 
 const configTrie = new Trie(
   {},
@@ -38,6 +39,7 @@ const configScheme = {
 
   remotePath: Joi.string().required(),
   uploadOnSave: Joi.boolean().optional(),
+  downloadOnOpen: Joi.boolean().optional(),
   syncMode: Joi.any().valid('update', 'full'),
   ignore: Joi.array()
     .min(0)
@@ -69,8 +71,10 @@ const defaultConfig = {
   secureOptions: null,
   passive: false,
 
-  remotePath: '/',
+  // default to login dir
+  remotePath: './',
   uploadOnSave: false,
+  downloadOnOpen: false,
   syncMode: 'update',
   ignore: [],
   watcher: {
@@ -118,7 +122,7 @@ function addConfig(config, defaultContext) {
   };
 
   configTrie.add(context, withDefault);
-  output.info(`config at ${context}`, withDefault);
+  logger.info(`config at ${context}`, withDefault);
   return withDefault;
 }
 

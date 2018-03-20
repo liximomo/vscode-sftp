@@ -1,4 +1,16 @@
 import * as vscode from 'vscode';
+import { EXTENSION_NAME } from './constants';
+
+export function getConfig() {
+  return vscode.workspace.getConfiguration(EXTENSION_NAME);
+}
+
+export function onDidOpenTextDocument(
+  listener: (e: vscode.TextDocument) => any,
+  thisArgs?: any
+) {
+  return vscode.workspace.onDidOpenTextDocument(listener, thisArgs);
+}
 
 export function simplifyPath(localPath) {
   return vscode.workspace.asRelativePath(localPath);

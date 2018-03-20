@@ -1,9 +1,5 @@
 import * as vscode from 'vscode';
-import { getConfig } from './editorConfig';
 import { EXTENSION_NAME } from '../constants';
-
-const config = getConfig();
-const printDebugLog = config.printDebugLog;
 
 class StatusBarItem {
   isShow: boolean;
@@ -89,17 +85,6 @@ export function print(...args) {
     .join(' ');
 
   outputChannel.appendLine(msg);
-}
-
-export function info(...args) {
-  print('[info]:', ...args);
-}
-
-export function debug(...args) {
-  if (!printDebugLog) {
-    return;
-  }
-  print('[debug]:', ...args);
 }
 
 export function error(...args) {

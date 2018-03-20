@@ -34,6 +34,11 @@
       "description": "True to upload on every save operation of VS code.",
       "default": false
     },
+    "downloadOnOpen": {
+      "type": "boolean",
+      "description": "True to download when a file opens.",
+      "default": false
+    },
     "syncMode": {
       "enum": ["update", "full"],
       "description": "The Strategy `sync` commnad to use.",
