@@ -171,7 +171,6 @@ export default class FTPFileSystem extends RemoteFileSystem {
         return this.mkdir(dirPath).then(mkdir, err => {
           // if (err && err.message !== 'Cannot create a file when that file already exists.')
           if (err.code === 550) {
-            logger.error(err, 'ftp mkdir failed at ${dirPath}');
             // ignore already exist
             mkdir();
           } else {
