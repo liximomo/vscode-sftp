@@ -242,33 +242,33 @@ async function getFileTaskListFromDirectorBySync(
       const file = desFileTable[id];
       delete desFileTable[id];
 
+      const desFsPath = desFs.pathResolver.join(des, srcFile.name);
       if (file) {
         // files exist on both side
         switch (srcFile.type) {
           case FileType.Directory:
-            dir2sync.push([srcFile.fspath, file.fspath]);
+            dir2sync.push([srcFile.fspath, desFsPath]);
             break;
           case FileType.File:
-            file2trans.push([srcFile.fspath, file.fspath]);
+            file2trans.push([srcFile.fspath, desFsPath]);
             break;
           case FileType.SymbolicLink:
-            symlink2trans.push([srcFile.fspath, file.fspath]);
+            symlink2trans.push([srcFile.fspath, desFsPath]);
             break;
           default:
           // do not process
         }
       } else if (option.model === 'full') {
-        const desFsPath = desFs.pathResolver.join(des, srcFile.name);
         // files exist only on src
         switch (srcFile.type) {
           case FileType.Directory:
             dir2trans.push([srcFile.fspath, desFsPath]);
             break;
           case FileType.File:
-            file2trans.push([srcFile.fspath, file.fspath]);
+            file2trans.push([srcFile.fspath, desFsPath]);
             break;
           case FileType.SymbolicLink:
-            symlink2trans.push([srcFile.fspath, file.fspath]);
+            symlink2trans.push([srcFile.fspath, desFsPath]);
             break;
           default:
           // do not process
