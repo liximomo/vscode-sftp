@@ -154,32 +154,59 @@ export default class FTPFileSystem extends RemoteFileSystem {
     });
   }
 
-  ensureDir(dir: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      const tokens = dir.split('/');
-      const root = tokens.shift();
-      let dirPath = root === '' ? '/' : root;
+  async ensureDir(dir: string): Promise<void> {
+    await this._ensureDir(dir, true);
+  }
 
-      const mkdir = () => {
-        let token = tokens.shift();
-        if (!token && !tokens.length) {
-          resolve();
-          return;
+  async _ensureDir(dir: string, checkExistFirst: boolean): Promise<void> {
+    // check if exist first
+    // cause ftp don't return distinct error code for dir not exists and dir exists
+    if (checkExistFirst) {
+      try {
+        const stat = await this.lstat(dir);
+        if (stat.type !== FileType.Directory) {
+          throw new Error(`${dir} is not a valid directory path`);
         }
-        token += '/';
-        dirPath = this.pathResolver.join(dirPath, token);
-        return this.mkdir(dirPath).then(mkdir, err => {
-          // if (err && err.message !== 'Cannot create a file when that file already exists.')
-          if (err.code === 550) {
-            // ignore already exist
-            mkdir();
-          } else {
-            reject(err);
-          }
-        });
-      };
-      mkdir();
-    });
+
+        // already exists
+        return;
+      } catch {
+        // ignore error
+      }
+    }
+
+    let err;
+    try {
+      await this.mkdir(dir);
+      return;
+    } catch (error) {
+      // avoid nested code block
+      err = error;
+    }
+
+    switch (err.code) {
+      // because check if exist first, so here must be dir not exists
+      case 550:
+        const parentPath = this.pathResolver.dirname(dir);
+        if (parentPath === dir) throw err;
+        await this._ensureDir(parentPath, false);
+        await this.mkdir(dir);
+        break;
+
+      // In the case of any other error, just see if there's a dir
+      // there already.  If so, then hooray!  If not, then something
+      // is borked.
+      default:
+        try {
+          const stat = await this.lstat(dir);
+          if (stat.type !== FileType.Directory) throw err;
+        } catch {
+          // if the stat fails, then that's super weird.
+          // let the original error be the failure reason
+          throw err;
+        }
+        break;
+    }
   }
 
   toFileEntry(fullPath, stat): IFileEntry {

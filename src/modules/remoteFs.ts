@@ -68,8 +68,13 @@ class KeepAliveRemoteFs {
           passive: option.passive,
           debug(str) {
             const log = str.match(/^\[connection\] (>|<) '(.*?)(\\r\\n)?'$/);
+
             if (!log) return;
+
+            if (log[2].match(/NOOP ok/)) return;
+
             if (log[2].match(/^PASS /)) log[2] = 'PASS ******';
+
             logger.debug(`${log[1]} ${log[2]}`);
           },
         };

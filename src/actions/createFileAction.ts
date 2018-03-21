@@ -56,6 +56,7 @@ export default function createFileAction(func, { doNotTriggerWatcher = false } =
         localFilePath,
         {
           ...config,
+          concurrency: config.protocol === 'ftp' ? 1 : config.concurrency,
           remotePath: paths.toRemote(path.relative(localContext, localFilePath), remoteContext),
           ignore: ignoreFunc,
         },
