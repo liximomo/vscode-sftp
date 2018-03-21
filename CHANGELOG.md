@@ -1,3 +1,8 @@
+## 1.1.4 - 2018-03-21
+* `connectTimeout` [config](https://github.com/liximomo/vscode-sftp#full-config).
+* `downloadOnOpen` [config](https://github.com/liximomo/vscode-sftp#full-config).
+* Fix ftp unexpectedly traverse up director [#80](https://github.com/liximomo/vscode-sftp/issues/80). Thanks for [Andrey Orst](https://github.com/andreyorst)'s help.
+
 ## 1.1.3 - 2018-03-18
 * Remove default ignore config. No files will be ignored if you don't explicitly config `ignore` option. Related isuse [#138](https://github.com/liximomo/vscode-sftp/issues/138).
 * Fix [#133](https://github.com/liximomo/vscode-sftp/issues/133).
