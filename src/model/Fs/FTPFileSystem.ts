@@ -202,9 +202,9 @@ export default class FTPFileSystem extends RemoteFileSystem {
           return;
         }
 
-        const fileEntries = result.map(item =>
-          this.toFileEntry(this.pathResolver.join(dir, item.name), item)
-        );
+        const fileEntries = result
+          .filter(item => item.name !== '.' && item.name !== '..')
+          .map(item => this.toFileEntry(this.pathResolver.join(dir, item.name), item));
         resolve(fileEntries);
       });
     });
