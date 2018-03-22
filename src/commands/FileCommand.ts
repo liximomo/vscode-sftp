@@ -45,6 +45,7 @@ export default class FileCommand extends Command {
         return;
       }
 
+      // $todo sequence exec if in ftp protocol
       const pendingTasks = [].concat(targets).map(target => this.handleFile(target, handler));
       return await Promise.all(pendingTasks);
     };

@@ -80,7 +80,7 @@ const listCmd = createFileCommand(
   async (fsPath, config) => {
     await download(fsPath, config);
     const fileEntry = await localFs.lstat(fsPath);
-    if (fileEntry.type === FileType.Directory) {
+    if (fileEntry.type !== FileType.Directory) {
       await showTextDocument(fsPath);
     }
   },

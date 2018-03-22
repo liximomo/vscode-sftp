@@ -107,8 +107,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
     }
 
     switch (err.code) {
-      // $todo to make sure dir exist err code and dir not exist err code
-      case 4:
+      case 2:
         const parentPath = this.pathResolver.dirname(dir);
         if (parentPath === dir) throw err;
         await this.ensureDir(parentPath);
