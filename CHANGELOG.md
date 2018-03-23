@@ -1,3 +1,8 @@
+## 1.1.5 - 2018-03-23
+* Improve stability of `ftp` protocol.
+* Fix document don't show automatically after select a file through `list` command.
+* Fix [#113](https://github.com/liximomo/vscode-sftp/issues/113).
+
 ## 1.1.4 - 2018-03-21
 * `connectTimeout` [config](https://github.com/liximomo/vscode-sftp#full-config).
 * `downloadOnOpen` [config](https://github.com/liximomo/vscode-sftp#full-config).
