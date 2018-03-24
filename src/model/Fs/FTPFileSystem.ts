@@ -49,10 +49,13 @@ export default class FTPFileSystem extends RemoteFileSystem {
     return this.getClient().getFsClient();
   }
 
-  // $caution windows will always get 0o666
   lstat(path: string): Promise<IStats> {
     return new Promise((resolve, reject) => {
-      this.ftp.list(this.pathResolver.dirname(path), (err, stats) => {
+      const isRootPath = path === '/';
+      const parentPath = isRootPath ? '/' : this.pathResolver.dirname(path);
+      const nameIdentity = isRootPath ? '.' : this.pathResolver.basename(path);
+
+      this.ftp.list(parentPath, (err, stats) => {
         if (err) {
           reject(err);
           return;
@@ -62,9 +65,9 @@ export default class FTPFileSystem extends RemoteFileSystem {
           .map(stat => ({
             ...stat,
             type: FTPFileSystem.getFileType(stat.type),
-            permissionMode: toNumMode(stat.rights),
+            permissionMode: toNumMode(stat.rights), // Caution: windows will always get 0o666
           }))
-          .find(ns => ns.name === this.pathResolver.basename(path));
+          .find(ns => ns.name === nameIdentity);
 
         if (!fileStat) {
           reject(new Error('file not exist'));

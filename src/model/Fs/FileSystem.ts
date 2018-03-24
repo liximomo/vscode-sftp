@@ -25,6 +25,8 @@ export interface IStreamOption {
 export interface IStats {
   type: FileType;
   permissionMode: number;
+
+  // symbol link target
   target?: string;
 }
 
