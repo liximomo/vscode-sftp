@@ -20,7 +20,17 @@ class StatusBarItem {
     return this.name;
   }
 
-  msg(text: string, varient?: number | Promise<any>) {
+  msg(content: string | { text: string, tooltip: string }, varient?: number | Promise<any>) {
+    let text;
+    let tooltip;
+
+    if (typeof content === 'object' && content.text !== undefined) {
+      text = content.text;
+      tooltip = content.tooltip;
+    } else {
+      text = content;
+    }
+
     if (this.timer) {
       clearTimeout(this.timer);
       this.timer = null;
@@ -32,6 +42,7 @@ class StatusBarItem {
     }
 
     this.statusBarItem.text = text;
+    this.statusBarItem.tooltip = tooltip;
 
     if (typeof varient === 'number') {
       this.timer = setTimeout(this.hide, varient);

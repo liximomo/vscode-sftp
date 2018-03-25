@@ -1,4 +1,5 @@
 import * as path from 'path';
+import { simplifyPath } from '../host';
 import upath from '../modules/upath';
 import { getHostInfo } from '../modules/config';
 import localFs from '../modules/localFs';
@@ -16,10 +17,17 @@ function onProgress(error, task: FileTask) {
   }
 
   logger.info(`${task.type} ${task.file.fsPath}`);
-  output.status.msg(`${task.type} ${task.file.fsPath}`);
+  output.status.msg({
+    text: `${task.type} ${path.basename(task.file.fsPath)}`,
+    tooltip: simplifyPath(task.file.fsPath),
+  });
 }
 
-export default function createFileAction(func, { doNotTriggerWatcher = false } = {}) {
+export default function createFileAction(
+  actionName: string,
+  func,
+  { doNotTriggerWatcher = false } = {}
+) {
   return async (localFilePath, config) => {
     const localContext = config.context;
     const remoteContext = config.remotePath;
@@ -41,14 +49,18 @@ export default function createFileAction(func, { doNotTriggerWatcher = false } =
       return relativePath !== '' && ignore.ignores(relativePath);
     };
 
-    output.status.msg('connecting...', 10 * 1000);
+    output.status.msg('connecting...', config.connectTimeout);
     const remoteFs = await getRemoteFs(getHostInfo(config));
     logger.info('connected');
-    output.status.msg('connected', 2 * 1000);
 
     if (doNotTriggerWatcher) {
       disableWatcher(config);
     }
+
+    output.status.msg({
+      text: `${actionName} ${path.basename(localFilePath)}...`,
+      tooltip: simplifyPath(localFilePath),
+    });
 
     let retValue;
     try {

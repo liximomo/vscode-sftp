@@ -1,3 +1,8 @@
+## 1.1.6 - 2018-03-24
+* Better procedure message in status bar.
+* Fix sync error when synced target is not exist.
+* Fix [#146](https://github.com/liximomo/vscode-sftp/issues/146).
+
 ## 1.1.5 - 2018-03-23
 * Improve stability of `ftp` protocol.
 * Fix document don't show automatically after select a file through `list` command.

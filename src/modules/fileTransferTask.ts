@@ -12,6 +12,7 @@ import upath from './upath';
 import * as output from './output';
 import FileSystem, { IFileEntry, FileType } from '../model/Fs/FileSystem';
 import flatten from '../helper/flatten';
+import { simplifyPath } from '../host';
 
 type SyncModel = 'full' | 'update';
 
@@ -76,10 +77,6 @@ function createRemoveFileTask(fsPath, fileType, location: FileLocation): FileTas
 
 function fileDepth(file: string) {
   return upath.normalize(file).split('/').length;
-}
-
-function fileName2Show(filePath) {
-  return vscode.workspace.asRelativePath(filePath);
 }
 
 function shouldSkip(path, ignore) {
@@ -186,8 +183,16 @@ async function getFileTaskListFromDirector(
     return Promise.resolve([createTransferFileTask(src, des, FileType.Directory)]);
   }
 
+  output.status.msg({
+    text: `retrieving directory ${upath.basename(src)}`,
+    tooltip: simplifyPath(src),
+  });
+
+  // $caution side effect
+  // Need this to make sure file can correct transfer
+  // This is the bset place current I can find.
   await desFs.ensureDir(des);
-  output.status.msg(`retrieving directory ${fileName2Show(src)}`);
+
   const fileEntries = await srcFs.list(src);
   const promises = fileEntries.map(file => {
     if (file.type === FileType.Directory) {
@@ -216,7 +221,10 @@ async function getFileTaskListFromDirectorBySync(
     return Promise.resolve([createTransferFileTask(src, des, FileType.Directory)]);
   }
 
-  output.status.msg(`collect files ${fileName2Show(src)}...`);
+  output.status.msg({
+    text: `retrieving directory ${upath.basename(src)}`,
+    tooltip: simplifyPath(src),
+  });
   const syncFiles = ([srcFileEntries, desFileEntries]: IFileEntry[][]) => {
     output.status.msg('diff files...');
     const srcFileTable = toHash(srcFileEntries, 'id', fileEntry => ({
@@ -359,6 +367,8 @@ export async function sync(
     ...option,
   };
 
+  // we can transfer file only desDir exist
+  await desFs.ensureDir(desDir);
   const tasks = await getFileTaskListFromDirectorBySync(srcDir, desDir, srcFs, desFs, fullOption);
   return await taskBatchProcess(tasks, srcFs, desFs, fullOption);
 }

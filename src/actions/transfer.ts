@@ -1,16 +1,19 @@
 import { transfer } from '../modules/fileTransferTask';
 import createFileAction from './createFileAction';
 
-export const upload = createFileAction((source, config, { localFs, remoteFs, onProgress }) =>
-  transfer(source, config.remotePath, localFs, remoteFs, {
-    concurrency: config.concurrency,
-    ignore: config.ignore,
-    perserveTargetMode: config.protocol === 'sftp',
-    onProgress,
-  })
+export const upload = createFileAction(
+  'upload',
+  (source, config, { localFs, remoteFs, onProgress }) =>
+    transfer(source, config.remotePath, localFs, remoteFs, {
+      concurrency: config.concurrency,
+      ignore: config.ignore,
+      perserveTargetMode: config.protocol === 'sftp',
+      onProgress,
+    })
 );
 
 export const download = createFileAction(
+  'download',
   (source, config, { localFs, remoteFs, onProgress }) =>
     transfer(config.remotePath, source, remoteFs, localFs, {
       concurrency: config.concurrency,
@@ -22,6 +25,7 @@ export const download = createFileAction(
 );
 
 export const downloadWithoutIgnore = createFileAction(
+  'download',
   (source, config, { localFs, remoteFs, onProgress }) =>
     transfer(config.remotePath, source, remoteFs, localFs, {
       concurrency: config.concurrency,

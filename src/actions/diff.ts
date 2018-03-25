@@ -6,8 +6,12 @@ import { transfer } from '../modules/fileTransferTask';
 import makeTmpFile from '../helper/makeTmpFile';
 
 export const diff = createFileAction(
+  'diff',
   async (localFsPath, config, { localFs, remoteFs, onProgress }) => {
-    const tmpPath = await makeTmpFile({ prefix: `${EXTENSION_NAME}-`, postfix: path.extname(localFsPath)});
+    const tmpPath = await makeTmpFile({
+      prefix: `${EXTENSION_NAME}-`,
+      postfix: path.extname(localFsPath),
+    });
 
     await transfer(config.remotePath, tmpPath, remoteFs, localFs, {
       perserveTargetMode: false,

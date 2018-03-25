@@ -7,6 +7,7 @@ import { upload, removeRemote } from '../actions';
 import { getConfig } from './config';
 import * as output from './output';
 import logger from '../logger';
+import { simplifyPath } from '../host';
 
 let workspaceWatcher: vscode.Disposable;
 const watchers: {
@@ -49,7 +50,10 @@ function doUpload() {
 
     upload(file, config).then(() => {
       logger.info('[watcher]', `upload ${file}`);
-      output.status.msg(`upload ${file}`, 2 * 1000);
+      output.status.msg({
+        text: `upload ${path.basename(file)}`,
+        tooltip: simplifyPath(file),
+      }, 2 * 1000);
     }, fileError('upload', file));
   });
 }
@@ -74,7 +78,10 @@ function doDelete() {
       skipDir: true,
     }).then(() => {
       logger.info('[watcher]', `delete ${file}`);
-      output.status.msg(`delete ${file}`, 2 * 1000);
+      output.status.msg({
+        text: `delete ${path.basename(file)}`,
+        tooltip: simplifyPath(file),
+      }, 2 * 1000);
     }, fileError('delete', config.remotePath, false));
   });
 }
