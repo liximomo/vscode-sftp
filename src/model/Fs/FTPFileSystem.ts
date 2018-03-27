@@ -165,16 +165,20 @@ export default class FTPFileSystem extends RemoteFileSystem {
     // check if exist first
     // cause ftp don't return distinct error code for dir not exists and dir exists
     if (checkExistFirst) {
+      let stat;
       try {
-        const stat = await this.lstat(dir);
+        stat = await this.lstat(dir);
+      } catch {
+        // ignore error
+      }
+
+      if (stat) {
         if (stat.type !== FileType.Directory) {
+          logger.error(`${dir} (type = ${stat.type})is not a directory`);
           throw new Error(`${dir} is not a valid directory path`);
         }
 
-        // already exists
         return;
-      } catch {
-        // ignore error
       }
     }
 

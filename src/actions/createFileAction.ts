@@ -61,6 +61,7 @@ export default function createFileAction(
       text: `${actionName} ${path.basename(localFilePath)}...`,
       tooltip: simplifyPath(localFilePath),
     });
+    logger.info(`${actionName} ${localFilePath}`);
 
     let retValue;
     try {
