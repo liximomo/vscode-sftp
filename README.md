@@ -1,11 +1,11 @@
 # sftp sync extension for VS Code
-Very simple reuqire just three lines of config! Very fast finished in a blink.
+Very simple, requires just three lines of config! Very fast, finished in a blink.
 
 ## Features
 
 * Multiple configs
 * Browser remote files
-* Compare a local file with remote file.
+* Compare a local file with remote file
 * Sync directory to remote
 * Sync directory to local
 * Download file/directory to local
