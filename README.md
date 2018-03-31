@@ -75,4 +75,5 @@ If this project help you reduce time to develop, you can give me a cup of coffee
 ### Wechat
 ![Wechat](https://raw.githubusercontent.com/liximomo/vscode-sftp/master/assets/wechat.png)
 
+### PayPal
 [![PayPal](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/liximomo)
