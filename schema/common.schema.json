@@ -82,6 +82,7 @@
           "default": false
         }
       },
+      "required": ["files"],
       "default": {
         "files": "**/*",
         "autoUpload": true,
