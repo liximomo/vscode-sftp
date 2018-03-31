@@ -69,10 +69,10 @@ You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/
 ## Donation
 If this project help you reduce time to develop, you can give me a cup of coffee :) 
 
-[![PayPal](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/liximomo)
-
 ### Alipay
-![PayPal](https://github.com/liximomo/vscode-sftp/tree/master/assets/alipay.png)
+![Alipay](https://raw.githubusercontent.com/liximomo/vscode-sftp/master/assets/alipay.png)
 
 ### Wechat
-![PayPal](https://github.com/liximomo/vscode-sftp/tree/master/assets/wechat.png)
+![Wechat](https://raw.githubusercontent.com/liximomo/vscode-sftp/master/assets/wechat.png)
+
+[![PayPal](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/liximomo)
