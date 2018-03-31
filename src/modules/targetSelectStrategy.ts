@@ -49,6 +49,7 @@ function createFileSelector({ filterCreator = null } = {}) {
   return async (): Promise<FileTarget> => {
     const configs = getAllConfigs();
     const remoteItems = configs.map((config, index) => ({
+      name: config.name,
       description: config.host,
       fsPath: config.remotePath,
       getFs: () => getRemoteFs(getHostInfo(config)),

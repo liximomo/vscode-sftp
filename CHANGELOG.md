@@ -1,3 +1,7 @@
+## 1.1.7 - 2018-03-31
+* `name` [config](https://github.com/liximomo/vscode-sftp#full-config).
+* Fix bugs.
+
 ## 1.1.6 - 2018-03-24
 * Better procedure message in status bar.
 * Fix sync error when synced target is not exist.

@@ -142,6 +142,7 @@ async function showFiles(
 
 export function listFiles(
   items: Array<{
+    name?: string,
     description: string;
     fsPath: string;
     getFs?: () => Promise<FileSystem>;
@@ -150,7 +151,7 @@ export function listFiles(
   option: IFilePickerOption
 ) {
   const baseItems = items.map(item => ({
-    name: item.fsPath,
+    name: item.name || item.fsPath,
     fsPath: item.fsPath,
     parentFsPath: ROOT,
     type: FileType.Directory,
@@ -170,7 +171,7 @@ export function selectContext(): Promise<string> {
     const projectsList = configs
       .map(cfg => ({
         value: cfg.context,
-        label: vscode.workspace.asRelativePath(cfg.context),
+        label: cfg.name || vscode.workspace.asRelativePath(cfg.context),
         description: '',
         detail: cfg.context,
       }))

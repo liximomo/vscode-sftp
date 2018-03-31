@@ -115,13 +115,13 @@ class KeepAliveRemoteFs {
   }
 }
 
-let testFs;
-function getTestFs() {
-  if (!testFs) {
-    testFs = new LocalFileSystem(path);
+let localFs;
+function getLocalFs() {
+  if (!localFs) {
+    localFs = new LocalFileSystem(path);
   }
 
-  return Promise.resolve(testFs);
+  return Promise.resolve(localFs);
 }
 
 const fsTable: {
@@ -129,8 +129,8 @@ const fsTable: {
 } = {};
 
 export default function getFileSystem(option): Promise<FileSystem> {
-  if (option.protocol === 'test') {
-    return getTestFs();
+  if (option.protocol === 'local') {
+    return getLocalFs();
   }
 
   const identity = hashOption(option);

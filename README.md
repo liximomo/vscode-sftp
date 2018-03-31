@@ -65,6 +65,9 @@ You can also use an array of configs in the config file.
 ### Full Config
 ```js
 {
+  // string - A string to identify your config.
+  name: '',
+
   // string - A path relative to the vsode workspace root folder.
   context: '.',
  

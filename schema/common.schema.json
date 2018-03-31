@@ -1,6 +1,10 @@
 {
   "type": "object",
   "properties": {
+    "name": {
+      "type": "string",
+      "description": "A string to identify your config."
+    },
     "context": {
       "type": "string",
       "description": "A path relative to the vsode workspace root folder."

@@ -17,8 +17,10 @@ const configTrie = new Trie(
 const nullable = schema => schema.optional().allow(null);
 
 const configScheme = {
+  name: Joi.string(),
+
   context: Joi.string(),
-  protocol: Joi.any().valid('sftp', 'ftp', 'test'),
+  protocol: Joi.any().valid('sftp', 'ftp', 'local'),
 
   host: Joi.string().required(),
   port: Joi.number().integer(),
@@ -56,6 +58,8 @@ const configScheme = {
 };
 
 const defaultConfig = {
+  name: null,
+
   protocol: 'sftp',
 
   host: 'host',

@@ -51,7 +51,6 @@ export default function createFileAction(
 
     output.status.msg('connecting...', config.connectTimeout);
     const remoteFs = await getRemoteFs(getHostInfo(config));
-    logger.info('connected');
 
     if (doNotTriggerWatcher) {
       disableWatcher(config);

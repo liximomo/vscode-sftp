@@ -31,7 +31,6 @@ export default class FileCommand extends Command {
     try {
       const config = getConfig(activityPath);
       await handler(activityPath, config);
-      logger.info(`${this.getName()} ${activityPath}`);
     } catch (error) {
       output.onError(error);
     }

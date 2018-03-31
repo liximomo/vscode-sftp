@@ -16,7 +16,11 @@ export const diff = createFileAction(
     await transfer(config.remotePath, tmpPath, remoteFs, localFs, {
       perserveTargetMode: false,
     });
-    await diffFiles(localFsPath, tmpPath, `${simplifyPath(localFsPath)} (local ↔ remote)`);
+    await diffFiles(
+      localFsPath,
+      tmpPath,
+      `${simplifyPath(localFsPath)} (local ↔ ${config.name || 'remote'})`
+    );
   },
   { doNotTriggerWatcher: true }
 );
