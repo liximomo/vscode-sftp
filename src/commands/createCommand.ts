@@ -5,6 +5,6 @@ export default function createCommand(id, name, handler) {
   return new Command(id, name, handler);
 }
 
-export function createFileCommand(id, name, handler, getFileTarget) {
-  return new FileCommand(id, name, handler, getFileTarget);
+export function createFileCommand(id, name, handler, getFileTarget, warnEmptyTarget = true) {
+  return new FileCommand(id, name, handler, getFileTarget, warnEmptyTarget);
 }

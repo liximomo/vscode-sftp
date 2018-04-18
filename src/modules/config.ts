@@ -75,7 +75,9 @@ const defaultConfig = {
 
   secure: false,
   secureOptions: null,
-  passive: false,
+
+  // currently `false` have no effect
+  passive: true,
 
   // default to login dir
   remotePath: './',
@@ -123,6 +125,9 @@ function addConfig(config, defaultContext) {
 
   const withDefault = {
     ...defaultConfig,
+
+    // override default port by protocol
+    port: config.protocol === 'ftp' ? 21 : 22,
     ...config,
     context,
   };

@@ -29,11 +29,7 @@ export default class FTPClient extends RemoteClient {
       this.client
         .on('ready', () => {
           this.connected = true;
-          if (option.passive) {
-            this.client._pasv(resolve);
-          } else {
-            resolve();
-          }
+          resolve();
         })
         .on('error', err => {
           reject(err);

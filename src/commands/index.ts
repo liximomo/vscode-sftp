@@ -70,7 +70,8 @@ const listAllCmd = createFileCommand(
       await showTextDocument(fsPath);
     }
   },
-  selectFileFromAll
+  selectFileFromAll,
+  false
 );
 listAllCmd.onCommandDone(refreshExplorer);
 
@@ -84,7 +85,8 @@ const listCmd = createFileCommand(
       await showTextDocument(fsPath);
     }
   },
-  selectFile
+  selectFile,
+  false
 );
 listCmd.onCommandDone(refreshExplorer);
 

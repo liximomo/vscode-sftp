@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import * as eachLimit from 'async/eachLimit';
+import taskQueue from '../modules/taskQueue';
 import {
   transferFile,
   transferSymlink,
@@ -172,7 +172,7 @@ async function taskBatchProcess(taskQueue: FileTask[], srcFs, desFs, option: Tra
   });
 }
 
-async function getFileTaskListFromDirector(
+async function doTransferDir(
   src: string,
   des: string,
   srcFs: FileSystem,
@@ -196,7 +196,7 @@ async function getFileTaskListFromDirector(
   const fileEntries = await srcFs.list(src);
   const promises = fileEntries.map(file => {
     if (file.type === FileType.Directory) {
-      return getFileTaskListFromDirector(
+      return doTransferDir(
         file.fspath,
         desFs.pathResolver.join(des, file.name),
         srcFs,
@@ -311,7 +311,7 @@ async function getFileTaskListFromDirectorBySync(
     );
 
     const transDirTasks = dir2trans.map(([srcfile, desFile]) =>
-      getFileTaskListFromDirector(srcfile, desFile, srcFs, desFs, option)
+      doTransferDir(srcfile, desFile, srcFs, desFs, option)
     );
 
     const syncDirTasks = dir2sync.map(([srcfile, desFile]) =>
@@ -351,7 +351,8 @@ async function transferDirTask(
     ...option,
   };
 
-  const tasks = await getFileTaskListFromDirector(src, des, srcFs, desFs, fullOption);
+  taskQueue.setConcurrency(fullOption.concurrency);
+  const tasks = await doTransferDir(src, des, srcFs, desFs, fullOption);
   return await taskBatchProcess(tasks, srcFs, desFs, fullOption);
 }
 

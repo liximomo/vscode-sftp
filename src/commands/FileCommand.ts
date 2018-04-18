@@ -10,15 +10,18 @@ export interface FileTarget {
 
 export default class FileCommand extends Command {
   private getFileTarget: (item, items?) => Promise<FileTarget>;
+  private warnEmptyTarget: boolean;
 
   constructor(
     id,
     name,
     handler: (fsPath: string, config: object) => any,
-    getFileTarget: (item, items?) => Promise<FileTarget>
+    getFileTarget: (item, items?) => Promise<FileTarget>,
+    warnEmptyTarget: boolean
   ) {
     super(id, name, handler);
     this.getFileTarget = getFileTarget;
+    this.warnEmptyTarget = warnEmptyTarget;
 
     this.onCommandDone(() => {
       output.status.msg(`${this.getName()} done`, 2000);
@@ -40,7 +43,9 @@ export default class FileCommand extends Command {
     return async (item, items) => {
       const targets = await this.getFileTarget(item, items);
       if (!targets) {
-        vscode.window.showWarningMessage(`The "${this.getName()}" command can not find a target.`);
+        if (this.warnEmptyTarget) {
+          vscode.window.showWarningMessage(`The "${this.getName()}" command can not find a target.`);
+        }
         return;
       }
 
