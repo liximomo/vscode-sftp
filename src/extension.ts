@@ -13,7 +13,7 @@ import { initConfigs, loadConfig } from './modules/config';
 import { endAllRemote } from './modules/remoteFs';
 import { watchWorkspace, watchFiles, clearAllWatcher } from './modules/fileWatcher';
 import autoSave from './modules/autoSave';
-import { getWorkspaceFolders } from './host';
+import { getWorkspaceFolders, setContextValue } from './host';
 
 function registerCommand(
   context: vscode.ExtensionContext,
@@ -69,6 +69,7 @@ export function activate(context: vscode.ExtensionContext) {
   setup()
     .then(_ => {
       output.status.msg('SFTP Ready', 1000 * 8);
+      setContextValue("enabled", true);
     })
     .catch(output.onError);
 }
