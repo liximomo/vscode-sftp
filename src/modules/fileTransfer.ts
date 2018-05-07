@@ -22,7 +22,7 @@ export function transferFile(
 ): Promise<void> {
   const transPromise = option.perserveTargetMode
     ? // $caution with ftp, mutilple remote cmd will cause previously opened inputstream to be closed.
-      Promise.all([srcFs.get(src), getFileMode(des, desFs)]).then(([inputStream, mode]) =>
+      Promise.all([srcFs.get(src), getFileMode(src, srcFs)]).then(([inputStream, mode]) =>
         desFs.put(inputStream, des, { mode })
       )
     : srcFs.get(src).then(inputStream => desFs.put(inputStream, des));
