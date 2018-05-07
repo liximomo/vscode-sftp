@@ -129,7 +129,7 @@ async function showFiles(
         fsPath: selectedPath,
         parentFsPath: selectedValue.parentFsPath,
         type: FileType.Directory,
-        description: ' choose current foler',
+        description: 'choose current folder',
         getFs: selectedValue.getFs,
         index: selectedValue.index,
       });
