@@ -69,7 +69,7 @@ export function activate(context: vscode.ExtensionContext) {
   setup()
     .then(_ => {
       output.status.msg('SFTP Ready', 1000 * 8);
-      setContextValue("enabled", true);
+      setContextValue('enabled', true);
     })
     .catch(output.onError);
 }
