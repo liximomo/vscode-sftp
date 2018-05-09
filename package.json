@@ -134,8 +134,8 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "tsc -p ./",
-    "compile": "tsc -watch -p ./",
+    "vscode:prepublish": "tsc --allowJs -p ./",
+    "compile": "tsc --allowJs -watch -p ./",
     "postinstall": "node ./node_modules/vscode/bin/install",
     "test": "node ./node_modules/vscode/bin/test",
     "test:spec": "jest",
@@ -156,12 +156,12 @@
   },
   "dependencies": {
     "async": "^2.6.0",
+    "async-limiter": "^1.0.0",
     "fs-extra": "^3.0.1",
     "ftp": "^0.3.10",
     "glob": "^7.1.2",
     "ignore": "^3.3.7",
     "joi": "^10.6.0",
-    "p-queue": "^2.4.0",
     "ssh2": "^0.5.5",
     "stat-mode": "^0.2.2",
     "tmp": "^0.0.33",

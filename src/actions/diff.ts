@@ -7,13 +7,13 @@ import makeTmpFile from '../helper/makeTmpFile';
 
 export const diff = createFileAction(
   'diff',
-  async (localFsPath, config, { localFs, remoteFs, onProgress }) => {
+  async (localFsPath, config, { localFs, remoteFs, scheduler, onProgress }) => {
     const tmpPath = await makeTmpFile({
       prefix: `${EXTENSION_NAME}-`,
       postfix: path.extname(localFsPath),
     });
 
-    await transfer(config.remotePath, tmpPath, remoteFs, localFs, {
+    await transfer(config.remotePath, tmpPath, remoteFs, scheduler, localFs, {
       perserveTargetMode: false,
     });
     await diffFiles(

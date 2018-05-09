@@ -3,9 +3,8 @@ import createFileAction from './createFileAction';
 
 export const sync2Remote = createFileAction(
   'sync',
-  (source, config, { localFs, remoteFs, onProgress }) =>
-    sync(source, config.remotePath, localFs, remoteFs, {
-      concurrency: config.concurrency,
+  (source, config, { localFs, remoteFs, scheduler, onProgress }) =>
+    sync(source, config.remotePath, localFs, remoteFs, scheduler, {
       ignore: config.ignore,
       model: config.syncMode,
       perserveTargetMode: config.protocol === 'sftp',
@@ -15,9 +14,8 @@ export const sync2Remote = createFileAction(
 
 export const sync2Local = createFileAction(
   'sync',
-  (source, config, { localFs, remoteFs, onProgress }) =>
-    sync(config.remotePath, source, remoteFs, localFs, {
-      concurrency: config.concurrency,
+  (source, config, { localFs, remoteFs, scheduler, onProgress }) =>
+    sync(config.remotePath, source, remoteFs, localFs, scheduler, {
       ignore: config.ignore,
       model: config.syncMode,
       perserveTargetMode: false,

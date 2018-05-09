@@ -1,6 +1,7 @@
 import { getConfig } from './config';
-import { upload } from '../actions';
 import * as output from './output';
+import { sftpBarItem } from '../global';
+import { upload } from '../actions';
 import logger from '../logger';
 
 export default async function autoSave(uri) {
@@ -14,8 +15,12 @@ export default async function autoSave(uri) {
   }
 
   if (config.uploadOnSave) {
-    await upload(activityPath, config).catch(output.onError);
-    logger.info(`[file-save] upload ${activityPath}`);
-    output.status.msg('upload done', 2 * 1000);
+    try {
+      await upload(activityPath, config);
+      logger.info(`[file-save] upload ${activityPath}`);
+    } catch (error) {
+      output.onError(error);
+    }
+    sftpBarItem.showMsg('upload done', 2 * 1000);
   }
 }

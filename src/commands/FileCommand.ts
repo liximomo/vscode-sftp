@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
+import { sftpBarItem } from '../global';
 import Command from './Command';
 import * as output from '../modules/output';
 import { getConfig } from '../modules/config';
-import logger from '../logger';
 
 export interface FileTarget {
   fsPath: string;
@@ -24,7 +24,7 @@ export default class FileCommand extends Command {
     this.warnEmptyTarget = warnEmptyTarget;
 
     this.onCommandDone(() => {
-      output.status.msg(`${this.getName()} done`, 2000);
+      sftpBarItem.showMsg(`${this.getName()} done`, 2000);
     });
   }
 

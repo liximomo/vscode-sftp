@@ -5,7 +5,9 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as util from 'util';
 
+import { sftpBarItem } from './global';
 import commands from './commands';
+import { COMMAND_OPEN_OUTPUT } from './constants';
 
 import * as output from './modules/output';
 import fileActivityMonitor from './modules/fileActivityMonitor';
@@ -60,16 +62,19 @@ function setup() {
 export function activate(context: vscode.ExtensionContext) {
   commands.forEach(cmd => cmd.register(context));
 
+  context.subscriptions.push(
+    vscode.commands.registerCommand(COMMAND_OPEN_OUTPUT, () => {
+      output.toggle();
+    })
+  );
+
   const workspaceFolders = getWorkspaceFolders();
   if (!workspaceFolders) {
     return;
   }
 
-  output.status.msg('SFTP init...');
   setup()
-    .then(_ => {
-      output.status.msg('SFTP Ready', 1000 * 8);
-    })
+    .then(_ => sftpBarItem.show())
     .catch(output.onError);
 }
 

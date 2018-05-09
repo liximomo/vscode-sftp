@@ -1,6 +1,3 @@
-import * as vscode from 'vscode';
-
-import * as eachLimit from 'async/eachLimit';
 import {
   transferFile,
   transferSymlink,
@@ -10,15 +7,14 @@ import {
 } from './fileTransfer';
 import upath from './upath';
 // import * as output from './output';
+import Scheduler from './Scheduler';
 import FileSystem, { IFileEntry, FileType } from '../model/Fs/FileSystem';
-import flatten from '../helper/flatten';
 import { simplifyPath } from '../host';
 
 type SyncModel = 'full' | 'update';
 
 interface TransferTaskOption extends TransferOption {
   onProgress?: (error, task: FileTask) => void;
-  concurrency?: number;
   ignore?: (fsPath: string) => boolean;
 }
 
@@ -75,10 +71,6 @@ function createRemoveFileTask(fsPath, fileType, location: FileLocation): FileTas
   };
 }
 
-function fileDepth(file: string) {
-  return upath.normalize(file).split('/').length;
-}
-
 function shouldSkip(path, ignore) {
   if (ignore) {
     return ignore(path);
@@ -97,90 +89,60 @@ const toHash = (items: any[], key: string, transform?: (a: any) => any): { [key:
     return hash;
   }, {});
 
-async function taskBatchProcess(taskQueue: FileTask[], srcFs, desFs, option: TransferTaskOption) {
-  return new Promise((resolve, reject) => {
-    const { concurrency, onProgress, ...transferOption } = option;
+async function processTask(task: FileTask, srcFs, desFs, option: TransferTaskOption) {
+  const { file, payload } = task;
+  const { onProgress, ...transferOption } = option;
 
-    taskQueue.sort((a, b) => fileDepth(b.file.fsPath) - fileDepth(a.file.fsPath));
+  if (shouldSkip(file.fsPath, transferOption.ignore)) {
+    return;
+  }
+  let promise;
+  if (task.type === 'transfer') {
+    switch (file.fileType) {
+      case FileType.File:
+        promise = transferFile(file.fsPath, payload.desFsPath, srcFs, desFs, transferOption);
+        break;
+      case FileType.SymbolicLink:
+        promise = transferSymlink(file.fsPath, payload.desFsPath, srcFs, desFs, transferOption);
+        break;
+      default:
+      // nothing to do;
+    }
+  } else if (task.type === 'remove') {
+    const fs = payload.location === 'des' ? desFs : srcFs;
+    switch (file.fileType) {
+      case FileType.File:
+      case FileType.SymbolicLink:
+        promise = removeFile(file.fsPath, fs, transferOption);
+        break;
+      case FileType.Directory:
+        promise = removeDir(file.fsPath, fs, transferOption);
+        break;
+      default:
+      // nothing to do;
+    }
+  }
 
-    eachLimit(
-      taskQueue,
-      concurrency,
-      (task: FileTask, callback) => {
-        const file = task.file;
-        if (shouldSkip(file.fsPath, transferOption.ignore)) {
-          callback();
-          return;
-        }
-
-        const payload = task.payload;
-        let pendingPromise;
-        if (task.type === 'transfer') {
-          switch (file.fileType) {
-            case FileType.File:
-              pendingPromise = transferFile(
-                file.fsPath,
-                payload.desFsPath,
-                srcFs,
-                desFs,
-                transferOption
-              );
-              break;
-            case FileType.SymbolicLink:
-              pendingPromise = transferSymlink(
-                file.fsPath,
-                payload.desFsPath,
-                srcFs,
-                desFs,
-                transferOption
-              );
-              break;
-            default:
-            // nothing to do;
-          }
-        } else if (task.type === 'remove') {
-          const fs = payload.location === 'des' ? desFs : srcFs;
-          switch (file.fileType) {
-            case FileType.File:
-            case FileType.SymbolicLink:
-              pendingPromise = removeFile(file.fsPath, fs, transferOption);
-              break;
-            case FileType.Directory:
-              pendingPromise = removeDir(file.fsPath, fs, transferOption);
-              break;
-            default:
-            // nothing to do;
-          }
-        }
-        pendingPromise
-          .then(_ => {
-            if (onProgress) onProgress(null, task);
-          })
-          .catch(error => {
-            if (onProgress) onProgress(error, task);
-          })
-          .then(callback);
-      },
-      error => {
-        if (error) {
-          reject(error);
-          return;
-        }
-        resolve();
-      }
-    );
-  });
+  if (promise) {
+    try {
+      await promise;
+      onProgress(null, task);
+    } catch (error) {
+      onProgress(error, task);
+    }
+  }
 }
 
-async function getFileTaskListFromDirector(
+async function doTransferDir(
   src: string,
   des: string,
   srcFs: FileSystem,
   desFs: FileSystem,
+  scheduler: Scheduler,
   option: TransferTaskOption
-): Promise<FileTask[]> {
+) {
   if (shouldSkip(src, option.ignore)) {
-    return Promise.resolve([createTransferFileTask(src, des, FileType.Directory)]);
+    return Promise.resolve();
   }
 
   // output.status.msg({
@@ -191,32 +153,36 @@ async function getFileTaskListFromDirector(
   // $caution side effect
   // Need this to make sure file can correct transfer
   // This is the bset place current I can find.
-  await desFs.ensureDir(des);
-
-  const fileEntries = await srcFs.list(src);
-  const promises = fileEntries.map(file => {
+  await scheduler.add(() => desFs.ensureDir(des));
+  const fileEntries = await scheduler.add(() => srcFs.list(src));
+  fileEntries.forEach(async file => {
     if (file.type === FileType.Directory) {
-      return getFileTaskListFromDirector(
+      doTransferDir(
         file.fspath,
         desFs.pathResolver.join(des, file.name),
         srcFs,
         desFs,
+        scheduler,
         option
       );
+      return;
     }
-    return createTransferFileTask(file.fspath, desFs.pathResolver.join(des, file.name), file.type);
+
+    const desFsPath = desFs.pathResolver.join(des, file.name);
+    const task = createTransferFileTask(file.fspath, desFsPath, file.type);
+
+    scheduler.add(() => processTask(task, srcFs, desFs, option));
   });
-  const tasks = await Promise.all<FileTask | FileTask[]>(promises);
-  return flatten(tasks);
 }
 
-async function getFileTaskListFromDirectorBySync(
+async function doSyncDir(
   src: string,
   des: string,
   srcFs: FileSystem,
   desFs: FileSystem,
+  scheduler: Scheduler,
   option: SyncTransferTaskOption
-): Promise<FileTask[]> {
+) {
   if (shouldSkip(src, option.ignore)) {
     return Promise.resolve([createTransferFileTask(src, des, FileType.Directory)]);
   }
@@ -242,8 +208,8 @@ async function getFileTaskListFromDirectorBySync(
     const dir2trans = [];
     const dir2sync = [];
 
-    const fileMissed = [];
-    const dirMissed = [];
+    const file2remove = [];
+    const dir2remove = [];
 
     Object.keys(srcFileTable).forEach(id => {
       const srcFile = srcFileTable[id];
@@ -290,17 +256,25 @@ async function getFileTaskListFromDirectorBySync(
         const file = desFileTable[id];
         switch (file.type) {
           case FileType.Directory:
-            dirMissed.push(file.fspath);
+            dir2remove.push(file.fspath);
             break;
           case FileType.File:
           case FileType.SymbolicLink:
-            fileMissed.push(file.fspath);
+            file2remove.push(file.fspath);
             break;
           default:
           // do not process
         }
       });
     }
+
+    dir2trans.forEach(([srcfile, desFile]) =>
+      doTransferDir(srcfile, desFile, srcFs, desFs, scheduler, option)
+    );
+
+    dir2sync.forEach(([srcfile, desFile]) =>
+      doSyncDir(srcfile, desFile, srcFs, desFs, scheduler, option)
+    );
 
     const transFileTasks = file2trans.map(([srcfile, desFile]) =>
       createTransferFileTask(srcfile, desFile, FileType.File)
@@ -310,40 +284,31 @@ async function getFileTaskListFromDirectorBySync(
       createTransferFileTask(srcfile, desFile, FileType.SymbolicLink)
     );
 
-    const transDirTasks = dir2trans.map(([srcfile, desFile]) =>
-      getFileTaskListFromDirector(srcfile, desFile, srcFs, desFs, option)
+    const clearFileTasks = file2remove.map(file =>
+      createRemoveFileTask(null, FileType.File, 'des')
     );
 
-    const syncDirTasks = dir2sync.map(([srcfile, desFile]) =>
-      getFileTaskListFromDirectorBySync(srcfile, desFile, srcFs, desFs, option)
-    );
-
-    const clearFileTasks = fileMissed.map(file => createRemoveFileTask(file, FileType.File, 'des'));
-
-    const clearDirTasks = dirMissed.map(file =>
+    const clearDirTasks = dir2remove.map(file =>
       createRemoveFileTask(file, FileType.Directory, 'des')
     );
 
-    return Promise.all<FileTask | FileTask[]>([
-      ...syncDirTasks,
-      ...transFileTasks,
-      ...transSymlinkTasks,
-      ...transDirTasks,
-      ...clearFileTasks,
-      ...clearDirTasks,
-    ]).then(flatten);
+    [...transFileTasks, ...transSymlinkTasks, ...clearFileTasks, ...clearDirTasks].map(task =>
+      scheduler.add(() => processTask(task, srcFs, desFs, option))
+    );
   };
 
-  return Promise.all([srcFs.list(src).catch(err => []), desFs.list(des).catch(err => [])]).then(
-    syncFiles
+  const files = await scheduler.add(() =>
+    Promise.all([srcFs.list(src).catch(err => []), desFs.list(des).catch(err => [])])
   );
+  syncFiles(files);
 }
 
-async function transferDirTask(
+function transferDirTask(
   src: string,
   des: string,
   srcFs: FileSystem,
   desFs: FileSystem,
+  scheduler: Scheduler,
   option: TransferTaskOption
 ) {
   const fullOption = {
@@ -351,8 +316,7 @@ async function transferDirTask(
     ...option,
   };
 
-  const tasks = await getFileTaskListFromDirector(src, des, srcFs, desFs, fullOption);
-  return await taskBatchProcess(tasks, srcFs, desFs, fullOption);
+  doTransferDir(src, des, srcFs, desFs, scheduler, fullOption);
 }
 
 export async function sync(
@@ -360,6 +324,7 @@ export async function sync(
   desDir: string,
   srcFs: FileSystem,
   desFs: FileSystem,
+  scheduler: Scheduler,
   option: SyncTransferTaskOption
 ) {
   const fullOption = {
@@ -368,16 +333,16 @@ export async function sync(
   };
 
   // we can transfer file only desDir exist
-  await desFs.ensureDir(desDir);
-  const tasks = await getFileTaskListFromDirectorBySync(srcDir, desDir, srcFs, desFs, fullOption);
-  return await taskBatchProcess(tasks, srcFs, desFs, fullOption);
+  await scheduler.add(() => desFs.ensureDir(desDir));
+  doSyncDir(srcDir, desDir, srcFs, desFs, scheduler, fullOption);
 }
 
-export function transfer(
+export async function transfer(
   src: string,
   des: string,
   srcFs: FileSystem,
   desFs: FileSystem,
+  scheduler: Scheduler,
   option: TransferTaskOption
 ) {
   const fullOption = {
@@ -389,44 +354,50 @@ export function transfer(
     return Promise.resolve();
   }
 
-  return srcFs.lstat(src).then(stat => {
-    let result;
+  const stat = await scheduler.add(() => srcFs.lstat(src));
+  if (stat.type === FileType.Directory) {
+    return transferDirTask(src, des, srcFs, desFs, scheduler, fullOption);
+  }
 
-    if (stat.type === FileType.Directory) {
-      result = transferDirTask(src, des, srcFs, desFs, fullOption);
-    } else if (stat.type === FileType.File) {
-      result = desFs
+  if (stat.type === FileType.File) {
+    return scheduler.add(() =>
+      desFs
         .ensureDir(desFs.pathResolver.dirname(des))
-        .then(() => transferFile(src, des, srcFs, desFs, fullOption));
-    } else if (stat.type === FileType.SymbolicLink) {
-      result = desFs
+        .then(() => transferFile(src, des, srcFs, desFs, fullOption))
+    );
+  }
+
+  if (stat.type === FileType.SymbolicLink) {
+    return scheduler.add(() =>
+      desFs
         .ensureDir(desFs.pathResolver.dirname(des))
-        .then(() => transferSymlink(src, des, srcFs, desFs, fullOption));
-    }
-    return result;
-  });
+        .then(() => transferSymlink(src, des, srcFs, desFs, fullOption))
+    );
+  }
 }
 
-export function remove(path: string, fs: FileSystem, option) {
+export async function remove(path: string, fs: FileSystem, scheduler: Scheduler, option) {
   if (shouldSkip(path, option.ignore)) {
     return Promise.resolve();
   }
 
-  return fs.lstat(path).then(stat => {
-    let result;
-    switch (stat.type) {
-      case FileType.Directory:
-        if (!option.skipDir) {
-          result = removeDir(path, fs, option);
-        }
-        break;
-      case FileType.File:
-      case FileType.SymbolicLink:
-        result = removeFile(path, fs, option);
-        break;
-      default:
-        throw new Error(`unsupport file type (type = ${stat.type})`);
-    }
-    return result;
-  });
+  const stat = await scheduler.add(() => fs.lstat(path));
+  let task;
+  switch (stat.type) {
+    case FileType.Directory:
+      if (!option.skipDir) {
+        task = () => removeDir(path, fs, option);
+      }
+      break;
+    case FileType.File:
+    case FileType.SymbolicLink:
+      task = () => removeFile(path, fs, option);
+      break;
+    default:
+      throw new Error(`unsupport file type (type = ${stat.type})`);
+  }
+
+  if (task) {
+    return await scheduler.add(task);
+  }
 }

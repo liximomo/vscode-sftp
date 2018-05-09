@@ -1,4 +1,5 @@
 import * as path from 'path';
+import { sftpBarItem } from '../global';
 import { simplifyPath } from '../host';
 import upath from '../modules/upath';
 import { getHostInfo } from '../modules/config';
@@ -6,6 +7,7 @@ import localFs from '../modules/localFs';
 import getRemoteFs from '../modules/remoteFs';
 import Ignore from '../modules/Ignore';
 import { FileTask } from '../modules/fileTransferTask';
+import schedulerManager from '../modules/schedulerManager';
 import * as paths from '../helper/paths';
 import * as output from '../modules/output';
 import logger from '../logger';
@@ -17,10 +19,10 @@ function onProgress(error, task: FileTask) {
   }
 
   logger.info(`${task.type} ${task.file.fsPath}`);
-  output.status.msg({
-    text: `${task.type} ${path.basename(task.file.fsPath)}`,
-    tooltip: simplifyPath(task.file.fsPath),
-  });
+  sftpBarItem.showMsg(
+    `${task.type} ${path.basename(task.file.fsPath)}`,
+    simplifyPath(task.file.fsPath)
+  );
 }
 
 export default function createFileAction(
@@ -49,19 +51,20 @@ export default function createFileAction(
       return relativePath !== '' && ignore.ignores(relativePath);
     };
 
-    output.status.msg('connecting...', config.connectTimeout);
+    sftpBarItem.showMsg('connecting...', config.connectTimeout);
     const remoteFs = await getRemoteFs(getHostInfo(config));
 
     if (doNotTriggerWatcher) {
       disableWatcher(config);
     }
 
-    output.status.msg({
-      text: `${actionName} ${path.basename(localFilePath)}...`,
-      tooltip: simplifyPath(localFilePath),
-    });
+    sftpBarItem.showMsg(
+      `${actionName} ${path.basename(localFilePath)}...`,
+      simplifyPath(localFilePath)
+    );
     logger.info(`${actionName} ${localFilePath}`);
 
+    const scheduler = schedulerManager.getScheduler(config);
     let retValue;
     try {
       retValue = await func(
@@ -75,6 +78,7 @@ export default function createFileAction(
         {
           localFs,
           remoteFs,
+          scheduler,
           onProgress,
         }
       );

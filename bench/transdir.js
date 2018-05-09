@@ -1,4 +1,5 @@
 const Benchmark = require('benchmark');
+const { transfer: transferQueue } = require('../out/src/modules/fileTransferTask-p-queue');
 const { transfer } = require('../out/src/modules/fileTransferTask');
 const mockFs = require('mock-fs');
 const localFs = require('../out/src/modules/localFs').default;
@@ -41,33 +42,44 @@ function onProgress(error, task) {
 
 (async () => {
   suite
-    .add('no concurrency', {
+    // .add('no concurrency', {
+    //   defer: true,
+    //   fn: async deferred => {
+    //     await transfer(src1, target1, localFs, localFs, {
+    //       concurrency: 1,
+    //       perserveTargetMode: false,
+    //       onProgress,
+    //     });
+    //     deferred.resolve();
+    //   },
+    // })
+    // .add('256 concurrency', {
+    //   defer: true,
+    //   fn: async deferred => {
+    //     await transfer(src2, target2, localFs, localFs, {
+    //       concurrency: 256,
+    //       perserveTargetMode: false,
+    //       onProgress,
+    //     });
+    //     deferred.resolve();
+    //   },
+    // })
+    .add('transfer', {
       defer: true,
       fn: async deferred => {
         await transfer(src1, target1, localFs, localFs, {
-          concurrency: 1,
+          concurrency: 4,
           perserveTargetMode: false,
           onProgress,
         });
         deferred.resolve();
       },
     })
-    .add('256 concurrency', {
+    .add('transfer queue', {
       defer: true,
       fn: async deferred => {
-        await transfer(src2, target2, localFs, localFs, {
-          concurrency: 256,
-          perserveTargetMode: false,
-          onProgress,
-        });
-        deferred.resolve();
-      },
-    })
-    .add('512 concurrency', {
-      defer: true,
-      fn: async deferred => {
-        await transfer(src3, target3, localFs, localFs, {
-          concurrency: 512,
+        await transferQueue(src2, target2, localFs, localFs, {
+          concurrency: 4,
           perserveTargetMode: false,
           onProgress,
         });

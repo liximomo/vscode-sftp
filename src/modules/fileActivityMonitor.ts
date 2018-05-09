@@ -1,10 +1,10 @@
-
 import { TextDocument } from 'vscode';
 import { onDidOpenTextDocument } from '../host';
-import { getConfig } from './config';
+import { sftpBarItem } from '../global';
 import { download } from '../actions';
-import * as output from './output';
 import logger from '../logger';
+import { getConfig } from './config';
+import * as output from './output';
 
 async function downloadOnOpen(uri) {
   const activityPath = uri.fsPath;
@@ -19,7 +19,7 @@ async function downloadOnOpen(uri) {
   if (config.downloadOnOpen) {
     await download(activityPath, config).catch(output.onError);
     logger.info(`[file-open] download ${activityPath}`);
-    output.status.msg('download done', 2 * 1000);
+    sftpBarItem.showMsg('download done', 2 * 1000);
   }
 }
 

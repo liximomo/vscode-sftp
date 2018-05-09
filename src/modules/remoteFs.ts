@@ -2,7 +2,6 @@ import * as path from 'path';
 import upath from './upath';
 import { promptForPassword } from '../host';
 import logger from '../logger';
-import * as output from '../modules/output';
 import FileSystem from '../model/Fs/FileSystem';
 import RemoteFileSystem from '../model/Fs/RemoteFileSystem';
 import LocalFileSystem from '../model/Fs/LocalFileSystem';

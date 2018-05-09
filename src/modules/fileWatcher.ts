@@ -1,7 +1,9 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import { sftpBarItem } from '../global';
 import { CONGIF_FILENAME } from '../constants';
 import { isValidFile } from '../helper/documentFilter';
+import fileDepth from '../helper/fileDepth';
 import throttle from '../helper/throttle';
 import { upload, removeRemote } from '../actions';
 import { getConfig } from './config';
@@ -14,32 +16,21 @@ const watchers: {
   [x: string]: vscode.FileSystemWatcher;
 } = {};
 
-const uploadQueue = [];
-const deleteQueue = [];
+const uploadBuffer = new Set();
+const deleteBuffer = new Set();
 
-const ACTION_INTEVAL = 500;
+const ACTION_INTEVAL = 300;
 
 function isConfigFile(uri: vscode.Uri) {
   const filename = path.basename(uri.fsPath);
   return filename === CONGIF_FILENAME;
 }
 
-function fileError(event, file, showErrorWindow = true) {
-  return error => {
-    logger.error(`${event} ${file}`, '\n', error.stack);
-    if (showErrorWindow) {
-      output.showOutPutChannel();
-    }
-  };
-}
-
 function doUpload() {
-  const files = uploadQueue
-    .slice()
-    .map(uri => uri.fsPath)
-    .sort();
-  uploadQueue.length = 0;
-  files.forEach(file => {
+  const files = [...uploadBuffer].slice().sort((a, b) => fileDepth(b) - fileDepth(a));
+  uploadBuffer.clear();
+
+  files.forEach(async file => {
     let config;
     try {
       config = getConfig(file);
@@ -48,24 +39,23 @@ function doUpload() {
       return;
     }
 
-    upload(file, config).then(() => {
-      logger.info('[watcher]', `upload ${file}`);
-      output.status.msg({
-        text: `upload ${path.basename(file)}`,
-        tooltip: simplifyPath(file),
-      }, 2 * 1000);
-    }, fileError('upload', file));
+    try {
+      await upload(file, config);
+      logger.info(`[watcher] upload ${file}`);
+      sftpBarItem.showMsg(`upload ${path.basename(file)}`, simplifyPath(file), 2 * 1000);
+    } catch (error) {
+      logger.error(`[watcher] upload ${file} error`, '\n', error.stack);
+      output.show();
+    }
   });
 }
 
 function doDelete() {
-  const files = deleteQueue
-    .slice()
-    .map(uri => uri.fsPath)
-    .sort();
-  deleteQueue.length = 0;
+  const files = [...deleteBuffer].slice().sort((a, b) => fileDepth(b) - fileDepth(a));
+  deleteBuffer.clear();
+
   let config;
-  files.forEach(file => {
+  files.forEach(async file => {
     try {
       config = getConfig(file);
     } catch (error) {
@@ -73,28 +63,28 @@ function doDelete() {
       return;
     }
 
-    removeRemote(config.remotePath, {
-      ...config,
-      skipDir: true,
-    }).then(() => {
-      logger.info('[watcher]', `delete ${file}`);
-      output.status.msg({
-        text: `delete ${path.basename(file)}`,
-        tooltip: simplifyPath(file),
-      }, 2 * 1000);
-    }, fileError('delete', config.remotePath, false));
+    try {
+      await removeRemote(config.remotePath, {
+        ...config,
+        skipDir: true,
+      });
+      logger.info(`[watcher] delete ${file}`);
+      sftpBarItem.showMsg(`delete ${path.basename(file)}`, simplifyPath(file), 2 * 1000);
+    } catch (error) {
+      logger.error(`[watcher] delete ${file} error`, error.stack);
+    }
   });
 }
 
-const throttledUpload = throttle(doUpload, ACTION_INTEVAL);
-const throttledDelete = throttle(doDelete, ACTION_INTEVAL);
+const throttledUpload = throttle(doUpload, ACTION_INTEVAL, { leading: false });
+const throttledDelete = throttle(doDelete, ACTION_INTEVAL, { leading: false });
 
 function uploadHandler(uri: vscode.Uri) {
   if (!isValidFile(uri)) {
     return;
   }
 
-  uploadQueue.push(uri);
+  uploadBuffer.add(uri.fsPath);
   throttledUpload();
 }
 
@@ -144,7 +134,7 @@ function setUpWatcher(config) {
         return;
       }
 
-      deleteQueue.push(uri);
+      deleteBuffer.add(uri.fsPath);
       throttledDelete();
     });
   }

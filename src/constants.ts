@@ -8,6 +8,8 @@ export const CONGIF_FILENAME = 'sftp.json';
 
 export const CONFIG_PATH = path.join(VENDOR_FOLDER, CONGIF_FILENAME);
 
+export const COMMAND_OPEN_OUTPUT = 'sftp.open-output';
+
 export const COMMAND_CONFIG = 'sftp.config.default';
 
 export const COMMAND_SYNC_TO_REMOTE = 'sftp.sync.remote';
