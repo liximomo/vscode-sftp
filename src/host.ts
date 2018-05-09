@@ -50,3 +50,7 @@ export function promptForPassword(prompt: string): Promise<string | null> {
     prompt,
   }) as Promise<string | null>;
 }
+
+export function setContextValue(key: string, value: any) {
+  vscode.commands.executeCommand('setContext', EXTENSION_NAME + ':' + key, value);
+}

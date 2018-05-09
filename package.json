@@ -90,39 +90,44 @@
         {
           "command": "sftp.diff",
           "group": "3_compare",
-          "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsFolder"
+          "when": "sftp:enabled && explorerViewletVisible && filesExplorerFocus && !explorerResourceIsFolder"
         },
         {
           "command": "sftp.sync.remote",
           "group": "sftp.sync@1",
-          "when": "explorerResourceIsFolder"
+          "when": "sftp:enabled && explorerResourceIsFolder"
         },
         {
           "command": "sftp.sync.local",
           "group": "sftp.sync@2",
-          "when": "explorerResourceIsFolder"
+          "when": "sftp:enabled && explorerResourceIsFolder"
         },
         {
           "command": "sftp.trans.remote",
-          "group": "sftp.trans@3"
+          "group": "sftp.trans@3",
+          "when": "sftp:enabled"
         },
         {
           "command": "sftp.trans.local",
-          "group": "sftp.trans@4"
+          "group": "sftp.trans@4",
+          "when": "sftp:enabled"
         }
       ],
       "editor/context": [
         {
           "command": "sftp.diff",
-          "group": "3_compare"
+          "group": "3_compare",
+          "when": "sftp:enabled"
         },
         {
           "command": "sftp.trans.remote",
-          "group": "sftp.trans@1"
+          "group": "sftp.trans@1",
+          "when": "sftp:enabled"
         },
         {
           "command": "sftp.trans.local",
-          "group": "sftp.trans@2"
+          "group": "sftp.trans@2",
+          "when": "sftp:enabled"
         }
       ]
     },
