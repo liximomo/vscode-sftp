@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import FileSystem, { FileType } from '../model/Fs/FileSystem';
+import FileSystem, { FileType } from '../core/Fs/FileSystem';
 import { getAllConfigs } from '../modules/config';
 import * as path from 'path';
 

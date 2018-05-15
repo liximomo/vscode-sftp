@@ -5,10 +5,11 @@ export function getConfig() {
   return vscode.workspace.getConfiguration(EXTENSION_NAME);
 }
 
-export function onDidOpenTextDocument(
-  listener: (e: vscode.TextDocument) => any,
-  thisArgs?: any
-) {
+export function onDidSaveTextDocument(listener: (e: vscode.TextDocument) => any, thisArgs?: any) {
+  return vscode.workspace.onDidSaveTextDocument(listener, thisArgs);
+}
+
+export function onDidOpenTextDocument(listener: (e: vscode.TextDocument) => any, thisArgs?: any) {
   return vscode.workspace.onDidOpenTextDocument(listener, thisArgs);
 }
 
@@ -53,4 +54,18 @@ export function promptForPassword(prompt: string): Promise<string | null> {
 
 export function setContextValue(key: string, value: any) {
   vscode.commands.executeCommand('setContext', EXTENSION_NAME + ':' + key, value);
+}
+
+export function showWarningMessage(message: string, ...items: string[]) {
+  return vscode.window.showWarningMessage(message, ...items);
+}
+
+export function registerCommand(
+  context: vscode.ExtensionContext,
+  name: string,
+  callback: (args: any[]) => any,
+  thisArg?: any
+) {
+  const disposable = vscode.commands.registerCommand(name, callback, thisArg);
+  context.subscriptions.push(disposable);
 }

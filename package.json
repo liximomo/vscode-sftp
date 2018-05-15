@@ -17,24 +17,10 @@
     "type": "git",
     "url": "https://github.com/liximomo/vscode-sftp.git"
   },
-  "categories": [
-    "Other"
-  ],
-  "keywords": [
-    "ftp",
-    "sftp",
-    "sync",
-    "remote"
-  ],
+  "categories": ["Other"],
+  "keywords": ["ftp", "sftp", "sync", "remote"],
   "activationEvents": [
     "onCommand:sftp.config.default",
-    "onCommand:sftp.trans.remote",
-    "onCommand:sftp.trans.local",
-    "onCommand:sftp.sync.remote",
-    "onCommand:sftp.sync.local",
-    "onCommand:sftp.list.default",
-    "onCommand:sftp.list.all",
-    "onCommand:sftp.diff",
     "workspaceContains:.vscode/sftp.json"
   ],
   "icon": "icon.png",
@@ -86,11 +72,46 @@
       }
     ],
     "menus": {
+      "commandPalette": [
+        {
+          "command": "sftp.config.default",
+          "when": "workbenchState != empty"
+        },
+        {
+          "command": "sftp.list.default",
+          "when": "sftp:enabled"
+        },
+        {
+          "command": "sftp.list.all",
+          "when": "sftp:enabled"
+        },
+        {
+          "command": "sftp.trans.remote",
+          "when": "sftp:enabled"
+        },
+        {
+          "command": "sftp.trans.local",
+          "when": "sftp:enabled"
+        },
+        {
+          "command": "sftp.sync.remote",
+          "when": "sftp:enabled"
+        },
+        {
+          "command": "sftp.sync.local",
+          "when": "sftp:enabled"
+        },
+        {
+          "command": "sftp.diff",
+          "when": "sftp:enabled"
+        }
+      ],
       "explorer/context": [
         {
           "command": "sftp.diff",
           "group": "3_compare",
-          "when": "sftp:enabled && explorerViewletVisible && filesExplorerFocus && !explorerResourceIsFolder"
+          "when":
+            "sftp:enabled && explorerViewletVisible && filesExplorerFocus && !explorerResourceIsFolder"
         },
         {
           "command": "sftp.sync.remote",
@@ -145,7 +166,8 @@
     "test": "node ./node_modules/vscode/bin/test",
     "test:spec": "jest",
     "package": "vsce package",
-    "pub:debug": "rm -rf _debug && mkdir _debug && vsce package --out _debug/sftp-debug.vsix && cd _debug && git init && git commit --allow-empty -m 'update debug package' && git checkout -b debug-pacakge && cp ../INSTALL_DEBUG.md README.md  && git add . && git commit -am 'update debug package' && git push git@github.com:liximomo/vscode-sftp.git debug-pacakge --force",
+    "pub:debug":
+      "rm -rf _debug && mkdir _debug && vsce package --out _debug/sftp-debug.vsix && cd _debug && git init && git commit --allow-empty -m 'update debug package' && git checkout -b debug-pacakge && cp ../INSTALL_DEBUG.md README.md  && git add . && git commit -am 'update debug package' && git push git@github.com:liximomo/vscode-sftp.git debug-pacakge --force",
     "lint": "tslint --project tsconfig.json src/**/*.ts"
   },
   "devDependencies": {
@@ -170,15 +192,10 @@
     "upath": "^1.0.0"
   },
   "jest": {
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
+    "moduleFileExtensions": ["ts", "js"],
     "transform": {
       "^.+\\.ts$": "<rootDir>/test/preprocessor.js"
     },
-    "testMatch": [
-      "**/test/*.spec.js"
-    ]
+    "testMatch": ["**/test/*.spec.js"]
   }
 }

@@ -1,4 +1,4 @@
-import upath from '../modules/upath';
+import upath from '../core/upath';
 import * as path from 'path';
 
 export function toRemote(relativePath, remoteContext) {

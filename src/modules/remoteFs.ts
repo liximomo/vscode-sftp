@@ -1,13 +1,12 @@
 import * as path from 'path';
-import upath from './upath';
+import upath from '../core/upath';
 import { promptForPassword } from '../host';
 import logger from '../logger';
-import * as output from '../modules/output';
-import FileSystem from '../model/Fs/FileSystem';
-import RemoteFileSystem from '../model/Fs/RemoteFileSystem';
-import LocalFileSystem from '../model/Fs/LocalFileSystem';
-import SFTPFileSystem from '../model/Fs/SFTPFileSystem';
-import FTPFileSystem from '../model/Fs/FTPFileSystem';
+import FileSystem from '../core/Fs/FileSystem';
+import RemoteFileSystem from '../core/Fs/RemoteFileSystem';
+import LocalFileSystem from '../core/Fs/LocalFileSystem';
+import SFTPFileSystem from '../core/Fs/SFTPFileSystem';
+import FTPFileSystem from '../core/Fs/FTPFileSystem';
 
 function hashOption(opiton) {
   return Object.keys(opiton)
@@ -28,80 +27,83 @@ class KeepAliveRemoteFs {
       return Promise.resolve(this.fs);
     }
 
-    if (!this.pendingPromise) {
-      let shouldPromptForPass = false;
-      let connectOption: any = {
-        host: option.host,
-        port: option.port,
-        username: option.username,
-        password: option.password,
-        connectTimeout: option.connectTimeout,
-      };
-      let FsConstructor;
-      if (option.protocol === 'sftp') {
-        connectOption = {
-          ...connectOption,
-          agent: option.agent,
-          privateKeyPath: option.privateKeyPath,
-          passphrase: option.passphrase,
-          interactiveAuth: option.interactiveAuth,
-          algorithms: option.algorithms,
-        };
-
-        // tslint:disable triple-equals
-        shouldPromptForPass =
-          connectOption.password == undefined &&
-          connectOption.agent == undefined &&
-          connectOption.privateKeyPath == undefined;
-        // tslint:enable
-
-        // explict compare to true, cause we want to distinct between string and true
-        if (option.passphrase === true) {
-          connectOption.passphrase = await promptForPassword('Enter your passphrase');
-        }
-        FsConstructor = SFTPFileSystem;
-      } else if (option.protocol === 'ftp') {
-        connectOption = {
-          ...connectOption,
-          secure: option.secure,
-          secureOptions: option.secureOptions,
-          passive: option.passive,
-          debug(str) {
-            const log = str.match(/^\[connection\] (>|<) '(.*?)(\\r\\n)?'$/);
-
-            if (!log) return;
-
-            if (log[2].match(/NOOP ok/)) return;
-
-            if (log[2].match(/^PASS /)) log[2] = 'PASS ******';
-
-            logger.debug(`${log[1]} ${log[2]}`);
-          },
-        };
-        // tslint:disable-next-line triple-equals
-        shouldPromptForPass = connectOption.password == undefined;
-        FsConstructor = FTPFileSystem;
-      } else {
-        return Promise.reject(new Error(`unsupported protocol ${option.protocol}`));
-      }
-
-      if (shouldPromptForPass) {
-        connectOption.password = await promptForPassword('Enter your password');
-      }
-      this.fs = new FsConstructor(upath, connectOption);
-      const client = this.fs.getClient();
-      client.onDisconnected(this.invalid.bind(this));
-      this.pendingPromise = client.connect(promptForPassword).then(
-        () => {
-          this.isValid = true;
-          return this.fs;
-        },
-        err => {
-          this.invalid('error');
-          throw err;
-        }
-      );
+    if (this.pendingPromise) {
+      return this.pendingPromise;
     }
+
+    let shouldPromptForPass = false;
+    let connectOption: any = {
+      host: option.host,
+      port: option.port,
+      username: option.username,
+      password: option.password,
+      connectTimeout: option.connectTimeout,
+    };
+    let FsConstructor;
+    if (option.protocol === 'sftp') {
+      connectOption = {
+        ...connectOption,
+        agent: option.agent,
+        privateKeyPath: option.privateKeyPath,
+        passphrase: option.passphrase,
+        interactiveAuth: option.interactiveAuth,
+        algorithms: option.algorithms,
+      };
+
+      // tslint:disable triple-equals
+      shouldPromptForPass =
+        connectOption.password == undefined &&
+        connectOption.agent == undefined &&
+        connectOption.privateKeyPath == undefined;
+      // tslint:enable
+
+      // explict compare to true, cause we want to distinct between string and true
+      if (option.passphrase === true) {
+        connectOption.passphrase = await promptForPassword('Enter your passphrase');
+      }
+      FsConstructor = SFTPFileSystem;
+    } else if (option.protocol === 'ftp') {
+      connectOption = {
+        ...connectOption,
+        secure: option.secure,
+        secureOptions: option.secureOptions,
+        passive: option.passive,
+        debug(str) {
+          const log = str.match(/^\[connection\] (>|<) '(.*?)(\\r\\n)?'$/);
+
+          if (!log) return;
+
+          if (log[2].match(/NOOP ok/)) return;
+
+          if (log[2].match(/^PASS /)) log[2] = 'PASS ******';
+
+          logger.debug(`${log[1]} ${log[2]}`);
+        },
+      };
+      // tslint:disable-next-line triple-equals
+      shouldPromptForPass = connectOption.password == undefined;
+      FsConstructor = FTPFileSystem;
+    } else {
+      return Promise.reject(new Error(`unsupported protocol ${option.protocol}`));
+    }
+
+    if (shouldPromptForPass) {
+      connectOption.password = await promptForPassword('Enter your password');
+    }
+
+    this.fs = new FsConstructor(upath, connectOption);
+    this.fs.onDisconnected(this.invalid.bind(this));
+    this.pendingPromise = this.fs.connect(promptForPassword).then(
+      () => {
+        this.isValid = true;
+        return this.fs;
+      },
+      err => {
+        this.invalid('error');
+        throw err;
+      }
+    );
+
     return this.pendingPromise;
   }
 
@@ -111,7 +113,7 @@ class KeepAliveRemoteFs {
   }
 
   end() {
-    this.fs.getClient().end();
+    this.fs.end();
   }
 }
 

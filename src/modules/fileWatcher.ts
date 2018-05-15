@@ -1,15 +1,15 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { CONGIF_FILENAME } from '../constants';
-import { isValidFile } from '../helper/documentFilter';
-import throttle from '../helper/throttle';
+import sftpBarItem from '../ui/sftpBarItem';
+import * as output from '../ui/output';
+import { isValidFile } from '../helper/fileType';
+import * as utils from '../utils';
 import { upload, removeRemote } from '../actions';
 import { getConfig } from './config';
-import * as output from './output';
+import reportError from '../helper/reportError';
 import logger from '../logger';
 import { simplifyPath } from '../host';
 
-let workspaceWatcher: vscode.Disposable;
 const watchers: {
   [x: string]: vscode.FileSystemWatcher;
 } = {};
@@ -19,16 +19,11 @@ const deleteQueue = [];
 
 const ACTION_INTEVAL = 500;
 
-function isConfigFile(uri: vscode.Uri) {
-  const filename = path.basename(uri.fsPath);
-  return filename === CONGIF_FILENAME;
-}
-
 function fileError(event, file, showErrorWindow = true) {
   return error => {
     logger.error(`${event} ${file}`, '\n', error.stack);
     if (showErrorWindow) {
-      output.showOutPutChannel();
+      output.show();
     }
   };
 }
@@ -44,16 +39,13 @@ function doUpload() {
     try {
       config = getConfig(file);
     } catch (error) {
-      output.onError(error);
+      reportError(error);
       return;
     }
 
     upload(file, config).then(() => {
       logger.info('[watcher]', `upload ${file}`);
-      output.status.msg({
-        text: `upload ${path.basename(file)}`,
-        tooltip: simplifyPath(file),
-      }, 2 * 1000);
+      sftpBarItem.showMsg(`upload ${path.basename(file)}`, simplifyPath(file), 2 * 1000);
     }, fileError('upload', file));
   });
 }
@@ -69,7 +61,7 @@ function doDelete() {
     try {
       config = getConfig(file);
     } catch (error) {
-      output.onError(error);
+      reportError(error);
       return;
     }
 
@@ -78,16 +70,13 @@ function doDelete() {
       skipDir: true,
     }).then(() => {
       logger.info('[watcher]', `delete ${file}`);
-      output.status.msg({
-        text: `delete ${path.basename(file)}`,
-        tooltip: simplifyPath(file),
-      }, 2 * 1000);
+      sftpBarItem.showMsg(`delete ${path.basename(file)}`, simplifyPath(file), 2 * 1000);
     }, fileError('delete', config.remotePath, false));
   });
 }
 
-const throttledUpload = throttle(doUpload, ACTION_INTEVAL);
-const throttledDelete = throttle(doDelete, ACTION_INTEVAL);
+const throttledUpload = utils.throttle(doUpload, ACTION_INTEVAL);
+const throttledDelete = utils.throttle(doDelete, ACTION_INTEVAL);
 
 function uploadHandler(uri: vscode.Uri) {
   if (!isValidFile(uri)) {
@@ -169,39 +158,12 @@ export function enableWatcher(config) {
   }, 1000 * 3);
 }
 
-export function watchWorkspace({
-  onDidSaveFile,
-  onDidSaveSftpConfig,
-}: {
-  onDidSaveFile: (uri: vscode.Uri) => void;
-  onDidSaveSftpConfig: (uri: vscode.Uri) => void;
-}) {
-  if (workspaceWatcher) {
-    workspaceWatcher.dispose();
-  }
-
-  workspaceWatcher = vscode.workspace.onDidSaveTextDocument((doc: vscode.TextDocument) => {
-    const uri = doc.uri;
-    if (!isValidFile(uri)) {
-      return;
-    }
-
-    // let configWatcher do this
-    if (isConfigFile(uri)) {
-      onDidSaveSftpConfig(uri);
-      return;
-    }
-
-    onDidSaveFile(uri);
-  });
-}
-
 export function watchFiles(config) {
   const configs = [].concat(config);
   configs.forEach(setUpWatcher);
 }
 
 export function clearAllWatcher() {
-  const disposable = vscode.Disposable.from(...getWatchs(), workspaceWatcher);
+  const disposable = vscode.Disposable.from(...getWatchs());
   disposable.dispose();
 }

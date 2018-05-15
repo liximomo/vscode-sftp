@@ -1,4 +1,4 @@
-import * as output from './modules/output';
+import * as output from './ui/output';
 import { getConfig } from './host';
 
 const config = getConfig();

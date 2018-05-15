@@ -3,7 +3,7 @@ import { FileTarget } from '../commands/FileCommand';
 import { listFiles } from '../helper/select';
 import * as paths from '../helper/paths';
 import { selectContext } from '../helper/select';
-import upath from '../modules/upath';
+import upath from '../core/upath';
 import { getAllConfigs } from '../modules/config';
 import { getHostInfo } from '../modules/config';
 import getRemoteFs from '../modules/remoteFs';

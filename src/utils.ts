@@ -1,4 +1,4 @@
-export default function throttle(func, delay, { leading = true, trailing = true } = {}) {
+export function throttle(func, delay, { leading = true, trailing = true } = {}) {
   let lastExec = -(delay + 1);
   let timeout;
 
@@ -27,4 +27,9 @@ export default function throttle(func, delay, { leading = true, trailing = true 
   }
 
   return wrapper;
+}
+
+export function flatten(items) {
+  const accumulater = (result, item) => result.concat(item);
+  return items.reduce(accumulater, []);
 }

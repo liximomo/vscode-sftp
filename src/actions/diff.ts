@@ -2,7 +2,7 @@ import * as path from 'path';
 import createFileAction from './createFileAction';
 import { diffFiles, simplifyPath } from '../host';
 import { EXTENSION_NAME } from '../constants';
-import { transfer } from '../modules/fileTransferTask';
+import { transfer } from '../core/fileTransferTask';
 import makeTmpFile from '../helper/makeTmpFile';
 
 export const diff = createFileAction(

@@ -18,4 +18,16 @@ export default abstract class RemoteFileSystem extends FileSystem {
   setClient(client: RemoteClient) {
     this.client = client;
   }
+
+  connect(readline?: (text: string) => Promise<string | undefined>): Promise<void> {
+    return this.client.connect(readline);
+  }
+
+  onDisconnected(cb) {
+    this.client.onDisconnected(cb);
+  }
+
+  end() {
+    this.client.end();
+  }
 }

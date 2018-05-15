@@ -1,4 +1,4 @@
-import { sync } from '../modules/fileTransferTask';
+import { sync } from '../core/fileTransferTask';
 import createFileAction from './createFileAction';
 
 export const sync2Remote = createFileAction(

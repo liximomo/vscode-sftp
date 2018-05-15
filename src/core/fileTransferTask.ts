@@ -1,5 +1,3 @@
-import * as vscode from 'vscode';
-
 import * as eachLimit from 'async/eachLimit';
 import {
   transferFile,
@@ -9,9 +7,9 @@ import {
   TransferOption,
 } from './fileTransfer';
 import upath from './upath';
-import * as output from './output';
-import FileSystem, { IFileEntry, FileType } from '../model/Fs/FileSystem';
-import flatten from '../helper/flatten';
+import sftpBarItem from '../ui/sftpBarItem';
+import FileSystem, { IFileEntry, FileType } from '../core/Fs/FileSystem';
+import * as  utils from '../utils';
 import { simplifyPath } from '../host';
 
 type SyncModel = 'full' | 'update';
@@ -183,10 +181,7 @@ async function getFileTaskListFromDirector(
     return Promise.resolve([createTransferFileTask(src, des, FileType.Directory)]);
   }
 
-  output.status.msg({
-    text: `retrieving directory ${upath.basename(src)}`,
-    tooltip: simplifyPath(src),
-  });
+  sftpBarItem.showMsg(`retrieving directory ${upath.basename(src)}`, simplifyPath(src));
 
   // $caution side effect
   // Need this to make sure file can correct transfer
@@ -207,7 +202,7 @@ async function getFileTaskListFromDirector(
     return createTransferFileTask(file.fspath, desFs.pathResolver.join(des, file.name), file.type);
   });
   const tasks = await Promise.all<FileTask | FileTask[]>(promises);
-  return flatten(tasks);
+  return utils.flatten(tasks);
 }
 
 async function getFileTaskListFromDirectorBySync(
@@ -221,12 +216,10 @@ async function getFileTaskListFromDirectorBySync(
     return Promise.resolve([createTransferFileTask(src, des, FileType.Directory)]);
   }
 
-  output.status.msg({
-    text: `retrieving directory ${upath.basename(src)}`,
-    tooltip: simplifyPath(src),
-  });
+  sftpBarItem.showMsg(`retrieving directory ${upath.basename(src)}`, simplifyPath(src));
   const syncFiles = ([srcFileEntries, desFileEntries]: IFileEntry[][]) => {
-    output.status.msg('diff files...');
+    sftpBarItem.showMsg('diff files...');
+
     const srcFileTable = toHash(srcFileEntries, 'id', fileEntry => ({
       ...fileEntry,
       id: upath.normalize(srcFs.pathResolver.relative(src, fileEntry.fspath)),
@@ -331,7 +324,7 @@ async function getFileTaskListFromDirectorBySync(
       ...transDirTasks,
       ...clearFileTasks,
       ...clearDirTasks,
-    ]).then(flatten);
+    ]).then(utils.flatten);
   };
 
   return Promise.all([srcFs.list(src).catch(err => []), desFs.list(des).catch(err => [])]).then(

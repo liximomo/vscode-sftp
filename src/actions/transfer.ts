@@ -1,4 +1,4 @@
-import { transfer } from '../modules/fileTransferTask';
+import { transfer } from '../core/fileTransferTask';
 import createFileAction from './createFileAction';
 
 export const upload = createFileAction(

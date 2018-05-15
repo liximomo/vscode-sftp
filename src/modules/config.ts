@@ -2,8 +2,8 @@ import { CONFIG_PATH } from '../constants';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as Joi from 'joi';
-import * as output from './output';
-import Trie from './Trie';
+import reportError from '../helper/reportError';
+import Trie from '../core/Trie';
 import { showTextDocument } from '../host';
 import logger from '../logger';
 
@@ -206,9 +206,7 @@ export function newConfig(basePath) {
         )
         .then(() => showTextDocument(configPath));
     })
-    .catch(error => {
-      output.onError(error);
-    });
+    .catch(reportError);
 }
 
 export function getHostInfo(config) {
