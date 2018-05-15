@@ -11,8 +11,8 @@ function createCommand(id, name, handler) {
   return cmd;
 }
 
-function createFileCommand(id, name, fileHandler, getFileTarget) {
-  const cmd = new FileCommand(id, name, fileHandler, getFileTarget);
+function createFileCommand(id, name, fileHandler, getFileTarget, requireTarget) {
+  const cmd = new FileCommand(id, name, fileHandler, getFileTarget, requireTarget);
   commands.push(cmd);
   return cmd;
 }

@@ -88,7 +88,7 @@ const defaultConfig = {
     autoUpload: false,
     autoDelete: false,
   },
-  concurrency: 512,
+  concurrency: 4,
 };
 
 function normalizeTriePath(pathname) {
@@ -123,6 +123,7 @@ function addConfig(config, defaultContext) {
 
   const withDefault = {
     ...defaultConfig,
+    port: config.protocol === 'ftp' ? 21 : 22, // override default port by protocol
     ...config,
     context,
   };

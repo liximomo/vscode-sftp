@@ -30,6 +30,10 @@ export default abstract class BaseCommand {
     };
   }
 
+  commitCommandDone() {
+    this.commandDoneListeners.forEach(listener => listener());
+  }
+
   register(context: vscode.ExtensionContext) {
     registerCommand(context, this.id, this._commandHandler, this);
   }
@@ -42,11 +46,5 @@ export default abstract class BaseCommand {
     } catch (error) {
       reportError(error);
     }
-
-    this.commitCommandDone();
-  }
-
-  private commitCommandDone() {
-    this.commandDoneListeners.forEach(listener => listener());
   }
 }

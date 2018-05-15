@@ -73,7 +73,7 @@ class KeepAliveRemoteFs {
 
           if (!log) return;
 
-          if (log[2].match(/NOOP ok/)) return;
+          if (log[2].match(/200 NOOP/)) return;
 
           if (log[2].match(/^PASS /)) log[2] = 'PASS ******';
 

@@ -70,8 +70,7 @@ async function showFiles(
     });
 
   const result = await vscode.window.showQuickPick(items, {
-    ignoreFocusOut: true,
-    placeHolder: 'Select a target...(ESC to cancel)',
+    placeHolder: 'Select a target...',
   });
 
   if (result === undefined) {
@@ -142,7 +141,7 @@ async function showFiles(
 
 export function listFiles(
   items: Array<{
-    name?: string,
+    name?: string;
     description: string;
     fsPath: string;
     getFs?: () => Promise<FileSystem>;
@@ -179,8 +178,7 @@ export function selectContext(): Promise<string> {
 
     vscode.window
       .showQuickPick(projectsList, {
-        ignoreFocusOut: true,
-        placeHolder: 'Select a folder...(ESC to cancel)',
+        placeHolder: 'Select a folder...',
       })
       .then(selection => {
         if (selection) {

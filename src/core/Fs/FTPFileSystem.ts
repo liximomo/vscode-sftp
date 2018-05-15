@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as FileStatus from 'stat-mode';
+import * as PQueue from 'p-queue';
 import logger from '../../logger';
 import FileSystem, { IFileEntry, FileType, IStats, IStreamOption } from './FileSystem';
 import RemoteFileSystem from './RemoteFileSystem';
@@ -40,6 +41,8 @@ export default class FTPFileSystem extends RemoteFileSystem {
     }
   }
 
+  private queue: any = new PQueue({ concurrency: 1 });
+
   constructor(pathResolver, option: IClientOption) {
     super(pathResolver);
     this.setClient(new FTPClient(option));
@@ -49,91 +52,44 @@ export default class FTPFileSystem extends RemoteFileSystem {
     return this.getClient().getFsClient();
   }
 
-  lstat(path: string): Promise<IStats> {
-    return new Promise((resolve, reject) => {
-      const isRootPath = path === '/';
-      const parentPath = isRootPath ? '/' : this.pathResolver.dirname(path);
-      const nameIdentity = isRootPath ? '.' : this.pathResolver.basename(path);
+  async lstat(path: string): Promise<IStats> {
+    const isRootPath = path === '/';
+    const parentPath = isRootPath ? '/' : this.pathResolver.dirname(path);
+    const nameIdentity = isRootPath ? '.' : this.pathResolver.basename(path);
+    const stats = await this.atomicList(parentPath);
 
-      this.ftp.list(parentPath, (err, stats) => {
-        if (err) {
-          reject(err);
-          return;
-        }
+    const fileStat = stats
+      .map(stat => ({
+        ...stat,
+        type: FTPFileSystem.getFileType(stat.type),
+        permissionMode: toNumMode(stat.rights), // Caution: windows will always get 0o666
+      }))
+      .find(ns => ns.name === nameIdentity);
 
-        const fileStat = stats
-          .map(stat => ({
-            ...stat,
-            type: FTPFileSystem.getFileType(stat.type),
-            permissionMode: toNumMode(stat.rights), // Caution: windows will always get 0o666
-          }))
-          .find(ns => ns.name === nameIdentity);
+    if (!fileStat) {
+      throw new Error('file not exist');
+    }
 
-        if (!fileStat) {
-          reject(new Error('file not exist'));
-          return;
-        }
-
-        resolve(fileStat);
-      });
-    });
+    return fileStat;
   }
 
-  get(path, option?: IStreamOption): Promise<fs.ReadStream> {
-    return new Promise((resolve, reject) => {
-      this.ftp.get(path, (err, stream) => {
-        if (err) {
-          reject(err);
-          return;
-        }
+  async get(path, option?: IStreamOption): Promise<fs.ReadStream> {
+    const stream = await this.atomicGet(path);
 
-        if (!stream) {
-          reject(new Error('create ReadStream failed'));
-          return;
-        }
+    if (!stream) {
+      throw new Error('create ReadStream failed');
+    }
 
-        resolve(stream);
-      });
-    });
+    return stream;
   }
 
-  chmod(path: string, mode: number): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      const command = `CHMOD ${mode.toString(8)} ${path}`;
-      this.ftp.site(command, err => {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        resolve();
-      });
-    });
+  async chmod(path: string, mode: number): Promise<void> {
+    const command = `CHMOD ${mode.toString(8)} ${path}`;
+    await this.atomicSite(command);
   }
 
-  put(input: fs.ReadStream | Buffer, path, option?: IStreamOption): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.ftp.put(input, path, err => {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        if (option && option.mode) {
-          this.chmod(path, option.mode)
-            .then(resolve)
-            .catch(error => {
-              // ignore error;
-              // $todo throw this error and ignore this error at up level.
-              logger.error(`change ${path} mode to ${option.mode.toString(8)}`, error);
-              resolve();
-            });
-          return;
-        }
-
-        resolve();
-      });
-    });
+  async put(input: fs.ReadStream | Buffer, path, option?: IStreamOption): Promise<void> {
+    await this.atomicPut(input);
   }
 
   readlink(path: string): Promise<string> {
@@ -145,16 +101,8 @@ export default class FTPFileSystem extends RemoteFileSystem {
     return Promise.resolve();
   }
 
-  mkdir(dir: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.ftp.mkdir(dir, err => {
-        if (err) {
-          reject(err);
-          return;
-        }
-        resolve();
-      });
-    });
+  async mkdir(dir: string): Promise<void> {
+    await this.atomicMakeDir(dir);
   }
 
   async ensureDir(dir: string): Promise<void> {
@@ -227,45 +175,117 @@ export default class FTPFileSystem extends RemoteFileSystem {
     };
   }
 
-  list(dir: string, { showHiddenFiles = true } = {}): Promise<IFileEntry[]> {
-    return new Promise((resolve, reject) => {
-      this.ftp.list(showHiddenFiles ? `-al ${dir}` : dir, (err, result = []) => {
-        if (err) {
-          reject(err);
-          return;
-        }
+  async list(dir: string, { showHiddenFiles = true } = {}): Promise<IFileEntry[]> {
+    const stats = await this.atomicList(showHiddenFiles ? `-al ${dir}` : dir);
 
-        const fileEntries = result
-          .filter(item => item.name !== '.' && item.name !== '..')
-          .map(item => this.toFileEntry(this.pathResolver.join(dir, item.name), item));
-        resolve(fileEntries);
-      });
-    });
+    return stats
+      .filter(item => item.name !== '.' && item.name !== '..')
+      .map(item => this.toFileEntry(this.pathResolver.join(dir, item.name), item));
   }
 
-  unlink(path: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
+  async unlink(path: string): Promise<void> {
+    await this.atomicDeleteFile(path);
+  }
+
+  async rmdir(path: string, recursive: boolean): Promise<void> {
+    await this.atomicRemoveDir(path, recursive);
+  }
+
+  private async atomicList(path: string): Promise<any[]> {
+    const task = () => new Promise<any[]>((resolve, reject) => {
+      this.ftp.list(path, (err, stats) => {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve(stats || []);
+      });
+    });
+
+    return this.queue.add(task);
+  }
+
+  private async atomicGet(path: string): Promise<any> {
+    const task = () => new Promise<any>((resolve, reject) => {
+      this.ftp.get(path, (err, stream) => {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve(stream);
+      });
+    });
+
+    return this.queue.add(task);
+  }
+
+  private async atomicPut(input: fs.ReadStream | Buffer): Promise<void> {
+    const task = () => new Promise<void>((resolve, reject) => {
+      this.ftp.put(input, err => {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve();
+      });
+    });
+
+    return this.queue.add(task);
+  }
+
+  private async atomicDeleteFile(path: string): Promise<void> {
+    const task = () => new Promise<void>((resolve, reject) => {
       this.ftp.delete(path, err => {
         if (err) {
-          reject(err);
-          return;
+          return reject(err);
         }
 
         resolve();
       });
     });
+
+    return this.queue.add(task);
   }
 
-  rmdir(path: string, recursive: boolean): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.ftp.rmdir(path, recursive, err => {
+  private async atomicMakeDir(path: string): Promise<void> {
+    const task = () => new Promise<void>((resolve, reject) => {
+      this.ftp.mkdir(path, err => {
         if (err) {
-          reject(err);
-          return;
+          return reject(err);
         }
 
         resolve();
       });
     });
+
+    return this.queue.add(task);
+  }
+
+  private async atomicRemoveDir(path: string, recursive: boolean): Promise<void> {
+    const task = () => new Promise<void>((resolve, reject) => {
+      this.ftp.rmdir(path, recursive, err => {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve();
+      });
+    });
+
+    return this.queue.add(task);
+  }
+
+  private async atomicSite(command: string): Promise<void> {
+    const task = () => new Promise<void>((resolve, reject) => {
+      this.ftp.site(command, err => {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve();
+      });
+    });
+
+    return this.queue.add(task);
   }
 }

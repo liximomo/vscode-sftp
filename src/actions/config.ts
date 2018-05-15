@@ -17,8 +17,7 @@ export function editConfig() {
 
   vscode.window
     .showQuickPick(initDirs, {
-      ignoreFocusOut: true,
-      placeHolder: 'Select a folder...(ESC to cancel)',
+      placeHolder: 'Select a folder...',
     })
     .then(item => {
       if (item === undefined) {

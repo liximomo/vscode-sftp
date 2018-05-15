@@ -17,8 +17,15 @@
     "type": "git",
     "url": "https://github.com/liximomo/vscode-sftp.git"
   },
-  "categories": ["Other"],
-  "keywords": ["ftp", "sftp", "sync", "remote"],
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "ftp",
+    "sftp",
+    "sync",
+    "remote"
+  ],
   "activationEvents": [
     "onCommand:sftp.config.default",
     "workspaceContains:.vscode/sftp.json"
@@ -110,8 +117,7 @@
         {
           "command": "sftp.diff",
           "group": "3_compare",
-          "when":
-            "sftp:enabled && explorerViewletVisible && filesExplorerFocus && !explorerResourceIsFolder"
+          "when": "sftp:enabled && explorerViewletVisible && filesExplorerFocus && !explorerResourceIsFolder"
         },
         {
           "command": "sftp.sync.remote",
@@ -166,8 +172,7 @@
     "test": "node ./node_modules/vscode/bin/test",
     "test:spec": "jest",
     "package": "vsce package",
-    "pub:debug":
-      "rm -rf _debug && mkdir _debug && vsce package --out _debug/sftp-debug.vsix && cd _debug && git init && git commit --allow-empty -m 'update debug package' && git checkout -b debug-pacakge && cp ../INSTALL_DEBUG.md README.md  && git add . && git commit -am 'update debug package' && git push git@github.com:liximomo/vscode-sftp.git debug-pacakge --force",
+    "pub:debug": "rm -rf _debug && mkdir _debug && vsce package --out _debug/sftp-debug.vsix && cd _debug && git init && git commit --allow-empty -m 'update debug package' && git checkout -b debug-pacakge && cp ../INSTALL_DEBUG.md README.md  && git add . && git commit -am 'update debug package' && git push git@github.com:liximomo/vscode-sftp.git debug-pacakge --force",
     "lint": "tslint --project tsconfig.json src/**/*.ts"
   },
   "devDependencies": {
@@ -186,16 +191,22 @@
     "glob": "^7.1.2",
     "ignore": "^3.3.7",
     "joi": "^10.6.0",
+    "p-queue": "^2.4.2",
     "ssh2": "^0.5.5",
     "stat-mode": "^0.2.2",
     "tmp": "^0.0.33",
     "upath": "^1.0.0"
   },
   "jest": {
-    "moduleFileExtensions": ["ts", "js"],
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
     "transform": {
       "^.+\\.ts$": "<rootDir>/test/preprocessor.js"
     },
-    "testMatch": ["**/test/*.spec.js"]
+    "testMatch": [
+      "**/test/*.spec.js"
+    ]
   }
 }

@@ -25,7 +25,8 @@ export default function init(context: vscode.ExtensionContext) {
     constants.COMMAND_SYNC_TO_REMOTE,
     'sync to remote',
     actions.sync2Remote,
-    selectFolderFallbackToConfigContext
+    selectFolderFallbackToConfigContext,
+    true
   );
 
   commandManager
@@ -33,7 +34,8 @@ export default function init(context: vscode.ExtensionContext) {
       constants.COMMAND_SYNC_TO_LOCAL,
       'sync to local',
       actions.sync2Local,
-      selectFolderFallbackToConfigContext
+      selectFolderFallbackToConfigContext,
+      true
     )
     .onCommandDone(refreshExplorer);
 
@@ -41,7 +43,8 @@ export default function init(context: vscode.ExtensionContext) {
     constants.COMMAND_UPLOAD,
     'upload',
     actions.upload,
-    selectFileFallbackToConfigContext
+    selectFileFallbackToConfigContext,
+    true
   );
 
   commandManager
@@ -49,7 +52,8 @@ export default function init(context: vscode.ExtensionContext) {
       constants.COMMAND_DOWNLOAD,
       'download',
       actions.download,
-      selectFileFallbackToConfigContext
+      selectFileFallbackToConfigContext,
+      true
     )
     .onCommandDone(refreshExplorer);
 
@@ -64,7 +68,8 @@ export default function init(context: vscode.ExtensionContext) {
           await showTextDocument(fsPath);
         }
       },
-      selectFileFromAll
+      selectFileFromAll,
+      false
     )
     .onCommandDone(refreshExplorer);
 
@@ -79,11 +84,18 @@ export default function init(context: vscode.ExtensionContext) {
           await showTextDocument(fsPath);
         }
       },
-      selectFile
+      selectFile,
+      false
     )
     .onCommandDone(refreshExplorer);
 
-  commandManager.createFileCommand(constants.COMMAND_DIFF, 'diff', actions.diff, selectFileOnly);
+  commandManager.createFileCommand(
+    constants.COMMAND_DIFF,
+    'diff',
+    actions.diff,
+    selectFileOnly,
+    true
+  );
 
   commandManager.registerAll(context);
 }

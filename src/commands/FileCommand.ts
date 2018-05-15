@@ -12,11 +12,13 @@ export interface FileTarget {
 export default class FileCommand extends BaseCommand {
   protected fileHandler: (fspath: string, config: any) => any;
   private getFileTarget: (item, items?) => Promise<FileTarget>;
+  private requireTarget: boolean;
 
-  constructor(id, name, fileHandler, getFileTarget) {
+  constructor(id, name, fileHandler, getFileTarget, requireTarget: boolean) {
     super(id, name);
     this.fileHandler = fileHandler;
     this.getFileTarget = getFileTarget;
+    this.requireTarget = requireTarget;
 
     this.onCommandDone(() => {
       sftpBarItem.showMsg(`${this.getName()} done`, 2000);
@@ -40,12 +42,21 @@ export default class FileCommand extends BaseCommand {
 
   private async handler(item, items) {
     const targets = await this.getFileTarget(item, items);
+
     if (!targets) {
-      showWarningMessage(`The "${this.getName()}" command can not find a target.`);
+      if (this.requireTarget) {
+        showWarningMessage(`The "${this.getName()}" command can not find a target.`);
+      }
+
       return;
     }
 
     const pendingTasks = [].concat(targets).map(target => this.handleFile(target));
-    return await Promise.all(pendingTasks);
+
+    try {
+      return await Promise.all(pendingTasks);
+    } finally {
+      this.commitCommandDone();
+    }
   }
 }

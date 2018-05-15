@@ -149,11 +149,6 @@
             "Optional opaque identifier used by servers to ensure session state is not shared between applications. Unused by clients. Note: tls.createServer() uses a 128 bit truncated SHA1 hash value generated from process.argv, other APIs that create secure contexts have no default value."
         }
       }
-    },
-    "passive": {
-      "type": "boolean",
-      "description": "True to enable ftp passive mode.",
-      "default": false
     }
   },
   "additionalProperties": false

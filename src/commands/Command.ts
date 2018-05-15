@@ -9,6 +9,10 @@ export default class Command extends BaseCommand {
   }
 
   protected async run(...args) {
-    return this.handler(...args);
+    try {
+      return await this.handler(...args);
+    } finally {
+      this.commitCommandDone();
+    }
   }
 }

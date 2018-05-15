@@ -36,17 +36,6 @@ export interface FileTask {
   payload?: any;
 }
 
-const defaultTransferOption = {
-  concurrency: 512,
-  perserveTargetMode: false,
-};
-
-const defaultSyncTransferOption = {
-  concurrency: 512,
-  perserveTargetMode: false,
-  model: 'update' as SyncModel,
-};
-
 function createTransferFileTask(srcFsPath, desFsPath, fileType): FileTask {
   return {
     type: 'transfer',
@@ -339,13 +328,8 @@ async function transferDirTask(
   desFs: FileSystem,
   option: TransferTaskOption
 ) {
-  const fullOption = {
-    ...defaultTransferOption,
-    ...option,
-  };
-
-  const tasks = await getFileTaskListFromDirector(src, des, srcFs, desFs, fullOption);
-  return await taskBatchProcess(tasks, srcFs, desFs, fullOption);
+  const tasks = await getFileTaskListFromDirector(src, des, srcFs, desFs, option);
+  return await taskBatchProcess(tasks, srcFs, desFs, option);
 }
 
 export async function sync(
@@ -355,15 +339,10 @@ export async function sync(
   desFs: FileSystem,
   option: SyncTransferTaskOption
 ) {
-  const fullOption = {
-    ...defaultSyncTransferOption,
-    ...option,
-  };
-
   // we can transfer file only desDir exist
   await desFs.ensureDir(desDir);
-  const tasks = await getFileTaskListFromDirectorBySync(srcDir, desDir, srcFs, desFs, fullOption);
-  return await taskBatchProcess(tasks, srcFs, desFs, fullOption);
+  const tasks = await getFileTaskListFromDirectorBySync(srcDir, desDir, srcFs, desFs, option);
+  return await taskBatchProcess(tasks, srcFs, desFs, option);
 }
 
 export function transfer(
@@ -373,12 +352,7 @@ export function transfer(
   desFs: FileSystem,
   option: TransferTaskOption
 ) {
-  const fullOption = {
-    ...defaultTransferOption,
-    ...option,
-  };
-
-  if (shouldSkip(src, fullOption.ignore)) {
+  if (shouldSkip(src, option.ignore)) {
     return Promise.resolve();
   }
 
@@ -386,15 +360,15 @@ export function transfer(
     let result;
 
     if (stat.type === FileType.Directory) {
-      result = transferDirTask(src, des, srcFs, desFs, fullOption);
+      result = transferDirTask(src, des, srcFs, desFs, option);
     } else if (stat.type === FileType.File) {
       result = desFs
         .ensureDir(desFs.pathResolver.dirname(des))
-        .then(() => transferFile(src, des, srcFs, desFs, fullOption));
+        .then(() => transferFile(src, des, srcFs, desFs, option));
     } else if (stat.type === FileType.SymbolicLink) {
       result = desFs
         .ensureDir(desFs.pathResolver.dirname(des))
-        .then(() => transferSymlink(src, des, srcFs, desFs, fullOption));
+        .then(() => transferSymlink(src, des, srcFs, desFs, option));
     }
     return result;
   });
