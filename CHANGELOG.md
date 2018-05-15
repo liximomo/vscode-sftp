@@ -1,6 +1,6 @@
 ## 1.1.8 - 2018-05-15
 * Some UX improvements.
-    * Only show `sftp` menu when extension get activated.
+    * Only show `sftp` menu when extension get activated. (Thanks [@mikolino](https://github.com/mikolino))
     * Remove some unnecessary warning.
 * Improve ftp reliability.
 * Upgrade `ssh2` version.
