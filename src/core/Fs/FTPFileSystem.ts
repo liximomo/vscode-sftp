@@ -89,7 +89,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
   }
 
   async put(input: fs.ReadStream | Buffer, path, option?: IStreamOption): Promise<void> {
-    await this.atomicPut(input);
+    await this.atomicPut(input, path);
   }
 
   readlink(path: string): Promise<string> {
@@ -192,99 +192,106 @@ export default class FTPFileSystem extends RemoteFileSystem {
   }
 
   private async atomicList(path: string): Promise<any[]> {
-    const task = () => new Promise<any[]>((resolve, reject) => {
-      this.ftp.list(path, (err, stats) => {
-        if (err) {
-          return reject(err);
-        }
+    const task = () =>
+      new Promise<any[]>((resolve, reject) => {
+        this.ftp.list(path, (err, stats) => {
+          if (err) {
+            return reject(err);
+          }
 
-        resolve(stats || []);
+          resolve(stats || []);
+        });
       });
-    });
 
     return this.queue.add(task);
   }
 
-  private async atomicGet(path: string): Promise<any> {
-    const task = () => new Promise<any>((resolve, reject) => {
-      this.ftp.get(path, (err, stream) => {
-        if (err) {
-          return reject(err);
-        }
+  private async atomicGet(path: string): Promise<fs.ReadStream> {
+    const task = () =>
+      new Promise<fs.ReadStream>((resolve, reject) => {
+        this.ftp.get(path, (err, stream) => {
+          if (err) {
+            return reject(err);
+          }
 
-        resolve(stream);
+          resolve(stream);
+        });
       });
-    });
 
     return this.queue.add(task);
   }
 
-  private async atomicPut(input: fs.ReadStream | Buffer): Promise<void> {
-    const task = () => new Promise<void>((resolve, reject) => {
-      this.ftp.put(input, err => {
-        if (err) {
-          return reject(err);
-        }
+  private async atomicPut(input: fs.ReadStream | Buffer, path: string): Promise<void> {
+    const task = () =>
+      new Promise<void>((resolve, reject) => {
+        this.ftp.put(input, path, err => {
+          if (err) {
+            return reject(err);
+          }
 
-        resolve();
+          resolve();
+        });
       });
-    });
 
     return this.queue.add(task);
   }
 
   private async atomicDeleteFile(path: string): Promise<void> {
-    const task = () => new Promise<void>((resolve, reject) => {
-      this.ftp.delete(path, err => {
-        if (err) {
-          return reject(err);
-        }
+    const task = () =>
+      new Promise<void>((resolve, reject) => {
+        this.ftp.delete(path, err => {
+          if (err) {
+            return reject(err);
+          }
 
-        resolve();
+          resolve();
+        });
       });
-    });
 
     return this.queue.add(task);
   }
 
   private async atomicMakeDir(path: string): Promise<void> {
-    const task = () => new Promise<void>((resolve, reject) => {
-      this.ftp.mkdir(path, err => {
-        if (err) {
-          return reject(err);
-        }
+    const task = () =>
+      new Promise<void>((resolve, reject) => {
+        this.ftp.mkdir(path, err => {
+          if (err) {
+            return reject(err);
+          }
 
-        resolve();
+          resolve();
+        });
       });
-    });
 
     return this.queue.add(task);
   }
 
   private async atomicRemoveDir(path: string, recursive: boolean): Promise<void> {
-    const task = () => new Promise<void>((resolve, reject) => {
-      this.ftp.rmdir(path, recursive, err => {
-        if (err) {
-          return reject(err);
-        }
+    const task = () =>
+      new Promise<void>((resolve, reject) => {
+        this.ftp.rmdir(path, recursive, err => {
+          if (err) {
+            return reject(err);
+          }
 
-        resolve();
+          resolve();
+        });
       });
-    });
 
     return this.queue.add(task);
   }
 
   private async atomicSite(command: string): Promise<void> {
-    const task = () => new Promise<void>((resolve, reject) => {
-      this.ftp.site(command, err => {
-        if (err) {
-          return reject(err);
-        }
+    const task = () =>
+      new Promise<void>((resolve, reject) => {
+        this.ftp.site(command, err => {
+          if (err) {
+            return reject(err);
+          }
 
-        resolve();
+          resolve();
+        });
       });
-    });
 
     return this.queue.add(task);
   }
