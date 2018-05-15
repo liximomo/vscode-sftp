@@ -1,3 +1,10 @@
+## 1.1.8 - 2018-05-15
+* Some UX improvements.
+    * Only show `sftp` menu when extension get activated.
+    * Remove some unnecessary warning.
+* Improve ftp reliability.
+* Upgrade `ssh2` version.
+
 ## 1.1.7 - 2018-03-31
 * `name` [config](https://github.com/liximomo/vscode-sftp#full-config).
 * Fix bugs.

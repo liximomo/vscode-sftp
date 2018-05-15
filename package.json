@@ -2,7 +2,7 @@
   "name": "sftp",
   "displayName": "sftp",
   "description": "SFTP/FTP sync",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "publisher": "liximomo",
   "author": "liximomo <liximomo@gmail.com> (https://liximomo.github.io/)",
   "engines": {
@@ -192,7 +192,7 @@
     "ignore": "^3.3.7",
     "joi": "^10.6.0",
     "p-queue": "^2.4.2",
-    "ssh2": "^0.5.5",
+    "ssh2": "^0.6.1",
     "stat-mode": "^0.2.2",
     "tmp": "^0.0.33",
     "upath": "^1.0.0"
