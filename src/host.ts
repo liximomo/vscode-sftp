@@ -60,6 +60,16 @@ export function showWarningMessage(message: string, ...items: string[]) {
   return vscode.window.showWarningMessage(message, ...items);
 }
 
+export async function showConfirmMessage(message: string) {
+  const result = await vscode.window.showInformationMessage(
+    message,
+    { title: 'Yes' },
+    { title: 'No' }
+  );
+
+  return Boolean(result && result.title === 'Yes');
+}
+
 export function registerCommand(
   context: vscode.ExtensionContext,
   name: string,

@@ -42,7 +42,9 @@ const configScheme = {
 
   remotePath: Joi.string().required(),
   uploadOnSave: Joi.boolean().optional(),
-  downloadOnOpen: Joi.boolean().optional(),
+  downloadOnOpen: Joi.boolean()
+    .optional()
+    .allow('confirm'),
   syncMode: Joi.any().valid('update', 'full'),
   ignore: Joi.array()
     .min(0)

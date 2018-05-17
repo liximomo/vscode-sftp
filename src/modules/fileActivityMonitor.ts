@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import logger from '../logger';
 import sftpBarItem from '../ui/sftpBarItem';
-import { onDidOpenTextDocument, onDidSaveTextDocument } from '../host';
+import { onDidOpenTextDocument, onDidSaveTextDocument, showConfirmMessage } from '../host';
 import { getConfig, loadConfig } from './config';
 import { upload } from '../actions';
 import { watchFiles } from './fileWatcher';
@@ -48,6 +48,11 @@ async function downloadOnOpen(uri) {
   }
 
   if (config.downloadOnOpen) {
+    if (config.downloadOnOpen === 'confirm') {
+      const isConfirm = await showConfirmMessage('Do you want SFTP to download this file?');
+      if (!isConfirm) return;
+    }
+
     await download(activityPath, config).catch(reportError);
     logger.info(`[file-open] download ${activityPath}`);
     sftpBarItem.showMsg('download done', 2 * 1000);

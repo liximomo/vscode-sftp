@@ -41,12 +41,12 @@
     "uploadOnSave": {
       "type": "boolean",
       "description": "True to upload on every save operation of VS code.",
-      "default": false
+      "default": true
     },
     "downloadOnOpen": {
-      "type": "boolean",
+      "enum": ["confirm", true, false],
       "description": "True to download when a file opens.",
-      "default": false
+      "default": "confirm"
     },
     "syncMode": {
       "enum": ["update", "full"],
@@ -91,7 +91,8 @@
     },
     "concurrency": {
       "type": "number",
-      "description": "Lower concurrency could get more stability because some client/server have some sort of configured/hard coded limit."
+      "description":
+        "Lower concurrency could get more stability because some client/server have some sort of configured/hard coded limit."
     }
   }
 }

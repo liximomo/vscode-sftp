@@ -46,7 +46,7 @@
       "type": "boolean",
       "description":
         "True to enable verifyCode dialog. Keyboard interaction authentication mechanism. For example using Google Authentication.",
-      "default": false
+      "default": true
     },
     "algorithms": {
       "type": "object",
