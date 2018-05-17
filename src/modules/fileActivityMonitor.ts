@@ -83,6 +83,10 @@ function watchWorkspace({
 
 function init() {
   onDidOpenTextDocument((doc: vscode.TextDocument) => {
+    if (!isValidFile(doc.uri)) {
+      return;
+    }
+
     downloadOnOpen(doc.uri);
   });
 
@@ -93,14 +97,9 @@ function init() {
 }
 
 function destory() {
-  onDidOpenTextDocument((doc: vscode.TextDocument) => {
-    downloadOnOpen(doc.uri);
-  });
-
-  watchWorkspace({
-    onDidSaveFile: handleFileSave,
-    onDidSaveSftpConfig: handleConfigSave,
-  });
+  if (workspaceWatcher) {
+    workspaceWatcher.dispose();
+  }
 }
 
 export default {

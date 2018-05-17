@@ -53,9 +53,15 @@ export default class FTPFileSystem extends RemoteFileSystem {
   }
 
   async lstat(path: string): Promise<IStats> {
-    const isRootPath = path === '/';
-    const parentPath = isRootPath ? '/' : this.pathResolver.dirname(path);
-    const nameIdentity = isRootPath ? '.' : this.pathResolver.basename(path);
+    if (path === '/') {
+      return {
+        type: FileType.Directory,
+        permissionMode: 0o666,
+      };
+    }
+
+    const parentPath = this.pathResolver.dirname(path);
+    const nameIdentity = this.pathResolver.basename(path);
     const stats = await this.atomicList(parentPath);
 
     const fileStat = stats
