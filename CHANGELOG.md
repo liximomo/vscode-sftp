@@ -1,3 +1,8 @@
+## 1.1.9 - 2018-05-17
+* Add `confirm` option to `downloadOnOpen`.
+* Fix [#160](https://github.com/liximomo/vscode-sftp/issues/160).
+* Fix [#195](https://github.com/liximomo/vscode-sftp/issues/195).
+
 ## 1.1.8 - 2018-05-15
 * Some UX improvements.
     * Only show `sftp` menu when extension get activated. (Thanks [@mikolino](https://github.com/mikolino))
