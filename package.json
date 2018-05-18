@@ -6,7 +6,7 @@
   "publisher": "liximomo",
   "author": "liximomo <liximomo@gmail.com> (https://liximomo.github.io/)",
   "engines": {
-    "vscode": "^1.17.0"
+    "vscode": "^1.23.0"
   },
   "bugs": {
     "url": "https://github.com/liximomo/vscode-sftp/issues",
@@ -81,8 +81,7 @@
     "menus": {
       "commandPalette": [
         {
-          "command": "sftp.config.default",
-          "when": "workbenchState != empty"
+          "command": "sftp.config.default"
         },
         {
           "command": "sftp.list.default",
@@ -182,7 +181,7 @@
     "mocha": "^2.3.3",
     "tslint": "^5.9.1",
     "typescript": "^2.7.2",
-    "vscode": "^1.1.10"
+    "vscode": "^1.1.17"
   },
   "dependencies": {
     "async": "^2.6.0",

@@ -15,10 +15,8 @@ function setupWorkspaceFolder(dir) {
   return initConfigs(dir).then(watchFiles);
 }
 
-function setup() {
+function setup(workspaceFolders: vscode.WorkspaceFolder[]) {
   fileActivityMonitor.init();
-
-  const workspaceFolders = getWorkspaceFolders();
   const pendingInits = workspaceFolders.map(folder => setupWorkspaceFolder(folder.uri.fsPath));
 
   return Promise.all(pendingInits);
@@ -29,8 +27,12 @@ function setup() {
 export function activate(context: vscode.ExtensionContext) {
   initCommand(context);
 
-  setContextValue('enabled', true);
-  setup()
+  const workspaceFolders = getWorkspaceFolders();
+  if (!workspaceFolders) {
+    return;
+  }
+
+  setup(workspaceFolders)
     .then(_ => {
       sftpBarItem.show();
     })

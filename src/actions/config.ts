@@ -1,9 +1,54 @@
 import * as vscode from 'vscode';
 import { newConfig } from '../modules/config';
-import { getWorkspaceFolders } from '../host';
+import {
+  getWorkspaceFolders,
+  showConfirmMessage,
+  showOpenDialog,
+  openFolder,
+  addWorkspaceFolder,
+} from '../host';
 
-export function editConfig() {
+export async function editConfig() {
   const workspaceFolders = getWorkspaceFolders();
+  if (!workspaceFolders) {
+    const result = await showConfirmMessage(
+      'SFTP expects to work at a folder.',
+      'Open Folder',
+      'Ok'
+    );
+
+    if (!result) {
+      return;
+    }
+
+    return openFolder();
+  }
+
+  if (workspaceFolders.length <= 0) {
+    const result = await showConfirmMessage(
+      'There are no available folders in current workspace.',
+      'Add Folder to Workspace',
+      'Ok'
+    );
+
+    if (!result) {
+      return;
+    }
+
+    const resources = await showOpenDialog({
+      canSelectFiles: false,
+      canSelectFolders: true,
+      canSelectMany: true,
+    });
+
+    if (!resources) {
+      return;
+    }
+
+    addWorkspaceFolder(...resources.map(uri => ({ uri })));
+    return;
+  }
+
   if (workspaceFolders.length === 1) {
     newConfig(workspaceFolders[0].uri.fsPath);
     return;

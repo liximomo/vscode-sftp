@@ -60,14 +60,26 @@ export function showWarningMessage(message: string, ...items: string[]) {
   return vscode.window.showWarningMessage(message, ...items);
 }
 
-export async function showConfirmMessage(message: string) {
+export async function showConfirmMessage(
+  message: string,
+  confirmLabel: string = 'Yes',
+  cancelLabel: string = 'No'
+) {
   const result = await vscode.window.showInformationMessage(
     message,
-    { title: 'Yes' },
-    { title: 'No' }
+    { title: confirmLabel },
+    { title: cancelLabel }
   );
 
-  return Boolean(result && result.title === 'Yes');
+  return Boolean(result && result.title === confirmLabel);
+}
+
+export function showOpenDialog(options: vscode.OpenDialogOptions) {
+  return vscode.window.showOpenDialog(options);
+}
+
+export function openFolder(uri?: vscode.Uri, newWindow?: boolean) {
+  return vscode.commands.executeCommand('vscode.openFolder', uri, newWindow);
 }
 
 export function registerCommand(
@@ -78,4 +90,8 @@ export function registerCommand(
 ) {
   const disposable = vscode.commands.registerCommand(name, callback, thisArg);
   context.subscriptions.push(disposable);
+}
+
+export function addWorkspaceFolder(...workspaceFoldersToAdd: { uri: vscode.Uri; name?: string }[]) {
+  return vscode.workspace.updateWorkspaceFolders(0, 0, ...workspaceFoldersToAdd);
 }
