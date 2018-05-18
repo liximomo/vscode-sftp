@@ -49,7 +49,6 @@ export default function createFileAction(
       return relativePath !== '' && ignore.ignores(relativePath);
     };
 
-    sftpBarItem.showMsg('connecting...', config.connectTimeout);
     const remoteFs = await getRemoteFs(getHostInfo(config));
 
     if (doNotTriggerWatcher) {

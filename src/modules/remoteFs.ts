@@ -2,6 +2,7 @@ import * as path from 'path';
 import upath from '../core/upath';
 import { promptForPassword } from '../host';
 import logger from '../logger';
+import sftpBarItem from '../ui/sftpBarItem';
 import FileSystem from '../core/Fs/FileSystem';
 import RemoteFileSystem from '../core/Fs/RemoteFileSystem';
 import LocalFileSystem from '../core/Fs/LocalFileSystem';
@@ -93,8 +94,11 @@ class KeepAliveRemoteFs {
 
     this.fs = new FsConstructor(upath, connectOption);
     this.fs.onDisconnected(this.invalid.bind(this));
+
+    sftpBarItem.showMsg('connecting...', connectOption.connectTimeout);
     this.pendingPromise = this.fs.connect(promptForPassword).then(
       () => {
+        sftpBarItem.clear();
         this.isValid = true;
         return this.fs;
       },
