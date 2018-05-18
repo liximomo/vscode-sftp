@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as debounce from 'lodash.debounce';
 import sftpBarItem from '../ui/sftpBarItem';
 import * as output from '../ui/output';
 import { isValidFile } from '../helper/fileType';
-import * as utils from '../utils';
 import { upload, removeRemote } from '../actions';
 import { getConfig } from './config';
 import reportError from '../helper/reportError';
@@ -14,10 +14,11 @@ const watchers: {
   [x: string]: vscode.FileSystemWatcher;
 } = {};
 
-const uploadQueue = [];
-const deleteQueue = [];
+const uploadQueue = new Set<string>();
+const deleteQueue = new Set<string>();
 
-const ACTION_INTEVAL = 500;
+// less than 550 will not work
+const ACTION_INTEVAL = 550;
 
 function fileError(event, file, showErrorWindow = true) {
   return error => {
@@ -29,11 +30,8 @@ function fileError(event, file, showErrorWindow = true) {
 }
 
 function doUpload() {
-  const files = uploadQueue
-    .slice()
-    .map(uri => uri.fsPath)
-    .sort();
-  uploadQueue.length = 0;
+  const files = Array.from(uploadQueue);
+  uploadQueue.clear();
   files.forEach(file => {
     let config;
     try {
@@ -51,11 +49,8 @@ function doUpload() {
 }
 
 function doDelete() {
-  const files = deleteQueue
-    .slice()
-    .map(uri => uri.fsPath)
-    .sort();
-  deleteQueue.length = 0;
+  const files = Array.from(deleteQueue);
+  deleteQueue.clear();
   let config;
   files.forEach(file => {
     try {
@@ -75,16 +70,16 @@ function doDelete() {
   });
 }
 
-const throttledUpload = utils.throttle(doUpload, ACTION_INTEVAL);
-const throttledDelete = utils.throttle(doDelete, ACTION_INTEVAL);
+const debouncedUpload = debounce(doUpload, ACTION_INTEVAL, { leading: true, trailing: true });
+const debouncedDelete = debounce(doDelete, ACTION_INTEVAL, { leading: true, trailing: true });
 
 function uploadHandler(uri: vscode.Uri) {
   if (!isValidFile(uri)) {
     return;
   }
 
-  uploadQueue.push(uri);
-  throttledUpload();
+  uploadQueue.add(uri.fsPath);
+  debouncedUpload();
 }
 
 function getWatcherByConfig(config) {
@@ -133,8 +128,8 @@ function setUpWatcher(config) {
         return;
       }
 
-      deleteQueue.push(uri);
-      throttledDelete();
+      deleteQueue.add(uri.fsPath);
+      debouncedDelete();
     });
   }
 }

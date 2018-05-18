@@ -32,6 +32,7 @@ export function activate(context: vscode.ExtensionContext) {
     return;
   }
 
+  setContextValue('enabled', true);
   setup(workspaceFolders)
     .then(_ => {
       sftpBarItem.show();
