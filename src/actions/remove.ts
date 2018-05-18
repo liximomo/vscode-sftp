@@ -2,7 +2,7 @@ import { remove } from '../core/fileTransferTask';
 import createFileAction from './createFileAction';
 
 export const removeRemote = createFileAction('remove', (source, config, { remoteFs }) =>
-  remove(source, remoteFs, {
+  remove(config.remotePath, remoteFs, {
     ignore: config.ignore,
     skipDir: config.skipDir,
   })

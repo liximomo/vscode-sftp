@@ -65,7 +65,7 @@ function doDelete() {
       return;
     }
 
-    removeRemote(config.remotePath, {
+    removeRemote(file, {
       ...config,
       skipDir: true,
     }).then(() => {
