@@ -1,3 +1,7 @@
+## 1.1.10 - 2018-05-18
+* Show open folder prompt in `sftp:config` command.
+* Fix [#174](https://github.com/liximomo/vscode-sftp/issues/174).
+
 ## 1.1.9 - 2018-05-17
 * Add `confirm` option to `downloadOnOpen`.
 * Fix [#160](https://github.com/liximomo/vscode-sftp/issues/160).
