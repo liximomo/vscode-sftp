@@ -1,3 +1,6 @@
+## 1.1.11 - 2018-05-21
+* Fix [#198](https://github.com/liximomo/vscode-sftp/issues/198).
+
 ## 1.1.10 - 2018-05-18
 * Show open folder prompt in `sftp:config` command.
 * Fix [#174](https://github.com/liximomo/vscode-sftp/issues/174).
