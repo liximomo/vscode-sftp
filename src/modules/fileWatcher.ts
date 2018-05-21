@@ -4,6 +4,7 @@ import * as debounce from 'lodash.debounce';
 import sftpBarItem from '../ui/sftpBarItem';
 import * as output from '../ui/output';
 import { isValidFile } from '../helper/fileType';
+import fileDepth from '../helper/fileDepth';
 import { upload, removeRemote } from '../actions';
 import { getConfig } from './config';
 import reportError from '../helper/reportError';
@@ -30,7 +31,7 @@ function fileError(event, file, showErrorWindow = true) {
 }
 
 function doUpload() {
-  const files = Array.from(uploadQueue);
+  const files = Array.from(uploadQueue).sort((a, b) => fileDepth(b) - fileDepth(a));
   uploadQueue.clear();
   files.forEach(file => {
     let config;
@@ -49,7 +50,7 @@ function doUpload() {
 }
 
 function doDelete() {
-  const files = Array.from(deleteQueue);
+  const files = Array.from(deleteQueue).sort((a, b) => fileDepth(b) - fileDepth(a));
   deleteQueue.clear();
   let config;
   files.forEach(file => {
@@ -62,7 +63,7 @@ function doDelete() {
 
     removeRemote(file, {
       ...config,
-      skipDir: true,
+      // skipDir: true,
     }).then(() => {
       logger.info('[watcher]', `delete ${file}`);
       sftpBarItem.showMsg(`delete ${path.basename(file)}`, simplifyPath(file), 2 * 1000);

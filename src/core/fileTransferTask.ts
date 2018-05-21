@@ -10,6 +10,7 @@ import upath from './upath';
 import sftpBarItem from '../ui/sftpBarItem';
 import FileSystem, { IFileEntry, FileType } from '../core/Fs/FileSystem';
 import * as  utils from '../utils';
+import fileDepth from '../helper/fileDepth';
 import { simplifyPath } from '../host';
 
 type SyncModel = 'full' | 'update';
@@ -60,10 +61,6 @@ function createRemoveFileTask(fsPath, fileType, location: FileLocation): FileTas
       location,
     },
   };
-}
-
-function fileDepth(file: string) {
-  return upath.normalize(file).split('/').length;
 }
 
 function shouldSkip(path, ignore) {
