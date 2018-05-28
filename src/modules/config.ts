@@ -1,6 +1,7 @@
 import { CONFIG_PATH } from '../constants';
 import * as fse from 'fs-extra';
 import * as path from 'path';
+import * as os from 'os';
 import * as Joi from 'joi';
 import reportError from '../helper/reportError';
 import Trie from '../core/Trie';
@@ -213,6 +214,11 @@ export function newConfig(basePath) {
 }
 
 export function getHostInfo(config) {
+  let privateKeyPath = config.privateKeyPath
+  if (privateKeyPath[0] === '~') {
+    privateKeyPath = path.join(os.homedir(), privateKeyPath.slice(1))
+  }
+
   return {
     protocol: config.protocol,
     host: config.host,
@@ -223,7 +229,7 @@ export function getHostInfo(config) {
 
     // sftp
     agent: config.agent,
-    privateKeyPath: config.privateKeyPath,
+    privateKeyPath,
     passphrase: config.passphrase,
     interactiveAuth: config.interactiveAuth,
     algorithms: config.algorithms,
