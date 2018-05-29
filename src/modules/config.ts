@@ -1,6 +1,7 @@
 import { CONFIG_PATH } from '../constants';
 import * as fse from 'fs-extra';
 import * as path from 'path';
+import * as os from 'os';
 import * as Joi from 'joi';
 import reportError from '../helper/reportError';
 import Trie from '../core/Trie';
@@ -106,7 +107,15 @@ function normalizeTriePath(pathname) {
   return path.normalize(pathname);
 }
 
+function normalizeHomePath(pathname) {
+  return pathname.substr(0, 2) === '~/' ? path.join(os.homedir(), pathname.slice(2)) : pathname
+}
+
 function addConfig(config, defaultContext) {
+  if (config.privateKeyPath) {
+    config.privateKeyPath = normalizeHomePath(config.privateKeyPath)
+  }
+
   const { error: validationError } = Joi.validate(config, configScheme, {
     convert: false,
     language: {
