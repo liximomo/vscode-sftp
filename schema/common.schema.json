@@ -60,7 +60,7 @@
         "type": "string",
         "description": "Ignore pattern."
       },
-      "default": [".vscode", ".git", ".DS_Store"]
+      "default": [".vscode", ".git", ".DS_Store", ".gitignore", "README.md"]
     },
     "watcher": {
       "type": "object",
