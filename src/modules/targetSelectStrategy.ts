@@ -84,7 +84,7 @@ export function selectFileFallbackToConfigContext(item, items): Promise<FileTarg
   }
 
   // short cut
-  if (!item.fsPath) {
+  if (item === null || !item.fsPath) {
     return getActiveTarget();
   }
 
