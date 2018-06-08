@@ -1,3 +1,6 @@
+## 1.1.12 - 2018-06-08
+* Fix [#200](https://github.com/liximomo/vscode-sftp/issues/200). Thanks for [Gergo Koos](https://github.com/gergokoos).
+
 ## 1.1.11 - 2018-05-21
 * Fix [#198](https://github.com/liximomo/vscode-sftp/issues/198).
 
