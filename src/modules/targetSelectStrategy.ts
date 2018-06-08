@@ -84,7 +84,7 @@ export function selectFileFallbackToConfigContext(item, items): Promise<FileTarg
   }
 
   // short cut
-  if (!item.fsPath) {
+  if (item === null || !item.fsPath) {
     return getActiveTarget();
   }
 
@@ -117,7 +117,7 @@ export function selectFileOnly(item, items): Promise<FileTarget> {
   }
 
   // short cut
-  if (item === undefined || !item.fsPath) {
+  if (item === null || item === undefined || !item.fsPath) {
     return getActiveTarget();
   }
 
