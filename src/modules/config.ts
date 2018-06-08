@@ -108,12 +108,12 @@ function normalizeTriePath(pathname) {
 }
 
 function normalizeHomePath(pathname) {
-  return pathname.substr(0, 2) === '~/' ? path.join(os.homedir(), pathname.slice(2)) : pathname
+  return pathname.substr(0, 2) === '~/' ? path.join(os.homedir(), pathname.slice(2)) : pathname;
 }
 
 function addConfig(config, defaultContext) {
   if (config.privateKeyPath) {
-    config.privateKeyPath = normalizeHomePath(config.privateKeyPath)
+    config.privateKeyPath = normalizeHomePath(config.privateKeyPath);
   }
 
   const { error: validationError } = Joi.validate(config, configScheme, {
