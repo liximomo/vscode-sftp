@@ -3,6 +3,7 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as os from 'os';
 import * as Joi from 'joi';
+import * as sshConfig from 'ssh-config';
 import reportError from '../helper/reportError';
 import Trie from '../core/Trie';
 import { showTextDocument } from '../host';
@@ -65,22 +66,27 @@ const defaultConfig = {
 
   protocol: 'sftp',
 
-  host: 'host',
+  // server common
+  host: 'localhost',
   port: 22,
-  username: 'username',
+  username: undefined,
   password: null,
-  connectTimeout: 10000,
+  connectTimeout: 10 * 1000,
 
+  // sftp
   agent: null,
   privateKeyPath: null,
   passphrase: null,
   interactiveAuth: false,
+  algorithms: undefined,
+  sshConfigPath: '~/.ssh/config',
 
+  // ftp
   secure: false,
   secureOptions: null,
   passive: false,
 
-  // default to login dir
+  // common
   remotePath: './',
   uploadOnSave: false,
   downloadOnOpen: false,
@@ -111,11 +117,73 @@ function normalizeHomePath(pathname) {
   return pathname.substr(0, 2) === '~/' ? path.join(os.homedir(), pathname.slice(2)) : pathname;
 }
 
-function addConfig(config, defaultContext) {
-  if (config.privateKeyPath) {
-    config.privateKeyPath = normalizeHomePath(config.privateKeyPath);
+async function extendConfig(config) {
+  const protocol = config.protocol;
+
+  const merged = {
+    ...defaultConfig,
+    ...config,
+  };
+
+  merged.port = protocol === 'ftp' ? 21 : 22; // override default port by protocol
+
+  const sshConfigPath = normalizeHomePath(merged.sshConfigPath);
+  if (protocol !== 'sftp' || !sshConfigPath) {
+    return merged;
   }
 
+  let content;
+  try {
+    content = await fse.readFile(sshConfigPath, 'utf8');
+  } catch {
+    return merged;
+  }
+
+  const parsedSSHConfig = sshConfig.parse(content);
+  const section = parsedSSHConfig.find({
+    Host: merged.host,
+  });
+
+  if (section === null) {
+    return merged;
+  }
+
+  const mapping = new Map([
+    ['HostName', 'host'],
+    ['Port', 'port'],
+    ['User', 'user'],
+    ['IdentityFile', 'privatekey'],
+    ['ServerAliveInterval', 'keepalive'],
+    ['ConnectTimeout', 'connTimeout'],
+  ]);
+
+  section.config.forEach(line => {
+    const key = mapping.get(line.param);
+
+    if (key !== undefined) {
+      merged[key] = line.value;
+    }
+  });
+
+  return merged;
+}
+
+function logConfig(config) {
+  const copy = {};
+  const privated = ['username', 'password', 'passphrase'];
+  Object.keys(config).forEach(key => {
+    const configValue = config[key];
+    // tslint:disable-next-line triple-equals
+    if (privated.indexOf(key) !== -1 && configValue != undefined) {
+      copy[key] = '******';
+    } else {
+      copy[key] = configValue;
+    }
+  });
+  logger.info(`config at ${config.context}`, copy);
+}
+
+async function addConfig(config, defaultContext) {
   const { error: validationError } = Joi.validate(config, configScheme, {
     convert: false,
     language: {
@@ -128,20 +196,18 @@ function addConfig(config, defaultContext) {
     throw new Error(`config validation fail: ${validationError.message}`);
   }
 
+  const extendedConfig = await extendConfig(config);
   // tslint:disable triple-equals
-  let context = config.context != undefined ? config.context : defaultContext;
-  context = normalizeTriePath(path.resolve(defaultContext, context));
+  const context = extendedConfig.context != undefined ? extendedConfig.context : defaultContext;
+  extendedConfig.context = normalizeTriePath(path.resolve(defaultContext, context));
+  if (extendedConfig.privateKeyPath) {
+    extendedConfig.privateKeyPath = normalizeHomePath(extendedConfig.privateKeyPath);
+  }
+  configTrie.add(context, extendedConfig);
 
-  const withDefault = {
-    ...defaultConfig,
-    port: config.protocol === 'ftp' ? 21 : 22, // override default port by protocol
-    ...config,
-    context,
-  };
+  logConfig(extendedConfig);
 
-  configTrie.add(context, withDefault);
-  logger.info(`config at ${context}`, withDefault);
-  return withDefault;
+  return extendedConfig;
 }
 
 export function getConfigPath(basePath) {
@@ -153,7 +219,7 @@ export function loadConfig(configPath) {
   return fse.readJson(configPath).then(config => {
     const configs = [].concat(config);
     const configContext = path.resolve(configPath, '../../');
-    return configs.map(cfg => addConfig(cfg, configContext));
+    return Promise.all(configs.map(cfg => addConfig(cfg, configContext)));
   });
 }
 
