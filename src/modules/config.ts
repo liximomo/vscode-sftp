@@ -122,10 +122,9 @@ async function extendConfig(config) {
 
   const merged = {
     ...defaultConfig,
+    port: protocol === 'ftp' ? 21 : 22, // override default port by protocol
     ...config,
   };
-
-  merged.port = protocol === 'ftp' ? 21 : 22; // override default port by protocol
 
   const sshConfigPath = normalizeHomePath(merged.sshConfigPath);
   if (protocol !== 'sftp' || !sshConfigPath) {
