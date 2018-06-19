@@ -124,6 +124,10 @@
           "description": "(H)MAC algorithms."
         }
       }
+    },
+    "sshConfigPath": {
+      "type": "string",
+      "description": "Absolute path to your SSH config file (eg. ~/.ssh/config)"
     }
   },
   "additionalProperties": false
