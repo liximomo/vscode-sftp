@@ -202,7 +202,7 @@ async function addConfig(config, defaultContext) {
   if (extendedConfig.privateKeyPath) {
     extendedConfig.privateKeyPath = normalizeHomePath(extendedConfig.privateKeyPath);
   }
-  configTrie.add(context, extendedConfig);
+  configTrie.add(extendedConfig.context, extendedConfig);
 
   logConfig(extendedConfig);
 
