@@ -46,6 +46,7 @@ You can also use an array of configs in the config file.
 ```json
 [
   {
+    "name": "server1",
     "context": "/workspace/a",
     "host": "host",
     "username": "username",
@@ -53,6 +54,7 @@ You can also use an array of configs in the config file.
     "remotePath": "/remote/workspace/a", 
   },
   {
+    "name": "server2",
     "context": "/workspace/b",
     "host": "host",
     "username": "username",
@@ -61,6 +63,7 @@ You can also use an array of configs in the config file.
   }
 ]
 ```
+*Note：* `name` is required in multi-config mode.
 
 You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/config).
 

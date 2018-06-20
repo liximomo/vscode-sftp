@@ -59,6 +59,8 @@ const configScheme = {
     autoDelete: Joi.boolean().optional(),
   },
   concurrency: Joi.number().integer(),
+
+  profiles: Joi.object().optional(),
 };
 
 const defaultConfig = {

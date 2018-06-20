@@ -1,134 +1,47 @@
 {
-  "allOf": [{ "$ref": "common.schema.json" }],
-  "type": "object",
-  "properties": {
-    "name": {},
-    "context": {},
-    "host": {},
-    "port": {},
-    "username": {},
-    "password": {},
-    "remotePath": {},
-    "connectTimeout": {},
-    "uploadOnSave": {},
-    "downloadOnOpen": {},
-    "syncMode": {},
-    "ignore": {},
-    "watcher": {},
-    "concurrency": {},
-
-    "protocol": {
-      "enum": ["sftp"],
-      "description": "sftp Connection protocol."
+  "allOf": [
+    {
+      "$ref": "definitions.json#/rootOption"
     },
-    "agent": {
-      "type": "string",
-      "description":
-        "Path to ssh-agent's UNIX socket for ssh-agent-based user authentication.  Windows users: set to 'pageant' for authenticating with Pageant or (actual) path to a cygwin \"UNIX socket\"."
+    {
+      "$ref": "definitions.json#/option"
     },
-    "privateKeyPath": {
-      "type": "string",
-      "description": "Absolute path to user private key."
+    {
+      "$ref": "definitions.json#/host"
     },
-    "passphrase": {
-      "oneOf": [
-        {
-          "type": "string"
-        },
-        {
-          "enum": [true]
-        }
-      ],
-      "description":
-        "For an encrypted private key, this is the passphrase string used to decrypt it. Set to true for enable passphrase dialog. This will prevent from using cleartext passphrase in this config."
+    {
+      "$ref": "definitions.json#/sftp"
     },
-    "interactiveAuth": {
-      "type": "boolean",
-      "description":
-        "True to enable verifyCode dialog. Keyboard interaction authentication mechanism. For example using Google Authentication.",
-      "default": true
-    },
-    "algorithms": {
+    {
       "type": "object",
-      "description":
-        "Explicit overrides for the default transport layer algorithms used for the connection.",
       "properties": {
-        "kex": {
-          "type": "array",
-          "items": {
-            "enum": [
-              "ecdh-sha2-nistp256",
-              "ecdh-sha2-nistp384",
-              "ecdh-sha2-nistp521",
-              "diffie-hellman-group-exchange-sha256",
-              "diffie-hellman-group14-sha1",
-              "diffie-hellman-group-exchange-sha1",
-              "diffie-hellman-group1-sha1"
-            ]
-          },
-          "description": "Key exchange algorithms."
+        "name": {
+          "type": "string",
+          "description": "A string to identify your config."
         },
-        "cipher": {
-          "type": "array",
-          "items": {
-            "enum": [
-              "aes128-ctr",
-              "aes192-ctr",
-              "aes256-ctr",
-              "aes128-gcm",
-              "aes128-gcm@openssh.com",
-              "aes256-gcm",
-              "aes256-gcm@openssh.com",
-              "aes256-cbc",
-              "aes192-cbc",
-              "aes128-cbc",
-              "blowfish-cbc",
-              "3des-cbc",
-              "arcfour256",
-              "arcfour128",
-              "cast128-cbc",
-              "arcfour"
-            ]
-          },
-          "description": "Ciphers."
+        "protocol": {
+          "enum": ["sftp"],
+          "description": "sftp connection protocol."
         },
-        "serverHostKey": {
-          "type": "array",
-          "items": {
-            "enum": [
-              "ssh-rsa",
-              "ecdsa-sha2-nistp256",
-              "ecdsa-sha2-nistp384",
-              "ecdsa-sha2-nistp521",
-              "ssh-dss"
-            ]
-          },
-          "description":
-            "Server host key formats. In server mode, this list must agree with the host private keys set in the hostKeys config setting."
-        },
-        "hmac": {
-          "type": "array",
-          "items": {
-            "enum": [
-              "hmac-sha2-256",
-              "hmac-sha2-512",
-              "hmac-sha1",
-              "hmac-md5",
-              "hmac-sha2-256-96",
-              "hmac-sha2-512-96",
-              "hmac-ripemd160",
-              "hmac-sha1-96",
-              "hmac-md5-96"
-            ]
-          },
-          "description": "(H)MAC algorithms."
+        "profiles": {
+          "patternProperties": {
+            "^.*$": {
+              "allOf": [
+                {
+                  "$ref": "definitions.json#/option"
+                },
+                {
+                  "$ref": "definitions.json#/host"
+                },
+                {
+                  "$ref": "definitions.json#/sftp"
+                }
+              ]
+            }
+          }
         }
-      }
-    },
-    "sshConfigPath": {
-      "type": "string",
-      "description": "Absolute path to your SSH config file (eg. ~/.ssh/config)"
+      },
+      "required": ["name"]
     }
-  },
-  "additionalProperties": false
+  ]
 }
