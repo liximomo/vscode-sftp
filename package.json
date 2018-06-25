@@ -76,6 +76,10 @@
       {
         "command": "sftp.diff",
         "title": "SFTP: Diff"
+      },
+      {
+        "command": "sftp.setProfile",
+        "title": "SFTP: Set Profile"
       }
     ],
     "menus": {
@@ -109,6 +113,10 @@
         },
         {
           "command": "sftp.diff",
+          "when": "sftp:enabled"
+        },
+        {
+          "command": "sftp.setProfile",
           "when": "sftp:enabled"
         }
       ],

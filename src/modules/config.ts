@@ -6,8 +6,9 @@ import * as Joi from 'joi';
 import * as sshConfig from 'ssh-config';
 import reportError from '../helper/reportError';
 import Trie from '../core/Trie';
-import { showTextDocument } from '../host';
+import { showTextDocument, showWarningMessage } from '../host';
 import logger from '../logger';
+import appState from './appState';
 
 const configTrie = new Trie(
   {},
@@ -59,33 +60,31 @@ const configScheme = {
     autoDelete: Joi.boolean().optional(),
   },
   concurrency: Joi.number().integer(),
-
-  profiles: Joi.object().optional(),
 };
 
 const defaultConfig = {
-  name: null,
+  name: undefined,
 
   protocol: 'sftp',
 
   // server common
-  host: 'localhost',
+  host: undefined,
   port: 22,
   username: undefined,
-  password: null,
+  password: undefined,
   connectTimeout: 10 * 1000,
 
   // sftp
-  agent: null,
-  privateKeyPath: null,
-  passphrase: null,
+  agent: undefined,
+  privateKeyPath: undefined,
+  passphrase: undefined,
   interactiveAuth: false,
   algorithms: undefined,
   sshConfigPath: '~/.ssh/config',
 
   // ftp
   secure: false,
-  secureOptions: null,
+  secureOptions: undefined,
   passive: false,
 
   // common
@@ -185,16 +184,8 @@ function logConfig(config) {
 }
 
 async function addConfig(config, defaultContext) {
-  const { error: validationError } = Joi.validate(config, configScheme, {
-    convert: false,
-    language: {
-      object: {
-        child: '!!prop "{{!child}}" fails because {{reason}}',
-      },
-    },
-  });
-  if (validationError) {
-    throw new Error(`config validation fail: ${validationError.message}`);
+  if (config.defaultProfile) {
+    appState.profile = config.defaultProfile;
   }
 
   const extendedConfig = await extendConfig(config);
@@ -216,9 +207,9 @@ export function getConfigPath(basePath) {
 }
 
 export function loadConfig(configPath) {
-  // $todo trie per workspace, so we can remove unused config
+  // $todo? trie per workspace, so we can remove unused config
   return fse.readJson(configPath).then(config => {
-    const configs = [].concat(config);
+    const configs = Array.isArray(config) ? config : [config];
     const configContext = path.resolve(configPath, '../../');
     return Promise.all(configs.map(cfg => addConfig(cfg, configContext)));
   });
@@ -243,7 +234,38 @@ export function getConfig(activityPath: string) {
     throw new Error(`(${activityPath}) config file not found`);
   }
 
-  return config;
+  let fullConfig = config;
+
+  const hasProfile = config.profiles && Object.keys(config.profiles).length > 0;
+  if (hasProfile && appState.profile) {
+    const profile = config.profiles[appState.profile];
+    if (!profile) {
+      throw new Error(
+        `Unkown Profile "${appState.profile}".` +
+          ' Please check your profile setting.' +
+          ' You can set a profile by running command `SFTP: Set Profile`.'
+      );
+    }
+
+    fullConfig = Object.assign({}, config, profile);
+    delete fullConfig.profiles;
+  }
+
+  // validate config
+  const { error: validationError } = Joi.validate(fullConfig, configScheme, {
+    allowUnknown: true,
+    convert: false,
+    language: {
+      object: {
+        child: '!!prop "{{!child}}" fails because {{reason}}',
+      },
+    },
+  });
+  if (validationError) {
+    throw new Error(`config validation fail: ${validationError.message}`);
+  }
+
+  return fullConfig;
 }
 
 export function getAllConfigs() {

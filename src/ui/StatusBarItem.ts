@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 export default class StatusBarItem {
-  private name: string;
+  private name: () => string | string;
   private tooltip: string;
   private statusBarItem: vscode.StatusBarItem;
   private timer: any = null;
@@ -12,8 +12,12 @@ export default class StatusBarItem {
     this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
     this.statusBarItem.command = command;
 
-    this.clear = this.clear.bind(this);
-    this.clear();
+    this.reset = this.reset.bind(this);
+    this.reset();
+  }
+
+  getText() {
+    return this.statusBarItem.text;
   }
 
   show() {
@@ -36,12 +40,12 @@ export default class StatusBarItem {
     this.statusBarItem.text = text;
     this.statusBarItem.tooltip = tooltip;
     if (hideAfterTimeout) {
-      this.timer = setTimeout(this.clear, hideAfterTimeout);
+      this.timer = setTimeout(this.reset, hideAfterTimeout);
     }
   }
 
-  clear() {
-    this.statusBarItem.text = this.name;
+  reset() {
+    this.statusBarItem.text = typeof this.name === 'function' ? this.name() : this.name;
     this.statusBarItem.tooltip = this.tooltip;
   }
 }

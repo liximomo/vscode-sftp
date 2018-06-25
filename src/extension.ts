@@ -8,6 +8,7 @@ import reportError from './helper/reportError';
 import fileActivityMonitor from './modules/fileActivityMonitor';
 import { initConfigs } from './modules/config';
 import { endAllRemote } from './modules/remoteFs';
+import appState from './modules/appState';
 import { watchFiles, clearAllWatcher } from './modules/fileWatcher';
 import { getWorkspaceFolders, setContextValue } from './host';
 
@@ -33,11 +34,15 @@ export function activate(context: vscode.ExtensionContext) {
   }
 
   setContextValue('enabled', true);
-  setup(workspaceFolders)
-    .then(_ => {
-      sftpBarItem.show();
-    })
-    .catch(reportError);
+  sftpBarItem.show();
+
+  appState.subscribe(state => {
+    const currentText = sftpBarItem.getText();
+    if (currentText.endsWith('SFTP')) {
+      sftpBarItem.reset();
+    }
+  });
+  setup(workspaceFolders).catch(reportError);
 }
 
 export function deactivate() {

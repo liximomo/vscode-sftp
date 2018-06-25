@@ -98,7 +98,7 @@ class KeepAliveRemoteFs {
     sftpBarItem.showMsg('connecting...', connectOption.connectTimeout);
     this.pendingPromise = this.fs.connect(promptForPassword).then(
       () => {
-        sftpBarItem.clear();
+        sftpBarItem.reset();
         this.isValid = true;
         return this.fs;
       },

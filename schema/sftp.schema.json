@@ -24,6 +24,7 @@
           "description": "sftp connection protocol."
         },
         "profiles": {
+          "description": "A collection of profiles. Using key as name. The profile will be merge to top level config.",
           "patternProperties": {
             "^.*$": {
               "allOf": [
@@ -38,6 +39,9 @@
                 }
               ]
             }
+          },
+          "default": {
+            "name": {}
           }
         }
       },

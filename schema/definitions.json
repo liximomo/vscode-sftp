@@ -69,7 +69,7 @@
       "host": {
         "type": "string",
         "description": "Hostname or IP address of the server.",
-        "default": "host"
+        "default": "localhost"
       },
       "port": {
         "type": "number",

@@ -10,15 +10,48 @@ import {
   selectFileOnly,
 } from '../modules/targetSelectStrategy';
 import localFs from '../modules/localFs';
+import { getAllConfigs } from '../modules/config';
+import appState from '../modules/appState';
 import { FileType } from '../core/Fs/FileSystem';
 import * as output from '../ui/output';
-import { showTextDocument, refreshExplorer } from '../host';
+import { showTextDocument, refreshExplorer, showInformationMessage } from '../host';
 
 export default function init(context: vscode.ExtensionContext) {
   commandManager.createCommand(constants.COMMAND_CONFIG, 'config sftp', actions.editConfig);
 
   commandManager.createCommand(constants.COMMAND_TOGGLE_OUTPUT, 'toggle output', () => {
     output.toggle();
+  });
+
+  commandManager.createCommand(constants.COMMAND_SET_PROFILE, 'set profile', async () => {
+    const profiles: Array<vscode.QuickPickItem & { value: string }> = getAllConfigs().reduce(
+      (acc, config) => {
+        if (!config.profiles) {
+          return acc;
+        }
+
+        Object.keys(config.profiles).forEach(key => {
+          acc.push({
+            value: key,
+            label: appState.profile === key ? `${key} (active)` : key,
+          });
+        });
+        return acc;
+      },
+      [{
+        label: 'UNSET',
+      }]
+    );
+
+    if (profiles.length <= 1) {
+      showInformationMessage('No Avaliable Profile.');
+      return;
+    }
+
+    const item = await vscode.window.showQuickPick(profiles, { placeHolder: 'select a profile' });
+    if (item === undefined) return;
+
+    appState.profile = item.value;
   });
 
   commandManager.createFileCommand(

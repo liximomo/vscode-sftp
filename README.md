@@ -4,6 +4,7 @@ Very simple, requires just three lines of config! Very fast, finished in a blink
 ## Features
 
 * Multiple configs
+* Switchable profiles
 * Browser remote files
 * Compare a local file with remote file
 * Sync directory to remote
@@ -34,7 +35,7 @@ Very simple, requires just three lines of config! Very fast, finished in a blink
 ## Config
 
 ### Example
-You are even not required to config a password!
+#### Password Free!
 ```json
 {
   "host": "host",
@@ -42,7 +43,35 @@ You are even not required to config a password!
   "remotePath": "/remote/workspace", 
 }
 ```
-You can also use an array of configs in the config file.
+
+#### Switchable Profiles
+```json
+{ 
+  "context": "/workspace/a",
+  "username": "username",
+  "password": "password",
+  "remotePath": "/remote/workspace/a", 
+  "watcher": {
+    "files": "dist/*.{js,css}",
+    "autoUpload": false,
+    "autoDelete": false,
+  },
+  "profiles" : {
+    "dev" : {
+      "host": "dev-host",
+      "remotePath" : "/dev",
+      "uploadOnSave": true
+    },
+    "prod" : {
+      "host": "prod-host",
+      "remotePath" : "/prod"
+    }
+  }
+}
+```
+*Note：* `context` and `watcher` are only avaliable at root level.
+
+#### multiple context.
 ```json
 [
   {
@@ -63,7 +92,7 @@ You can also use an array of configs in the config file.
   }
 ]
 ```
-*Note：* `name` is required in multi-config mode.
+*Note：* `name` is required in this mode.
 
 You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/config).
 

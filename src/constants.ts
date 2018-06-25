@@ -7,8 +7,9 @@ export const EXTENSION_NAME = 'sftp';
 export const CONGIF_FILENAME = 'sftp.json';
 export const CONFIG_PATH = path.join(VENDOR_FOLDER, CONGIF_FILENAME);
 
-export const COMMAND_TOGGLE_OUTPUT = 'sftp.toggleOutput';
 export const COMMAND_CONFIG = 'sftp.config.default';
+export const COMMAND_TOGGLE_OUTPUT = 'sftp.toggleOutput';
+export const COMMAND_SET_PROFILE = 'sftp.setProfile';
 
 export const COMMAND_SYNC_TO_REMOTE = 'sftp.sync.remote';
 export const COMMAND_SYNC_TO_LOCAL = 'sftp.sync.local';
