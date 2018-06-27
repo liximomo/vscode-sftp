@@ -1,3 +1,7 @@
+## 1.2.3 - 2018-06-19
+### New Features
+  * [Swtichable Profiles](https://github.com/liximomo/vscode-sftp/#profiles).
+
 ## 1.2.0 - 2018-06-19
 * Support [SSH config file](https://www.ssh.com/ssh/config/). The default ssh config file is `~/.ssh/config`. This can be changed by `sshConfigPath` option.
 

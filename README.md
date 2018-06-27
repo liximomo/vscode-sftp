@@ -44,7 +44,7 @@ Very simple, requires just three lines of config! Very fast, finished in a blink
 }
 ```
 
-#### Switchable Profiles
+#### Profiles
 ```json
 { 
   "context": "/workspace/a",
@@ -70,6 +70,8 @@ Very simple, requires just three lines of config! Very fast, finished in a blink
 }
 ```
 *Note：* `context` and `watcher` are only avaliable at root level.
+
+Use `SFTP: Set Profile` to swtich profile.
 
 #### multiple context.
 ```json
