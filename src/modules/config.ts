@@ -1,9 +1,9 @@
-import { CONFIG_PATH } from '../constants';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as os from 'os';
 import * as Joi from 'joi';
 import * as sshConfig from 'ssh-config';
+import { CONFIG_PATH } from '../constants';
 import reportError from '../helper/reportError';
 import Trie from '../core/Trie';
 import { showTextDocument } from '../host';
