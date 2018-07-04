@@ -6,7 +6,7 @@ import * as Joi from 'joi';
 import * as sshConfig from 'ssh-config';
 import reportError from '../helper/reportError';
 import Trie from '../core/Trie';
-import { showTextDocument, showWarningMessage } from '../host';
+import { showTextDocument } from '../host';
 import logger from '../logger';
 import appState from './appState';
 

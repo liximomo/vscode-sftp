@@ -1,5 +1,4 @@
 import * as path from 'path';
-import { simplifyPath } from '../host';
 import upath from '../core/upath';
 import { getHostInfo } from '../modules/config';
 import localFs from '../modules/localFs';
@@ -19,7 +18,7 @@ function onProgress(error, task: FileTask) {
   logger.info(`${task.type} ${task.file.fsPath}`);
   sftpBarItem.showMsg(
     `${task.type} ${path.basename(task.file.fsPath)}`,
-    simplifyPath(task.file.fsPath)
+    paths.simplifyPath(task.file.fsPath)
   );
 }
 
@@ -54,12 +53,6 @@ export default function createFileAction(
     if (doNotTriggerWatcher) {
       disableWatcher(config);
     }
-
-    sftpBarItem.showMsg(
-      `${actionName} ${path.basename(localFilePath)}...`,
-      simplifyPath(localFilePath)
-    );
-    logger.info(`${actionName} ${localFilePath}`);
 
     let retValue;
     try {

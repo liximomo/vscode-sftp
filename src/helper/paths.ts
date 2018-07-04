@@ -1,5 +1,10 @@
 import upath from '../core/upath';
+import { pathRelativeToWorkspace } from '../host';
 import * as path from 'path';
+
+export function simplifyPath(absolutePath) {
+  return pathRelativeToWorkspace(absolutePath);
+}
 
 export function toRemote(relativePath, remoteContext) {
   return upath.join(remoteContext, relativePath);

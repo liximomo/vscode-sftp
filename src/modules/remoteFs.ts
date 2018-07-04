@@ -40,6 +40,7 @@ class KeepAliveRemoteFs {
       password: option.password,
       connectTimeout: option.connectTimeout,
     };
+    // tslint:disable variable-name
     let FsConstructor;
     if (option.protocol === 'sftp') {
       connectOption = {

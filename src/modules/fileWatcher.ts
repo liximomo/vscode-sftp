@@ -4,12 +4,12 @@ import * as debounce from 'lodash.debounce';
 import sftpBarItem from '../ui/sftpBarItem';
 import * as output from '../ui/output';
 import { isValidFile } from '../helper/fileType';
+import reportError from '../helper/reportError';
 import fileDepth from '../helper/fileDepth';
+import { simplifyPath } from '../helper/paths';
 import { upload, removeRemote } from '../actions';
 import { getConfig } from './config';
-import reportError from '../helper/reportError';
 import logger from '../logger';
-import { simplifyPath } from '../host';
 
 const watchers: {
   [x: string]: vscode.FileSystemWatcher;

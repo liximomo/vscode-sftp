@@ -31,7 +31,7 @@ export default class FileCommand extends BaseCommand {
 
   private async handleFile(fileTarget) {
     const activityPath = fileTarget.fsPath;
-    logger.trace(`run ${this.getName()} task at`, activityPath);
+    logger.trace(`execute ${this.getName()} for`, activityPath);
     try {
       const config = getConfig(activityPath);
       await this.fileHandler(activityPath, config);
@@ -54,6 +54,7 @@ export default class FileCommand extends BaseCommand {
     const pendingTasks = [].concat(targets).map(target => this.handleFile(target));
 
     try {
+      sftpBarItem.showMsg(`${this.getName()}...`);
       return await Promise.all(pendingTasks);
     } finally {
       this.commitCommandDone();
