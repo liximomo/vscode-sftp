@@ -202,6 +202,45 @@ async function addConfig(config, defaultContext) {
   return extendedConfig;
 }
 
+function normalizeConfig(config) {
+  const result = { ...config };
+
+  const hasProfile = config.profiles && Object.keys(config.profiles).length > 0;
+  if (hasProfile && appState.profile) {
+    const profile = config.profiles[appState.profile];
+    if (!profile) {
+      throw new Error(
+        `Unkown Profile "${appState.profile}".` +
+          ' Please check your profile setting.' +
+          ' You can set a profile by running command `SFTP: Set Profile`.'
+      );
+    }
+
+    Object.assign(result, profile);
+    delete result.profiles;
+  }
+
+  // validate config
+  const { error: validationError } = Joi.validate(result, configScheme, {
+    allowUnknown: true,
+    convert: false,
+    language: {
+      object: {
+        child: '!!prop "{{!child}}" fails because {{reason}}',
+      },
+    },
+  });
+  if (validationError) {
+    let errorMsg = `Config validation fail: ${validationError.message}.`;
+    if (hasProfile && appState.profile == null) {
+      errorMsg += ' Maybe you should set a profile first.';
+    }
+    throw new Error(errorMsg);
+  }
+
+  return result;
+}
+
 export function getConfigPath(basePath) {
   return path.join(basePath, CONFIG_PATH);
 }
@@ -234,38 +273,15 @@ export function getConfig(activityPath: string) {
     throw new Error(`(${activityPath}) config file not found`);
   }
 
-  let fullConfig = config;
+  return normalizeConfig(config);
+}
 
-  const hasProfile = config.profiles && Object.keys(config.profiles).length > 0;
-  if (hasProfile && appState.profile) {
-    const profile = config.profiles[appState.profile];
-    if (!profile) {
-      throw new Error(
-        `Unkown Profile "${appState.profile}".` +
-          ' Please check your profile setting.' +
-          ' You can set a profile by running command `SFTP: Set Profile`.'
-      );
-    }
-
-    fullConfig = Object.assign({}, config, profile);
-    delete fullConfig.profiles;
+export function getAllRawConfigs() {
+  if (configTrie === undefined) {
+    return [];
   }
 
-  // validate config
-  const { error: validationError } = Joi.validate(fullConfig, configScheme, {
-    allowUnknown: true,
-    convert: false,
-    language: {
-      object: {
-        child: '!!prop "{{!child}}" fails because {{reason}}',
-      },
-    },
-  });
-  if (validationError) {
-    throw new Error(`config validation fail: ${validationError.message}`);
-  }
-
-  return fullConfig;
+  return configTrie.getAllValues();
 }
 
 export function getAllConfigs() {
@@ -273,7 +289,7 @@ export function getAllConfigs() {
     return [];
   }
 
-  return configTrie.getAllValues();
+  return configTrie.getAllValues().map(normalizeConfig);
 }
 
 export function getShortestDistinctConfigs() {

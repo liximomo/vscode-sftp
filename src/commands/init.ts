@@ -10,7 +10,7 @@ import {
   selectFileOnly,
 } from '../modules/targetSelectStrategy';
 import localFs from '../modules/localFs';
-import { getAllConfigs } from '../modules/config';
+import { getAllRawConfigs } from '../modules/config';
 import appState from '../modules/appState';
 import { FileType } from '../core/Fs/FileSystem';
 import * as output from '../ui/output';
@@ -24,7 +24,7 @@ export default function init(context: vscode.ExtensionContext) {
   });
 
   commandManager.createCommand(constants.COMMAND_SET_PROFILE, 'set profile', async () => {
-    const profiles: Array<vscode.QuickPickItem & { value: string }> = getAllConfigs().reduce(
+    const profiles: Array<vscode.QuickPickItem & { value: string }> = getAllRawConfigs().reduce(
       (acc, config) => {
         if (!config.profiles) {
           return acc;

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import FileSystem, { FileType } from '../core/Fs/FileSystem';
-import { getAllConfigs } from '../modules/config';
+import { getAllRawConfigs } from '../modules/config';
 import * as path from 'path';
 
 const ROOT = '@root';
@@ -166,7 +166,7 @@ export function listFiles(
 
 export function selectContext(): Promise<string> {
   return new Promise((resolve, reject) => {
-    const configs = getAllConfigs();
+    const configs = getAllRawConfigs();
     const projectsList = configs
       .map(cfg => ({
         value: cfg.context,
