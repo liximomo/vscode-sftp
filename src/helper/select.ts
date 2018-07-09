@@ -176,9 +176,9 @@ export function selectContext(): Promise<string> {
       }))
       .sort((l, r) => l.label.localeCompare(r.label));
 
-    if (projectsList.length === 1) {
-      return resolve(projectsList[0].value);
-    }
+    // if (projectsList.length === 1) {
+      // return resolve(projectsList[0].value);
+    // }
 
     vscode.window
       .showQuickPick(projectsList, {

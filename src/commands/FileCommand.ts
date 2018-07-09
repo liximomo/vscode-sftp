@@ -51,10 +51,10 @@ export default class FileCommand extends BaseCommand {
       return;
     }
 
+    sftpBarItem.showMsg(`${this.getName()}...`);
     const pendingTasks = [].concat(targets).map(target => this.handleFile(target));
 
     try {
-      sftpBarItem.showMsg(`${this.getName()}...`);
       return await Promise.all(pendingTasks);
     } finally {
       this.commitCommandDone();
