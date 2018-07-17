@@ -165,6 +165,9 @@ async function extendConfig(config) {
     }
   });
 
+  // convert to integer
+  merged.port = parseInt(merged.port, 10);
+
   return merged;
 }
 
