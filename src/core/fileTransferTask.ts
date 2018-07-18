@@ -83,7 +83,7 @@ const toHash = (items: any[], key: string, transform?: (a: any) => any): { [key:
 
 async function taskBatchProcess(taskQueue: FileTask[], srcFs, desFs, option: TransferTaskOption) {
   return new Promise((resolve, reject) => {
-    const { concurrency, onProgress, ...transferOption } = option;
+    const { concurrency = 1, onProgress, ...transferOption } = option;
 
     taskQueue.sort((a, b) => fileDepth(b.file.fsPath) - fileDepth(a.file.fsPath));
 
