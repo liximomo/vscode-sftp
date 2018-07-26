@@ -34,8 +34,8 @@ export default class SFTPClient extends RemoteClient {
           .connect({
             keepaliveInterval: 1000 * 30,
             keepaliveCountMax: 2,
-            ...option,
             readyTimeout: interactiveAuth ? Math.max(60 * 1000, connectTimeout) : connectTimeout,
+            ...option,
             privateKey,
             password: passwd,
             tryKeyboard: interactiveAuth,

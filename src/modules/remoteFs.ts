@@ -32,26 +32,11 @@ class KeepAliveRemoteFs {
       return this.pendingPromise;
     }
 
+    const connectOption: any = { ...option };
     let shouldPromptForPass = false;
-    let connectOption: any = {
-      host: option.host,
-      port: option.port,
-      username: option.username,
-      password: option.password,
-      connectTimeout: option.connectTimeout,
-    };
     // tslint:disable variable-name
     let FsConstructor;
     if (option.protocol === 'sftp') {
-      connectOption = {
-        ...connectOption,
-        agent: option.agent,
-        privateKeyPath: option.privateKeyPath,
-        passphrase: option.passphrase,
-        interactiveAuth: option.interactiveAuth,
-        algorithms: option.algorithms,
-      };
-
       // tslint:disable triple-equals
       shouldPromptForPass =
         connectOption.password == undefined &&
@@ -65,22 +50,16 @@ class KeepAliveRemoteFs {
       }
       FsConstructor = SFTPFileSystem;
     } else if (option.protocol === 'ftp') {
-      connectOption = {
-        ...connectOption,
-        secure: option.secure,
-        secureOptions: option.secureOptions,
-        passive: option.passive,
-        debug(str) {
-          const log = str.match(/^\[connection\] (>|<) '(.*?)(\\r\\n)?'$/);
+      connectOption.debug = function debug(str) {
+        const log = str.match(/^\[connection\] (>|<) '(.*?)(\\r\\n)?'$/);
 
-          if (!log) return;
+        if (!log) return;
 
-          if (log[2].match(/200 NOOP/)) return;
+        if (log[2].match(/200 NOOP/)) return;
 
-          if (log[2].match(/^PASS /)) log[2] = 'PASS ******';
+        if (log[2].match(/^PASS /)) log[2] = 'PASS ******';
 
-          logger.debug(`${log[1]} ${log[2]}`);
-        },
+        logger.debug(`${log[1]} ${log[2]}`);
       };
       // tslint:disable-next-line triple-equals
       shouldPromptForPass = connectOption.password == undefined;

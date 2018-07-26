@@ -63,7 +63,19 @@ const configScheme = {
 };
 
 const defaultConfig = {
+  // common
   name: undefined,
+  remotePath: './',
+  uploadOnSave: false,
+  downloadOnOpen: false,
+  syncMode: 'update',
+  ignore: [],
+  watcher: {
+    files: false,
+    autoUpload: false,
+    autoDelete: false,
+  },
+  concurrency: 4,
 
   protocol: 'sftp',
 
@@ -86,19 +98,6 @@ const defaultConfig = {
   secure: false,
   secureOptions: undefined,
   passive: false,
-
-  // common
-  remotePath: './',
-  uploadOnSave: false,
-  downloadOnOpen: false,
-  syncMode: 'update',
-  ignore: [],
-  watcher: {
-    files: false,
-    autoUpload: false,
-    autoDelete: false,
-  },
-  concurrency: 4,
 };
 
 function normalizeTriePath(pathname) {
@@ -126,6 +125,15 @@ async function extendConfig(config) {
     port: protocol === 'ftp' ? 21 : 22, // override default port by protocol
     ...config,
   };
+
+  if (merged.agent && merged.agent.startsWith('$')) {
+    const evnVarName = merged.agent.slice(1);
+    const val = process.env[evnVarName];
+    if (!val) {
+      throw new Error(`Environment variable "${evnVarName}" not found`);
+    }
+    merged.agent = val;
+  }
 
   const sshConfigPath = normalizeHomePath(merged.sshConfigPath);
   if (protocol !== 'sftp' || !sshConfigPath) {
@@ -330,24 +338,22 @@ export function newConfig(basePath) {
 }
 
 export function getHostInfo(config) {
-  return {
-    protocol: config.protocol,
-    host: config.host,
-    port: config.port,
-    username: config.username,
-    password: config.password,
-    connectTimeout: config.connectTimeout,
+  const ignoreOptions = [
+    'name',
+    'remotePath',
+    'uploadOnSave',
+    'downloadOnOpen',
+    'syncMode',
+    'ignore',
+    'watcher',
+    'concurrency',
+    'sshConfigPath',
+  ];
 
-    // sftp
-    agent: config.agent,
-    privateKeyPath: config.privateKeyPath,
-    passphrase: config.passphrase,
-    interactiveAuth: config.interactiveAuth,
-    algorithms: config.algorithms,
-
-    // ftp
-    secure: config.secure,
-    secureOptions: config.secureOptions,
-    passive: config.passive,
-  };
+  return Object.keys(config).reduce((obj, key) => {
+    if (ignoreOptions.indexOf(key) === -1) {
+      obj[key] = config[key];
+    }
+    return obj;
+  }, {});
 }
