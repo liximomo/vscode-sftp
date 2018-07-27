@@ -1,3 +1,7 @@
+## 1.2.7 - 2018-07-27
+### New Features
+  * `ignoreFile` [option](https://github.com/liximomo/vscode-sftp/wiki/Config#ignorefile).
+
 ## 1.2.3 - 2018-06-19
 ### New Features
   * [Swtichable Profiles](https://github.com/liximomo/vscode-sftp/#profiles).

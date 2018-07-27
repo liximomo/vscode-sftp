@@ -64,7 +64,7 @@
       "ignoreFile": {
         "type": "string",
         "description": "Absolute path to the ignore file or Relative path relative to the workspace root folder.",
-        "default": [".gitignore"]
+        "default": ".gitignore"
       }
     }
   },
