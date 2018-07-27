@@ -100,6 +100,10 @@ const defaultConfig = {
   passive: false,
 };
 
+function chooseDefaultPort(protocol) {
+  return protocol === 'ftp' ? 21 : 22;
+}
+
 function normalizeTriePath(pathname) {
   const isWindows = process.platform === 'win32';
   if (isWindows) {
@@ -122,7 +126,7 @@ async function extendConfig(config) {
 
   const merged = {
     ...defaultConfig,
-    port: protocol === 'ftp' ? 21 : 22, // override default port by protocol
+    port: chooseDefaultPort(protocol), // override default port by protocol
     ...config,
   };
 
@@ -326,9 +330,10 @@ export function newConfig(basePath) {
           configPath,
           {
             protocol: defaultConfig.protocol,
-            host: defaultConfig.host,
-            username: defaultConfig.username,
-            remotePath: defaultConfig.remotePath,
+            host: 'localhost',
+            port: chooseDefaultPort(defaultConfig.protocol),
+            username: 'username',
+            remotePath: '/',
           },
           { spaces: 4 }
         )
