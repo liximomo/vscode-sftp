@@ -1,4 +1,4 @@
-import FileSystem from '../core/Fs/FileSystem';
+import FileSystem from './Fs/FileSystem';
 
 export interface TransferOption {
   perserveTargetMode: boolean;

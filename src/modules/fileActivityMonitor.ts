@@ -1,14 +1,13 @@
 import * as vscode from 'vscode';
 import logger from '../logger';
-import sftpBarItem from '../ui/sftpBarItem';
+import app from '../app';
 import { onDidOpenTextDocument, onDidSaveTextDocument, showConfirmMessage } from '../host';
 import { getConfig, loadConfig } from './config';
 import { upload } from '../actions';
 import { watchFiles } from './fileWatcher';
 import { endAllRemote } from './remoteFs';
 import { download } from '../actions';
-import reportError from '../helper/reportError';
-import { isValidFile, isConfigFile } from '../helper/fileType';
+import { reportError, isValidFile, isConfigFile } from '../helper';
 
 let workspaceWatcher: vscode.Disposable;
 
@@ -33,7 +32,7 @@ async function handleFileSave(uri) {
   if (config.uploadOnSave) {
     await upload(activityPath, config).catch(reportError);
     logger.info(`[file-save] upload ${activityPath}`);
-    sftpBarItem.showMsg('upload done', 2 * 1000);
+    app.sftpBarItem.showMsg('upload done', 2 * 1000);
   }
 }
 
@@ -55,7 +54,7 @@ async function downloadOnOpen(uri) {
 
     await download(activityPath, config).catch(reportError);
     logger.info(`[file-open] download ${activityPath}`);
-    sftpBarItem.showMsg('download done', 2 * 1000);
+    app.sftpBarItem.showMsg('download done', 2 * 1000);
   }
 }
 
@@ -76,10 +75,14 @@ function watchWorkspace({
       return;
     }
 
-    // let configWatcher do this
     if (isConfigFile(uri)) {
       onDidSaveSftpConfig(uri);
       return;
+    }
+
+    // remove staled cache
+    if (app.ignoreFileCache.has(uri.fsPath)) {
+      app.ignoreFileCache.del(uri.fsPath);
     }
 
     onDidSaveFile(uri);

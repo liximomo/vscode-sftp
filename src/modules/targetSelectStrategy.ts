@@ -1,13 +1,17 @@
 import { getActiveTextEditor } from '../host';
 import { FileTarget } from '../commands/FileCommand';
-import { listFiles } from '../helper/select';
-import * as paths from '../helper/paths';
-import { selectContext } from '../helper/select';
+import {
+  listFiles,
+  isSubpathOf,
+  toLocalPath,
+  selectContext,
+  filesIgnoredFromConfig,
+} from '../helper';
 import upath from '../core/upath';
-import { getAllConfigs } from '../modules/config';
-import { getHostInfo } from '../modules/config';
-import getRemoteFs from '../modules/remoteFs';
-import Ignore from '../modules/Ignore';
+import { getAllConfigs } from './config';
+import { getHostInfo } from './config';
+import getRemoteFs from './remoteFs';
+import Ignore from './Ignore';
 
 function getActiveTarget(): Promise<FileTarget> {
   return new Promise((resolve, reject) => {
@@ -25,11 +29,11 @@ function getActiveTarget(): Promise<FileTarget> {
 function configIngoreFilterCreator(configs) {
   const filterConfigs = configs.map(config => ({
     context: config.remotePath,
-    filter: Ignore.from(config.ignore).createFilter(),
+    filter: Ignore.from(filesIgnoredFromConfig(config)).createFilter(),
   }));
 
   const filter = file => {
-    const filterConfig = filterConfigs.find(f => paths.isSubpathOf(f.context, file.fsPath));
+    const filterConfig = filterConfigs.find(f => isSubpathOf(f.context, file.fsPath));
     if (!filterConfig) {
       return true;
     }
@@ -65,7 +69,7 @@ function createFileSelector({ filterCreator = null } = {}) {
     }
 
     const targetConfig = configs[selected.index];
-    const localTarget = paths.toLocal(
+    const localTarget = toLocalPath(
       upath.relative(targetConfig.remotePath, selected.fsPath),
       targetConfig.context
     );

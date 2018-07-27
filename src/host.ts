@@ -5,6 +5,13 @@ export function getConfig() {
   return vscode.workspace.getConfiguration(EXTENSION_NAME);
 }
 
+export function onWillSaveTextDocument(
+  listener: (e: vscode.TextDocumentWillSaveEvent) => any,
+  thisArgs?: any
+) {
+  return vscode.workspace.onWillSaveTextDocument(listener, thisArgs);
+}
+
 export function onDidSaveTextDocument(listener: (e: vscode.TextDocument) => any, thisArgs?: any) {
   return vscode.workspace.onDidSaveTextDocument(listener, thisArgs);
 }

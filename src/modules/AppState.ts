@@ -22,6 +22,4 @@ class AppState {
   }
 }
 
-const appState = new AppState();
-
-export default appState;
+export default AppState;

@@ -7,11 +7,10 @@ import {
   TransferOption,
 } from './fileTransfer';
 import upath from './upath';
-import sftpBarItem from '../ui/sftpBarItem';
-import FileSystem, { IFileEntry, FileType } from '../core/Fs/FileSystem';
-import * as  utils from '../utils';
-import fileDepth from '../helper/fileDepth';
-import { simplifyPath } from '../helper/paths';
+import app from '../app';
+import FileSystem, { IFileEntry, FileType } from './Fs/FileSystem';
+import * as utils from '../utils';
+import { fileDepth, simplifyPath } from '../helper';
 
 type SyncModel = 'full' | 'update';
 
@@ -167,7 +166,7 @@ async function fileTaskListFromDirector(
     return Promise.resolve([]);
   }
 
-  sftpBarItem.showMsg(`retrieving directory ${upath.basename(src)}`, simplifyPath(src));
+  app.sftpBarItem.showMsg(`retrieving directory ${upath.basename(src)}`, simplifyPath(src));
 
   // $caution side effect
   // Need this to make sure file can correct transfer
@@ -202,9 +201,9 @@ async function fileTaskListFromDirectorForSync(
     return Promise.resolve([]);
   }
 
-  sftpBarItem.showMsg(`retrieving directory ${upath.basename(src)}`, simplifyPath(src));
+  app.sftpBarItem.showMsg(`retrieving directory ${upath.basename(src)}`, simplifyPath(src));
   const syncFiles = ([srcFileEntries, desFileEntries]: IFileEntry[][]) => {
-    sftpBarItem.showMsg('diff files...');
+    app.sftpBarItem.showMsg('diff files...');
 
     const srcFileTable = toHash(srcFileEntries, 'id', fileEntry => ({
       ...fileEntry,

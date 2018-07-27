@@ -5,8 +5,8 @@ import localFs from '../modules/localFs';
 import getRemoteFs from '../modules/remoteFs';
 import Ignore from '../modules/Ignore';
 import { FileTask } from '../core/fileTransferTask';
-import * as paths from '../helper/paths';
-import sftpBarItem from '../ui/sftpBarItem';
+import { simplifyPath, toRemotePath, filesIgnoredFromConfig } from '../helper';
+import app from '../app';
 import logger from '../logger';
 import { disableWatcher, enableWatcher } from '../modules/fileWatcher';
 
@@ -16,9 +16,9 @@ function onProgress(error, task: FileTask) {
   }
 
   logger.info(`${task.type} ${task.file.fsPath}`);
-  sftpBarItem.showMsg(
+  app.sftpBarItem.showMsg(
     `${task.type} ${path.basename(task.file.fsPath)}`,
-    paths.simplifyPath(task.file.fsPath)
+    simplifyPath(task.file.fsPath)
   );
 }
 
@@ -31,7 +31,8 @@ export default function createFileAction(
     const localContext = config.context;
     const remoteContext = config.remotePath;
 
-    const ignore = Ignore.from(config.ignore);
+    const ignoreConfig = filesIgnoredFromConfig(config);
+    const ignore = Ignore.from(ignoreConfig);
     const ignoreFunc = fsPath => {
       // vscode will always return path with / as separator
       const normalizedPath = path.normalize(fsPath);
@@ -61,7 +62,7 @@ export default function createFileAction(
         {
           ...config,
           concurrency: config.protocol === 'ftp' ? 1 : config.concurrency,
-          remotePath: paths.toRemote(path.relative(localContext, localFilePath), remoteContext),
+          remotePath: toRemotePath(path.relative(localContext, localFilePath), remoteContext),
           ignore: ignoreFunc,
         },
         {

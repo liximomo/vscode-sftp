@@ -3,7 +3,7 @@
     "properties": {
       "context": {
         "type": "string",
-        "description": "A path relative to the vsode workspace root folder."
+        "description": "Relative path relative to the workspace root folder."
       },
       "watcher": {
         "type": "object",
@@ -39,7 +39,7 @@
     "properties": {
       "uploadOnSave": {
         "type": "boolean",
-        "description": "True to upload on every save operation of VS code.",
+        "description": "True to upload on every save operation of VS Code.",
         "default": true
       },
       "downloadOnOpen": {
@@ -54,12 +54,17 @@
       },
       "ignore": {
         "type": "array",
-        "description": "Ignore files. Same behavior as gitignore.",
+        "description": "Files to ignore. Same behavior as gitignore.",
         "items": {
           "type": "string",
           "description": "Ignore pattern."
         },
         "default": [".vscode", ".git", ".DS_Store"]
+      },
+      "ignoreFile": {
+        "type": "string",
+        "description": "Absolute path to the ignore file or Relative path relative to the workspace root folder.",
+        "default": [".gitignore"]
       }
     }
   },

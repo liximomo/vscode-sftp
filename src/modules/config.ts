@@ -1,14 +1,13 @@
 import * as fse from 'fs-extra';
 import * as path from 'path';
-import * as os from 'os';
 import * as Joi from 'joi';
 import * as sshConfig from 'ssh-config';
+import app from '../app';
 import { CONFIG_PATH } from '../constants';
-import reportError from '../helper/reportError';
+import { reportError, replaceHomePath, resolvePath } from '../helper';
 import Trie from '../core/Trie';
 import { showTextDocument } from '../host';
 import logger from '../logger';
-import appState from './appState';
 
 const configTrie = new Trie(
   {},
@@ -52,6 +51,7 @@ const configScheme = {
   ignore: Joi.array()
     .min(0)
     .items(Joi.string()),
+  ignoreFile: Joi.string().optional(),
   watcher: {
     files: Joi.string()
       .allow(false, null)
@@ -70,6 +70,7 @@ const defaultConfig = {
   downloadOnOpen: false,
   syncMode: 'update',
   ignore: [],
+  ignoreFile: undefined,
   watcher: {
     files: false,
     autoUpload: false,
@@ -117,10 +118,6 @@ function normalizeTriePath(pathname) {
   return path.normalize(pathname);
 }
 
-function normalizeHomePath(pathname) {
-  return pathname.substr(0, 2) === '~/' ? path.join(os.homedir(), pathname.slice(2)) : pathname;
-}
-
 async function extendConfig(config) {
   const protocol = config.protocol;
 
@@ -130,16 +127,7 @@ async function extendConfig(config) {
     ...config,
   };
 
-  if (merged.agent && merged.agent.startsWith('$')) {
-    const evnVarName = merged.agent.slice(1);
-    const val = process.env[evnVarName];
-    if (!val) {
-      throw new Error(`Environment variable "${evnVarName}" not found`);
-    }
-    merged.agent = val;
-  }
-
-  const sshConfigPath = normalizeHomePath(merged.sshConfigPath);
+  const sshConfigPath = replaceHomePath(merged.sshConfigPath);
   if (protocol !== 'sftp' || !sshConfigPath) {
     return merged;
   }
@@ -198,17 +186,20 @@ function logConfig(config) {
   logger.info(`config at ${config.context}`, copy);
 }
 
-async function addConfig(config, defaultContext) {
+async function addConfig(config, workspace) {
   if (config.defaultProfile) {
-    appState.profile = config.defaultProfile;
+    app.state.profile = config.defaultProfile;
   }
 
   const extendedConfig = await extendConfig(config);
   // tslint:disable triple-equals
-  const context = extendedConfig.context != undefined ? extendedConfig.context : defaultContext;
-  extendedConfig.context = normalizeTriePath(path.resolve(defaultContext, context));
+  const context = extendedConfig.context != undefined ? extendedConfig.context : workspace;
+  extendedConfig.context = normalizeTriePath(path.resolve(workspace, context));
   if (extendedConfig.privateKeyPath) {
-    extendedConfig.privateKeyPath = normalizeHomePath(extendedConfig.privateKeyPath);
+    extendedConfig.privateKeyPath = resolvePath(workspace, extendedConfig.privateKeyPath);
+  }
+  if (extendedConfig.ignoreFile) {
+    extendedConfig.ignoreFile = resolvePath(workspace, extendedConfig.ignoreFile);
   }
   configTrie.add(extendedConfig.context, extendedConfig);
 
@@ -220,12 +211,21 @@ async function addConfig(config, defaultContext) {
 function normalizeConfig(config) {
   const result = { ...config };
 
+  if (result.agent && result.agent.startsWith('$')) {
+    const evnVarName = result.agent.slice(1);
+    const val = process.env[evnVarName];
+    if (!val) {
+      throw new Error(`Environment variable "${evnVarName}" not found`);
+    }
+    result.agent = val;
+  }
+
   const hasProfile = config.profiles && Object.keys(config.profiles).length > 0;
-  if (hasProfile && appState.profile) {
-    const profile = config.profiles[appState.profile];
+  if (hasProfile && app.state.profile) {
+    const profile = config.profiles[app.state.profile];
     if (!profile) {
       throw new Error(
-        `Unkown Profile "${appState.profile}".` +
+        `Unkown Profile "${app.state.profile}".` +
           ' Please check your profile setting.' +
           ' You can set a profile by running command `SFTP: Set Profile`.'
       );
@@ -247,7 +247,7 @@ function normalizeConfig(config) {
   });
   if (validationError) {
     let errorMsg = `Config validation fail: ${validationError.message}.`;
-    if (hasProfile && appState.profile == null) {
+    if (hasProfile && app.state.profile == null) {
       errorMsg += ' Maybe you should set a profile first.';
     }
     throw new Error(errorMsg);
@@ -350,6 +350,7 @@ export function getHostInfo(config) {
     'downloadOnOpen',
     'syncMode',
     'ignore',
+    'ignoreFile',
     'watcher',
     'concurrency',
     'sshConfigPath',

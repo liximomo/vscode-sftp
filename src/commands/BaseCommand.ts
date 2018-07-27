@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { registerCommand } from '../host';
-import reportError from '../helper/reportError';
+import { reportError } from '../helper';
 
 export interface ITarget {
   fsPath: string;

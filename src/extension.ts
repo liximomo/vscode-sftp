@@ -2,13 +2,12 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import sftpBarItem from './ui/sftpBarItem';
+import app from './app';
 import initCommand from './commands/init';
-import reportError from './helper/reportError';
+import { reportError } from './helper';
 import fileActivityMonitor from './modules/fileActivityMonitor';
 import { initConfigs } from './modules/config';
 import { endAllRemote } from './modules/remoteFs';
-import appState from './modules/appState';
 import { watchFiles, clearAllWatcher } from './modules/fileWatcher';
 import { getWorkspaceFolders, setContextValue } from './host';
 
@@ -34,12 +33,12 @@ export function activate(context: vscode.ExtensionContext) {
   }
 
   setContextValue('enabled', true);
-  sftpBarItem.show();
+  app.sftpBarItem.show();
 
-  appState.subscribe(state => {
-    const currentText = sftpBarItem.getText();
+  app.state.subscribe(state => {
+    const currentText = app.sftpBarItem.getText();
     if (currentText.endsWith('SFTP')) {
-      sftpBarItem.reset();
+      app.sftpBarItem.reset();
     }
   });
   setup(workspaceFolders).catch(reportError);

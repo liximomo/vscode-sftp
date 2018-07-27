@@ -1,12 +1,9 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as debounce from 'lodash.debounce';
-import sftpBarItem from '../ui/sftpBarItem';
 import * as output from '../ui/output';
-import { isValidFile } from '../helper/fileType';
-import reportError from '../helper/reportError';
-import fileDepth from '../helper/fileDepth';
-import { simplifyPath } from '../helper/paths';
+import app from '../app';
+import { reportError, isValidFile, fileDepth, simplifyPath } from '../helper';
 import { upload, removeRemote } from '../actions';
 import { getConfig } from './config';
 import logger from '../logger';
@@ -44,7 +41,7 @@ function doUpload() {
 
     upload(file, config).then(() => {
       logger.info('[watcher]', `upload ${file}`);
-      sftpBarItem.showMsg(`upload ${path.basename(file)}`, simplifyPath(file), 2 * 1000);
+      app.sftpBarItem.showMsg(`upload ${path.basename(file)}`, simplifyPath(file), 2 * 1000);
     }, fileError('upload', file));
   });
 }
@@ -66,7 +63,7 @@ function doDelete() {
       // skipDir: true,
     }).then(() => {
       logger.info('[watcher]', `delete ${file}`);
-      sftpBarItem.showMsg(`delete ${path.basename(file)}`, simplifyPath(file), 2 * 1000);
+      app.sftpBarItem.showMsg(`delete ${path.basename(file)}`, simplifyPath(file), 2 * 1000);
     }, fileError('delete', config.remotePath, false));
   });
 }

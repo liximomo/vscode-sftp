@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as constants from '../constants';
 import * as actions from '../actions';
+import app from '../app';
 import commandManager from './commandManager';
 import {
   selectFileFallbackToConfigContext,
@@ -11,7 +12,6 @@ import {
 } from '../modules/targetSelectStrategy';
 import localFs from '../modules/localFs';
 import { getAllRawConfigs } from '../modules/config';
-import appState from '../modules/appState';
 import { FileType } from '../core/Fs/FileSystem';
 import * as output from '../ui/output';
 import { showTextDocument, refreshExplorer, showInformationMessage } from '../host';
@@ -33,7 +33,7 @@ export default function init(context: vscode.ExtensionContext) {
         Object.keys(config.profiles).forEach(key => {
           acc.push({
             value: key,
-            label: appState.profile === key ? `${key} (active)` : key,
+            label: app.state.profile === key ? `${key} (active)` : key,
           });
         });
         return acc;
@@ -51,7 +51,7 @@ export default function init(context: vscode.ExtensionContext) {
     const item = await vscode.window.showQuickPick(profiles, { placeHolder: 'select a profile' });
     if (item === undefined) return;
 
-    appState.profile = item.value;
+    app.state.profile = item.value;
   });
 
   commandManager.createFileCommand(

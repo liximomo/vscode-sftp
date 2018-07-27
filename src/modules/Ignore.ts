@@ -5,7 +5,7 @@ export default class Ignore {
     return new Ignore(pattern);
   }
 
-  pattern: string[];
+  pattern: string[] | string;
   private ignore: any;
 
   constructor(pattern) {

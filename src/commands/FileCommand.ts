@@ -1,8 +1,8 @@
 import BaseCommand from './BaseCommand';
 import logger from '../logger';
-import sftpBarItem from '../ui/sftpBarItem';
+import app from '../app';
 import { showWarningMessage } from '../host';
-import reportError from '../helper/reportError';
+import { reportError } from '../helper';
 import { getConfig } from '../modules/config';
 
 export interface FileTarget {
@@ -21,7 +21,7 @@ export default class FileCommand extends BaseCommand {
     this.requireTarget = requireTarget;
 
     this.onCommandDone(() => {
-      sftpBarItem.showMsg(`${this.getName()} done`, 2000);
+      app.sftpBarItem.showMsg(`${this.getName()} done`, 2000);
     });
   }
 
@@ -51,7 +51,7 @@ export default class FileCommand extends BaseCommand {
       return;
     }
 
-    sftpBarItem.showMsg(`${this.getName()}...`);
+    app.sftpBarItem.showMsg(`${this.getName()}...`);
     const pendingTasks = [].concat(targets).map(target => this.handleFile(target));
 
     try {
