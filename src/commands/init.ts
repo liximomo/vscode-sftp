@@ -4,11 +4,11 @@ import * as actions from '../actions';
 import app from '../app';
 import commandManager from './commandManager';
 import {
-  selectFileFallbackToConfigContext,
+  selectActivedFile,
   selectFolderFallbackToConfigContext,
   selectFile,
   selectFileFromAll,
-  selectFileOnly,
+  selectContext,
 } from '../modules/targetSelectStrategy';
 import localFs from '../modules/localFs';
 import { getAllRawConfigs } from '../modules/config';
@@ -38,9 +38,11 @@ export default function init(context: vscode.ExtensionContext) {
         });
         return acc;
       },
-      [{
-        label: 'UNSET',
-      }]
+      [
+        {
+          label: 'UNSET',
+        },
+      ]
     );
 
     if (profiles.length <= 1) {
@@ -76,8 +78,16 @@ export default function init(context: vscode.ExtensionContext) {
     constants.COMMAND_UPLOAD,
     'upload',
     actions.upload,
-    selectFileFallbackToConfigContext,
+    selectActivedFile,
     true
+  );
+
+  commandManager.createFileCommand(
+    constants.COMMAND_UPLOAD_PROJECT,
+    'upload project',
+    actions.upload,
+    selectContext,
+    false
   );
 
   commandManager
@@ -85,8 +95,18 @@ export default function init(context: vscode.ExtensionContext) {
       constants.COMMAND_DOWNLOAD,
       'download',
       actions.download,
-      selectFileFallbackToConfigContext,
+      selectActivedFile,
       true
+    )
+    .onCommandDone(refreshExplorer);
+
+  commandManager
+    .createFileCommand(
+      constants.COMMAND_DOWNLOAD_PROJECT,
+      'download project',
+      actions.download,
+      selectContext,
+      false
     )
     .onCommandDone(refreshExplorer);
 
@@ -126,7 +146,7 @@ export default function init(context: vscode.ExtensionContext) {
     constants.COMMAND_DIFF,
     'diff',
     actions.diff,
-    selectFileOnly,
+    selectActivedFile,
     true
   );
 

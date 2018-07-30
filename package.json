@@ -66,6 +66,14 @@
         "title": "SFTP: Download"
       },
       {
+        "command": "sftp.trans.remote.project",
+        "title": "SFTP: Upload Project"
+      },
+      {
+        "command": "sftp.trans.local.project",
+        "title": "SFTP: Download Project"
+      },
+      {
         "command": "sftp.sync.remote",
         "title": "SFTP: Sync To Remote"
       },
@@ -101,6 +109,14 @@
         },
         {
           "command": "sftp.trans.local",
+          "when": "sftp:enabled"
+        },
+        {
+          "command": "sftp.trans.remote.project",
+          "when": "sftp:enabled"
+        },
+        {
+          "command": "sftp.trans.local.project",
           "when": "sftp:enabled"
         },
         {

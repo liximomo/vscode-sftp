@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import FileSystem, { FileType } from '../core/Fs/FileSystem';
-import { getAllRawConfigs } from '../modules/config';
 import * as path from 'path';
 
 const ROOT = '@root';
@@ -162,36 +161,4 @@ export function listFiles(
     [ROOT]: baseItems,
   };
   return showFiles(fileLookUp, null, baseItems, option);
-}
-
-export function selectContext(): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const configs = getAllRawConfigs();
-    const projectsList = configs
-      .map(cfg => ({
-        value: cfg.context,
-        label: cfg.name || vscode.workspace.asRelativePath(cfg.context),
-        description: '',
-        detail: cfg.context,
-      }))
-      .sort((l, r) => l.label.localeCompare(r.label));
-
-    // if (projectsList.length === 1) {
-      // return resolve(projectsList[0].value);
-    // }
-
-    vscode.window
-      .showQuickPick(projectsList, {
-        placeHolder: 'Select a folder...',
-      })
-      .then(selection => {
-        if (selection) {
-          resolve(selection.value);
-          return;
-        }
-
-        // cancel selection
-        return null;
-      }, reject);
-  });
 }

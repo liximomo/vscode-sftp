@@ -1,17 +1,44 @@
+import * as vscode from 'vscode';
 import { getActiveTextEditor } from '../host';
+import { getAllRawConfigs } from '../modules/config';
 import { FileTarget } from '../commands/FileCommand';
-import {
-  listFiles,
-  isSubpathOf,
-  toLocalPath,
-  selectContext,
-  filesIgnoredFromConfig,
-} from '../helper';
+import { listFiles, isSubpathOf, toLocalPath, filesIgnoredFromConfig } from '../helper';
 import upath from '../core/upath';
 import { getAllConfigs } from './config';
 import { getHostInfo } from './config';
 import getRemoteFs from './remoteFs';
 import Ignore from './Ignore';
+
+export function selectContext(): Promise<FileTarget> {
+  return new Promise((resolve, reject) => {
+    const configs = getAllRawConfigs();
+    const projectsList = configs
+      .map(cfg => ({
+        value: cfg.context,
+        label: cfg.name || vscode.workspace.asRelativePath(cfg.context),
+        description: '',
+        detail: cfg.context,
+      }))
+      .sort((l, r) => l.label.localeCompare(r.label));
+
+    // if (projectsList.length === 1) {
+    // return resolve(projectsList[0].value);
+    // }
+
+    vscode.window
+      .showQuickPick(projectsList, {
+        placeHolder: 'Select a folder...',
+      })
+      .then(selection => {
+        if (selection) {
+          return resolve({ fsPath: selection.value });
+        }
+
+        // cancel selection
+        resolve(null);
+      }, reject);
+  });
+}
 
 function getActiveTarget(): Promise<FileTarget> {
   return new Promise((resolve, reject) => {
@@ -81,18 +108,13 @@ function createFileSelector({ filterCreator = null } = {}) {
 }
 
 // selected file or activeTarget or configContext
-export function selectFileFallbackToConfigContext(item, items): Promise<FileTarget> {
-  // command palette
-  if (item === undefined) {
-    return selectContext().then(path => ({ fsPath: path }));
+export function selectActivedFile(item, items): Promise<FileTarget> {
+  // from file explorer
+  if (item && item.fsPath) {
+    return Promise.resolve(items ? items : item);
   }
 
-  // short cut
-  if (item === null || !item.fsPath) {
-    return getActiveTarget();
-  }
-
-  return Promise.resolve(items ? items : item);
+  return getActiveTarget();
 }
 
 // selected folder or configContext
@@ -102,7 +124,7 @@ export function selectFolderFallbackToConfigContext(item, items): Promise<FileTa
     return Promise.resolve(items ? items : item);
   }
 
-  return selectContext().then(path => ({ fsPath: path }));
+  return selectContext();
 }
 
 // selected file from all remote files
@@ -112,18 +134,3 @@ export const selectFileFromAll = createFileSelector();
 export const selectFile = createFileSelector({
   filterCreator: configIngoreFilterCreator,
 });
-
-// selected file from remote files expect ignored
-export function selectFileOnly(item, items): Promise<FileTarget> {
-  // context menu
-  if (item && item.fsPath) {
-    return Promise.resolve(items ? items : item);
-  }
-
-  // short cut
-  if (item === null || item === undefined || !item.fsPath) {
-    return getActiveTarget();
-  }
-
-  return null;
-}
