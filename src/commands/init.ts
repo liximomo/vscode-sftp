@@ -74,13 +74,15 @@ export default function init(context: vscode.ExtensionContext) {
     )
     .onCommandDone(refreshExplorer);
 
-  commandManager.createFileCommand(
-    constants.COMMAND_UPLOAD,
-    'upload',
-    actions.upload,
-    selectActivedFile,
-    true
-  );
+  commandManager
+    .createFileCommand(constants.COMMAND_UPLOAD, 'upload', actions.upload, selectActivedFile, true)
+    .onCommandDone((uri, uris) => {
+      if (uri) {
+        app.remoteExplorer.refresh(uri);
+      } else {
+        uris.forEach(i => app.remoteExplorer.refresh(i));
+      }
+    });
 
   commandManager.createFileCommand(
     constants.COMMAND_UPLOAD_PROJECT,
@@ -114,11 +116,11 @@ export default function init(context: vscode.ExtensionContext) {
     .createFileCommand(
       constants.COMMAND_LIST_ALL,
       '(list) download',
-      async (fsPath, config) => {
-        await actions.downloadWithoutIgnore(fsPath, config);
-        const fileEntry = await localFs.lstat(fsPath);
+      async (localPath, remotePath, config) => {
+        await actions.downloadWithoutIgnore(localPath, remotePath, config);
+        const fileEntry = await localFs.lstat(localPath);
         if (fileEntry.type !== FileType.Directory) {
-          await showTextDocument(fsPath);
+          await showTextDocument(localPath);
         }
       },
       selectFileFromAll,
@@ -130,11 +132,11 @@ export default function init(context: vscode.ExtensionContext) {
     .createFileCommand(
       constants.COMMAND_LIST_DEFAULT,
       '(list) download',
-      async (fsPath, config) => {
-        await actions.download(fsPath, config);
-        const fileEntry = await localFs.lstat(fsPath);
+      async (localPath, remotePath, config) => {
+        await actions.download(localPath, remotePath, config);
+        const fileEntry = await localFs.lstat(localPath);
         if (fileEntry.type !== FileType.Directory) {
-          await showTextDocument(fsPath);
+          await showTextDocument(localPath);
         }
       },
       selectFile,
@@ -146,6 +148,17 @@ export default function init(context: vscode.ExtensionContext) {
     constants.COMMAND_DIFF,
     'diff',
     actions.diff,
+    selectActivedFile,
+    true
+  );
+
+  commandManager.createFileCommand(
+    constants.COMMAND_REMOTEEXPLORER_OPENINLOCAL,
+    'open in local',
+    async (localPath, remotePath, config) => {
+      await actions.download(localPath, remotePath, config);
+      await showTextDocument(localPath, { preview: false });
+    },
     selectActivedFile,
     true
   );

@@ -9,7 +9,7 @@ export interface ITarget {
 export default abstract class BaseCommand {
   private id: string;
   private name: string;
-  private commandDoneListeners: Array<() => void>;
+  private commandDoneListeners: Array<(...args: any[]) => void>;
 
   constructor(id, name) {
     this.id = id;
@@ -30,8 +30,8 @@ export default abstract class BaseCommand {
     };
   }
 
-  commitCommandDone() {
-    this.commandDoneListeners.forEach(listener => listener());
+  commitCommandDone(...args) {
+    this.commandDoneListeners.forEach(listener => listener(...args));
   }
 
   register(context: vscode.ExtensionContext) {

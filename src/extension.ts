@@ -10,6 +10,7 @@ import { initConfigs } from './modules/config';
 import { endAllRemote } from './modules/remoteFs';
 import { watchFiles, clearAllWatcher } from './modules/fileWatcher';
 import { getWorkspaceFolders, setContextValue } from './host';
+import RemoteExplorer from './modules/RemoteExplorer';
 
 function setupWorkspaceFolder(dir) {
   return initConfigs(dir).then(watchFiles);
@@ -34,7 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   setContextValue('enabled', true);
   app.sftpBarItem.show();
-
+  app.remoteExplorer = new RemoteExplorer(context);
   app.state.subscribe(state => {
     const currentText = app.sftpBarItem.getText();
     if (currentText.endsWith('SFTP')) {

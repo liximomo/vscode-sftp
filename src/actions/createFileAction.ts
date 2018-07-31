@@ -1,11 +1,13 @@
 import * as path from 'path';
 import upath from '../core/upath';
-import { getHostInfo } from '../modules/config';
 import localFs from '../modules/localFs';
-import getRemoteFs from '../modules/remoteFs';
 import Ignore from '../modules/Ignore';
 import { FileTask } from '../core/fileTransferTask';
-import { simplifyPath, toRemotePath, filesIgnoredFromConfig } from '../helper';
+import {
+  getRemotefsFromConfig,
+  simplifyPath,
+  filesIgnoredFromConfig,
+} from '../helper';
 import app from '../app';
 import logger from '../logger';
 import { disableWatcher, enableWatcher } from '../modules/fileWatcher';
@@ -27,7 +29,7 @@ export default function createFileAction(
   func,
   { doNotTriggerWatcher = false } = {}
 ) {
-  return async (localFilePath, config) => {
+  return async (localFilePath, remotePath, config) => {
     const localContext = config.context;
     const remoteContext = config.remotePath;
 
@@ -49,7 +51,7 @@ export default function createFileAction(
       return relativePath !== '' && ignore.ignores(relativePath);
     };
 
-    const remoteFs = await getRemoteFs(getHostInfo(config));
+    const remoteFs = await getRemotefsFromConfig(config);
 
     if (doNotTriggerWatcher) {
       disableWatcher(config);
@@ -62,7 +64,7 @@ export default function createFileAction(
         {
           ...config,
           concurrency: config.protocol === 'ftp' ? 1 : config.concurrency,
-          remotePath: toRemotePath(path.relative(localContext, localFilePath), remoteContext),
+          remotePath,
           ignore: ignoreFunc,
         },
         {

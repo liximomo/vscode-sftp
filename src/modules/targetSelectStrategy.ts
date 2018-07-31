@@ -1,12 +1,16 @@
 import * as vscode from 'vscode';
 import { getActiveTextEditor } from '../host';
-import { getAllRawConfigs } from '../modules/config';
+import { getAllRawConfigs } from './config';
 import { FileTarget } from '../commands/FileCommand';
-import { listFiles, isSubpathOf, toLocalPath, filesIgnoredFromConfig } from '../helper';
+import {
+  getRemotefsFromConfig,
+  listFiles,
+  isSubpathOf,
+  toLocalPath,
+  filesIgnoredFromConfig,
+} from '../helper';
 import upath from '../core/upath';
 import { getAllConfigs } from './config';
-import { getHostInfo } from './config';
-import getRemoteFs from './remoteFs';
 import Ignore from './Ignore';
 
 export function selectContext(): Promise<FileTarget> {
@@ -31,7 +35,7 @@ export function selectContext(): Promise<FileTarget> {
       })
       .then(selection => {
         if (selection) {
-          return resolve({ fsPath: selection.value });
+          return resolve(vscode.Uri.file(selection.value));
         }
 
         // cancel selection
@@ -47,9 +51,7 @@ function getActiveTarget(): Promise<FileTarget> {
       throw new Error('Action must have a file or directory as target!');
     }
 
-    resolve({
-      fsPath: active.document.fileName,
-    });
+    resolve(vscode.Uri.file(active.document.fileName));
   });
 }
 
@@ -83,7 +85,7 @@ function createFileSelector({ filterCreator = null } = {}) {
       name: config.name,
       description: config.host,
       fsPath: config.remotePath,
-      getFs: () => getRemoteFs(getHostInfo(config)),
+      getFs: () => getRemotefsFromConfig(config),
       index,
     }));
 
@@ -101,9 +103,7 @@ function createFileSelector({ filterCreator = null } = {}) {
       targetConfig.context
     );
 
-    return {
-      fsPath: localTarget,
-    };
+    return vscode.Uri.file(localTarget);
   };
 }
 

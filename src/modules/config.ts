@@ -329,6 +329,7 @@ export function newConfig(basePath) {
         .outputJson(
           configPath,
           {
+            name: `sftp-${Date.now()}`,
             protocol: defaultConfig.protocol,
             host: 'localhost',
             port: chooseDefaultPort(defaultConfig.protocol),
@@ -340,26 +341,4 @@ export function newConfig(basePath) {
         .then(() => showTextDocument(configPath));
     })
     .catch(reportError);
-}
-
-export function getHostInfo(config) {
-  const ignoreOptions = [
-    'name',
-    'remotePath',
-    'uploadOnSave',
-    'downloadOnOpen',
-    'syncMode',
-    'ignore',
-    'ignoreFile',
-    'watcher',
-    'concurrency',
-    'sshConfigPath',
-  ];
-
-  return Object.keys(config).reduce((obj, key) => {
-    if (ignoreOptions.indexOf(key) === -1) {
-      obj[key] = config[key];
-    }
-    return obj;
-  }, {});
 }

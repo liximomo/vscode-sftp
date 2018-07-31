@@ -2,11 +2,13 @@ import * as LRU from 'lru-cache';
 import StatusBarItem from './ui/StatusBarItem';
 import { COMMAND_TOGGLE_OUTPUT } from './constants';
 import AppState from './modules/AppState';
+import RemoteExplorer from './modules/RemoteExplorer';
 
 interface App {
   ignoreFileCache: LRU.Cache<string, string[]>;
   state: AppState;
   sftpBarItem: StatusBarItem;
+  remoteExplorer: RemoteExplorer;
 }
 
 const app: App = Object.create(null);

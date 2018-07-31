@@ -6,7 +6,7 @@
   "publisher": "liximomo",
   "author": "liximomo <liximomo@gmail.com> (https://liximomo.github.io/)",
   "engines": {
-    "vscode": "^1.23.0"
+    "vscode": "^1.24.0"
   },
   "bugs": {
     "url": "https://github.com/liximomo/vscode-sftp/issues",
@@ -30,9 +30,26 @@
     "onCommand:sftp.config.default",
     "workspaceContains:.vscode/sftp.json"
   ],
-  "icon": "icon.png",
+  "icon": "resources/icon.png",
   "main": "./out/src/extension",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "sftp",
+          "title": "SFTP",
+          "icon": "resources/remote-explorer.svg"
+        }
+      ]
+    },
+    "views": {
+      "sftp": [
+        {
+          "id": "remoteExplorer",
+          "name": "Remote Explorer"
+        }
+      ]
+    },
     "configuration": {
       "type": "object",
       "title": "sftp configuration",
@@ -88,96 +105,159 @@
       {
         "command": "sftp.setProfile",
         "title": "SFTP: Set Profile"
+      },
+      {
+        "command": "sftp.remoteExplorer.refresh",
+        "title": "Refresh",
+        "icon": {
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
+        }
+      },
+      {
+        "command": "sftp.remoteExplorer.revealResource",
+        "title": "SFTP: Reveal in Remote Explorer"
+      },
+      {
+        "command": "sftp.remoteExplorer.openInLocal",
+        "title": "SFTP: Open in Local"
       }
     ],
     "menus": {
       "commandPalette": [
         {
-          "command": "sftp.config.default"
+          "command": "sftp.config.default",
+          "when": "workspaceFolderCount"
         },
         {
           "command": "sftp.list.default",
-          "when": "sftp:enabled"
+          "when": "sftp.enabled"
         },
         {
           "command": "sftp.list.all",
-          "when": "sftp:enabled"
-        },
-        {
-          "command": "sftp.trans.remote",
-          "when": "sftp:enabled"
-        },
-        {
-          "command": "sftp.trans.local",
-          "when": "sftp:enabled"
+          "when": "sftp.enabled"
         },
         {
           "command": "sftp.trans.remote.project",
-          "when": "sftp:enabled"
+          "when": "sftp.enabled"
         },
         {
           "command": "sftp.trans.local.project",
-          "when": "sftp:enabled"
+          "when": "sftp.enabled"
         },
         {
           "command": "sftp.sync.remote",
-          "when": "sftp:enabled"
+          "when": "sftp.enabled"
         },
         {
           "command": "sftp.sync.local",
-          "when": "sftp:enabled"
-        },
-        {
-          "command": "sftp.diff",
-          "when": "sftp:enabled"
+          "when": "sftp.enabled"
         },
         {
           "command": "sftp.setProfile",
-          "when": "sftp:enabled"
+          "when": "sftp.enabled"
+        },
+        {
+          "command": "sftp.trans.remote",
+          "when": "false"
+        },
+        {
+          "command": "sftp.trans.local",
+          "when": "false"
+        },
+        {
+          "command": "sftp.diff",
+          "when": "false"
+        },
+        {
+          "command": "sftp.remoteExplorer.refresh",
+          "when": "false"
+        },
+        {
+          "command": "sftp.remoteExplorer.revealResource",
+          "when": "false"
+        },
+        {
+          "command": "sftp.remoteExplorer.openInLocal",
+          "when": "false"
         }
       ],
       "explorer/context": [
         {
           "command": "sftp.diff",
           "group": "3_compare",
-          "when": "sftp:enabled && explorerViewletVisible && filesExplorerFocus && !explorerResourceIsFolder"
+          "when": "sftp.enabled && explorerViewletVisible && filesExplorerFocus && !explorerResourceIsFolder"
         },
         {
           "command": "sftp.sync.remote",
           "group": "sftp.sync@1",
-          "when": "sftp:enabled && explorerResourceIsFolder"
+          "when": "sftp.enabled && explorerResourceIsFolder"
         },
         {
           "command": "sftp.sync.local",
           "group": "sftp.sync@2",
-          "when": "sftp:enabled && explorerResourceIsFolder"
+          "when": "sftp.enabled && explorerResourceIsFolder"
         },
         {
           "command": "sftp.trans.remote",
           "group": "sftp.trans@3",
-          "when": "sftp:enabled"
+          "when": "sftp.enabled"
         },
         {
           "command": "sftp.trans.local",
           "group": "sftp.trans@4",
-          "when": "sftp:enabled"
+          "when": "sftp.enabled"
         }
       ],
       "editor/context": [
         {
-          "command": "sftp.diff",
-          "group": "3_compare",
-          "when": "sftp:enabled"
-        },
-        {
           "command": "sftp.trans.remote",
           "group": "sftp.trans@1",
-          "when": "sftp:enabled"
+          "when": "sftp.enabled && resourceScheme == file"
         },
         {
           "command": "sftp.trans.local",
           "group": "sftp.trans@2",
-          "when": "sftp:enabled"
+          "when": "sftp.enabled && resourceScheme == file"
+        },
+        {
+          "command": "sftp.diff",
+          "group": "3_compare",
+          "when": "sftp.enabled"
+        },
+        {
+          "command": "sftp.remoteExplorer.openInLocal",
+          "group": "navigation@1",
+          "when": "resourceScheme == remote"
+        },
+        {
+          "command": "sftp.remoteExplorer.revealResource",
+          "group": "navigation@2",
+          "when": "resourceScheme == remote"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "sftp.remoteExplorer.refresh",
+          "when": "view == remoteExplorer",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "sftp.diff",
+          "group": "3_compare",
+          "when": "view == remoteExplorer && viewItem == file"
+        },
+        {
+          "command": "sftp.trans.local",
+          "group": "navigation",
+          "when": "view == remoteExplorer && viewItem == folder"
+        },
+        {
+          "command": "sftp.remoteExplorer.openInLocal",
+          "group": "navigation",
+          "when": "view == remoteExplorer && viewItem == file"
         }
       ]
     },

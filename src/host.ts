@@ -40,8 +40,8 @@ export function focusOpenEditors() {
   return vscode.commands.executeCommand('workbench.files.action.focusOpenEditorsView');
 }
 
-export function showTextDocument(filepath: string) {
-  return vscode.window.showTextDocument(vscode.Uri.file(filepath));
+export function showTextDocument(filepath: string, option?: vscode.TextDocumentShowOptions) {
+  return vscode.window.showTextDocument(vscode.Uri.file(filepath), option);
 }
 
 export function diffFiles(leftFsPath, rightFsPath, title, option?) {
@@ -60,7 +60,7 @@ export function promptForPassword(prompt: string): Promise<string | null> {
 }
 
 export function setContextValue(key: string, value: any) {
-  vscode.commands.executeCommand('setContext', EXTENSION_NAME + ':' + key, value);
+  vscode.commands.executeCommand('setContext', EXTENSION_NAME + '.' + key, value);
 }
 
 export function showInformationMessage(message: string, ...items: string[]) {

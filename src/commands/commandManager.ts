@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import BaseCommand from './BaseCommand';
 import Command from './Command';
-import FileCommand from './FileCommand';
+import FileCommand, { FileTarget } from './FileCommand';
 
 const commands: BaseCommand[] = [];
 
@@ -11,7 +11,13 @@ function createCommand(id, name, handler) {
   return cmd;
 }
 
-function createFileCommand(id, name, fileHandler, getFileTarget, requireTarget) {
+function createFileCommand(
+  id,
+  name,
+  fileHandler: (localPath: string, remotePatg: string, config: any) => any,
+  getFileTarget,
+  requireTarget
+) {
   const cmd = new FileCommand(id, name, fileHandler, getFileTarget, requireTarget);
   commands.push(cmd);
   return cmd;
