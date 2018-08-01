@@ -1,17 +1,15 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
-import upath from '../core/upath';
 import BaseCommand from './BaseCommand';
 import logger from '../logger';
 import app from '../app';
 import { showWarningMessage } from '../host';
-import { reportError, toRemotePath, toLocalPath } from '../helper';
+import { reportError } from '../helper';
 import { getConfig } from '../modules/config';
 
 export type FileTarget = vscode.Uri;
 
 export default class FileCommand extends BaseCommand {
-  protected fileHandler: (localPath: string, remotePath: string, config: any) => any;
+  protected fileHandler: (localPath: vscode.Uri, remotePath: vscode.Uri, config: any) => any;
   private getFileTarget: (item, items?) => Promise<FileTarget>;
   private requireTarget: boolean;
 
@@ -36,32 +34,29 @@ export default class FileCommand extends BaseCommand {
 
   private async handleFile(fileTarget: FileTarget) {
     const activityPath = fileTarget.fsPath;
+
     logger.trace(`execute ${this.getName()} for`, activityPath);
+
+    let config;
+    let localUri: vscode.Uri = fileTarget;
+    let remoteUri: vscode.Uri;
+
+    if (fileTarget.scheme === 'remote') {
+      remoteUri = fileTarget;
+      const remoteRoot = app.remoteExplorer.findRoot(remoteUri);
+      if (!remoteRoot) {
+        throw new Error(`Can't find config for remote resource ${remoteUri}.`);
+      }
+      config = remoteRoot.explorerContext.config;
+      localUri = app.remoteExplorer.localUri(remoteUri, config);
+    } else {
+      localUri = fileTarget;
+      config = getConfig(localUri.fsPath);
+      remoteUri = app.remoteExplorer.remoteUri(localUri, config);
+    }
+
     try {
-      let config;
-      if (fileTarget.scheme === 'remote') {
-        const root = app.remoteExplorer.findRoot(fileTarget);
-        if (!root) {
-          throw new Error(`Can't find config for remote resource ${fileTarget}.`);
-        }
-        config = root.explorerContext.config;
-      } else {
-        config = getConfig(fileTarget.fsPath);
-      }
-
-      const localContext = config.context;
-      const remoteContext = config.remotePath;
-      let localFilePath;
-      let remotePath;
-      if (fileTarget.scheme === 'remote') {
-        remotePath = fileTarget.fsPath;
-        localFilePath = toLocalPath(upath.relative(remoteContext, remotePath), localContext);
-      } else {
-        localFilePath = fileTarget.fsPath;
-        remotePath = toRemotePath(path.relative(localContext, localFilePath), remoteContext);
-      }
-
-      await this.fileHandler(localFilePath, remotePath, config);
+      await this.fileHandler(localUri, remoteUri, config);
     } catch (error) {
       reportError(error);
     }

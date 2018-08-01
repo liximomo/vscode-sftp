@@ -3,8 +3,8 @@ import createFileAction from './createFileAction';
 
 export const sync2Remote = createFileAction(
   'sync',
-  (source, config, { localFs, remoteFs, onProgress }) =>
-    sync(source, config.remotePath, localFs, remoteFs, {
+  (sourceUri, desUri, config, { localFs, remoteFs, onProgress }) =>
+    sync(sourceUri, desUri, localFs, remoteFs, {
       concurrency: config.concurrency,
       ignore: config.ignore,
       model: config.syncMode,
@@ -15,8 +15,8 @@ export const sync2Remote = createFileAction(
 
 export const sync2Local = createFileAction(
   'sync',
-  (source, config, { localFs, remoteFs, onProgress }) =>
-    sync(config.remotePath, source, remoteFs, localFs, {
+  (sourceUri, desUri, config, { localFs, remoteFs, onProgress }) =>
+    sync(desUri, sourceUri, remoteFs, localFs, {
       concurrency: config.concurrency,
       ignore: config.ignore,
       model: config.syncMode,

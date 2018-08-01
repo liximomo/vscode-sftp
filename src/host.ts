@@ -5,6 +5,10 @@ export function getConfig() {
   return vscode.workspace.getConfiguration(EXTENSION_NAME);
 }
 
+export function executeCommand(command: string, ...rest: any[]): Thenable<{}> {
+  return vscode.commands.executeCommand(command, ...rest);
+}
+
 export function onWillSaveTextDocument(
   listener: (e: vscode.TextDocumentWillSaveEvent) => any,
   thisArgs?: any
@@ -33,22 +37,22 @@ export function getWorkspaceFolders() {
 }
 
 export function refreshExplorer() {
-  return vscode.commands.executeCommand('workbench.files.action.refreshFilesExplorer');
+  return executeCommand('workbench.files.action.refreshFilesExplorer');
 }
 
 export function focusOpenEditors() {
-  return vscode.commands.executeCommand('workbench.files.action.focusOpenEditorsView');
+  return executeCommand('workbench.files.action.focusOpenEditorsView');
 }
 
-export function showTextDocument(filepath: string, option?: vscode.TextDocumentShowOptions) {
-  return vscode.window.showTextDocument(vscode.Uri.file(filepath), option);
+export function showTextDocument(uri: vscode.Uri, option?: vscode.TextDocumentShowOptions) {
+  return vscode.window.showTextDocument(uri, option);
 }
 
 export function diffFiles(leftFsPath, rightFsPath, title, option?) {
   const leftUri = vscode.Uri.file(leftFsPath);
   const rightUri = vscode.Uri.file(rightFsPath);
 
-  return vscode.commands.executeCommand('vscode.diff', leftUri, rightUri, title, option);
+  return executeCommand('vscode.diff', leftUri, rightUri, title, option);
 }
 
 export function promptForPassword(prompt: string): Promise<string | null> {
@@ -60,7 +64,7 @@ export function promptForPassword(prompt: string): Promise<string | null> {
 }
 
 export function setContextValue(key: string, value: any) {
-  vscode.commands.executeCommand('setContext', EXTENSION_NAME + '.' + key, value);
+  executeCommand('setContext', EXTENSION_NAME + '.' + key, value);
 }
 
 export function showInformationMessage(message: string, ...items: string[]) {
@@ -89,7 +93,7 @@ export function showOpenDialog(options: vscode.OpenDialogOptions) {
 }
 
 export function openFolder(uri?: vscode.Uri, newWindow?: boolean) {
-  return vscode.commands.executeCommand('vscode.openFolder', uri, newWindow);
+  return executeCommand('vscode.openFolder', uri, newWindow);
 }
 
 export function registerCommand(

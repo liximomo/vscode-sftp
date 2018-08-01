@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import BaseCommand from './BaseCommand';
 import Command from './Command';
-import FileCommand, { FileTarget } from './FileCommand';
+import FileCommand from './FileCommand';
 
 const commands: BaseCommand[] = [];
 
@@ -14,7 +14,7 @@ function createCommand(id, name, handler) {
 function createFileCommand(
   id,
   name,
-  fileHandler: (localPath: string, remotePatg: string, config: any) => any,
+  fileHandler: (localPath: vscode.Uri, remotePatg: vscode.Uri, config: any) => any,
   getFileTarget,
   requireTarget
 ) {

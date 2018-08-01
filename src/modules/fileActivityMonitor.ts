@@ -1,12 +1,11 @@
 import * as vscode from 'vscode';
 import logger from '../logger';
 import app from '../app';
-import { onDidOpenTextDocument, onDidSaveTextDocument, showConfirmMessage } from '../host';
+import { COMMAND_DOWNLOAD, COMMAND_UPLOAD } from '../constants';
+import { executeCommand, onDidOpenTextDocument, onDidSaveTextDocument, showConfirmMessage } from '../host';
 import { getConfig, loadConfig } from './config';
-import { upload } from '../actions';
 import { watchFiles } from './fileWatcher';
 import { endAllRemote } from './remoteFs';
-import { download } from '../actions';
 import { reportError, isValidFile, isConfigFile } from '../helper';
 
 let workspaceWatcher: vscode.Disposable;
@@ -30,9 +29,8 @@ async function handleFileSave(uri) {
   }
 
   if (config.uploadOnSave) {
-    await upload(activityPath, config).catch(reportError);
-    logger.info(`[file-save] upload ${activityPath}`);
-    app.sftpBarItem.showMsg('upload done', 2 * 1000);
+    logger.info(`[file-save] ${activityPath}`);
+    await executeCommand(COMMAND_UPLOAD, uri);
   }
 }
 
@@ -52,9 +50,8 @@ async function downloadOnOpen(uri) {
       if (!isConfirm) return;
     }
 
-    await download(activityPath, config).catch(reportError);
     logger.info(`[file-open] download ${activityPath}`);
-    app.sftpBarItem.showMsg('download done', 2 * 1000);
+    await executeCommand(COMMAND_DOWNLOAD, uri);
   }
 }
 

@@ -1,7 +1,6 @@
 import getFileSystem from '../modules/remoteFs';
 
 export * from './paths';
-export * from './fileDepth';
 export * from './config';
 export * from './file';
 export * from './error';

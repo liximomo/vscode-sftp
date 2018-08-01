@@ -3,8 +3,8 @@ import createFileAction from './createFileAction';
 
 export const upload = createFileAction(
   'upload',
-  (source, config, { localFs, remoteFs, onProgress }) =>
-    transfer(source, config.remotePath, localFs, remoteFs, {
+  (sourceUri, desUri, config, { localFs, remoteFs, onProgress }) =>
+    transfer(sourceUri, desUri, localFs, remoteFs, {
       concurrency: config.concurrency,
       ignore: config.ignore,
       perserveTargetMode: config.protocol === 'sftp',
@@ -14,8 +14,8 @@ export const upload = createFileAction(
 
 export const download = createFileAction(
   'download',
-  (source, config, { localFs, remoteFs, onProgress }) =>
-    transfer(config.remotePath, source, remoteFs, localFs, {
+  (sourceUri, desUri, config, { localFs, remoteFs, onProgress }) =>
+    transfer(desUri, sourceUri, remoteFs, localFs, {
       concurrency: config.concurrency,
       ignore: config.ignore,
       perserveTargetMode: false,
@@ -26,8 +26,8 @@ export const download = createFileAction(
 
 export const downloadWithoutIgnore = createFileAction(
   'download',
-  (source, config, { localFs, remoteFs, onProgress }) =>
-    transfer(config.remotePath, source, remoteFs, localFs, {
+  (sourceUri, desUri, config, { localFs, remoteFs, onProgress }) =>
+    transfer(desUri, sourceUri, remoteFs, localFs, {
       concurrency: config.concurrency,
       perserveTargetMode: false,
       onProgress,

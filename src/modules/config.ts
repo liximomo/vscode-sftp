@@ -1,3 +1,4 @@
+import * as vscode from 'vscode';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as Joi from 'joi';
@@ -8,6 +9,8 @@ import { reportError, replaceHomePath, resolvePath } from '../helper';
 import Trie from '../core/Trie';
 import { showTextDocument } from '../host';
 import logger from '../logger';
+
+let id = 0;
 
 const configTrie = new Trie(
   {},
@@ -201,9 +204,11 @@ async function addConfig(config, workspace) {
   if (extendedConfig.ignoreFile) {
     extendedConfig.ignoreFile = resolvePath(workspace, extendedConfig.ignoreFile);
   }
-  configTrie.add(extendedConfig.context, extendedConfig);
 
   logConfig(extendedConfig);
+
+  extendedConfig.id = ++id;
+  configTrie.add(extendedConfig.context, extendedConfig);
 
   return extendedConfig;
 }
@@ -322,14 +327,13 @@ export function newConfig(basePath) {
     .pathExists(configPath)
     .then(exist => {
       if (exist) {
-        return showTextDocument(configPath);
+        return showTextDocument(vscode.Uri.file(configPath));
       }
 
       return fse
         .outputJson(
           configPath,
           {
-            name: `sftp-${Date.now()}`,
             protocol: defaultConfig.protocol,
             host: 'localhost',
             port: chooseDefaultPort(defaultConfig.protocol),
@@ -338,7 +342,7 @@ export function newConfig(basePath) {
           },
           { spaces: 4 }
         )
-        .then(() => showTextDocument(configPath));
+        .then(() => showTextDocument(vscode.Uri.file(configPath)));
     })
     .catch(reportError);
 }

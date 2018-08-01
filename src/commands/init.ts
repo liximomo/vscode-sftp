@@ -16,6 +16,34 @@ import { FileType } from '../core/Fs/FileSystem';
 import * as output from '../ui/output';
 import { showTextDocument, refreshExplorer, showInformationMessage } from '../host';
 
+async function refreshRemoteOne(localUri, isDirectory?: boolean) {
+  if (isDirectory === undefined) {
+    const fileEntry = await localFs.lstat(localUri.fsPath);
+    isDirectory = fileEntry.type === FileType.Directory;
+  }
+
+  app.remoteExplorer.refresh({
+    isDirectory,
+    resourceUri: localUri,
+  });
+}
+
+function refreshRemoteExplorer(localUri, localUris) {
+  if (localUri) {
+    refreshRemoteOne(localUri);
+  } else {
+    localUris.forEach(refreshRemoteOne);
+  }
+}
+
+function refreshRemoteExplorerDir(localUri, localUris) {
+  if (localUri) {
+    refreshRemoteOne(localUri, true);
+  } else {
+    localUris.forEach(uri => refreshRemoteOne(uri, true));
+  }
+}
+
 export default function init(context: vscode.ExtensionContext) {
   commandManager.createCommand(constants.COMMAND_CONFIG, 'config sftp', actions.editConfig);
 
@@ -56,13 +84,15 @@ export default function init(context: vscode.ExtensionContext) {
     app.state.profile = item.value;
   });
 
-  commandManager.createFileCommand(
-    constants.COMMAND_SYNC_TO_REMOTE,
-    'sync to remote',
-    actions.sync2Remote,
-    selectFolderFallbackToConfigContext,
-    true
-  );
+  commandManager
+    .createFileCommand(
+      constants.COMMAND_SYNC_TO_REMOTE,
+      'sync to remote',
+      actions.sync2Remote,
+      selectFolderFallbackToConfigContext,
+      true
+    )
+    .onCommandDone(refreshRemoteExplorerDir);
 
   commandManager
     .createFileCommand(
@@ -76,21 +106,17 @@ export default function init(context: vscode.ExtensionContext) {
 
   commandManager
     .createFileCommand(constants.COMMAND_UPLOAD, 'upload', actions.upload, selectActivedFile, true)
-    .onCommandDone((uri, uris) => {
-      if (uri) {
-        app.remoteExplorer.refresh(uri);
-      } else {
-        uris.forEach(i => app.remoteExplorer.refresh(i));
-      }
-    });
+    .onCommandDone(refreshRemoteExplorer);
 
-  commandManager.createFileCommand(
-    constants.COMMAND_UPLOAD_PROJECT,
-    'upload project',
-    actions.upload,
-    selectContext,
-    false
-  );
+  commandManager
+    .createFileCommand(
+      constants.COMMAND_UPLOAD_PROJECT,
+      'upload project',
+      actions.upload,
+      selectContext,
+      false
+    )
+    .onCommandDone(refreshRemoteExplorerDir);
 
   commandManager
     .createFileCommand(
@@ -116,11 +142,11 @@ export default function init(context: vscode.ExtensionContext) {
     .createFileCommand(
       constants.COMMAND_LIST_ALL,
       '(list) download',
-      async (localPath, remotePath, config) => {
-        await actions.downloadWithoutIgnore(localPath, remotePath, config);
-        const fileEntry = await localFs.lstat(localPath);
+      async (sourceUri, remoteUri, config) => {
+        await actions.downloadWithoutIgnore(sourceUri, remoteUri, config);
+        const fileEntry = await localFs.lstat(sourceUri.fsPath);
         if (fileEntry.type !== FileType.Directory) {
-          await showTextDocument(localPath);
+          await showTextDocument(sourceUri);
         }
       },
       selectFileFromAll,
@@ -132,11 +158,11 @@ export default function init(context: vscode.ExtensionContext) {
     .createFileCommand(
       constants.COMMAND_LIST_DEFAULT,
       '(list) download',
-      async (localPath, remotePath, config) => {
-        await actions.download(localPath, remotePath, config);
-        const fileEntry = await localFs.lstat(localPath);
+      async (sourceUri, remoteUri, config) => {
+        await actions.download(sourceUri, remoteUri, config);
+        const fileEntry = await localFs.lstat(sourceUri.fsPath);
         if (fileEntry.type !== FileType.Directory) {
-          await showTextDocument(localPath);
+          await showTextDocument(sourceUri);
         }
       },
       selectFile,
@@ -153,11 +179,19 @@ export default function init(context: vscode.ExtensionContext) {
   );
 
   commandManager.createFileCommand(
-    constants.COMMAND_REMOTEEXPLORER_OPENINLOCAL,
-    'open in local',
-    async (localPath, remotePath, config) => {
-      await actions.download(localPath, remotePath, config);
-      await showTextDocument(localPath, { preview: false });
+    constants.COMMAND_REMOVEREMOTE,
+    'remove',
+    actions.removeRemote,
+    selectActivedFile,
+    true
+  );
+
+  commandManager.createFileCommand(
+    constants.COMMAND_REMOTEEXPLORER_EDITINLOCAL,
+    'edit in local',
+    async (sourceUri, remoteUri, config) => {
+      await actions.download(sourceUri, remoteUri, config);
+      await showTextDocument(remoteUri, { preview: false });
     },
     selectActivedFile,
     true

@@ -47,7 +47,7 @@ export default abstract class FileSystem {
     this.pathResolver = pathResolver;
   }
 
-  abstract get(path, option?: IStreamOption): Promise<fs.ReadStream>;
+  abstract get(path: string, option?: IStreamOption): Promise<fs.ReadStream>;
   abstract put(input: fs.ReadStream | Buffer, path, option?: IStreamOption): Promise<void>;
   abstract mkdir(dir: string): Promise<void>;
   abstract ensureDir(dir: string): Promise<void>;

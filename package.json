@@ -119,8 +119,8 @@
         "title": "SFTP: Reveal in Remote Explorer"
       },
       {
-        "command": "sftp.remoteExplorer.openInLocal",
-        "title": "SFTP: Open in Local"
+        "command": "sftp.remoteExplorer.editInLocal",
+        "title": "SFTP: Edit in Local"
       }
     ],
     "menus": {
@@ -178,7 +178,7 @@
           "when": "false"
         },
         {
-          "command": "sftp.remoteExplorer.openInLocal",
+          "command": "sftp.remoteExplorer.editInLocal",
           "when": "false"
         }
       ],
@@ -226,7 +226,7 @@
           "when": "sftp.enabled"
         },
         {
-          "command": "sftp.remoteExplorer.openInLocal",
+          "command": "sftp.remoteExplorer.editInLocal",
           "group": "navigation@1",
           "when": "resourceScheme == remote"
         },
@@ -255,7 +255,7 @@
           "when": "view == remoteExplorer && viewItem == folder"
         },
         {
-          "command": "sftp.remoteExplorer.openInLocal",
+          "command": "sftp.remoteExplorer.editInLocal",
           "group": "navigation",
           "when": "view == remoteExplorer && viewItem == file"
         }

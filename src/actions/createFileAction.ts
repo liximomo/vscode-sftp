@@ -1,35 +1,32 @@
+import * as vscode from 'vscode';
 import * as path from 'path';
 import upath from '../core/upath';
 import localFs from '../modules/localFs';
 import Ignore from '../modules/Ignore';
 import { FileTask } from '../core/fileTransferTask';
-import {
-  getRemotefsFromConfig,
-  simplifyPath,
-  filesIgnoredFromConfig,
-} from '../helper';
+import { getRemotefsFromConfig, simplifyPath, filesIgnoredFromConfig } from '../helper';
 import app from '../app';
 import logger from '../logger';
 import { disableWatcher, enableWatcher } from '../modules/fileWatcher';
 
 function onProgress(error, task: FileTask) {
   if (error) {
-    logger.error(error, `${task.type} ${task.file.fsPath}`);
+    logger.error(error, `${task.type} ${task.resourceUri.fsPath}`);
   }
 
-  logger.info(`${task.type} ${task.file.fsPath}`);
+  logger.info(`${task.type} ${task.resourceUri.fsPath}`);
   app.sftpBarItem.showMsg(
-    `${task.type} ${path.basename(task.file.fsPath)}`,
-    simplifyPath(task.file.fsPath)
+    `${task.type} ${path.basename(task.resourceUri.fsPath)}`,
+    simplifyPath(task.resourceUri.fsPath)
   );
 }
 
 export default function createFileAction(
   actionName: string,
-  func,
+  func: (localUri: vscode.Uri, remoteUri: vscode.Uri, config: any, option: any) => any,
   { doNotTriggerWatcher = false } = {}
 ) {
-  return async (localFilePath, remotePath, config) => {
+  return async (localUri: vscode.Uri, remoteUri: vscode.Uri, config: any) => {
     const localContext = config.context;
     const remoteContext = config.remotePath;
 
@@ -60,11 +57,11 @@ export default function createFileAction(
     let retValue;
     try {
       retValue = await func(
-        localFilePath,
+        localUri,
+        remoteUri,
         {
           ...config,
           concurrency: config.protocol === 'ftp' ? 1 : config.concurrency,
-          remotePath,
           ignore: ignoreFunc,
         },
         {

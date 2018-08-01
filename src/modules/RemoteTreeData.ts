@@ -6,20 +6,21 @@ import { getAllConfigs } from './config';
 import { getRemotefsFromConfig } from '../helper';
 import { COMMAND_REMOTEEXPLORER_SHOWRESOURCE } from '../constants';
 
-let uid = 0;
-type Id = string;
+type Id = number;
 
 interface ExplorerChild {
   resourceUri: vscode.Uri;
   isDirectory: boolean;
 }
 
-interface ExplorerRoot extends ExplorerChild {
+export interface ExplorerRoot extends ExplorerChild {
   explorerContext: {
     config: any;
     id: Id;
   };
 }
+
+export type ExplorerItem = ExplorerRoot | ExplorerChild;
 
 function dirFisrtSort(fileA: ExplorerItem, fileB: ExplorerItem) {
   if (fileA.isDirectory === fileB.isDirectory) {
@@ -28,8 +29,6 @@ function dirFisrtSort(fileA: ExplorerItem, fileB: ExplorerItem) {
 
   return fileA.isDirectory ? -1 : 1;
 }
-
-export type ExplorerItem = ExplorerRoot | ExplorerChild;
 
 export class RemoteTreeData
   implements vscode.TreeDataProvider<ExplorerItem>, vscode.TextDocumentContentProvider {
@@ -42,50 +41,17 @@ export class RemoteTreeData
   readonly onDidChangeTreeData: vscode.Event<ExplorerItem> = this._onDidChangeFolder.event;
   readonly onDidChange: vscode.Event<vscode.Uri> = this._onDidChangeFile.event;
 
-  _makeResourceUri({ host, port, path, id }) {
+  makeResourceUri({ host, port, path, id }) {
     return vscode.Uri.parse(
       `remote://${host}${port ? `:${port}` : ''}/${path.replace(/^\/+/, '')}?rootId=${id}`
     );
   }
 
-  _getRoots(): ExplorerRoot[] {
-    if (this._roots) {
-      return this._roots;
-    }
-
-    this._roots = [];
-    this._rootsMap = new Map();
-    const localId = ++uid;
-    getAllConfigs().forEach((config, index) => {
-      const itemId = `${localId}_${index}`;
-      const item = {
-        resourceUri: this._makeResourceUri({
-          host: config.host,
-          port: config.port,
-          path: config.remotePath,
-          id: itemId,
-        }),
-        isDirectory: true,
-        explorerContext: {
-          config,
-          id: itemId,
-        },
-      };
-      this._roots.push(item);
-      this._rootsMap.set(itemId, item);
-    });
-    return this._roots;
-  }
-
-  refresh(item?: ExplorerItem | vscode.Uri): any {
+  refresh(item?: ExplorerItem): any {
     // refresh root
     if (!item) {
       this._roots = null;
       this._rootsMap = null;
-    }
-
-    if (item instanceof vscode.Uri) {
-      return this._onDidChangeFile.fire(item);
     }
 
     if (item.isDirectory) {
@@ -121,9 +87,11 @@ export class RemoteTreeData
     }
     const fs = await getRemotefsFromConfig(root.explorerContext.config);
     const fileEntries = await fs.list(item.resourceUri.path);
+    const query = querystring.parse(item.resourceUri.query);
+    query.t = Date.now();
     return fileEntries
       .map(file => ({
-        resourceUri: item.resourceUri.with({ path: file.fspath }),
+        resourceUri: item.resourceUri.with({ path: file.fspath, query: querystring.stringify(query) }),
         isDirectory: file.type === FileType.Directory,
       }))
       .sort(dirFisrtSort);
@@ -151,7 +119,7 @@ export class RemoteTreeData
     }
 
     const query = querystring.parse(uri.query);
-    return this._rootsMap.get(query.rootId);
+    return this._rootsMap.get(parseInt(query.rootId, 10));
   }
 
   provideTextDocumentContent(
@@ -184,6 +152,34 @@ export class RemoteTreeData
       stream.on('error', onEnd);
       stream.on('end', onEnd);
     });
+  }
+
+  private _getRoots(): ExplorerRoot[] {
+    if (this._roots) {
+      return this._roots;
+    }
+
+    this._roots = [];
+    this._rootsMap = new Map();
+    getAllConfigs().forEach(config => {
+      const id = config.id;
+      const item = {
+        resourceUri: this.makeResourceUri({
+          host: config.host,
+          port: config.port,
+          path: config.remotePath,
+          id,
+        }),
+        isDirectory: true,
+        explorerContext: {
+          config,
+          id,
+        },
+      };
+      this._roots.push(item);
+      this._rootsMap.set(id, item);
+    });
+    return this._roots;
   }
 }
 

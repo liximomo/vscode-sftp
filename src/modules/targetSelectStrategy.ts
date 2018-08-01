@@ -51,7 +51,7 @@ function getActiveTarget(): Promise<FileTarget> {
       throw new Error('Action must have a file or directory as target!');
     }
 
-    resolve(vscode.Uri.file(active.document.fileName));
+    resolve(active.document.uri);
   });
 }
 
@@ -98,10 +98,7 @@ function createFileSelector({ filterCreator = null } = {}) {
     }
 
     const targetConfig = configs[selected.index];
-    const localTarget = toLocalPath(
-      upath.relative(targetConfig.remotePath, selected.fsPath),
-      targetConfig.context
-    );
+    const localTarget = toLocalPath(selected.fsPath, targetConfig.remotePath, targetConfig.context);
 
     return vscode.Uri.file(localTarget);
   };
@@ -109,9 +106,14 @@ function createFileSelector({ filterCreator = null } = {}) {
 
 // selected file or activeTarget or configContext
 export function selectActivedFile(item, items): Promise<FileTarget> {
-  // from file explorer
+  // from explorer or editor context
   if (item && item.fsPath) {
     return Promise.resolve(items ? items : item);
+  }
+
+  // from remote explorer
+  if (item.resourceUri) {
+    return Promise.resolve(item.resourceUri);
   }
 
   return getActiveTarget();
@@ -119,9 +121,14 @@ export function selectActivedFile(item, items): Promise<FileTarget> {
 
 // selected folder or configContext
 export function selectFolderFallbackToConfigContext(item, items): Promise<FileTarget> {
-  // context menu
+  // from explorer
   if (item && item.fsPath) {
     return Promise.resolve(items ? items : item);
+  }
+
+  // from remote explorer
+  if (item.resourceUri) {
+    return Promise.resolve(item.resourceUri);
   }
 
   return selectContext();

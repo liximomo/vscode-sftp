@@ -3,10 +3,12 @@ import * as path from 'path';
 import * as debounce from 'lodash.debounce';
 import * as output from '../ui/output';
 import app from '../app';
-import { reportError, isValidFile, fileDepth, simplifyPath } from '../helper';
-import { upload, removeRemote } from '../actions';
-import { getConfig } from './config';
+import { executeCommand } from '../host';
+import { COMMAND_UPLOAD, COMMAND_REMOVEREMOTE } from '../constants';
+import { reportError, isValidFile, fileDepth, simplifyPath, toRemotePath } from '../helper';
+import { removeRemote } from '../actions';
 import logger from '../logger';
+import { getConfig } from './config';
 
 const watchers: {
   [x: string]: vscode.FileSystemWatcher;
@@ -30,41 +32,26 @@ function fileError(event, file, showErrorWindow = true) {
 function doUpload() {
   const files = Array.from(uploadQueue).sort((a, b) => fileDepth(b) - fileDepth(a));
   uploadQueue.clear();
-  files.forEach(file => {
-    let config;
+  files.forEach(async file => {
+    logger.info('[watcher]', `${file} updated`);
     try {
-      config = getConfig(file);
-    } catch (error) {
-      reportError(error);
-      return;
+      await executeCommand(COMMAND_UPLOAD, vscode.Uri.file(file));
+    } catch {
+      fileError('upload', file);
     }
-
-    upload(file, config).then(() => {
-      logger.info('[watcher]', `upload ${file}`);
-      app.sftpBarItem.showMsg(`upload ${path.basename(file)}`, simplifyPath(file), 2 * 1000);
-    }, fileError('upload', file));
   });
 }
 
 function doDelete() {
   const files = Array.from(deleteQueue).sort((a, b) => fileDepth(b) - fileDepth(a));
   deleteQueue.clear();
-  let config;
-  files.forEach(file => {
+  files.forEach(async file => {
+    logger.info('[watcher]', `${file} removed`);
     try {
-      config = getConfig(file);
-    } catch (error) {
-      reportError(error);
-      return;
+      await executeCommand(COMMAND_REMOVEREMOTE, vscode.Uri.file(file));
+    } catch {
+      fileError(`remove ${file}'s remote`, false);
     }
-
-    removeRemote(file, {
-      ...config,
-      // skipDir: true,
-    }).then(() => {
-      logger.info('[watcher]', `delete ${file}`);
-      app.sftpBarItem.showMsg(`delete ${path.basename(file)}`, simplifyPath(file), 2 * 1000);
-    }, fileError('delete', config.remotePath, false));
   });
 }
 
