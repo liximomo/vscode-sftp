@@ -47,7 +47,8 @@ export class RemoteTreeData
     );
   }
 
-  refresh(item?: ExplorerItem): any {
+  // FIXME: refresh can't work for user created ExplorerItem
+  async refresh(item?: ExplorerItem): Promise<any> {
     // refresh root
     if (!item) {
       this._roots = null;
@@ -55,7 +56,10 @@ export class RemoteTreeData
     }
 
     if (item.isDirectory) {
+      // refresh top level file as well
       this._onDidChangeFolder.fire(item);
+      const children = await this.getChildren(item);
+      children.filter(i => !i.isDirectory).forEach(i => this._onDidChangeFile.fire(i.resourceUri));
     } else {
       this._onDidChangeFile.fire(item.resourceUri);
     }
@@ -87,13 +91,18 @@ export class RemoteTreeData
     }
     const fs = await getRemotefsFromConfig(root.explorerContext.config);
     const fileEntries = await fs.list(item.resourceUri.path);
-    const query = querystring.parse(item.resourceUri.query);
-    query.t = Date.now();
+
     return fileEntries
-      .map(file => ({
-        resourceUri: item.resourceUri.with({ path: file.fspath, query: querystring.stringify(query) }),
-        isDirectory: file.type === FileType.Directory,
-      }))
+      .map(file => {
+        const isDirectory = file.type === FileType.Directory;
+
+        return {
+          resourceUri: item.resourceUri.with({
+            path: file.fspath,
+          }),
+          isDirectory,
+        };
+      })
       .sort(dirFisrtSort);
   }
 

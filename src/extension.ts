@@ -25,7 +25,7 @@ function setup(workspaceFolders: vscode.WorkspaceFolder[]) {
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
   initCommand(context);
 
   const workspaceFolders = getWorkspaceFolders();
@@ -35,14 +35,18 @@ export function activate(context: vscode.ExtensionContext) {
 
   setContextValue('enabled', true);
   app.sftpBarItem.show();
-  app.remoteExplorer = new RemoteExplorer(context);
   app.state.subscribe(state => {
     const currentText = app.sftpBarItem.getText();
     if (currentText.endsWith('SFTP')) {
       app.sftpBarItem.reset();
     }
   });
-  setup(workspaceFolders).catch(reportError);
+  try {
+    await setup(workspaceFolders);
+    app.remoteExplorer = new RemoteExplorer(context);
+  } catch (error) {
+    reportError(error);
+  }
 }
 
 export function deactivate() {

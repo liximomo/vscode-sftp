@@ -229,7 +229,9 @@
           "command": "sftp.remoteExplorer.editInLocal",
           "group": "navigation@1",
           "when": "resourceScheme == remote"
-        },
+        }
+      ],
+      "editor/title/context": [
         {
           "command": "sftp.remoteExplorer.revealResource",
           "group": "navigation@2",

@@ -28,20 +28,12 @@ async function refreshRemoteOne(localUri, isDirectory?: boolean) {
   });
 }
 
-function refreshRemoteExplorer(localUri, localUris) {
-  if (localUri) {
-    refreshRemoteOne(localUri);
-  } else {
-    localUris.forEach(refreshRemoteOne);
-  }
+function refreshRemoteExplorer(localUris) {
+  localUris.forEach(uri => refreshRemoteOne(uri));
 }
 
-function refreshRemoteExplorerDir(localUri, localUris) {
-  if (localUri) {
-    refreshRemoteOne(localUri, true);
-  } else {
-    localUris.forEach(uri => refreshRemoteOne(uri, true));
-  }
+function refreshRemoteExplorerDir(localUris) {
+  localUris.forEach(uri => refreshRemoteOne(uri, true));
 }
 
 export default function init(context: vscode.ExtensionContext) {
@@ -142,11 +134,11 @@ export default function init(context: vscode.ExtensionContext) {
     .createFileCommand(
       constants.COMMAND_LIST_ALL,
       '(list) download',
-      async (sourceUri, remoteUri, config) => {
-        await actions.downloadWithoutIgnore(sourceUri, remoteUri, config);
-        const fileEntry = await localFs.lstat(sourceUri.fsPath);
+      async (localUri, remoteUri, config) => {
+        await actions.downloadWithoutIgnore(localUri, remoteUri, config);
+        const fileEntry = await localFs.lstat(localUri.fsPath);
         if (fileEntry.type !== FileType.Directory) {
-          await showTextDocument(sourceUri);
+          await showTextDocument(localUri);
         }
       },
       selectFileFromAll,
@@ -158,11 +150,11 @@ export default function init(context: vscode.ExtensionContext) {
     .createFileCommand(
       constants.COMMAND_LIST_DEFAULT,
       '(list) download',
-      async (sourceUri, remoteUri, config) => {
-        await actions.download(sourceUri, remoteUri, config);
-        const fileEntry = await localFs.lstat(sourceUri.fsPath);
+      async (localUri, remoteUri, config) => {
+        await actions.download(localUri, remoteUri, config);
+        const fileEntry = await localFs.lstat(localUri.fsPath);
         if (fileEntry.type !== FileType.Directory) {
-          await showTextDocument(sourceUri);
+          await showTextDocument(localUri);
         }
       },
       selectFile,
@@ -189,9 +181,9 @@ export default function init(context: vscode.ExtensionContext) {
   commandManager.createFileCommand(
     constants.COMMAND_REMOTEEXPLORER_EDITINLOCAL,
     'edit in local',
-    async (sourceUri, remoteUri, config) => {
-      await actions.download(sourceUri, remoteUri, config);
-      await showTextDocument(remoteUri, { preview: false });
+    async (localUri, remoteUri, config) => {
+      await actions.download(localUri, remoteUri, config);
+      await showTextDocument(localUri, { preview: true });
     },
     selectActivedFile,
     true

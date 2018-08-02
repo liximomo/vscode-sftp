@@ -107,13 +107,13 @@ function createFileSelector({ filterCreator = null } = {}) {
 // selected file or activeTarget or configContext
 export function selectActivedFile(item, items): Promise<FileTarget> {
   // from explorer or editor context
-  if (item && item.fsPath) {
-    return Promise.resolve(items ? items : item);
-  }
-
-  // from remote explorer
-  if (item.resourceUri) {
-    return Promise.resolve(item.resourceUri);
+  if (item) {
+    if (item.fsPath) {
+      return Promise.resolve(items ? items : item);
+    } else if (item.resourceUri) {
+      // from remote explorer
+      return Promise.resolve(item.resourceUri);
+    }
   }
 
   return getActiveTarget();
@@ -121,14 +121,14 @@ export function selectActivedFile(item, items): Promise<FileTarget> {
 
 // selected folder or configContext
 export function selectFolderFallbackToConfigContext(item, items): Promise<FileTarget> {
-  // from explorer
-  if (item && item.fsPath) {
-    return Promise.resolve(items ? items : item);
-  }
-
-  // from remote explorer
-  if (item.resourceUri) {
-    return Promise.resolve(item.resourceUri);
+  // from explorer or editor context
+  if (item) {
+    if (item.fsPath) {
+      return Promise.resolve(items ? items : item);
+    } else if (item.resourceUri) {
+      // from remote explorer
+      return Promise.resolve(item.resourceUri);
+    }
   }
 
   return selectContext();

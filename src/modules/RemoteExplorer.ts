@@ -27,7 +27,9 @@ export default class RemoteExplorer {
     vscode.commands.registerCommand(COMMAND_REMOTEEXPLORER_SHOWRESOURCE, resource =>
       this._openResource(resource)
     );
-    vscode.commands.registerCommand(COMMAND_REMOTEEXPLORER_REVEALRESOURCE, () => this._reveal());
+    vscode.commands.registerCommand(COMMAND_REMOTEEXPLORER_REVEALRESOURCE, item =>
+      this._reveal(item)
+    );
   }
 
   refresh(item?: ExplorerItem) {
@@ -40,7 +42,7 @@ export default class RemoteExplorer {
 
   remoteUri(localUri: vscode.Uri, config?: any) {
     const localPath = localUri.fsPath;
-    config = config ||  getConfig(localPath);
+    config = config || getConfig(localPath);
     const remotePath = toRemotePath(localPath, config.context, config.remotePath);
     return this._treeDataProvider.makeResourceUri({
       host: config.host,
@@ -73,19 +75,24 @@ export default class RemoteExplorer {
     showTextDocument(resource);
   }
 
-  private _reveal(): Thenable<void> {
-    const item = this._getItemFromActiveEditor();
-    return item ? this._explorerView.reveal(item) : null;
+  private _reveal(uri: vscode.Uri): Thenable<void> {
+    uri = uri || this._getUriFromActiveEditor();
+    return uri
+      ? this._explorerView.reveal({
+          resourceUri: uri,
+          isDirectory: false,
+        })
+      : null;
   }
 
-  private _getItemFromActiveEditor(): ExplorerItem {
+  private _getUriFromActiveEditor(): vscode.Uri {
     if (!vscode.window.activeTextEditor) {
       return null;
     }
 
     const uri = vscode.window.activeTextEditor.document.uri;
     if (uri.scheme === 'remote') {
-      return { resourceUri: uri, isDirectory: false };
+      return uri;
     }
   }
 }

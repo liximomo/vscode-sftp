@@ -24,11 +24,24 @@ export default class FileCommand extends BaseCommand {
     });
   }
 
-  protected async run(...args) {
+  protected async run(item, items) {
+    const target = await this.getFileTarget(item, items);
+    if (!target) {
+      if (this.requireTarget) {
+        showWarningMessage(`The "${this.getName()}" command can not find a target.`);
+      }
+
+      return;
+    }
+
+    const targetList: vscode.Uri[] = Array.isArray(target) ? target : [target];
+    app.sftpBarItem.showMsg(`${this.getName()}...`);
+    const pendingTasks = targetList.map(t => this.handleFile(t));
+
     try {
-      return await this.handler(args[0], args[1]);
+      return await Promise.all(pendingTasks);
     } finally {
-      this.commitCommandDone(...args);
+      this.commitCommandDone(targetList);
     }
   }
 
@@ -60,22 +73,5 @@ export default class FileCommand extends BaseCommand {
     } catch (error) {
       reportError(error);
     }
-  }
-
-  private async handler(item, items) {
-    const targets = await this.getFileTarget(item, items);
-
-    if (!targets) {
-      if (this.requireTarget) {
-        showWarningMessage(`The "${this.getName()}" command can not find a target.`);
-      }
-
-      return;
-    }
-
-    app.sftpBarItem.showMsg(`${this.getName()}...`);
-    const pendingTasks = [].concat(targets).map(target => this.handleFile(target));
-
-    return await Promise.all(pendingTasks);
   }
 }
