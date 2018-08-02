@@ -3,11 +3,7 @@ import { showTextDocument } from '../host';
 import { toRemotePath, toLocalPath } from '../helper';
 import { getConfig } from './config';
 import RemoteTreeData, { ExplorerItem } from './RemoteTreeData';
-import {
-  COMMAND_REMOTEEXPLORER_REFRESH,
-  COMMAND_REMOTEEXPLORER_SHOWRESOURCE,
-  COMMAND_REMOTEEXPLORER_REVEALRESOURCE,
-} from '../constants';
+import { COMMAND_REMOTEEXPLORER_REFRESH, COMMAND_SHOWRESOURCE } from '../constants';
 
 export default class RemoteExplorer {
   private _explorerView: vscode.TreeView<ExplorerItem>;
@@ -24,11 +20,8 @@ export default class RemoteExplorer {
     });
 
     vscode.commands.registerCommand(COMMAND_REMOTEEXPLORER_REFRESH, () => this._refreshSelection());
-    vscode.commands.registerCommand(COMMAND_REMOTEEXPLORER_SHOWRESOURCE, resource =>
+    vscode.commands.registerCommand(COMMAND_SHOWRESOURCE, resource =>
       this._openResource(resource)
-    );
-    vscode.commands.registerCommand(COMMAND_REMOTEEXPLORER_REVEALRESOURCE, item =>
-      this._reveal(item)
     );
   }
 
@@ -38,6 +31,15 @@ export default class RemoteExplorer {
     }
 
     this._treeDataProvider.refresh(item);
+  }
+
+  reveal(uri: vscode.Uri): Thenable<void> {
+    return uri
+      ? this._explorerView.reveal({
+          resourceUri: uri,
+          isDirectory: false,
+        })
+      : null;
   }
 
   remoteUri(localUri: vscode.Uri, config?: any) {
@@ -73,16 +75,6 @@ export default class RemoteExplorer {
 
   private _openResource(resource: vscode.Uri): void {
     showTextDocument(resource);
-  }
-
-  private _reveal(uri: vscode.Uri): Thenable<void> {
-    uri = uri || this._getUriFromActiveEditor();
-    return uri
-      ? this._explorerView.reveal({
-          resourceUri: uri,
-          isDirectory: false,
-        })
-      : null;
   }
 
   private _getUriFromActiveEditor(): vscode.Uri {

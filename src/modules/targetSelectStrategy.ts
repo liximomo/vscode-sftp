@@ -105,11 +105,16 @@ function createFileSelector({ filterCreator = null } = {}) {
 }
 
 // selected file or activeTarget or configContext
-export function selectActivedFile(item, items): Promise<FileTarget> {
+export function selectActivedFile(item, items): Promise<FileTarget | FileTarget[]> {
   // from explorer or editor context
   if (item) {
     if (item.fsPath) {
-      return Promise.resolve(items ? items : item);
+      if (Array.isArray(items) && items[0].fsPath) {
+        // multi-select in explorer
+        return Promise.resolve(items);
+      } else {
+        return Promise.resolve(item);
+      }
     } else if (item.resourceUri) {
       // from remote explorer
       return Promise.resolve(item.resourceUri);

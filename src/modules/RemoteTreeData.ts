@@ -4,7 +4,7 @@ import upath from '../core/upath';
 import { FileType } from '../core/Fs/FileSystem';
 import { getAllConfigs } from './config';
 import { getRemotefsFromConfig } from '../helper';
-import { COMMAND_REMOTEEXPLORER_SHOWRESOURCE } from '../constants';
+import { COMMAND_SHOWRESOURCE } from '../constants';
 
 type Id = number;
 
@@ -73,7 +73,7 @@ export class RemoteTreeData
       command: item.isDirectory
         ? undefined
         : {
-            command: COMMAND_REMOTEEXPLORER_SHOWRESOURCE,
+            command: COMMAND_SHOWRESOURCE,
             arguments: [item.resourceUri],
             title: 'View Remote Resource',
           },

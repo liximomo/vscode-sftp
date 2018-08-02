@@ -4,7 +4,7 @@ import * as debounce from 'lodash.debounce';
 import * as output from '../ui/output';
 import app from '../app';
 import { executeCommand } from '../host';
-import { COMMAND_UPLOAD, COMMAND_REMOVEREMOTE } from '../constants';
+import { COMMAND_UPLOAD, COMMAND_DELETEREMOTE } from '../constants';
 import { reportError, isValidFile, fileDepth, simplifyPath, toRemotePath } from '../helper';
 import { removeRemote } from '../actions';
 import logger from '../logger';
@@ -48,9 +48,9 @@ function doDelete() {
   files.forEach(async file => {
     logger.info('[watcher]', `${file} removed`);
     try {
-      await executeCommand(COMMAND_REMOVEREMOTE, vscode.Uri.file(file));
+      await executeCommand(COMMAND_DELETEREMOTE, vscode.Uri.file(file));
     } catch {
-      fileError(`remove ${file}'s remote`, false);
+      fileError(`delete ${file}'s remote`, false);
     }
   });
 }

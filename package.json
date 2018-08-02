@@ -103,8 +103,20 @@
         "title": "SFTP: Diff"
       },
       {
+        "command": "ui.sftp.deleteRemote",
+        "title": "SFTP: Delete"
+      },
+      {
         "command": "sftp.setProfile",
         "title": "SFTP: Set Profile"
+      },
+      {
+        "command": "sftp.revealInExplorer",
+        "title": "SFTP: Reveal in Explorer"
+      },
+      {
+        "command": "sftp.revealInRemoteExplorer",
+        "title": "SFTP: Reveal in Remote Explorer"
       },
       {
         "command": "sftp.remoteExplorer.refresh",
@@ -113,10 +125,6 @@
           "light": "resources/light/refresh.svg",
           "dark": "resources/dark/refresh.svg"
         }
-      },
-      {
-        "command": "sftp.remoteExplorer.revealResource",
-        "title": "SFTP: Reveal in Remote Explorer"
       },
       {
         "command": "sftp.remoteExplorer.editInLocal",
@@ -170,11 +178,19 @@
           "when": "false"
         },
         {
-          "command": "sftp.remoteExplorer.refresh",
+          "command": "ui.sftp.deleteRemote",
           "when": "false"
         },
         {
-          "command": "sftp.remoteExplorer.revealResource",
+          "command": "sftp.revealInExplorer",
+          "when": "false"
+        },
+        {
+          "command": "sftp.revealInRemoteExplorer",
+          "when": "false"
+        },
+        {
+          "command": "sftp.remoteExplorer.refresh",
           "when": "false"
         },
         {
@@ -184,9 +200,14 @@
       ],
       "explorer/context": [
         {
+          "command": "sftp.revealInRemoteExplorer",
+          "group": "navigation",
+          "when": "sftp.enabled"
+        },
+        {
           "command": "sftp.diff",
           "group": "3_compare",
-          "when": "sftp.enabled && explorerViewletVisible && filesExplorerFocus && !explorerResourceIsFolder"
+          "when": "sftp.enabled && !explorerResourceIsFolder"
         },
         {
           "command": "sftp.sync.remote",
@@ -200,12 +221,12 @@
         },
         {
           "command": "sftp.trans.remote",
-          "group": "sftp.trans@3",
+          "group": "sftp.trans@1",
           "when": "sftp.enabled"
         },
         {
           "command": "sftp.trans.local",
-          "group": "sftp.trans@4",
+          "group": "sftp.trans@2",
           "when": "sftp.enabled"
         }
       ],
@@ -223,19 +244,23 @@
         {
           "command": "sftp.diff",
           "group": "3_compare",
-          "when": "sftp.enabled"
+          "when": "sftp.enabled && resourceScheme == file"
         },
         {
           "command": "sftp.remoteExplorer.editInLocal",
-          "group": "navigation@1",
+          "group": "2_files",
           "when": "resourceScheme == remote"
         }
       ],
       "editor/title/context": [
         {
-          "command": "sftp.remoteExplorer.revealResource",
-          "group": "navigation@2",
+          "command": "sftp.revealInExplorer",
+          "group": "2_files",
           "when": "resourceScheme == remote"
+        },
+        {
+          "command": "sftp.revealInRemoteExplorer",
+          "group": "2_files"
         }
       ],
       "view/title": [
@@ -247,19 +272,19 @@
       ],
       "view/item/context": [
         {
-          "command": "sftp.diff",
-          "group": "3_compare",
-          "when": "view == remoteExplorer && viewItem == file"
-        },
-        {
-          "command": "sftp.trans.local",
-          "group": "navigation",
-          "when": "view == remoteExplorer && viewItem == folder"
-        },
-        {
           "command": "sftp.remoteExplorer.editInLocal",
-          "group": "navigation",
+          "group": "2_files",
           "when": "view == remoteExplorer && viewItem == file"
+        },
+        {
+          "command": "sftp.revealInExplorer",
+          "group": "2_files",
+          "when": "view == remoteExplorer"
+        },
+        {
+          "command": "ui.sftp.deleteRemote",
+          "group": "7_modification",
+          "when": "view == remoteExplorer"
         }
       ]
     },

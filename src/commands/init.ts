@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as constants from '../constants';
 import * as actions from '../actions';
+import upath from '../core/upath';
 import app from '../app';
 import commandManager from './commandManager';
 import {
@@ -14,7 +15,13 @@ import localFs from '../modules/localFs';
 import { getAllRawConfigs } from '../modules/config';
 import { FileType } from '../core/Fs/FileSystem';
 import * as output from '../ui/output';
-import { showTextDocument, refreshExplorer, showInformationMessage } from '../host';
+import {
+  executeCommand,
+  showTextDocument,
+  refreshExplorer,
+  showInformationMessage,
+  showConfirmMessage,
+} from '../host';
 
 async function refreshRemoteOne(localUri, isDirectory?: boolean) {
   if (isDirectory === undefined) {
@@ -171,11 +178,41 @@ export default function init(context: vscode.ExtensionContext) {
   );
 
   commandManager.createFileCommand(
-    constants.COMMAND_REMOVEREMOTE,
-    'remove',
+    constants.COMMAND_DELETEREMOTE,
+    'delete',
     actions.removeRemote,
     selectActivedFile,
     true
+  );
+
+  commandManager.createFileCommand(
+    constants.UI_COMMAND_DELETEREMOTE,
+    'delete(explorer)',
+    async localUri => {
+      await executeCommand(constants.COMMAND_DELETEREMOTE, localUri);
+    },
+    async item => {
+      // from remote explorer context
+      const uri: vscode.Uri = item.resourceUri;
+      const result = await showConfirmMessage(
+        `Are you sure you want to delete ${upath.basename(uri.path)}'?`,
+        'Delete',
+        'Cancel'
+      );
+
+      return result ? item : null;
+    },
+    false
+  );
+
+  commandManager.createFileCommand(
+    constants.COMMAND_REVEALINEXPLORER,
+    'reveal in explorer',
+    async (localUri, remoteUri) => {
+      await executeCommand('revealInExplorer', localUri);
+    },
+    selectActivedFile,
+    false
   );
 
   commandManager.createFileCommand(
@@ -187,6 +224,16 @@ export default function init(context: vscode.ExtensionContext) {
     },
     selectActivedFile,
     true
+  );
+
+  commandManager.createFileCommand(
+    constants.COMMAND_REVEALRESOURCE,
+    'reveal in remote explorer',
+    async (localUri, remoteUri) => {
+      app.remoteExplorer.reveal(remoteUri);
+    },
+    selectActivedFile,
+    false
   );
 
   commandManager.registerAll(context);

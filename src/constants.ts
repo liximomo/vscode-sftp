@@ -20,9 +20,12 @@ export const COMMAND_DOWNLOAD_PROJECT = 'sftp.trans.local.project';
 export const COMMAND_LIST_DEFAULT = 'sftp.list.default';
 export const COMMAND_LIST_ALL = 'sftp.list.all';
 export const COMMAND_DIFF = 'sftp.diff';
-export const COMMAND_REMOVEREMOTE = 'sftp.removeRemote';
+export const COMMAND_DELETEREMOTE = 'sftp.deleteRemote';
+export const COMMAND_REVEALINEXPLORER = 'sftp.revealInExplorer';
+export const COMMAND_REVEALRESOURCE = 'sftp.revealInRemoteExplorer';
+export const COMMAND_SHOWRESOURCE = 'sftp.showResource';
 
+export const UI_COMMAND_DELETEREMOTE = 'ui.sftp.deleteRemote';
+export const COMMAND_REMOTEEXPLORER_DELETE = 'sftp.remoteExplorer.delete';
 export const COMMAND_REMOTEEXPLORER_REFRESH = 'sftp.remoteExplorer.refresh';
-export const COMMAND_REMOTEEXPLORER_SHOWRESOURCE = 'sftp.remoteExplorer.showResource';
-export const COMMAND_REMOTEEXPLORER_REVEALRESOURCE = 'sftp.remoteExplorer.revealResource';
 export const COMMAND_REMOTEEXPLORER_EDITINLOCAL = 'sftp.remoteExplorer.editInLocal';
