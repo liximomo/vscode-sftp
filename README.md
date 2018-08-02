@@ -3,6 +3,7 @@ Very simple, requires just three lines of config! Very fast, finished in a blink
 
 ## Features
 
+* Remote explorer
 * Multiple configs
 * Switchable profiles
 * Browser remote files
@@ -17,13 +18,11 @@ Very simple, requires just three lines of config! Very fast, finished in a blink
 
 ## Usage
 1. `Ctrl+Shift+P` on Windows/Linux open command palette, run `SFTP: config` command.
-2. Run command on editor context menu or explorer context menu.
+2. Enjoy.
 
-*Note1* ：A command must run with a target(file or directory). When Running command within command palette it will ask you to select a folder.
+*Note* ：Sync commands will only be available to a directory. Try not to bind shortcuts to those commands because there is no way to figure out the target directory.
 
-*Note2* ：Sync commands will only be available to a directory. Try not to bind shortcuts to those commands because there is no way to figure out the target directory.
-
-### Commands
+### Main Commands
 | Command              | Description                                  |Detailed description|
 | -------------------- |----------------------------------------------|---------------|
 | `SFTP: Config`         | create a new config file at workspace root  | see below for an explained config file |
@@ -97,6 +96,16 @@ Use `SFTP: Set Profile` to swtich profile.
 *Note：* `name` is required in this mode.
 
 You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/config).
+
+## Remote Explorer
+[https://github.com/liximomo/vscode-sftp/tree/master/assets/showcase/remote-explorer.png]
+
+Remote Explorer let you explore files in remote. You can open Remote Explorer by:
+
+1. View: Show SFTP.
+2. Click SFTP view in Activity Bar.
+
+You can only view files content with Remote Explorer. Run command `SFTP: Edit in Local` to edit it in local.
 
 -----------------------------------------------------------------------------------------------------------
 
