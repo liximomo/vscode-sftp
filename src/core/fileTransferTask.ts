@@ -30,33 +30,40 @@ type FileLocation = 'src' | 'des';
 
 export interface FileTask {
   type: FileTaskType;
+  resourceFsPath: string;
   resourceUri: vscode.Uri;
   resourceType: FileType;
   payload?: any;
 }
 
 function createTransferFileTask(
+  resourceFsPath: string,
   resourceUri: vscode.Uri,
   resourceType: FileType,
+  desFsPath: string,
   desUri: vscode.Uri
 ): FileTask {
   return {
     type: 'transfer',
+    resourceFsPath,
     resourceUri,
     resourceType,
     payload: {
+      desFsPath,
       desUri,
     },
   };
 }
 
 function createRemoveFileTask(
+  resourceFsPath: string,
   resourceUri: vscode.Uri,
   resourceType: FileType,
   location: FileLocation
 ): FileTask {
   return {
     type: 'remove',
+    resourceFsPath,
     resourceUri,
     resourceType,
     payload: {
@@ -87,14 +94,14 @@ async function taskBatchProcess(taskQueue: FileTask[], srcFs, desFs, option: Tra
   return new Promise((resolve, reject) => {
     const { concurrency = 1, onProgress, ...transferOption } = option;
 
-    taskQueue.sort((a, b) => fileDepth(b.resourceUri.fsPath) - fileDepth(a.resourceUri.fsPath));
+    taskQueue.sort((a, b) => fileDepth(b.resourceFsPath) - fileDepth(a.resourceFsPath));
 
     eachLimit(
       taskQueue,
       concurrency,
       (task: FileTask, callback) => {
-        const resourceUri = task.resourceUri;
-        if (shouldSkip(resourceUri.fsPath, transferOption.ignore)) {
+        const resourceFsPath = task.resourceFsPath;
+        if (shouldSkip(resourceFsPath, transferOption.ignore)) {
           callback();
           return;
         }
@@ -106,8 +113,8 @@ async function taskBatchProcess(taskQueue: FileTask[], srcFs, desFs, option: Tra
           switch (resourceType) {
             case FileType.File:
               pendingPromise = transferFile(
-                resourceUri.fsPath,
-                payload.desUri.fsPath,
+                resourceFsPath,
+                payload.desFsPath,
                 srcFs,
                 desFs,
                 transferOption
@@ -115,8 +122,8 @@ async function taskBatchProcess(taskQueue: FileTask[], srcFs, desFs, option: Tra
               break;
             case FileType.SymbolicLink:
               pendingPromise = transferSymlink(
-                resourceUri.fsPath,
-                payload.desUri.fsPath,
+                resourceFsPath,
+                payload.desFsPath,
                 srcFs,
                 desFs,
                 transferOption
@@ -130,10 +137,10 @@ async function taskBatchProcess(taskQueue: FileTask[], srcFs, desFs, option: Tra
           switch (resourceType) {
             case FileType.File:
             case FileType.SymbolicLink:
-              pendingPromise = removeFile(resourceUri.fsPath, fs, transferOption);
+              pendingPromise = removeFile(resourceFsPath, fs, transferOption);
               break;
             case FileType.Directory:
-              pendingPromise = removeDir(resourceUri.fsPath, fs, transferOption);
+              pendingPromise = removeDir(resourceFsPath, fs, transferOption);
               break;
             default:
             // nothing to do;
@@ -160,15 +167,14 @@ async function taskBatchProcess(taskQueue: FileTask[], srcFs, desFs, option: Tra
 }
 
 async function fileTaskListFromDirector(
+  src: string,
+  des: string,
   srcUri: vscode.Uri,
   desUri: vscode.Uri,
   srcFs: FileSystem,
   desFs: FileSystem,
   option: TransferTaskOption
 ): Promise<FileTask[]> {
-  const src = srcUri.fsPath;
-  const des = desUri.fsPath;
-
   if (shouldSkip(src, option.ignore)) {
     return Promise.resolve([]);
   }
@@ -182,13 +188,16 @@ async function fileTaskListFromDirector(
 
   const fileEntries = await srcFs.list(src);
   const promises = fileEntries.map(file => {
+    const desPath = desFs.pathResolver.join(des, file.name);
     if (file.type === FileType.Directory) {
       return fileTaskListFromDirector(
+        file.fspath,
+        desPath,
         srcUri.with({
           path: file.fspath,
         }),
         desUri.with({
-          path: desFs.pathResolver.join(des, file.name),
+          path: desPath,
         }),
         srcFs,
         desFs,
@@ -196,12 +205,14 @@ async function fileTaskListFromDirector(
       );
     }
     return createTransferFileTask(
+      file.fspath,
       srcUri.with({
         path: file.fspath,
       }),
       file.type,
+      desPath,
       desUri.with({
-        path: desFs.pathResolver.join(des, file.name),
+        path: desPath,
       })
     );
   });
@@ -210,15 +221,14 @@ async function fileTaskListFromDirector(
 }
 
 async function fileTaskListFromDirectorForSync(
+  src: string,
+  des: string,
   srcUri: vscode.Uri,
   desUri: vscode.Uri,
   srcFs: FileSystem,
   desFs: FileSystem,
   option: SyncTransferTaskOption
 ): Promise<FileTask[]> {
-  const src = srcUri.fsPath;
-  const des = desUri.fsPath;
-
   if (shouldSkip(src, option.ignore)) {
     return Promise.resolve([]);
   }
@@ -304,22 +314,28 @@ async function fileTaskListFromDirectorForSync(
 
     const transFileTasks = file2trans.map(([srcfile, desFile]) =>
       createTransferFileTask(
+        srcfile,
         srcUri.with({ path: srcfile }),
         FileType.File,
+        desFile,
         desUri.with({ path: desFile })
       )
     );
 
     const transSymlinkTasks = symlink2trans.map(([srcfile, desFile]) =>
       createTransferFileTask(
+        srcfile,
         srcUri.with({ path: srcfile }),
         FileType.SymbolicLink,
+        desFile,
         desUri.with({ path: desFile })
       )
     );
 
     const transDirTasks = dir2trans.map(([srcfile, desFile]) =>
       fileTaskListFromDirector(
+        srcfile,
+        desFile,
         srcUri.with({ path: srcfile }),
         desUri.with({ path: desFile }),
         srcFs,
@@ -330,6 +346,8 @@ async function fileTaskListFromDirectorForSync(
 
     const syncDirTasks = dir2sync.map(([srcfile, desFile]) =>
       fileTaskListFromDirectorForSync(
+        srcfile,
+        desFile,
         srcUri.with({ path: srcfile }),
         desUri.with({ path: desFile }),
         srcFs,
@@ -339,11 +357,11 @@ async function fileTaskListFromDirectorForSync(
     );
 
     const clearFileTasks = fileMissed.map(file =>
-      createRemoveFileTask(desUri.with({ path: file }), FileType.File, 'des')
+      createRemoveFileTask(file, desUri.with({ path: file }), FileType.File, 'des')
     );
 
     const clearDirTasks = dirMissed.map(file =>
-      createRemoveFileTask(desUri.with({ path: file }), FileType.Directory, 'des')
+      createRemoveFileTask(file, desUri.with({ path: file }), FileType.Directory, 'des')
     );
 
     return Promise.all<FileTask | FileTask[]>([
@@ -362,35 +380,41 @@ async function fileTaskListFromDirectorForSync(
 }
 
 export async function sync(
+  srcDir: string,
+  desDir: string,
   srcUri: vscode.Uri,
   desUri: vscode.Uri,
   srcFs: FileSystem,
   desFs: FileSystem,
   option: SyncTransferTaskOption
 ) {
-  const srcDir = srcUri.fsPath;
-  const desDir = desUri.fsPath;
-
   if (shouldSkip(srcDir, option.ignore)) {
     return Promise.resolve();
   }
 
   // we can transfer file only desDir exist
   await desFs.ensureDir(desDir);
-  const tasks = await fileTaskListFromDirectorForSync(srcUri, desUri, srcFs, desFs, option);
+  const tasks = await fileTaskListFromDirectorForSync(
+    srcDir,
+    desDir,
+    srcUri,
+    desUri,
+    srcFs,
+    desFs,
+    option
+  );
   return await taskBatchProcess(tasks, srcFs, desFs, option);
 }
 
 export function transfer(
+  src: string,
+  des: string,
   srcUri: vscode.Uri,
   desUri: vscode.Uri,
   srcFs: FileSystem,
   desFs: FileSystem,
   option: TransferTaskOption
 ) {
-  const src = srcUri.fsPath;
-  const des = desUri.fsPath;
-
   if (shouldSkip(src, option.ignore)) {
     return Promise.resolve();
   }
@@ -400,12 +424,12 @@ export function transfer(
 
     switch (stat.type) {
       case FileType.Directory:
-        tasks = await fileTaskListFromDirector(srcUri, desUri, srcFs, desFs, option);
+        tasks = await fileTaskListFromDirector(src, des, srcUri, desUri, srcFs, desFs, option);
         break;
       case FileType.File:
       case FileType.SymbolicLink:
         await desFs.ensureDir(desFs.pathResolver.dirname(des));
-        tasks = [createTransferFileTask(srcUri, stat.type, desUri)];
+        tasks = [createTransferFileTask(src, srcUri, stat.type, des, desUri)];
         break;
       default:
         throw new Error(`Unsupported file type (type = ${stat.type})`);
@@ -415,8 +439,7 @@ export function transfer(
   });
 }
 
-export function remove(uri: vscode.Uri, fs: FileSystem, option) {
-  const path = uri.fsPath;
+export function remove(path: string, uri: vscode.Uri, fs: FileSystem, option) {
   if (shouldSkip(path, option.ignore)) {
     return Promise.resolve();
   }
@@ -429,11 +452,11 @@ export function remove(uri: vscode.Uri, fs: FileSystem, option) {
           return;
         }
 
-        task = createRemoveFileTask(uri, FileType.Directory, 'src');
+        task = createRemoveFileTask(path, uri, FileType.Directory, 'src');
         break;
       case FileType.File:
       case FileType.SymbolicLink:
-        task = createRemoveFileTask(uri, FileType.File, 'src');
+        task = createRemoveFileTask(path, uri, FileType.File, 'src');
         break;
       default:
         throw new Error(`Unsupported file type (type = ${stat.type})`);

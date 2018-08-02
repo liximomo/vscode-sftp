@@ -3,13 +3,19 @@ import BaseCommand from './BaseCommand';
 import logger from '../logger';
 import app from '../app';
 import { showWarningMessage } from '../host';
-import { reportError } from '../helper';
+import { reportError, toRemotePath } from '../helper';
 import { getConfig } from '../modules/config';
 
 export type FileTarget = vscode.Uri;
 
 export default class FileCommand extends BaseCommand {
-  protected fileHandler: (localPath: vscode.Uri, remotePath: vscode.Uri, config: any) => any;
+  protected fileHandler: (
+    localFsPath: string,
+    localUri: vscode.Uri,
+    remoteFsPath: string,
+    remoteUri: vscode.Uri,
+    config: any
+  ) => any;
   private getFileTarget: (item, items?) => Promise<FileTarget>;
   private requireTarget: boolean;
 
@@ -67,9 +73,9 @@ export default class FileCommand extends BaseCommand {
       config = getConfig(localUri.fsPath);
       remoteUri = app.remoteExplorer.remoteUri(localUri, config);
     }
-
+    const remotePath = toRemotePath(localUri.fsPath, config.context, config.remotePath);
     try {
-      await this.fileHandler(localUri, remoteUri, config);
+      await this.fileHandler(localUri.fsPath, localUri, remotePath, remoteUri, config);
     } catch (error) {
       reportError(error);
     }

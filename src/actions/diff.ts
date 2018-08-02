@@ -1,4 +1,3 @@
-import * as vscode from 'vscode';
 import * as path from 'path';
 import createFileAction from './createFileAction';
 import { diffFiles } from '../host';
@@ -8,16 +7,23 @@ import { makeTmpFile, simplifyPath } from '../helper';
 
 export const diff = createFileAction(
   'diff',
-  async (sourceUri, desUri, config, { localFs, remoteFs }) => {
-    const localFsPath = sourceUri.fsPath;
+  async (localFsPath, remoteFsPath, localUri, remoteUri, config, { localFs, remoteFs }) => {
     const tmpPath = await makeTmpFile({
       prefix: `${EXTENSION_NAME}-`,
       postfix: path.extname(localFsPath),
     });
 
-    await transfer(desUri, sourceUri.with({ path: tmpPath }), remoteFs, localFs, {
-      perserveTargetMode: false,
-    });
+    await transfer(
+      remoteFsPath,
+      tmpPath,
+      remoteUri,
+      localUri.with({ path: tmpPath }),
+      remoteFs,
+      localFs,
+      {
+        perserveTargetMode: false,
+      }
+    );
     await diffFiles(
       localFsPath,
       tmpPath,

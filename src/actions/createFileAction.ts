@@ -23,10 +23,23 @@ function onProgress(error, task: FileTask) {
 
 export default function createFileAction(
   actionName: string,
-  func: (localUri: vscode.Uri, remoteUri: vscode.Uri, config: any, option: any) => any,
+  func: (
+    localFsPath: string,
+    remoteFsPath: string,
+    localUri: vscode.Uri,
+    remoteUri: vscode.Uri,
+    config: any,
+    option: any
+  ) => any,
   { doNotTriggerWatcher = false } = {}
 ) {
-  return async (localUri: vscode.Uri, remoteUri: vscode.Uri, config: any) => {
+  return async (
+    localFsPath: string,
+    localUri: vscode.Uri,
+    remoteFsPath: string,
+    remoteUri: vscode.Uri,
+    config: any
+  ) => {
     const localContext = config.context;
     const remoteContext = config.remotePath;
 
@@ -57,6 +70,8 @@ export default function createFileAction(
     let retValue;
     try {
       retValue = await func(
+        localFsPath,
+        remoteFsPath,
         localUri,
         remoteUri,
         {

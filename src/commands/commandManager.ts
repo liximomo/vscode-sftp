@@ -14,7 +14,13 @@ function createCommand(id, name, handler) {
 function createFileCommand(
   id,
   name,
-  fileHandler: (localPath: vscode.Uri, remotePatg: vscode.Uri, config: any) => any,
+  fileHandler: (
+    localFsPath: string,
+    localUri: vscode.Uri,
+    remoteFsPath: string,
+    remoteUri: vscode.Uri,
+    config: any
+  ) => any,
   getFileTarget,
   requireTarget
 ) {

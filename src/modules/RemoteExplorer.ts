@@ -76,15 +76,4 @@ export default class RemoteExplorer {
   private _openResource(resource: vscode.Uri): void {
     showTextDocument(resource);
   }
-
-  private _getUriFromActiveEditor(): vscode.Uri {
-    if (!vscode.window.activeTextEditor) {
-      return null;
-    }
-
-    const uri = vscode.window.activeTextEditor.document.uri;
-    if (uri.scheme === 'remote') {
-      return uri;
-    }
-  }
 }

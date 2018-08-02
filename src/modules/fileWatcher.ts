@@ -1,14 +1,10 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 import * as debounce from 'lodash.debounce';
 import * as output from '../ui/output';
-import app from '../app';
 import { executeCommand } from '../host';
 import { COMMAND_UPLOAD, COMMAND_DELETEREMOTE } from '../constants';
-import { reportError, isValidFile, fileDepth, simplifyPath, toRemotePath } from '../helper';
-import { removeRemote } from '../actions';
+import { isValidFile, fileDepth } from '../helper';
 import logger from '../logger';
-import { getConfig } from './config';
 
 const watchers: {
   [x: string]: vscode.FileSystemWatcher;

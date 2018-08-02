@@ -141,8 +141,8 @@ export default function init(context: vscode.ExtensionContext) {
     .createFileCommand(
       constants.COMMAND_LIST_ALL,
       '(list) download',
-      async (localUri, remoteUri, config) => {
-        await actions.downloadWithoutIgnore(localUri, remoteUri, config);
+      async (localFsPath, localUri, remoteFsPath, remoteUri, config) => {
+        await actions.downloadWithoutIgnore(localFsPath, localUri, remoteFsPath, remoteUri, config);
         const fileEntry = await localFs.lstat(localUri.fsPath);
         if (fileEntry.type !== FileType.Directory) {
           await showTextDocument(localUri);
@@ -157,8 +157,8 @@ export default function init(context: vscode.ExtensionContext) {
     .createFileCommand(
       constants.COMMAND_LIST_DEFAULT,
       '(list) download',
-      async (localUri, remoteUri, config) => {
-        await actions.download(localUri, remoteUri, config);
+      async (localFsPath, localUri, remoteFsPath, remoteUri, config) => {
+        await actions.download(localFsPath, localUri, remoteFsPath, remoteUri, config);
         const fileEntry = await localFs.lstat(localUri.fsPath);
         if (fileEntry.type !== FileType.Directory) {
           await showTextDocument(localUri);
@@ -200,7 +200,7 @@ export default function init(context: vscode.ExtensionContext) {
         'Cancel'
       );
 
-      return result ? item : null;
+      return result ? uri : null;
     },
     false
   );
@@ -208,7 +208,7 @@ export default function init(context: vscode.ExtensionContext) {
   commandManager.createFileCommand(
     constants.COMMAND_REVEALINEXPLORER,
     'reveal in explorer',
-    async (localUri, remoteUri) => {
+    async (localFsPath, localUri) => {
       await executeCommand('revealInExplorer', localUri);
     },
     selectActivedFile,
@@ -218,8 +218,8 @@ export default function init(context: vscode.ExtensionContext) {
   commandManager.createFileCommand(
     constants.COMMAND_REMOTEEXPLORER_EDITINLOCAL,
     'edit in local',
-    async (localUri, remoteUri, config) => {
-      await actions.download(localUri, remoteUri, config);
+    async (localFsPath, localUri, remoteFsPath, remoteUri, config) => {
+      await actions.download(localFsPath, localUri, remoteFsPath, remoteUri, config);
       await showTextDocument(localUri, { preview: true });
     },
     selectActivedFile,
@@ -229,7 +229,7 @@ export default function init(context: vscode.ExtensionContext) {
   commandManager.createFileCommand(
     constants.COMMAND_REVEALRESOURCE,
     'reveal in remote explorer',
-    async (localUri, remoteUri) => {
+    async (localFsPath, localUri, remoteFsPath, remoteUri) => {
       app.remoteExplorer.reveal(remoteUri);
     },
     selectActivedFile,
