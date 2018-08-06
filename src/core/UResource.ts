@@ -1,3 +1,4 @@
+import * as querystring from 'querystring';
 import { Uri } from 'vscode';
 import { toLocalPath, toRemotePath } from '../helper';
 
@@ -20,9 +21,15 @@ export default class UResource {
   }
 
   static makeRemoteUri({ host, port, remotePath, rootId }) {
-    // todo: _normalizePath
+    const remote = `${host}${port ? `:${port}` : ''}`;
+
+    const query = {
+      remote,
+      rootId,
+    };
+
     return Uri.parse(
-      `remote://${host}${port ? `:${port}` : ''}/${remotePath.replace(/^\/+/, '')}?rootId=${rootId}`
+      `remote:///${remotePath.replace(/^\/+/, '')}?${querystring.stringify(query)}`
     );
   }
 
@@ -81,10 +88,5 @@ export default class UResource {
 
   get remoteUri(): Uri {
     return this._remoteResouce.uri;
-  }
-
-  // normalize relative path
-  private _normalizePath(path: string): string {
-    return '';
   }
 }

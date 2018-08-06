@@ -25,7 +25,7 @@ export type ExplorerItem = ExplorerRoot | ExplorerChild;
 
 function dirFisrtSort(fileA: ExplorerItem, fileB: ExplorerItem) {
   if (fileA.isDirectory === fileB.isDirectory) {
-    return fileA.resourceUri.path.localeCompare(fileB.resourceUri.path);
+    return fileA.resourceUri.fsPath.localeCompare(fileB.resourceUri.fsPath);
   }
 
   return fileA.isDirectory ? -1 : 1;
@@ -88,7 +88,7 @@ export class RemoteTreeData
       throw new Error(`Can't find config for remote resource ${item.resourceUri}.`);
     }
     const fs = await getRemotefsFromConfig(root.explorerContext.config);
-    const fileEntries = await fs.list(item.resourceUri.path);
+    const fileEntries = await fs.list(item.resourceUri.fsPath);
 
     return fileEntries
       .map(file => {
@@ -110,12 +110,12 @@ export class RemoteTreeData
       throw new Error(`Can't find config for remote resource ${item.resourceUri}.`);
     }
 
-    if (item.resourceUri.path === root.resourceUri.path) {
+    if (item.resourceUri.fsPath === root.resourceUri.fsPath) {
       return null;
     }
 
     const parentResourceUri = item.resourceUri.with({
-      path: upath.dirname(item.resourceUri.path),
+      path: upath.dirname(item.resourceUri.fsPath),
     });
     return { resourceUri: parentResourceUri, isDirectory: true };
   }
