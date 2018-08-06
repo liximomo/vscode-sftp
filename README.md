@@ -98,7 +98,7 @@ Use `SFTP: Set Profile` to swtich profile.
 You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/config).
 
 ## Remote Explorer
-[https://github.com/liximomo/vscode-sftp/tree/master/assets/showcase/remote-explorer.png]
+![remote-explorer-preview](https://github.com/liximomo/vscode-sftp/tree/master/assets/showcase/remote-explorer.png)
 
 Remote Explorer let you explore files in remote. You can open Remote Explorer by:
 
@@ -106,6 +106,8 @@ Remote Explorer let you explore files in remote. You can open Remote Explorer by
 2. Click SFTP view in Activity Bar.
 
 You can only view files content with Remote Explorer. Run command `SFTP: Edit in Local` to edit it in local.
+
+*Note：* You need manually refresh the parent folder after **delete** a file to make the explorer updated.
 
 -----------------------------------------------------------------------------------------------------------
 
