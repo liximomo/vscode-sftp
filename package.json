@@ -279,12 +279,12 @@
         {
           "command": "sftp.revealInExplorer",
           "group": "2_files",
-          "when": "view == remoteExplorer"
+          "when": "view == remoteExplorer && viewItem != root"
         },
         {
           "command": "ui.sftp.deleteRemote",
           "group": "7_modification",
-          "when": "view == remoteExplorer"
+          "when": "view == remoteExplorer && viewItem != root"
         }
       ]
     },

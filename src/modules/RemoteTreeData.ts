@@ -61,10 +61,13 @@ export class RemoteTreeData
   }
 
   getTreeItem(item: ExplorerItem): vscode.TreeItem {
+    const isRoot = (item as ExplorerRoot).explorerContext !== undefined;
     return {
       resourceUri: item.resourceUri,
       collapsibleState: item.isDirectory ? vscode.TreeItemCollapsibleState.Collapsed : undefined,
-      contextValue: item.isDirectory ? 'folder' : 'file',
+      contextValue: isRoot
+        ? 'root'
+        : item.isDirectory ? 'folder' : 'file',
       command: item.isDirectory
         ? undefined
         : {
