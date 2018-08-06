@@ -1,5 +1,5 @@
-import * as vscode from 'vscode';
 import logger from '../logger';
+import { showErrorMessage } from '../host';
 
 export function reportError(err: Error | string) {
   let errorString = err;
@@ -8,5 +8,5 @@ export function reportError(err: Error | string) {
     logger.error(`${err.stack}`);
   }
 
-  return vscode.window.showErrorMessage(errorString as string);
+  return showErrorMessage(errorString as string);
 }

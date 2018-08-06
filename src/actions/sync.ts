@@ -1,27 +1,29 @@
+import UResource from '../core/UResource';
+import FileSystem from '../core/Fs/FileSystem';
 import { sync } from '../core/fileTransferTask';
 import createFileAction from './createFileAction';
 
 export const sync2Remote = createFileAction(
   'sync',
-  (localFsPath, remoteFsPath, localUri, remoteUri, config, { localFs, remoteFs, onProgress }) =>
-    sync(localFsPath, remoteFsPath, localUri, remoteUri, localFs, remoteFs, {
-      concurrency: config.concurrency,
-      ignore: config.ignore,
-      model: config.syncMode,
-      perserveTargetMode: config.protocol === 'sftp',
-      onProgress,
+  (uResource: UResource, localFs: FileSystem, remoteFs: FileSystem, option: any) =>
+    sync(uResource.localFsPath, uResource.remoteFsPath, localFs, remoteFs, {
+      concurrency: option.concurrency,
+      ignore: option.ignore,
+      model: option.syncMode,
+      perserveTargetMode: option.protocol === 'sftp',
+      onProgress: option.onProgress,
     })
 );
 
 export const sync2Local = createFileAction(
   'sync',
-  (localFsPath, remoteFsPath, localUri, remoteUri, config, { localFs, remoteFs, onProgress }) =>
-    sync(remoteFsPath, localFsPath, remoteUri, localUri, remoteFs, localFs, {
-      concurrency: config.concurrency,
-      ignore: config.ignore,
-      model: config.syncMode,
+  (uResource: UResource, localFs: FileSystem, remoteFs: FileSystem, option: any) =>
+    sync(uResource.remoteFsPath, uResource.localFsPath, remoteFs, localFs, {
+      concurrency: option.concurrency,
+      ignore: option.ignore,
+      model: option.syncMode,
       perserveTargetMode: false,
-      onProgress,
+      onProgress: option.onProgress,
     }),
   { doNotTriggerWatcher: true }
 );

@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import UResource from '../core/UResource';
 import BaseCommand from './BaseCommand';
 import Command from './Command';
 import FileCommand from './FileCommand';
@@ -14,13 +15,7 @@ function createCommand(id, name, handler) {
 function createFileCommand(
   id,
   name,
-  fileHandler: (
-    localFsPath: string,
-    localUri: vscode.Uri,
-    remoteFsPath: string,
-    remoteUri: vscode.Uri,
-    config: any
-  ) => any,
+  fileHandler: (uResource: UResource, config: any) => any,
   getFileTarget,
   requireTarget
 ) {

@@ -2,24 +2,20 @@ import * as vscode from 'vscode';
 import BaseCommand from './BaseCommand';
 import logger from '../logger';
 import app from '../app';
+import UResource from '../core/UResource';
 import { showWarningMessage } from '../host';
-import { reportError, toRemotePath } from '../helper';
+import { reportError } from '../helper';
 import { getConfig } from '../modules/config';
 
 export type FileTarget = vscode.Uri;
+type FileHandler = (resource: UResource, config: any) => any;
 
 export default class FileCommand extends BaseCommand {
-  protected fileHandler: (
-    localFsPath: string,
-    localUri: vscode.Uri,
-    remoteFsPath: string,
-    remoteUri: vscode.Uri,
-    config: any
-  ) => any;
+  protected fileHandler: FileHandler;
   private getFileTarget: (item, items?) => Promise<FileTarget>;
   private requireTarget: boolean;
 
-  constructor(id, name, fileHandler, getFileTarget, requireTarget: boolean) {
+  constructor(id, name, fileHandler: FileHandler, getFileTarget, requireTarget: boolean) {
     super(id, name);
     this.fileHandler = fileHandler;
     this.getFileTarget = getFileTarget;
@@ -56,26 +52,34 @@ export default class FileCommand extends BaseCommand {
 
     logger.trace(`execute ${this.getName()} for`, activityPath);
 
+    const isRemote: boolean = fileTarget.scheme === 'remote';
     let config;
-    let localUri: vscode.Uri = fileTarget;
-    let remoteUri: vscode.Uri;
+    let rootResouce: UResource;
 
-    if (fileTarget.scheme === 'remote') {
-      remoteUri = fileTarget;
-      const remoteRoot = app.remoteExplorer.findRoot(remoteUri);
+    if (isRemote) {
+      const remoteRoot = app.remoteExplorer.findRoot(fileTarget);
       if (!remoteRoot) {
-        throw new Error(`Can't find config for remote resource ${remoteUri}.`);
+        throw new Error(`Can't find config for remote resource ${fileTarget}.`);
       }
       config = remoteRoot.explorerContext.config;
-      localUri = app.remoteExplorer.localUri(remoteUri, config);
+      const localRootUri = UResource.toLocalUri(config.context);
+      rootResouce = UResource.from(localRootUri, remoteRoot.resourceUri);
     } else {
-      localUri = fileTarget;
-      config = getConfig(localUri.fsPath);
-      remoteUri = app.remoteExplorer.remoteUri(localUri, config);
+      config = getConfig(fileTarget.fsPath);
+      const localRootUri = UResource.toLocalUri(config.context);
+      const remoteRootUri = UResource.makeRemoteUri({
+        host: config.host,
+        port: config.port,
+        remotePath: config.remotePath,
+        rootId: config.id,
+      });
+      rootResouce = UResource.from(localRootUri, remoteRootUri);
     }
-    const remotePath = toRemotePath(localUri.fsPath, config.context, config.remotePath);
+
+    const resource = UResource.from(fileTarget, isRemote, rootResouce);
+
     try {
-      await this.fileHandler(localUri.fsPath, localUri, remotePath, remoteUri, config);
+      await this.fileHandler(resource, config);
     } catch (error) {
       reportError(error);
     }

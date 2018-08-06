@@ -1,6 +1,7 @@
 import * as querystring from 'querystring';
 import * as vscode from 'vscode';
 import upath from '../core/upath';
+import UResource from '../core/UResource';
 import { FileType } from '../core/Fs/FileSystem';
 import { getAllConfigs } from './config';
 import { getRemotefsFromConfig } from '../helper';
@@ -40,12 +41,6 @@ export class RemoteTreeData
   private _onDidChangeFile: vscode.EventEmitter<vscode.Uri> = new vscode.EventEmitter<vscode.Uri>();
   readonly onDidChangeTreeData: vscode.Event<ExplorerItem> = this._onDidChangeFolder.event;
   readonly onDidChange: vscode.Event<vscode.Uri> = this._onDidChangeFile.event;
-
-  makeResourceUri({ host, port, path, id }) {
-    return vscode.Uri.parse(
-      `remote://${host}${port ? `:${port}` : ''}/${path.replace(/^\/+/, '')}?rootId=${id}`
-    );
-  }
 
   // FIXME: refresh can't work for user created ExplorerItem
   async refresh(item?: ExplorerItem): Promise<any> {
@@ -173,11 +168,11 @@ export class RemoteTreeData
     getAllConfigs().forEach(config => {
       const id = config.id;
       const item = {
-        resourceUri: this.makeResourceUri({
+        resourceUri: UResource.makeRemoteUri({
           host: config.host,
           port: config.port,
-          path: config.remotePath,
-          id,
+          remotePath: config.remotePath,
+          rootId: id,
         }),
         isDirectory: true,
         explorerContext: {

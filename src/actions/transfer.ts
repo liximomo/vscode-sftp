@@ -1,36 +1,38 @@
+import UResource from '../core/UResource';
+import FileSystem from '../core/Fs/FileSystem';
 import { transfer } from '../core/fileTransferTask';
 import createFileAction from './createFileAction';
 
 export const upload = createFileAction(
   'upload',
-  (localFsPath, remoteFsPath, localUri, remoteUri, config, { localFs, remoteFs, onProgress }) =>
-    transfer(localFsPath, remoteFsPath, localUri, remoteUri, localFs, remoteFs, {
-      concurrency: config.concurrency,
-      ignore: config.ignore,
-      perserveTargetMode: config.protocol === 'sftp',
-      onProgress,
+  (uResource: UResource, localFs: FileSystem, remoteFs: FileSystem, option: any) =>
+    transfer(uResource.localFsPath, uResource.remoteFsPath, localFs, remoteFs, {
+      concurrency: option.concurrency,
+      ignore: option.ignore,
+      perserveTargetMode: option.protocol === 'sftp',
+      onProgress: option.onProgress,
     })
 );
 
 export const download = createFileAction(
   'download',
-  (localFsPath, remoteFsPath, localUri, remoteUri, config, { localFs, remoteFs, onProgress }) =>
-    transfer(remoteFsPath, localFsPath, remoteUri, localUri, remoteFs, localFs, {
-      concurrency: config.concurrency,
-      ignore: config.ignore,
+  (uResource: UResource, localFs: FileSystem, remoteFs: FileSystem, option: any) =>
+    transfer(uResource.remoteFsPath, uResource.localFsPath, remoteFs, localFs, {
+      concurrency: option.concurrency,
+      ignore: option.ignore,
       perserveTargetMode: false,
-      onProgress,
+      onProgress: option.onProgress,
     }),
   { doNotTriggerWatcher: true }
 );
 
 export const downloadWithoutIgnore = createFileAction(
   'download',
-  (localFsPath, remoteFsPath, localUri, remoteUri, config, { localFs, remoteFs, onProgress }) =>
-    transfer(remoteFsPath, localFsPath, remoteUri, localUri, remoteFs, localFs, {
-      concurrency: config.concurrency,
+  (uResource: UResource, localFs: FileSystem, remoteFs: FileSystem, option: any) =>
+    transfer(uResource.remoteFsPath, uResource.localFsPath, remoteFs, localFs, {
+      concurrency: option.concurrency,
       perserveTargetMode: false,
-      onProgress,
+      onProgress: option.onProgress,
     }),
   { doNotTriggerWatcher: true }
 );

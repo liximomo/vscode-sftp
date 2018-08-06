@@ -67,9 +67,14 @@ export function setContextValue(key: string, value: any) {
   executeCommand('setContext', EXTENSION_NAME + '.' + key, value);
 }
 
+export function showErrorMessage(message: string, ...items: string[]) {
+  return vscode.window.showErrorMessage(message, ...items);
+}
+
 export function showInformationMessage(message: string, ...items: string[]) {
   return vscode.window.showInformationMessage(message, ...items);
 }
+
 export function showWarningMessage(message: string, ...items: string[]) {
   return vscode.window.showWarningMessage(message, ...items);
 }

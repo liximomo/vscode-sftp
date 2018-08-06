@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { showTextDocument } from '../host';
-import { toRemotePath, toLocalPath } from '../helper';
+import UResource from '../core/UResource';
+import { toRemotePath } from '../helper';
 import { getConfig } from './config';
 import RemoteTreeData, { ExplorerItem } from './RemoteTreeData';
 import { COMMAND_REMOTEEXPLORER_REFRESH, COMMAND_SHOWRESOURCE } from '../constants';
@@ -20,14 +21,12 @@ export default class RemoteExplorer {
     });
 
     vscode.commands.registerCommand(COMMAND_REMOTEEXPLORER_REFRESH, () => this._refreshSelection());
-    vscode.commands.registerCommand(COMMAND_SHOWRESOURCE, resource =>
-      this._openResource(resource)
-    );
+    vscode.commands.registerCommand(COMMAND_SHOWRESOURCE, resource => this._openResource(resource));
   }
 
   refresh(item?: ExplorerItem) {
     if (item.resourceUri.scheme !== 'remote') {
-      item.resourceUri = this.remoteUri(item.resourceUri);
+      item.resourceUri = this._remoteUri(item.resourceUri);
     }
 
     this._treeDataProvider.refresh(item);
@@ -42,27 +41,20 @@ export default class RemoteExplorer {
       : null;
   }
 
-  remoteUri(localUri: vscode.Uri, config?: any) {
-    const localPath = localUri.fsPath;
-    config = config || getConfig(localPath);
-    const remotePath = toRemotePath(localPath, config.context, config.remotePath);
-    return this._treeDataProvider.makeResourceUri({
-      host: config.host,
-      port: config.port,
-      path: remotePath,
-      id: config.id,
-    });
-  }
-
   findRoot(remoteUri: vscode.Uri) {
     return this._treeDataProvider.findRoot(remoteUri);
   }
 
-  localUri(remoteUri: vscode.Uri, config) {
-    const remoteContext = config.remotePath;
-    const localContext = config.context;
-    const localFilePath = toLocalPath(remoteUri.fsPath, remoteContext, localContext);
-    return vscode.Uri.file(localFilePath);
+  private _remoteUri(localUri: vscode.Uri) {
+    const localPath = localUri.fsPath;
+    const config = getConfig(localPath);
+    const remotePath = toRemotePath(localPath, config.context, config.remotePath);
+    return UResource.makeRemoteUri({
+      host: config.host,
+      port: config.port,
+      remotePath,
+      rootId: config.id,
+    });
   }
 
   private _refreshSelection() {

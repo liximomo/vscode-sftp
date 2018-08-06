@@ -1,6 +1,8 @@
-import * as vscode from 'vscode';
 import * as path from 'path';
+import { showErrorMessage } from '../host';
 import upath from '../core/upath';
+import UResource from '../core/UResource';
+import FileSystem from '../core/Fs/FileSystem';
 import localFs from '../modules/localFs';
 import Ignore from '../modules/Ignore';
 import { FileTask } from '../core/fileTransferTask';
@@ -9,37 +11,25 @@ import app from '../app';
 import logger from '../logger';
 import { disableWatcher, enableWatcher } from '../modules/fileWatcher';
 
-function onProgress(error, task: FileTask) {
+function onProgress(error: Error, task: FileTask) {
+  const localFsPath = task.file.fsPath;
   if (error) {
-    logger.error(error, `${task.type} ${task.resourceUri.fsPath}`);
+    const errorMsg = `${error.message} when ${task.type} ${localFsPath}`;
+    logger.error(errorMsg);
+    showErrorMessage(errorMsg);
+    return;
   }
 
-  logger.info(`${task.type} ${task.resourceUri.fsPath}`);
-  app.sftpBarItem.showMsg(
-    `${task.type} ${path.basename(task.resourceUri.fsPath)}`,
-    simplifyPath(task.resourceUri.fsPath)
-  );
+  logger.info(`${task.type} ${localFsPath}`);
+  app.sftpBarItem.showMsg(`${task.type} ${path.basename(localFsPath)}`, simplifyPath(localFsPath));
 }
 
 export default function createFileAction(
   actionName: string,
-  func: (
-    localFsPath: string,
-    remoteFsPath: string,
-    localUri: vscode.Uri,
-    remoteUri: vscode.Uri,
-    config: any,
-    option: any
-  ) => any,
+  func: (uResource: UResource, localFs: FileSystem, remoteFs: FileSystem, option: any) => any,
   { doNotTriggerWatcher = false } = {}
 ) {
-  return async (
-    localFsPath: string,
-    localUri: vscode.Uri,
-    remoteFsPath: string,
-    remoteUri: vscode.Uri,
-    config: any
-  ) => {
+  return async (uResource: UResource, config: any) => {
     const localContext = config.context;
     const remoteContext = config.remotePath;
 
@@ -69,22 +59,12 @@ export default function createFileAction(
 
     let retValue;
     try {
-      retValue = await func(
-        localFsPath,
-        remoteFsPath,
-        localUri,
-        remoteUri,
-        {
-          ...config,
-          concurrency: config.protocol === 'ftp' ? 1 : config.concurrency,
-          ignore: ignoreFunc,
-        },
-        {
-          localFs,
-          remoteFs,
-          onProgress,
-        }
-      );
+      retValue = await func(uResource, localFs, remoteFs, {
+        ...config,
+        concurrency: config.protocol === 'ftp' ? 1 : config.concurrency,
+        ignore: ignoreFunc,
+        onProgress,
+      });
     } catch (error) {
       throw error;
     } finally {
