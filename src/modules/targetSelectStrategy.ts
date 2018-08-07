@@ -131,17 +131,19 @@ export function selectFolderFallbackToConfigContext(
   items
 ): Promise<FileTarget | FileTarget[]> {
   // from explorer or editor context
-  if (item instanceof vscode.Uri) {
-    if (Array.isArray(items) && items[0] instanceof vscode.Uri) {
-      // multi-select in explorer
-      return Promise.resolve(items);
-    } else {
-      // from editor title
-      return Promise.resolve(item);
+  if (item) {
+    if (item instanceof vscode.Uri) {
+      if (Array.isArray(items) && items[0] instanceof vscode.Uri) {
+        // multi-select in explorer
+        return Promise.resolve(items);
+      } else {
+        // from editor title
+        return Promise.resolve(item);
+      }
+    } else if (item.resourceUri) {
+      // from remote explorer
+      return Promise.resolve(item.resourceUri);
     }
-  } else if (item.resourceUri) {
-    // from remote explorer
-    return Promise.resolve(item.resourceUri);
   }
 
   return selectContext();
