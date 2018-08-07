@@ -98,7 +98,7 @@ Use `SFTP: Set Profile` to swtich profile.
 You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/config).
 
 ## Remote Explorer
-![remote-explorer-preview](https://github.com/liximomo/vscode-sftp/tree/master/assets/showcase/remote-explorer.png)
+![remote-explorer-preview](https://raw.githubusercontent.com/liximomo/vscode-sftp/master/assets/showcase/remote-explorer.png)
 
 Remote Explorer let you explore files in remote. You can open Remote Explorer by:
 
