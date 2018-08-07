@@ -1,6 +1,6 @@
 ## 1.3.0 - 2018-08-02
 ### New Features
-  * (Remote Explorer)[https://github.com/liximomo/vscode-sftp#remote-explorer].
+  * [Remote Explorer](https://github.com/liximomo/vscode-sftp#remote-explorer).
 
 ## 1.2.7 - 2018-07-27
 ### New Features
