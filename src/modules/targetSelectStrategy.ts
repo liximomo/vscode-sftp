@@ -108,11 +108,12 @@ function createFileSelector({ filterCreator = null } = {}) {
 export function selectActivedFile(item, items): Promise<FileTarget | FileTarget[]> {
   // from explorer or editor context
   if (item) {
-    if (item.fsPath) {
-      if (Array.isArray(items) && items[0].fsPath) {
+    if (item instanceof vscode.Uri) {
+      if (Array.isArray(items) && items[0] instanceof vscode.Uri) {
         // multi-select in explorer
         return Promise.resolve(items);
       } else {
+        // from editor title
         return Promise.resolve(item);
       }
     } else if (item.resourceUri) {
@@ -125,15 +126,22 @@ export function selectActivedFile(item, items): Promise<FileTarget | FileTarget[
 }
 
 // selected folder or configContext
-export function selectFolderFallbackToConfigContext(item, items): Promise<FileTarget> {
+export function selectFolderFallbackToConfigContext(
+  item,
+  items
+): Promise<FileTarget | FileTarget[]> {
   // from explorer or editor context
-  if (item) {
-    if (item.fsPath) {
-      return Promise.resolve(items ? items : item);
-    } else if (item.resourceUri) {
-      // from remote explorer
-      return Promise.resolve(item.resourceUri);
+  if (item instanceof vscode.Uri) {
+    if (Array.isArray(items) && items[0] instanceof vscode.Uri) {
+      // multi-select in explorer
+      return Promise.resolve(items);
+    } else {
+      // from editor title
+      return Promise.resolve(item);
     }
+  } else if (item.resourceUri) {
+    // from remote explorer
+    return Promise.resolve(item.resourceUri);
   }
 
   return selectContext();

@@ -32,13 +32,8 @@ export default class RemoteExplorer {
     this._treeDataProvider.refresh(item);
   }
 
-  reveal(uri: vscode.Uri): Thenable<void> {
-    return uri
-      ? this._explorerView.reveal({
-          resourceUri: uri,
-          isDirectory: false,
-        })
-      : null;
+  reveal(item: ExplorerItem): Thenable<void> {
+    return item ? this._explorerView.reveal(item) : null;
   }
 
   findRoot(remoteUri: vscode.Uri) {

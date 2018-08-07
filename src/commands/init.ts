@@ -31,8 +31,9 @@ async function refreshRemoteOne(localUri, isDirectory?: boolean) {
   }
 
   app.remoteExplorer.refresh({
-    isDirectory,
+    fsPath: localUri.fsPath,
     resourceUri: localUri,
+    isDirectory,
   });
 }
 
@@ -231,7 +232,11 @@ export default function init(context: vscode.ExtensionContext) {
     constants.COMMAND_REVEALRESOURCE,
     'reveal in remote explorer',
     async (uResource: UResource, config: any) => {
-      app.remoteExplorer.reveal(uResource.remoteUri);
+      app.remoteExplorer.reveal({
+        fsPath: uResource.remoteFsPath,
+        resourceUri: uResource.remoteUri,
+        isDirectory: false,
+      });
     },
     selectActivedFile,
     false
