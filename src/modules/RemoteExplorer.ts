@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import { showTextDocument } from '../host';
-import UResource from '../core/UResource';
+import UResource, { Resource } from '../core/UResource';
 import { toRemotePath } from '../helper';
+import { REMOTE_SCHEME } from '../constants';
 import { getConfig } from './config';
 import RemoteTreeData, { ExplorerItem } from './RemoteTreeData';
 import { COMMAND_REMOTEEXPLORER_REFRESH, COMMAND_SHOWRESOURCE } from '../constants';
@@ -13,7 +14,7 @@ export default class RemoteExplorer {
   constructor(context: vscode.ExtensionContext) {
     this._treeDataProvider = new RemoteTreeData();
     context.subscriptions.push(
-      vscode.workspace.registerTextDocumentContentProvider('remote', this._treeDataProvider)
+      vscode.workspace.registerTextDocumentContentProvider(REMOTE_SCHEME, this._treeDataProvider)
     );
 
     this._explorerView = vscode.window.createTreeView('remoteExplorer', {
@@ -21,12 +22,24 @@ export default class RemoteExplorer {
     });
 
     vscode.commands.registerCommand(COMMAND_REMOTEEXPLORER_REFRESH, () => this._refreshSelection());
-    vscode.commands.registerCommand(COMMAND_SHOWRESOURCE, resource => this._openResource(resource));
+    vscode.commands.registerCommand(COMMAND_SHOWRESOURCE, (resource: Resource) =>
+      this._openResource(resource)
+    );
   }
 
   refresh(item?: ExplorerItem) {
-    if (item.resourceUri.scheme !== 'remote') {
-      item.resourceUri = this._remoteUri(item.resourceUri);
+    if (!item.resource.isRemote) {
+      const localPath = item.resource.fsPath;
+      const config = getConfig(localPath);
+      const remotePath = toRemotePath(localPath, config.context, config.remotePath);
+      item.resource = UResource.makeResource({
+        remote: {
+          host: config.host,
+          port: config.port,
+        },
+        fsPath: remotePath,
+        remoteId: config.id,
+      });
     }
 
     this._treeDataProvider.refresh(item);
@@ -40,18 +53,6 @@ export default class RemoteExplorer {
     return this._treeDataProvider.findRoot(remoteUri);
   }
 
-  private _remoteUri(localUri: vscode.Uri) {
-    const localPath = localUri.fsPath;
-    const config = getConfig(localPath);
-    const remotePath = toRemotePath(localPath, config.context, config.remotePath);
-    return UResource.makeRemoteUri({
-      host: config.host,
-      port: config.port,
-      remotePath,
-      rootId: config.id,
-    });
-  }
-
   private _refreshSelection() {
     if (this._explorerView.selection.length) {
       this._explorerView.selection.forEach(item => this.refresh(item));
@@ -60,7 +61,7 @@ export default class RemoteExplorer {
     }
   }
 
-  private _openResource(resource: vscode.Uri): void {
-    showTextDocument(resource);
+  private _openResource(resource: Resource): void {
+    showTextDocument(resource.uri);
   }
 }

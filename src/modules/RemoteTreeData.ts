@@ -1,7 +1,6 @@
-import * as querystring from 'querystring';
 import * as vscode from 'vscode';
 import upath from '../core/upath';
-import UResource from '../core/UResource';
+import UResource, { Resource } from '../core/UResource';
 import { FileType } from '../core/Fs/FileSystem';
 import { getAllConfigs } from './config';
 import { getRemotefsFromConfig } from '../helper';
@@ -10,9 +9,7 @@ import { COMMAND_SHOWRESOURCE } from '../constants';
 type Id = number;
 
 interface ExplorerChild {
-  // uri.fsPath will always be current platform pecific, so need to store valid fsPath for remote platform
-  fsPath: string;
-  resourceUri: vscode.Uri;
+  resource: Resource;
   isDirectory: boolean;
 }
 
@@ -27,7 +24,7 @@ export type ExplorerItem = ExplorerRoot | ExplorerChild;
 
 function dirFisrtSort(fileA: ExplorerItem, fileB: ExplorerItem) {
   if (fileA.isDirectory === fileB.isDirectory) {
-    return fileA.fsPath.localeCompare(fileB.fsPath);
+    return fileA.resource.fsPath.localeCompare(fileB.resource.fsPath);
   }
 
   return fileA.isDirectory ? -1 : 1;
@@ -53,26 +50,27 @@ export class RemoteTreeData
     }
 
     if (item.isDirectory) {
-      // refresh top level file as well
       this._onDidChangeFolder.fire(item);
+
+      // refresh top level files as well
       const children = await this.getChildren(item);
-      children.filter(i => !i.isDirectory).forEach(i => this._onDidChangeFile.fire(i.resourceUri));
+      children.filter(i => !i.isDirectory).forEach(i => this._onDidChangeFile.fire(i.resource.uri));
     } else {
-      this._onDidChangeFile.fire(item.resourceUri);
+      this._onDidChangeFile.fire(item.resource.uri);
     }
   }
 
   getTreeItem(item: ExplorerItem): vscode.TreeItem {
     const isRoot = (item as ExplorerRoot).explorerContext !== undefined;
     return {
-      resourceUri: item.resourceUri,
+      resourceUri: item.resource.uri,
       collapsibleState: item.isDirectory ? vscode.TreeItemCollapsibleState.Collapsed : undefined,
       contextValue: isRoot ? 'root' : item.isDirectory ? 'folder' : 'file',
       command: item.isDirectory
         ? undefined
         : {
             command: COMMAND_SHOWRESOURCE,
-            arguments: [item.resourceUri],
+            arguments: [item.resource],
             title: 'View Remote Resource',
           },
     };
@@ -83,21 +81,20 @@ export class RemoteTreeData
       return this._getRoots();
     }
 
-    const root = this.findRoot(item.resourceUri);
+    const root = this.findRoot(item.resource.uri);
     if (!root) {
-      throw new Error(`Can't find config for remote resource ${item.resourceUri}.`);
+      throw new Error(`Can't find config for remote resource ${item.resource.uri}.`);
     }
     const fs = await getRemotefsFromConfig(root.explorerContext.config);
-    const fileEntries = await fs.list(item.fsPath);
+    const fileEntries = await fs.list(item.resource.fsPath);
 
     return fileEntries
       .map(file => {
         const isDirectory = file.type === FileType.Directory;
 
         return {
-          fsPath: file.fspath,
-          resourceUri: item.resourceUri.with({
-            path: file.fspath,
+          resource: UResource.updateResource(item.resource, {
+            remotePath: file.fspath,
           }),
           isDirectory,
         };
@@ -106,20 +103,22 @@ export class RemoteTreeData
   }
 
   getParent(item: ExplorerChild): ExplorerItem {
-    const root = this.findRoot(item.resourceUri);
+    const resourceUri = item.resource.uri;
+    const root = this.findRoot(resourceUri);
     if (!root) {
-      throw new Error(`Can't find config for remote resource ${item.resourceUri}.`);
+      throw new Error(`Can't find config for remote resource ${resourceUri}.`);
     }
 
-    if (item.fsPath === root.fsPath) {
+    if (item.resource.fsPath === root.resource.fsPath) {
       return null;
     }
 
-    const parentFsPath = upath.dirname(item.fsPath);
-    const parentResourceUri = item.resourceUri.with({
-      path: parentFsPath,
-    });
-    return { fsPath: parentFsPath, resourceUri: parentResourceUri, isDirectory: true };
+    return {
+      resource: UResource.updateResource(item.resource, {
+        remotePath: upath.dirname(item.resource.fsPath),
+      }),
+      isDirectory: true,
+    };
   }
 
   findRoot(uri: vscode.Uri): ExplorerRoot {
@@ -127,8 +126,9 @@ export class RemoteTreeData
       return null;
     }
 
-    const query = querystring.parse(uri.query);
-    return this._rootsMap.get(parseInt(query.rootId, 10));
+    // todo
+    const rootId = UResource.makeResource(uri).remoteId;
+    return this._rootsMap.get(rootId);
   }
 
   provideTextDocumentContent(
@@ -142,8 +142,9 @@ export class RemoteTreeData
       }
 
       const fs = await getRemotefsFromConfig(root.explorerContext.config);
-      // uri.fsPath will always be current platform pecific, so need to normalize it for target platform
-      const stream = await fs.get(fs.pathResolver.normalize(uri.fsPath));
+      const stream = await fs.get(
+        UResource.makeResource(uri).fsPath || fs.pathResolver.normalize(uri.fsPath)
+      );
       const arr = [];
 
       const onData = chunk => {
@@ -174,12 +175,13 @@ export class RemoteTreeData
     getAllConfigs().forEach(config => {
       const id = config.id;
       const item = {
-        fsPath: config.remotePath,
-        resourceUri: UResource.makeRemoteUri({
-          host: config.host,
-          port: config.port,
-          remotePath: config.remotePath,
-          rootId: id,
+        resource: UResource.makeResource({
+          remote: {
+            host: config.host,
+            port: config.port,
+          },
+          fsPath: config.remotePath,
+          remoteId: id,
         }),
         isDirectory: true,
         explorerContext: {

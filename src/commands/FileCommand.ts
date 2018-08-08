@@ -5,6 +5,7 @@ import app from '../app';
 import UResource from '../core/UResource';
 import { showWarningMessage } from '../host';
 import { reportError } from '../helper';
+import { REMOTE_SCHEME } from '../constants';
 import { getConfig } from '../modules/config';
 
 export type FileTarget = vscode.Uri;
@@ -52,9 +53,8 @@ export default class FileCommand extends BaseCommand {
 
     logger.trace(`execute ${this.getName()} for`, activityPath);
 
-    const isRemote: boolean = fileTarget.scheme === 'remote';
+    const isRemote: boolean = fileTarget.scheme === REMOTE_SCHEME;
     let config;
-    let rootResouce: UResource;
 
     if (isRemote) {
       const remoteRoot = app.remoteExplorer.findRoot(fileTarget);
@@ -62,21 +62,19 @@ export default class FileCommand extends BaseCommand {
         throw new Error(`Can't find config for remote resource ${fileTarget}.`);
       }
       config = remoteRoot.explorerContext.config;
-      const localRootUri = UResource.toLocalUri(config.context);
-      rootResouce = UResource.from(localRootUri, remoteRoot.resourceUri);
     } else {
       config = getConfig(fileTarget.fsPath);
-      const localRootUri = UResource.toLocalUri(config.context);
-      const remoteRootUri = UResource.makeRemoteUri({
-        host: config.host,
-        port: config.port,
-        remotePath: config.remotePath,
-        rootId: config.id,
-      });
-      rootResouce = UResource.from(localRootUri, remoteRootUri);
     }
 
-    const resource = UResource.from(fileTarget, isRemote, rootResouce);
+    const resource = UResource.from(fileTarget, {
+      localBasePath: config.context,
+      remoteBasePath: config.remotePath,
+      remoteId: config.id,
+      remote: {
+        host: config.host,
+        port: config.port,
+      },
+    });
 
     try {
       await this.fileHandler(resource, config);

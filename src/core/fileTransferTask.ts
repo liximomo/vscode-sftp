@@ -11,6 +11,7 @@ import app from '../app';
 import FileSystem, { IFileEntry, FileType } from './Fs/FileSystem';
 import * as utils from '../utils';
 import { fileDepth, simplifyPath } from '../helper';
+import logger from '../logger';
 
 type SyncModel = 'full' | 'update';
 
@@ -384,6 +385,7 @@ export function transfer(
     return Promise.resolve();
   }
 
+  logger.debug('transfer', src, des);
   return srcFs.lstat(src).then(async stat => {
     let tasks;
 
