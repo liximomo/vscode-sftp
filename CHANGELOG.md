@@ -1,3 +1,6 @@
+## 1.3.7 - 2018-08-10
+* Fix bug in remoteExplorer.refresh
+
 ## 1.3.0 - 2018-08-02
 ### New Features
   * [Remote Explorer](https://github.com/liximomo/vscode-sftp#remote-explorer).
