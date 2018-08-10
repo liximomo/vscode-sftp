@@ -12,6 +12,8 @@ let workspaceWatcher: vscode.Disposable;
 
 function handleConfigSave(uri: vscode.Uri) {
   loadConfig(uri.fsPath).then(config => {
+    app.remoteExplorer.refresh();
+
     // close connected remote, cause the remote may changed
     endAllRemote();
     watchFiles(config);

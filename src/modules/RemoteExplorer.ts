@@ -28,7 +28,7 @@ export default class RemoteExplorer {
   }
 
   refresh(item?: ExplorerItem) {
-    if (!item.resource.isRemote) {
+    if (item && !item.resource.isRemote) {
       const localPath = item.resource.fsPath;
       const config = getConfig(localPath);
       const remotePath = toRemotePath(localPath, config.context, config.remotePath);

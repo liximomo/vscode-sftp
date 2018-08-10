@@ -45,8 +45,12 @@ export class RemoteTreeData
   async refresh(item?: ExplorerItem): Promise<any> {
     // refresh root
     if (!item) {
+      // clear cache
       this._roots = null;
       this._rootsMap = null;
+
+      this._onDidChangeFile.fire();
+      return;
     }
 
     if (item.isDirectory) {

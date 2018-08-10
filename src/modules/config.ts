@@ -7,6 +7,7 @@ import app from '../app';
 import { CONFIG_PATH } from '../constants';
 import { reportError, replaceHomePath, resolvePath } from '../helper';
 import Trie from '../core/Trie';
+import upath from '../core/upath';
 import { showTextDocument } from '../host';
 import logger from '../logger';
 
@@ -215,6 +216,9 @@ async function addConfig(config, workspace) {
 
 function normalizeConfig(config) {
   const result = { ...config };
+
+  // remove the './' part from a relative path
+  result.remotePath = upath.normalize(result.remotePath);
 
   if (result.agent && result.agent.startsWith('$')) {
     const evnVarName = result.agent.slice(1);
