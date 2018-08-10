@@ -46,7 +46,8 @@
       "sftp": [
         {
           "id": "remoteExplorer",
-          "name": "Remote Explorer"
+          "name": "Remote Explorer",
+          "when": "sftp.enabled"
         }
       ]
     },
