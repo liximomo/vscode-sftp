@@ -14,6 +14,7 @@ import {
 } from '../modules/targetSelectStrategy';
 import localFs from '../modules/localFs';
 import { getAllRawConfigs } from '../modules/config';
+import { ExplorerItem } from '../modules/RemoteTreeData';
 import * as output from '../ui/output';
 import {
   executeCommand,
@@ -192,9 +193,9 @@ export default function init(context: vscode.ExtensionContext) {
     async (uResource: UResource) => {
       await executeCommand(constants.COMMAND_DELETEREMOTE, uResource.localUri);
     },
-    async item => {
+    async (item: ExplorerItem) => {
       // from remote explorer context
-      const uri: vscode.Uri = item.resourceUri;
+      const uri: vscode.Uri = item.resource.uri;
       const result = await showConfirmMessage(
         `Are you sure you want to delete ${upath.basename(uri.path)}'?`,
         'Delete',

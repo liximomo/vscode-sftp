@@ -6,8 +6,8 @@ import { REMOTE_SCHEME } from '../constants';
 import upath from './upath';
 
 function createUriString(authority: string, path: string, query: any) {
-  const normalizedPath = '/' + path.replace(/^\/+/, '');
-  return `${REMOTE_SCHEME}://${authority}${normalizedPath}?${querystring.stringify(query)}`;
+  const normalizedPath = encodeURIComponent(path.replace(/^\/+/, ''));
+  return `${REMOTE_SCHEME}://${authority}/${normalizedPath}?${querystring.stringify(query)}`;
 }
 
 // tslint:disable-next-line class-name
