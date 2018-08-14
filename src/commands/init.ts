@@ -19,11 +19,17 @@ import * as output from '../ui/output';
 import {
   executeCommand,
   showTextDocument,
-  refreshExplorer,
+  // refreshExplorer,
   showInformationMessage,
   showConfirmMessage,
 } from '../host';
 import commandManager from './commandManager';
+
+// NEED_VSCODE_UPDATE: detect explorer view visible
+// refresh will open explorer view which cause a problem https://github.com/liximomo/vscode-sftp/issues/286
+function refreshExplorer() {
+  // do nothing
+}
 
 async function refreshRemoteOne(localUri, isDirectory?: boolean) {
   if (isDirectory === undefined) {
