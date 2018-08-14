@@ -385,7 +385,7 @@ export function transfer(
     return Promise.resolve();
   }
 
-  logger.debug('transfer', src, des);
+  logger.trace(`transfer from ${src} to ${des}`);
   return srcFs.lstat(src).then(async stat => {
     let tasks;
 

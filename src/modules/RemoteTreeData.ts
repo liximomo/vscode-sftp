@@ -49,7 +49,7 @@ export class RemoteTreeData
       this._roots = null;
       this._rootsMap = null;
 
-      this._onDidChangeFile.fire();
+      this._onDidChangeFolder.fire();
       return;
     }
 
