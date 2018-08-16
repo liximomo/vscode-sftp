@@ -49,7 +49,7 @@
       },
       "syncMode": {
         "enum": ["update", "full"],
-        "description": "The Strategy `sync` commnad to use.",
+        "description": "The Strategy `sync` command to use.",
         "default": "update"
       },
       "ignore": {
