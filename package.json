@@ -2,7 +2,7 @@
   "name": "sftp",
   "displayName": "sftp",
   "description": "SFTP/FTP sync",
-  "version": "1.3.9",
+  "version": "1.3.10",
   "publisher": "liximomo",
   "author": "liximomo <liximomo@gmail.com> (https://liximomo.github.io/)",
   "engines": {
@@ -135,8 +135,7 @@
     "menus": {
       "commandPalette": [
         {
-          "command": "sftp.config.default",
-          "when": "workspaceFolderCount"
+          "command": "sftp.config.default"
         },
         {
           "command": "sftp.list.default",
