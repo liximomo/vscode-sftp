@@ -1,6 +1,10 @@
 {
   "rootOption": {
     "properties": {
+      "name": {
+        "type": "string",
+        "description": "A string to identify your config."
+      },
       "context": {
         "type": "string",
         "description": "Relative path relative to the workspace root folder."
@@ -31,8 +35,13 @@
           "autoUpload": true,
           "autoDelete": false
         }
+      },
+      "defaultProfile": {
+        "type": "string",
+        "description": "Profile name you want to set as default."
       }
-    }
+    },
+    "required": ["name"]
   },
   "option": {
     "type": "object",

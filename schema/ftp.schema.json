@@ -15,10 +15,6 @@
     {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "A string to identify your config."
-        },
         "protocol": {
           "enum": ["ftp"],
           "description": "ftp connection protocol."
@@ -38,10 +34,12 @@
                 }
               ]
             }
+          },
+          "default": {
+            "profileName": {}
           }
         }
-      },
-      "required": ["name"]
+      }
     }
   ]
 }
