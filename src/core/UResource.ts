@@ -3,7 +3,6 @@ import * as querystring from 'querystring';
 import { Uri } from 'vscode';
 import { toLocalPath, toRemotePath } from '../helper';
 import { REMOTE_SCHEME } from '../constants';
-import upath from './upath';
 
 function createUriString(authority: string, path: string, query: any) {
   const normalizedPath = encodeURIComponent(path.replace(/^\/+/, ''));

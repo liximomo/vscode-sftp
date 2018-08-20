@@ -26,7 +26,7 @@ async function handleFileSave(uri) {
   try {
     config = getConfig(activityPath);
   } catch (error) {
-    // ignore config error
+    logger.error(error);
     return;
   }
 
@@ -42,7 +42,7 @@ async function downloadOnOpen(uri) {
   try {
     config = getConfig(activityPath);
   } catch (error) {
-    // ignore config error
+    logger.error(error);
     return;
   }
 

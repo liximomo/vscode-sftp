@@ -65,7 +65,7 @@ class KeepAliveRemoteFs {
       shouldPromptForPass = connectOption.password == undefined;
       FsConstructor = FTPFileSystem;
     } else {
-      return Promise.reject(new Error(`unsupported protocol ${option.protocol}`));
+      throw new Error(`unsupported protocol ${option.protocol}`);
     }
 
     if (shouldPromptForPass) {

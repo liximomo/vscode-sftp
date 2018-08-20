@@ -113,7 +113,6 @@ export function selectActivedFile(item, items): Promise<FileTarget | FileTarget[
         // multi-select in explorer
         return Promise.resolve(items);
       } else {
-        // from editor title
         return Promise.resolve(item);
       }
     } else if (item.resourceUri) {
@@ -137,7 +136,6 @@ export function selectFolderFallbackToConfigContext(
         // multi-select in explorer
         return Promise.resolve(items);
       } else {
-        // from editor title
         return Promise.resolve(item);
       }
     } else if (item.resourceUri) {
