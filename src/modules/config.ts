@@ -164,7 +164,7 @@ async function extendConfig(config) {
   section.config.forEach(line => {
     const key = mapping.get(line.param);
 
-    if (key !== undefined) {
+    if (config[key] === undefined && key !== undefined) {
       merged[key] = line.value;
     }
   });
