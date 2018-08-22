@@ -209,6 +209,7 @@ async function addConfig(config, workspace) {
   logConfig(extendedConfig);
 
   extendedConfig.id = ++id;
+  extendedConfig.workspace = workspace;
   configTrie.add(extendedConfig.context, extendedConfig);
 
   return extendedConfig;
@@ -265,25 +266,24 @@ function normalizeConfig(config) {
   return result;
 }
 
-export function getConfigPath(basePath) {
+function getConfigPath(basePath) {
   return path.join(basePath, CONFIG_PATH);
 }
 
-export function loadConfig(configPath) {
+export function loadConfig(configPath, workspace) {
   // $todo? trie per workspace, so we can remove unused config
   return fse.readJson(configPath).then(config => {
     const configs = Array.isArray(config) ? config : [config];
-    const configContext = path.resolve(configPath, '../../');
-    return Promise.all(configs.map(cfg => addConfig(cfg, configContext)));
+    return Promise.all(configs.map(cfg => addConfig(cfg, workspace)));
   });
 }
 
-export function initConfigs(basePath): Promise<Array<{}>> {
-  const configPath = getConfigPath(basePath);
+export function initConfigs(workspace): Promise<Array<{}>> {
+  const configPath = getConfigPath(workspace);
   return fse.pathExists(configPath).then(
     exist => {
       if (exist) {
-        return loadConfig(configPath);
+        return loadConfig(configPath, workspace);
       }
       return [];
     },
@@ -349,4 +349,8 @@ export function newConfig(basePath) {
         .then(() => showTextDocument(vscode.Uri.file(configPath)));
     })
     .catch(reportError);
+}
+
+export function removeConfig(config) {
+  return configTrie.remove(config.context);
 }

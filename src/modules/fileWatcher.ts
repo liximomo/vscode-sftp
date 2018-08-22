@@ -63,22 +63,22 @@ function uploadHandler(uri: vscode.Uri) {
   debouncedUpload();
 }
 
-function getWatcherByConfig(config) {
+function addWatcher(config, watcher) {
+  watchers[config.context] = watcher;
+}
+
+function getWatcher(config) {
   return watchers[config.context];
 }
 
-function removeWatcherByConfig(config) {
-  return delete watchers[config.context];
-}
-
-function getWatchs() {
+function getWatcheres() {
   return Object.keys(watchers).map(key => watchers[key]);
 }
 
-function setUpWatcher(config) {
+export function createWatcher(config) {
   const watchConfig = config.watcher !== undefined ? config.watcher : {};
 
-  let watcher = getWatcherByConfig(config);
+  let watcher = getWatcher(config);
   if (watcher) {
     // clear old watcher
     watcher.dispose();
@@ -96,7 +96,7 @@ function setUpWatcher(config) {
     false,
     false
   );
-  watchers[config.context] = watcher;
+  addWatcher(config, watcher);
 
   if (watchConfig.autoUpload) {
     watcher.onDidCreate(uploadHandler);
@@ -115,31 +115,20 @@ function setUpWatcher(config) {
   }
 }
 
-export function disableWatcher(config) {
-  const watcher = getWatcherByConfig(config);
+export function removeWatcher(config) {
+  const watcher = getWatcher(config);
   if (watcher) {
     watcher.dispose();
-    removeWatcherByConfig(config);
+    delete watchers[config.context];
   }
-}
-
-export function enableWatcher(config) {
-  if (getWatcherByConfig(config) !== undefined) {
-    return;
-  }
-
-  // delay setup watcher to avoid download event
-  setTimeout(() => {
-    setUpWatcher(config);
-  }, 1000 * 3);
 }
 
 export function watchFiles(config) {
   const configs = [].concat(config);
-  configs.forEach(setUpWatcher);
+  configs.forEach(createWatcher);
 }
 
 export function clearAllWatcher() {
-  const disposable = vscode.Disposable.from(...getWatchs());
+  const disposable = vscode.Disposable.from(...getWatcheres());
   disposable.dispose();
 }

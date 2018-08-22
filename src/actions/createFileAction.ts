@@ -9,7 +9,10 @@ import { FileTask } from '../core/fileTransferTask';
 import { getRemotefsFromConfig, simplifyPath, filesIgnoredFromConfig } from '../helper';
 import app from '../app';
 import logger from '../logger';
-import { disableWatcher, enableWatcher } from '../modules/fileWatcher';
+import {
+  removeWatcher as disableWatcher,
+  createWatcher as enableWatcher,
+} from '../modules/fileWatcher';
 
 function onProgress(error: Error, task: FileTask) {
   const localFsPath = task.file.fsPath;
@@ -69,7 +72,10 @@ export default function createFileAction(
       throw error;
     } finally {
       if (doNotTriggerWatcher) {
-        enableWatcher(config);
+        // delay setup watcher to avoid download event
+        setTimeout(() => {
+          enableWatcher(config);
+        }, 1000 * 3);
       }
     }
 

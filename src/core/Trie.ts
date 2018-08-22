@@ -12,11 +12,13 @@ class TrieNode {
 
   private value: any;
   private children: ITrieNodeChildren;
+  private parent: TrieNode;
 
   constructor(token: string, value = null) {
     this.token = token;
     this.value = value;
     this.children = {};
+    this.parent = null;
   }
 
   // is store value
@@ -38,12 +40,17 @@ class TrieNode {
     return this;
   }
 
+  getParent(): TrieNode {
+    return this.parent;
+  }
+
   getChildren(): TrieNode[] {
     return Object.keys(this.children).map(key => this.children[key]);
   }
 
-  addChild(token: string, childNode): TrieNode {
+  addChild(token: string, childNode: TrieNode): TrieNode {
     this.children[token] = childNode;
+    childNode.parent = this;
     return this;
   }
 
@@ -51,8 +58,8 @@ class TrieNode {
     return this.children[token];
   }
 
-  removeChild(token) {
-    return delete this.children[token];
+  removeChild(node: TrieNode) {
+    return delete this.children[node.token];
   }
 
   getChildrenNum(): number {
@@ -102,12 +109,19 @@ export default class Trie {
       return false;
     }
 
-    if (node.getChildrenNum() <= 0) {
-      const precedeTokens = tokens.slice(0, tokens.length - 1);
-      return this.remove(precedeTokens);
+    if (node.getChildrenNum() > 0) {
+      node.clearValue();
+      return true;
     }
 
     node.clearValue();
+    let current = node;
+    let parent;
+    // tslint:disable-next-line no-conditional-assignment
+    while (!current.isLoaded() && current.getChildrenNum() <= 0 && (parent = current.getParent())) {
+      parent.removeChild(current);
+      current = parent;
+    }
     return true;
   }
 

@@ -6,7 +6,7 @@ export * from './file';
 export * from './error';
 export * from './select';
 
-function getHostInfo(config) {
+export function getHostInfo(config) {
   const ignoreOptions = [
     'name',
     'remotePath',
@@ -18,6 +18,8 @@ function getHostInfo(config) {
     'watcher',
     'concurrency',
     'sshConfigPath',
+    'id',
+    'workspace',
   ];
 
   return Object.keys(config).reduce((obj, key) => {

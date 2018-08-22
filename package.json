@@ -332,6 +332,7 @@
     "upath": "^1.0.0"
   },
   "jest": {
+    "verbose": true,
     "moduleFileExtensions": [
       "ts",
       "js"

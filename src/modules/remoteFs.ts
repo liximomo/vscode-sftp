@@ -130,6 +130,15 @@ export default function getFileSystem(option): Promise<FileSystem> {
   return fsInstance.getFs(option);
 }
 
+export function removeRemote(option) {
+  const identity = hashOption(option);
+  const fs = fsTable[identity];
+  if (fs !== undefined) {
+    fs.end();
+    delete fsTable[identity];
+  }
+}
+
 export function endAllRemote() {
   Object.keys(fsTable).forEach(key => {
     const fs = fsTable[key];

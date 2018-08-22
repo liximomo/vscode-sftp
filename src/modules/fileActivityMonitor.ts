@@ -2,22 +2,43 @@ import * as vscode from 'vscode';
 import logger from '../logger';
 import app from '../app';
 import { COMMAND_DOWNLOAD, COMMAND_UPLOAD } from '../constants';
-import { executeCommand, onDidOpenTextDocument, onDidSaveTextDocument, showConfirmMessage } from '../host';
-import { getConfig, loadConfig } from './config';
-import { watchFiles } from './fileWatcher';
-import { endAllRemote } from './remoteFs';
-import { reportError, isValidFile, isConfigFile } from '../helper';
+import {
+  executeCommand,
+  onDidOpenTextDocument,
+  onDidSaveTextDocument,
+  showConfirmMessage,
+} from '../host';
+import { getConfig, loadConfig, getAllRawConfigs, removeConfig } from './config';
+import { watchFiles, removeWatcher } from './fileWatcher';
+import { endAllRemote, removeRemote } from './remoteFs';
+import { reportError, isValidFile, isConfigFile, getHostInfo } from '../helper';
 
 let workspaceWatcher: vscode.Disposable;
 
-function handleConfigSave(uri: vscode.Uri) {
-  loadConfig(uri.fsPath).then(config => {
-    app.remoteExplorer.refresh();
+function clearResource(config) {
+  removeConfig(config);
+  removeWatcher(config);
+  removeRemote(getHostInfo(config));
+}
 
-    // close connected remote, cause the remote may changed
-    endAllRemote();
+async function handleConfigSave(uri: vscode.Uri) {
+  const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
+  const workspacePath = workspaceFolder.uri.fsPath;
+
+  // clear old config
+  getAllRawConfigs()
+    .filter(config => config.workspace === workspacePath)
+    .forEach(clearResource);
+
+  // add new config
+  try {
+    const config = await loadConfig(uri.fsPath, workspacePath);
     watchFiles(config);
-  }, reportError);
+  } catch (error) {
+    reportError(error);
+  } finally {
+    app.remoteExplorer.refresh();
+  }
 }
 
 async function handleFileSave(uri) {
