@@ -10,7 +10,7 @@ import {
 } from '../host';
 import { getConfig, loadConfig, getAllRawConfigs, removeConfig } from './config';
 import { watchFiles, removeWatcher } from './fileWatcher';
-import { endAllRemote, removeRemote } from './remoteFs';
+import { removeRemote } from '../core/remoteFs';
 import { reportError, isValidFile, isConfigFile, getHostInfo } from '../helper';
 
 let workspaceWatcher: vscode.Disposable;

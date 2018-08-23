@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as FileStatus from 'stat-mode';
-import FileSystem, { IFileEntry, FileType, IStats, IStreamOption } from './FileSystem';
+import FileSystem, { IFileEntry, FileType, IStats, IFileOption } from './FileSystem';
 import RemoteFileSystem from './RemoteFileSystem';
 import { IClientOption } from '../Client/RemoteClient';
 import SFTPClient from '../Client/SFTPClient';
@@ -8,7 +8,7 @@ import SFTPClient from '../Client/SFTPClient';
 export default class SFTPFileSystem extends RemoteFileSystem {
   constructor(pathResolver, option: IClientOption) {
     super(pathResolver);
-    this.setClient(new SFTPClient(option));
+    this.client = new SFTPClient(option);
   }
 
   get sftp() {
@@ -32,7 +32,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
     });
   }
 
-  get(path, option?: IStreamOption): Promise<fs.ReadStream> {
+  get(path, option?: IFileOption): Promise<fs.ReadStream> {
     return new Promise((resolve, reject) => {
       try {
         const stream = this.sftp.createReadStream(path, option);
@@ -43,7 +43,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
     });
   }
 
-  put(input: fs.ReadStream | Buffer, path, option?: IStreamOption): Promise<void> {
+  put(input: fs.ReadStream | Buffer, path, option?: IFileOption): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       const stream = this.sftp.createWriteStream(path, option);
 

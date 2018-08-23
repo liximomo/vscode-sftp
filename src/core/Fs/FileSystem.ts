@@ -15,7 +15,7 @@ export interface IFileEntry {
   accessTime: number;
 }
 
-export interface IStreamOption {
+export interface IFileOption {
   flags?: string;
   encoding?: string | null;
   mode?: number;
@@ -47,8 +47,9 @@ export default abstract class FileSystem {
     this.pathResolver = pathResolver;
   }
 
-  abstract get(path: string, option?: IStreamOption): Promise<fs.ReadStream>;
-  abstract put(input: fs.ReadStream | Buffer, path, option?: IStreamOption): Promise<void>;
+  abstract readFile(path: string, option?: IFileOption): Promise<string | Buffer>;
+  abstract get(path: string, option?: IFileOption): Promise<fs.ReadStream>;
+  abstract put(input: fs.ReadStream | Buffer, path, option?: IFileOption): Promise<void>;
   abstract mkdir(dir: string): Promise<void>;
   abstract ensureDir(dir: string): Promise<void>;
   abstract list(dir: string, option?): Promise<IFileEntry[]>;

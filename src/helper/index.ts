@@ -1,4 +1,4 @@
-import getFileSystem from '../modules/remoteFs';
+import getFileSystem from '../core/remoteFs';
 
 export * from './paths';
 export * from './config';

@@ -35,7 +35,12 @@ Very simple, requires just three lines of config! Very fast, finished in a blink
 You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/config).
 
 ### Config Example
-#### Password Free!
+* [Simple](#password-free)
+* [Profiles](#profiles)
+* [Multiple Context](#multiple-context)
+* [Connection Hopping](#multiple-context)
+
+#### Password Free
 ```json
 {
   "host": "host",
@@ -73,7 +78,7 @@ You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/
 
 Use `SFTP: Set Profile` to swtich profile.
 
-#### multiple context.
+#### Multiple Context
 ```json
 [
   {
@@ -95,6 +100,52 @@ Use `SFTP: Set Profile` to swtich profile.
 ]
 ```
 *Note：* `name` is required in this mode.
+
+#### Connection Hopping through SSH.
+
+##### Single Hop
+local -> hop -> target
+
+```json
+{
+  "name": "target",
+  "context": "/workspace/a",
+  "host": "targetHost",
+  "username": "targetUsername",
+  "privateKeyPath": "~/.ssh/id_rsa",
+  "remotePath": "/path/in/target", 
+  "hop": {
+    "host": "hopHost",
+    "username": "hopUsername",
+    "privateKeyPath": "/Users/hopUsername/.ssh/id_rsa", // The key file is assumed on the hop. You can not use "~" in here.
+  }
+}
+```
+##### Multiple Hop
+local -> hopA -> hopB -> target
+
+```json
+{
+  "name": "target",
+  "context": "/workspace/a",
+  "host": "targetHost",
+  "username": "targetUsername",
+  "privateKeyPath": "~/.ssh/id_rsa",
+  "remotePath": "/path/in/target", 
+  "hop": [
+    {
+      "host": "hopAHost",
+      "username": "hopAUsername",
+      "privateKeyPath": "/Users/hopAUsername/.ssh/id_rsa",
+    },
+    {
+      "host": "hopBHost",
+      "username": "hopBUsername",
+      "privateKeyPath": "/Users/hopBUsername/.ssh/id_rsa",
+    },
+  ]
+}
+```
 
 ## Remote Explorer
 ![remote-explorer-preview](https://raw.githubusercontent.com/liximomo/vscode-sftp/master/assets/showcase/remote-explorer.png)

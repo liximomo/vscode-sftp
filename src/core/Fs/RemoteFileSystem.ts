@@ -1,8 +1,8 @@
-import FileSystem, { IFileEntry, FileType, IStats } from './FileSystem';
+import FileSystem, { IFileOption } from './FileSystem';
 import RemoteClient from '../Client/RemoteClient';
 
 export default abstract class RemoteFileSystem extends FileSystem {
-  private client: RemoteClient;
+  protected client: RemoteClient;
 
   constructor(pathResolver) {
     super(pathResolver);
@@ -15,7 +15,7 @@ export default abstract class RemoteFileSystem extends FileSystem {
     return this.client;
   }
 
-  setClient(client: RemoteClient) {
+  setClient(client) {
     this.client = client;
   }
 
@@ -29,5 +29,29 @@ export default abstract class RemoteFileSystem extends FileSystem {
 
   end() {
     this.client.end();
+  }
+
+  async readFile(path: string, option?: IFileOption): Promise<string | Buffer> {
+    return new Promise<string | Buffer>(async (resolve, reject) => {
+      const stream = await this.get(path, option);
+      const arr = [];
+
+      const onData = chunk => {
+        arr.push(chunk);
+      };
+
+      const onEnd = err => {
+        if (err) {
+          return reject(err);
+        }
+
+        const buffer = Buffer.concat(arr);
+        resolve(option && option.encoding ? buffer.toString(option.encoding) : buffer);
+      };
+
+      stream.on('data', onData);
+      stream.on('error', onEnd);
+      stream.on('end', onEnd);
+    });
   }
 }

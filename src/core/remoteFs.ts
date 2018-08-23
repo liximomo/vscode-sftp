@@ -1,13 +1,12 @@
-import * as path from 'path';
-import upath from '../core/upath';
+import upath from './upath';
 import { promptForPassword } from '../host';
 import logger from '../logger';
 import app from '../app';
-import FileSystem from '../core/Fs/FileSystem';
-import RemoteFileSystem from '../core/Fs/RemoteFileSystem';
-import LocalFileSystem from '../core/Fs/LocalFileSystem';
-import SFTPFileSystem from '../core/Fs/SFTPFileSystem';
-import FTPFileSystem from '../core/Fs/FTPFileSystem';
+import FileSystem from './Fs/FileSystem';
+import RemoteFileSystem from './Fs/RemoteFileSystem';
+import SFTPFileSystem from './Fs/SFTPFileSystem';
+import FTPFileSystem from './Fs/FTPFileSystem';
+import localFs from './localFs';
 
 function hashOption(opiton) {
   return Object.keys(opiton)
@@ -83,6 +82,7 @@ class KeepAliveRemoteFs {
         return this.fs;
       },
       err => {
+        this.fs.end();
         this.invalid('error');
         throw err;
       }
@@ -101,12 +101,7 @@ class KeepAliveRemoteFs {
   }
 }
 
-let localFs;
 function getLocalFs() {
-  if (!localFs) {
-    localFs = new LocalFileSystem(path);
-  }
-
   return Promise.resolve(localFs);
 }
 

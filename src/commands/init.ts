@@ -12,7 +12,7 @@ import {
   selectFileFromAll,
   selectContext,
 } from '../modules/targetSelectStrategy';
-import localFs from '../modules/localFs';
+import localFs from '../core/localFs';
 import { getAllRawConfigs } from '../modules/config';
 import { ExplorerItem } from '../modules/RemoteTreeData';
 import * as output from '../ui/output';

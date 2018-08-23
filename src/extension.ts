@@ -7,7 +7,7 @@ import initCommand from './commands/init';
 import { reportError } from './helper';
 import fileActivityMonitor from './modules/fileActivityMonitor';
 import { initConfigs } from './modules/config';
-import { endAllRemote } from './modules/remoteFs';
+import { endAllRemote } from './core/remoteFs';
 import { watchFiles, clearAllWatcher } from './modules/fileWatcher';
 import { getWorkspaceFolders, setContextValue } from './host';
 import RemoteExplorer from './modules/RemoteExplorer';

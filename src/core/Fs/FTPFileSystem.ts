@@ -1,8 +1,7 @@
 import * as fs from 'fs';
-import * as FileStatus from 'stat-mode';
 import * as PQueue from 'p-queue';
 import logger from '../../logger';
-import FileSystem, { IFileEntry, FileType, IStats, IStreamOption } from './FileSystem';
+import { IFileEntry, FileType, IStats, IFileOption } from './FileSystem';
 import RemoteFileSystem from './RemoteFileSystem';
 import { IClientOption } from '../Client/RemoteClient';
 import FTPClient from '../Client/FTPClient';
@@ -45,7 +44,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
 
   constructor(pathResolver, option: IClientOption) {
     super(pathResolver);
-    this.setClient(new FTPClient(option));
+    this.client = new FTPClient(option);
   }
 
   get ftp() {
@@ -79,7 +78,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
     return fileStat;
   }
 
-  async get(path, option?: IStreamOption): Promise<fs.ReadStream> {
+  async get(path, option?: IFileOption): Promise<fs.ReadStream> {
     const stream = await this.atomicGet(path);
 
     if (!stream) {
@@ -94,7 +93,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
     await this.atomicSite(command);
   }
 
-  async put(input: fs.ReadStream | Buffer, path, option?: IStreamOption): Promise<void> {
+  async put(input: fs.ReadStream | Buffer, path, option?: IFileOption): Promise<void> {
     await this.atomicPut(input, path);
   }
 

@@ -3,7 +3,7 @@ import { showErrorMessage } from '../host';
 import upath from '../core/upath';
 import UResource from '../core/UResource';
 import FileSystem from '../core/Fs/FileSystem';
-import localFs from '../modules/localFs';
+import localFs from '../core/localFs';
 import Ignore from '../modules/Ignore';
 import { FileTask } from '../core/fileTransferTask';
 import { getRemotefsFromConfig, simplifyPath, filesIgnoredFromConfig } from '../helper';

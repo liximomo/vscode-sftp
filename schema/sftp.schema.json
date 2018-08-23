@@ -19,6 +19,23 @@
           "enum": ["sftp"],
           "description": "sftp connection protocol."
         },
+        "hop": {
+          "oneOf": [
+            {
+              "$ref": "definitions.json#/sftp"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "definitions.json#/sftp"
+              }
+            }
+          ],
+          "default": {
+            "host": "bridgeHost",
+            "port": "bridgePort"
+          }
+        },
         "profiles": {
           "description": "A collection of profiles. Using key as name. The profile will be merge to top level config.",
           "patternProperties": {

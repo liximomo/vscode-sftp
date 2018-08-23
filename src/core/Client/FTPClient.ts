@@ -6,10 +6,6 @@ export default class FTPClient extends RemoteClient {
 
   constructor(option?: IClientOption) {
     super(option);
-
-    this.onDisconnected(() => {
-      this.connected = false;
-    });
   }
 
   initClient() {
@@ -17,6 +13,10 @@ export default class FTPClient extends RemoteClient {
   }
 
   connect(): Promise<void> {
+    this.onDisconnected(() => {
+      this.connected = false;
+    });
+
     const { username, connectTimeout, ...option } = this.getOption();
     return new Promise<void>((resolve, reject) => {
       setTimeout(() => {

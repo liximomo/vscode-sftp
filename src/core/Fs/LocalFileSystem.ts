@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
-import FileSystem, { IFileEntry, IStats, IStreamOption } from './FileSystem';
+import FileSystem, { IFileEntry, IStats, IFileOption } from './FileSystem';
 
 export default class LocalFileSystem extends FileSystem {
   constructor(pathResolver: any) {
@@ -24,7 +24,19 @@ export default class LocalFileSystem extends FileSystem {
     });
   }
 
-  get(path, option): Promise<fs.ReadStream> {
+  readFile(path, option?): Promise<string | Buffer> {
+    return new Promise((resolve, reject) => {
+      fs.readFile(path, option, (err, data) => {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve(data);
+      });
+    });
+  }
+
+  get(path, option?): Promise<fs.ReadStream> {
     return new Promise((resolve, reject) => {
       try {
         const stream = fs.createReadStream(path, option);
@@ -35,7 +47,7 @@ export default class LocalFileSystem extends FileSystem {
     });
   }
 
-  put(input: fs.ReadStream | Buffer, path, option?: IStreamOption): Promise<void> {
+  put(input: fs.ReadStream | Buffer, path, option?: IFileOption): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       const stream = fs.createWriteStream(path, option);
 

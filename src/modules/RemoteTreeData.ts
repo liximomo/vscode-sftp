@@ -135,38 +135,20 @@ export class RemoteTreeData
     return this._rootsMap.get(rootId);
   }
 
-  provideTextDocumentContent(
+  async provideTextDocumentContent(
     uri: vscode.Uri,
     token: vscode.CancellationToken
-  ): vscode.ProviderResult<string> {
-    return new Promise(async (resolve, reject) => {
-      const root = this.findRoot(uri);
-      if (!root) {
-        reject(`Can't find remote for resource ${uri}.`);
-      }
+  ): Promise<string> {
+    const root = this.findRoot(uri);
+    if (!root) {
+      throw new Error(`Can't find remote for resource ${uri}.`);
+    }
 
-      const fs = await getRemotefsFromConfig(root.explorerContext.config);
-      const stream = await fs.get(
-        UResource.makeResource(uri).fsPath || fs.pathResolver.normalize(uri.fsPath)
-      );
-      const arr = [];
-
-      const onData = chunk => {
-        arr.push(chunk);
-      };
-
-      const onEnd = err => {
-        if (err) {
-          return reject(err);
-        }
-
-        resolve(Buffer.concat(arr).toString());
-      };
-
-      stream.on('data', onData);
-      stream.on('error', onEnd);
-      stream.on('end', onEnd);
-    });
+    const fs = await getRemotefsFromConfig(root.explorerContext.config);
+    const buffer = await fs.readFile(
+      UResource.makeResource(uri).fsPath || fs.pathResolver.normalize(uri.fsPath)
+    );
+    return buffer.toString();
   }
 
   private _getRoots(): ExplorerRoot[] {
