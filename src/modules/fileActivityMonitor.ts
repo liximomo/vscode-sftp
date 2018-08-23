@@ -63,7 +63,10 @@ async function downloadOnOpen(uri) {
   try {
     config = getConfig(activityPath);
   } catch (error) {
-    logger.error(error);
+    // a new-created config
+    if (!isConfigFile(uri)) {
+      logger.error(error);
+    }
     return;
   }
 
