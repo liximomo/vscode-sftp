@@ -32,8 +32,9 @@ Very simple, requires just three lines of config! Very fast, finished in a blink
 | `SFTP: Sync To Local`  | sync remote directory to local               | same as above, but in the opposite direction|
   
 ## Config
+You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/config).
 
-### Example
+### Config Example
 #### Password Free!
 ```json
 {
@@ -94,8 +95,6 @@ Use `SFTP: Set Profile` to swtich profile.
 ]
 ```
 *Note：* `name` is required in this mode.
-
-You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/config).
 
 ## Remote Explorer
 ![remote-explorer-preview](https://raw.githubusercontent.com/liximomo/vscode-sftp/master/assets/showcase/remote-explorer.png)
