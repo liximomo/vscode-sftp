@@ -1,7 +1,7 @@
 import * as os from 'os';
 import * as path from 'path';
 import upath from '../core/upath';
-import { pathRelativeToWorkspace } from '../host';
+import { pathRelativeToWorkspace, getWorkspaceFolders } from '../host';
 
 export function simplifyPath(absolutePath: string) {
   return pathRelativeToWorkspace(absolutePath);
@@ -25,4 +25,8 @@ export function replaceHomePath(pathname: string) {
 
 export function resolvePath(from: string, to: string) {
   return path.resolve(from, replaceHomePath(to));
+}
+
+export function isInWorksapce(filepath: string) {
+  return getWorkspaceFolders().some(folder => filepath.indexOf(folder.uri.fsPath) === 0);
 }

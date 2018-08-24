@@ -19,6 +19,11 @@
           "enum": ["ftp"],
           "description": "ftp connection protocol."
         },
+        "remotePath": {
+          "type": "string",
+          "description": "The absolute path on remote.",
+          "default": "/"
+        },
         "profiles": {
           "patternProperties": {
             "^.*$": {

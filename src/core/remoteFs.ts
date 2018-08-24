@@ -45,7 +45,7 @@ class KeepAliveRemoteFs {
 
       // explict compare to true, cause we want to distinct between string and true
       if (option.passphrase === true) {
-        connectOption.passphrase = await promptForPassword('Enter your passphrase');
+        connectOption.passphrase = await promptForPassword(`[${connectOption.host}]: Enter your passphrase`);
       }
       FsConstructor = SFTPFileSystem;
     } else if (option.protocol === 'ftp') {
@@ -68,7 +68,7 @@ class KeepAliveRemoteFs {
     }
 
     if (shouldPromptForPass) {
-      connectOption.password = await promptForPassword('Enter your password');
+      connectOption.password = await promptForPassword(`[${connectOption.host}]: Enter your password`);
     }
 
     this.fs = new FsConstructor(upath, connectOption);

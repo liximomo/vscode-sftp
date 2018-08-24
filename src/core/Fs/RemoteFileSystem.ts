@@ -33,13 +33,17 @@ export default abstract class RemoteFileSystem extends FileSystem {
 
   async readFile(path: string, option?: IFileOption): Promise<string | Buffer> {
     return new Promise<string | Buffer>(async (resolve, reject) => {
-      const stream = await this.get(path, option);
-      const arr = [];
+      let stream;
+      try {
+        stream = await this.get(path, option);
+      } catch (error) {
+        return reject(error);
+      }
 
+      const arr = [];
       const onData = chunk => {
         arr.push(chunk);
       };
-
       const onEnd = err => {
         if (err) {
           return reject(err);

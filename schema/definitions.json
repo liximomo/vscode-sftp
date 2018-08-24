@@ -103,11 +103,6 @@
         "type": "number",
         "description": "How long (in milliseconds) to wait for the connect to complete.",
         "default": 10000
-      },
-      "remotePath": {
-        "type": "string",
-        "description": "The absolute path on remote.",
-        "default": "/"
       }
     }
   },

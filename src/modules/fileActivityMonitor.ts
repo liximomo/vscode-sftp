@@ -11,7 +11,7 @@ import {
 import { getConfig, loadConfig, getAllRawConfigs, removeConfig } from './config';
 import { watchFiles, removeWatcher } from './fileWatcher';
 import { removeRemote } from '../core/remoteFs';
-import { reportError, isValidFile, isConfigFile, getHostInfo } from '../helper';
+import { reportError, isValidFile, isConfigFile, getHostInfo, isInWorksapce } from '../helper';
 
 let workspaceWatcher: vscode.Disposable;
 
@@ -94,7 +94,7 @@ function watchWorkspace({
 
   workspaceWatcher = onDidSaveTextDocument((doc: vscode.TextDocument) => {
     const uri = doc.uri;
-    if (!isValidFile(uri)) {
+    if (!isValidFile(uri) || !isInWorksapce(uri.fsPath)) {
       return;
     }
 
@@ -114,7 +114,7 @@ function watchWorkspace({
 
 function init() {
   onDidOpenTextDocument((doc: vscode.TextDocument) => {
-    if (!isValidFile(doc.uri)) {
+    if (!isValidFile(doc.uri) || !isInWorksapce(doc.uri.fsPath)) {
       return;
     }
 

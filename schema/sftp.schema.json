@@ -19,15 +19,20 @@
           "enum": ["sftp"],
           "description": "sftp connection protocol."
         },
+        "remotePath": {
+          "type": "string",
+          "description": "The absolute path on remote.",
+          "default": "/"
+        },
         "hop": {
           "oneOf": [
             {
-              "$ref": "definitions.json#/sftp"
+              "$ref": "#/definitions/hop"
             },
             {
               "type": "array",
               "items": {
-                "$ref": "definitions.json#/sftp"
+                "$ref": "#/definitions/hop"
               }
             }
           ],
@@ -59,5 +64,17 @@
         }
       }
     }
-  ]
+  ],
+  "definitions": {
+    "hop": {
+      "allOf": [
+        {
+          "$ref": "definitions.json#/host"
+        },
+        {
+          "$ref": "definitions.json#/sftp"
+        }
+      ]
+    }
+  }
 }

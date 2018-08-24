@@ -8,6 +8,7 @@ import {
   isSubpathOf,
   toLocalPath,
   filesIgnoredFromConfig,
+  simplifyPath,
 } from '../helper';
 import upath from '../core/upath';
 import { getAllConfigs } from './config';
@@ -19,7 +20,7 @@ export function selectContext(): Promise<FileTarget> {
     const projectsList = configs
       .map(cfg => ({
         value: cfg.context,
-        label: cfg.name || vscode.workspace.asRelativePath(cfg.context),
+        label: cfg.name || simplifyPath(cfg.context),
         description: '',
         detail: cfg.context,
       }))
