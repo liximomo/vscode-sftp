@@ -1,23 +1,24 @@
 import * as Client from 'ftp';
-import RemoteClient, { IClientOption } from './RemoteClient';
+import RemoteClient, { ConnectOption } from './RemoteClient';
 
 export default class FTPClient extends RemoteClient {
   private connected: boolean = false;
 
-  constructor(option?: IClientOption) {
-    super(option);
-  }
-
-  initClient() {
+  _initClient() {
     return new Client();
   }
 
-  connect(): Promise<void> {
+  _hasProvideAuth(connectOption: ConnectOption) {
+    // tslint:disable-next-line triple-equals
+    return connectOption.password != undefined;
+  }
+
+  _doConnect(connectOption: ConnectOption): Promise<void> {
     this.onDisconnected(() => {
       this.connected = false;
     });
 
-    const { username, connectTimeout, ...option } = this.getOption();
+    const { username, connectTimeout, ...option } = connectOption;
     return new Promise<void>((resolve, reject) => {
       setTimeout(() => {
         if (!this.connected) {
@@ -26,11 +27,11 @@ export default class FTPClient extends RemoteClient {
         }
       }, connectTimeout);
 
-      this.client
+      this._client
         .on('ready', () => {
           this.connected = true;
           if (option.passive) {
-            this.client._pasv(resolve);
+            this._client._pasv(resolve);
           } else {
             resolve();
           }
@@ -49,10 +50,10 @@ export default class FTPClient extends RemoteClient {
   }
 
   end() {
-    return this.client.end();
+    return this._client.end();
   }
 
   getFsClient() {
-    return this.client;
+    return this._client;
   }
 }

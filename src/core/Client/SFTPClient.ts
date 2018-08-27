@@ -1,6 +1,6 @@
 import { Client } from 'ssh2';
 import upath from '../upath';
-import RemoteClient, { IClientOption } from './RemoteClient';
+import RemoteClient, { ConnectOption, Config } from './RemoteClient';
 import SFTPFileSystem from '../Fs/SFTPFileSystem';
 import localFs from '../localFs';
 import FileSystem from '../Fs/FileSystem';
@@ -11,16 +11,17 @@ export default class SFTPClient extends RemoteClient {
   private sftp: any;
   private hoppingClients: SFTPClient[];
 
-  constructor(option?: IClientOption) {
-    super(option);
-  }
-
-  initClient() {
+  _initClient() {
     return new Client();
   }
 
-  async connect(readline): Promise<void> {
-    const { hop, ...option } = this.getOption();
+  _hasProvideAuth(connectOption: ConnectOption) {
+    // tslint:disable-next-line triple-equals
+    return ['password', 'agent', 'privateKeyPath'].some(key => connectOption[key] != undefined);
+  }
+
+  async _doConnect(connectOption: ConnectOption, config: Config): Promise<void> {
+    const { hop, ...option } = connectOption;
 
     let fs: FileSystem | RemoteFileSystem = localFs;
     let sock;
@@ -28,18 +29,27 @@ export default class SFTPClient extends RemoteClient {
       this.hoppingClients = [];
       const connectOptions = Array.isArray(hop) ? hop.slice() : [hop];
       for (let index = 0; index < connectOptions.length; index++) {
-        const connectOption = connectOptions[index];
-        connectOption.port = connectOption.port || 22;
+        const curOpt = connectOptions[index];
+        if (curOpt.port === undefined) {
+          curOpt.port = 22;
+        }
         const preClient = this.hoppingClients[index - 1];
         if (preClient) {
-          sock = await this._makeHopping(preClient, connectOption.host, connectOption.port);
-          fs = new SFTPFileSystem(upath, {});
-          (fs as RemoteFileSystem).setClient(preClient);
+          sock = await this._makeHopping(preClient, curOpt.host, curOpt.port);
+          fs = new SFTPFileSystem(upath, preClient);
         }
 
-        const client = new SFTPClient({ ...connectOption, sock, fs });
+        if (curOpt.privateKeyPath) {
+          const buffer = await fs.readFile(curOpt.privateKeyPath);
+          curOpt.privateKey = buffer.toString();
+        }
+
+        const client = new SFTPClient(curOpt);
         this.hoppingClients.push(client);
-        await client.connect(readline);
+        await client.connect(
+          { ...curOpt, sock },
+          config
+        );
       }
       sock = await this._makeHopping(
         this.hoppingClients[this.hoppingClients.length - 1],
@@ -47,8 +57,14 @@ export default class SFTPClient extends RemoteClient {
         option.port
       );
     }
-    await this._connectSSHClient(this.client, { ...option, sock, fs }, readline);
-    this.sftp = await this._getSftp(this.client);
+
+    if (option.privateKeyPath) {
+      const buffer = await fs.readFile(option.privateKeyPath);
+      option.privateKey = buffer.toString();
+    }
+
+    await this._connectSSHClient(this._client, { ...option, sock }, config);
+    this.sftp = await this._getSftp(this._client);
   }
 
   // connect1(readline): Promise<void> {
@@ -123,33 +139,21 @@ export default class SFTPClient extends RemoteClient {
 
   private async _connectSSHClient(
     client,
-    connetOption: { fs: FileSystem; [x: string]: any },
-    readline
+    remoteOption: ConnectOption,
+    config: Config
   ): Promise<any> {
-    return new Promise<void>(async (resolve, reject) => {
-      const {
-        fs,
-        interactiveAuth,
-        password,
-        privateKeyPath,
-        connectTimeout,
-        ...option // tslint:disable-line
-      } = connetOption;
-      const connectWithCredential = credentiai =>
-        client
-          .on('ready', resolve)
-          .on('error', err => {
-            reject(new Error(`[${option.host}]: ${err.message}`));
-          })
-          .connect({
-            keepaliveInterval: 1000 * 30,
-            keepaliveCountMax: 2,
-            readyTimeout: interactiveAuth ? Math.max(60 * 1000, connectTimeout) : connectTimeout,
-            ...option,
-            ...credentiai,
-            tryKeyboard: interactiveAuth,
-          });
+    const {
+      interactiveAuth,
+      connectTimeout,
+      ...option // tslint:disable-line
+    } = remoteOption;
 
+    // explict compare to true, cause we want to distinct between string and true
+    if (option.passphrase === true) {
+      option.passphrase = await config.askForPasswd(`[${option.host}]: Enter your passphrase`);
+    }
+
+    return new Promise<void>((resolve, reject) => {
       if (interactiveAuth) {
         client.on('keyboard-interactive', function redo(
           name,
@@ -161,25 +165,30 @@ export default class SFTPClient extends RemoteClient {
         ) {
           const answers = stackedAnswers || [];
           if (answers.length < prompts.length) {
-            readline(`[${option.host}]: ${prompts[answers.length].prompt}`).then(answer => {
-              answers.push(answer);
-              redo(name, instructions, instructionsLang, prompts, finish, answers);
-            });
+            config
+              .askForPasswd(`[${option.host}]: ${prompts[answers.length].prompt}`)
+              .then(answer => {
+                answers.push(answer);
+                redo(name, instructions, instructionsLang, prompts, finish, answers);
+              });
           } else {
             finish(answers);
           }
         });
       }
 
-      if (!privateKeyPath) {
-        return connectWithCredential({ password });
-      }
-      try {
-        const buffer = await fs.readFile(privateKeyPath);
-        connectWithCredential({ privateKey: buffer.toString() });
-      } catch (error) {
-        reject(error);
-      }
+      client
+        .on('ready', resolve)
+        .on('error', err => {
+          reject(new Error(`[${option.host}]: ${err.message}`));
+        })
+        .connect({
+          keepaliveInterval: 1000 * 30,
+          keepaliveCountMax: 2,
+          readyTimeout: interactiveAuth ? Math.max(60 * 1000, connectTimeout) : connectTimeout,
+          ...option,
+          tryKeyboard: interactiveAuth,
+        });
     });
   }
 
@@ -196,12 +205,12 @@ export default class SFTPClient extends RemoteClient {
   }
 
   private _makeHopping(sftpClient: SFTPClient, dstHost, dstPort): Promise<any> {
-    logger.info(`hopping from ${sftpClient.getOption().host} to ${dstHost}`);
+    logger.info(`hopping from ${sftpClient._option.host} to ${dstHost}`);
     return new Promise((resolve, reject) => {
       // Create a connect form 127.0.0.1:port to dstHost:dstPort
-      sftpClient.client.forwardOut(
+      sftpClient._client.forwardOut(
         '127.0.0.1',
-        sftpClient.getOption().port,
+        sftpClient._option.port,
         dstHost,
         dstPort,
         (error, stream) => {
@@ -217,7 +226,7 @@ export default class SFTPClient extends RemoteClient {
 
   end() {
     // todo end hop clients
-    this.client.end();
+    this._client.end();
 
     if (this.hoppingClients) {
       // last connect first end

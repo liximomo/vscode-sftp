@@ -3,7 +3,6 @@ import * as PQueue from 'p-queue';
 import logger from '../../logger';
 import { IFileEntry, FileType, IStats, IFileOption } from './FileSystem';
 import RemoteFileSystem from './RemoteFileSystem';
-import { IClientOption } from '../Client/RemoteClient';
 import FTPClient from '../Client/FTPClient';
 
 const numMap = {
@@ -42,13 +41,12 @@ export default class FTPFileSystem extends RemoteFileSystem {
 
   private queue: any = new PQueue({ concurrency: 1 });
 
-  constructor(pathResolver, option: IClientOption) {
-    super(pathResolver);
-    this.client = new FTPClient(option);
-  }
-
   get ftp() {
     return this.getClient().getFsClient();
+  }
+
+  _createClient(option) {
+    return new FTPClient(option);
   }
 
   async lstat(path: string): Promise<IStats> {

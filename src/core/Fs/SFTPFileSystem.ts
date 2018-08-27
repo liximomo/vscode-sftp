@@ -2,17 +2,15 @@ import * as fs from 'fs';
 import * as FileStatus from 'stat-mode';
 import FileSystem, { IFileEntry, FileType, IStats, IFileOption } from './FileSystem';
 import RemoteFileSystem from './RemoteFileSystem';
-import { IClientOption } from '../Client/RemoteClient';
 import SFTPClient from '../Client/SFTPClient';
 
 export default class SFTPFileSystem extends RemoteFileSystem {
-  constructor(pathResolver, option: IClientOption) {
-    super(pathResolver);
-    this.client = new SFTPClient(option);
-  }
-
   get sftp() {
     return this.getClient().getFsClient();
+  }
+
+  _createClient(option) {
+    return new SFTPClient(option);
   }
 
   lstat(path: string): Promise<IStats> {

@@ -1,12 +1,19 @@
 import FileSystem, { IFileOption } from './FileSystem';
-import RemoteClient from '../Client/RemoteClient';
+import RemoteClient, { ConnectOption, Config } from '../Client/RemoteClient';
 
 export default abstract class RemoteFileSystem extends FileSystem {
   protected client: RemoteClient;
 
-  constructor(pathResolver) {
+  constructor(pathResolver, option: ConnectOption | RemoteClient) {
     super(pathResolver);
+    if (option instanceof RemoteClient) {
+      this.client = option;
+    } else {
+      this.client = this._createClient(option);
+    }
   }
+
+  protected abstract _createClient(option: ConnectOption): any;
 
   getClient() {
     if (!this.client) {
@@ -15,12 +22,11 @@ export default abstract class RemoteFileSystem extends FileSystem {
     return this.client;
   }
 
-  setClient(client) {
-    this.client = client;
-  }
-
-  connect(readline?: (text: string) => Promise<string | undefined>): Promise<void> {
-    return this.client.connect(readline);
+  connect(connectOpetion: ConnectOption, config: Config): Promise<void> {
+    return this.client.connect(
+      connectOpetion,
+      config
+    );
   }
 
   onDisconnected(cb) {
