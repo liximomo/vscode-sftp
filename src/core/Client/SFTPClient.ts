@@ -29,7 +29,6 @@ export default class SFTPClient extends RemoteClient {
       const connectOptions = Array.isArray(hop) ? hop.slice() : [hop];
       for (let index = 0; index < connectOptions.length; index++) {
         const connectOption = connectOptions[index];
-        const preOption = connectOptions[index - 1];
         connectOption.port = connectOption.port || 22;
         const preClient = this.hoppingClients[index - 1];
         if (preClient) {
