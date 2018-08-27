@@ -38,7 +38,7 @@ You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/
 * [Simple](#password-free)
 * [Profiles](#profiles)
 * [Multiple Context](#multiple-context)
-* [Connection Hopping](#multiple-context)
+* [Connection Hopping](#connection-hopping)
 
 #### Password Free
 ```json
@@ -101,9 +101,14 @@ Use `SFTP: Set Profile` to swtich profile.
 ```
 *Note：* `name` is required in this mode.
 
-#### Connection Hopping through SSH.
+#### Connection Hopping.
+
+You can connection to a target server through a proxy with ssh protocol.
+
+*Note：* **Variable substitution is not working in a hop config.**
 
 ##### Single Hop
+
 local -> hop -> target
 
 ```json
@@ -117,7 +122,7 @@ local -> hop -> target
   "hop": {
     "host": "hopHost",
     "username": "hopUsername",
-    "privateKeyPath": "/Users/hopUsername/.ssh/id_rsa", // The key file is assumed on the hop. You can not use "~" in here.
+    "privateKeyPath": "/Users/hopUsername/.ssh/id_rsa", // The key file is assumed on the hop.
   }
 }
 ```
