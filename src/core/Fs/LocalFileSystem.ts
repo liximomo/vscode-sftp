@@ -1,25 +1,31 @@
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
-import FileSystem, { IFileEntry, IStats, IFileOption } from './FileSystem';
+import FileSystem, { FileEntry, FileStats, FileOption } from './FileSystem';
+
+function toFileStat(stat: fs.Stats): FileStats {
+  return {
+    type: FileSystem.getFileTypecharacter(stat),
+    size: stat.size,
+    mode: stat.mode & parseInt('777', 8), // tslint:disable-line:no-bitwise
+    mtime: stat.mtime.getTime(),
+    atime: stat.atime.getTime(),
+  };
+}
 
 export default class LocalFileSystem extends FileSystem {
   constructor(pathResolver: any) {
     super(pathResolver);
   }
 
-  lstat(path: string): Promise<IStats> {
+  lstat(path: string): Promise<FileStats> {
     return new Promise((resolve, reject) => {
-      fs.lstat(path, (err, stat) => {
+      fs.lstat(path, (err, stat: fs.Stats) => {
         if (err) {
           reject(err);
           return;
         }
 
-        resolve({
-          ...stat,
-          type: FileSystem.getFileTypecharacter(stat),
-          permissionMode: stat.mode & parseInt('777', 8), // tslint:disable-line:no-bitwise
-        } as IStats);
+        resolve(toFileStat(stat));
       });
     });
   }
@@ -47,7 +53,7 @@ export default class LocalFileSystem extends FileSystem {
     });
   }
 
-  put(input: fs.ReadStream | Buffer, path, option?: IFileOption): Promise<void> {
+  put(input: fs.ReadStream | Buffer, path, option?: FileOption): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       const stream = fs.createWriteStream(path, option);
 
@@ -109,18 +115,15 @@ export default class LocalFileSystem extends FileSystem {
     return fse.ensureDir(dir);
   }
 
-  toFileEntry(fullPath, stat) {
+  toFileEntry(fullPath, stat): FileEntry {
     return {
       fspath: fullPath,
       name: this.pathResolver.basename(fullPath),
-      type: stat.type,
-      size: stat.size,
-      modifyTime: stat.mtime.getTime() / 1000,
-      accessTime: stat.atime.getTime() / 1000,
+      ...stat,
     };
   }
 
-  list(dir: string): Promise<IFileEntry[]> {
+  list(dir: string): Promise<FileEntry[]> {
     return new Promise((resolve, reject) => {
       fs.readdir(dir, (err, files) => {
         if (err) {

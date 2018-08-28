@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as PQueue from 'p-queue';
 import logger from '../../logger';
-import { IFileEntry, FileType, IStats, IFileOption } from './FileSystem';
+import { FileEntry, FileType, FileStats, FileOption } from './FileSystem';
 import RemoteFileSystem from './RemoteFileSystem';
 import FTPClient from '../Client/FTPClient';
 
@@ -28,6 +28,18 @@ function toNumMode(rightObj) {
   return parseInt(modeStr, 8);
 }
 
+function toFileStat(stat): FileStats {
+  const mtime = stat.date.getTime();
+  return {
+    type: FTPFileSystem.getFileType(stat.type),
+    mode: toNumMode(stat.rights), // Caution: windows will always get 0o666
+    size: stat.size,
+    mtime,
+    atime: mtime,
+    target: stat.target,
+  };
+}
+
 export default class FTPFileSystem extends RemoteFileSystem {
   static getFileType(type) {
     if (type === 'd') {
@@ -49,25 +61,22 @@ export default class FTPFileSystem extends RemoteFileSystem {
     return new FTPClient(option);
   }
 
-  async lstat(path: string): Promise<IStats> {
+  async lstat(path: string): Promise<FileStats> {
     if (path === '/') {
       return {
         type: FileType.Directory,
-        permissionMode: 0o666,
+        mode: 0o666,
+        size: 0,
+        mtime: 0,
+        atime: 0,
       };
     }
 
     const parentPath = this.pathResolver.dirname(path);
     const nameIdentity = this.pathResolver.basename(path);
-    const stats = await this.atomicList(parentPath);
+    const stats = await this.list(parentPath);
 
-    const fileStat = stats
-      .map(stat => ({
-        ...stat,
-        type: FTPFileSystem.getFileType(stat.type),
-        permissionMode: toNumMode(stat.rights), // Caution: windows will always get 0o666
-      }))
-      .find(ns => ns.name === nameIdentity);
+    const fileStat = stats.find(ns => ns.name === nameIdentity);
 
     if (!fileStat) {
       throw new Error('file not exist');
@@ -76,7 +85,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
     return fileStat;
   }
 
-  async get(path, option?: IFileOption): Promise<fs.ReadStream> {
+  async get(path, option?: FileOption): Promise<fs.ReadStream> {
     const stream = await this.atomicGet(path);
 
     if (!stream) {
@@ -91,7 +100,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
     await this.atomicSite(command);
   }
 
-  async put(input: fs.ReadStream | Buffer, path, option?: IFileOption): Promise<void> {
+  async put(input: fs.ReadStream | Buffer, path, option?: FileOption): Promise<void> {
     await this.atomicPut(input, path);
   }
 
@@ -167,18 +176,15 @@ export default class FTPFileSystem extends RemoteFileSystem {
     }
   }
 
-  toFileEntry(fullPath, stat): IFileEntry {
+  toFileEntry(fullPath, stat): FileEntry {
     return {
       fspath: fullPath,
-      type: FTPFileSystem.getFileType(stat.type),
       name: stat.name,
-      size: stat.size,
-      modifyTime: stat.date.getTime() / 1000,
-      accessTime: stat.date.getTime() / 1000,
+      ...toFileStat(stat),
     };
   }
 
-  async list(dir: string, { showHiddenFiles = true } = {}): Promise<IFileEntry[]> {
+  async list(dir: string, { showHiddenFiles = true } = {}): Promise<FileEntry[]> {
     const stats = await this.atomicList(showHiddenFiles ? `-al ${dir}` : dir);
 
     return stats

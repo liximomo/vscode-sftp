@@ -1,8 +1,22 @@
 import * as fs from 'fs';
 import * as FileStatus from 'stat-mode';
-import FileSystem, { IFileEntry, FileType, IStats, IFileOption } from './FileSystem';
+import FileSystem, { FileEntry, FileType, FileStats, FileOption } from './FileSystem';
 import RemoteFileSystem from './RemoteFileSystem';
 import SFTPClient from '../Client/SFTPClient';
+
+function toSimpleFileMode(mode: number) {
+  return mode & parseInt('777', 8); // tslint:disable-line:no-bitwise
+}
+
+function toFileStat(stat): FileStats {
+  return {
+    type: FileSystem.getFileTypecharacter(stat),
+    mode: toSimpleFileMode(stat.mode), // tslint:disable-line:no-bitwise
+    size: stat.size,
+    mtime: stat.mtime * 1000,
+    atime: stat.atime * 1000,
+  };
+}
 
 export default class SFTPFileSystem extends RemoteFileSystem {
   get sftp() {
@@ -13,7 +27,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
     return new SFTPClient(option);
   }
 
-  lstat(path: string): Promise<IStats> {
+  lstat(path: string): Promise<FileStats> {
     return new Promise((resolve, reject) => {
       this.sftp.lstat(path, (err, stat) => {
         if (err) {
@@ -21,16 +35,12 @@ export default class SFTPFileSystem extends RemoteFileSystem {
           return;
         }
 
-        resolve({
-          ...stat,
-          type: FileSystem.getFileTypecharacter(stat),
-          permissionMode: stat.mode & parseInt('777', 8), // tslint:disable-line:no-bitwise
-        } as IStats);
+        resolve(toFileStat(stat));
       });
     });
   }
 
-  get(path, option?: IFileOption): Promise<fs.ReadStream> {
+  get(path, option?: FileOption): Promise<fs.ReadStream> {
     return new Promise((resolve, reject) => {
       try {
         const stream = this.sftp.createReadStream(path, option);
@@ -41,7 +51,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
     });
   }
 
-  put(input: fs.ReadStream | Buffer, path, option?: IFileOption): Promise<void> {
+  put(input: fs.ReadStream | Buffer, path, option?: FileOption): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       const stream = this.sftp.createWriteStream(path, option);
 
@@ -128,19 +138,16 @@ export default class SFTPFileSystem extends RemoteFileSystem {
     }
   }
 
-  toFileEntry(fullPath, item): IFileEntry {
+  toFileEntry(fullPath, item): FileEntry {
     const stat = new FileStatus(item.attrs);
     return {
       fspath: fullPath,
-      type: FileSystem.getFileTypecharacter(stat),
       name: item.filename,
-      size: item.attrs.size,
-      modifyTime: item.attrs.mtime * 1000,
-      accessTime: item.attrs.atime * 1000,
+      ...toFileStat(item.attrs),
     };
   }
 
-  list(dir: string, { showHiddenFiles = false } = {}): Promise<IFileEntry[]> {
+  list(dir: string, { showHiddenFiles = false } = {}): Promise<FileEntry[]> {
     return new Promise((resolve, reject) => {
       this.sftp.readdir(dir, (err, result) => {
         if (err) {

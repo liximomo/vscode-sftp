@@ -7,7 +7,7 @@ export interface TransferOption {
 async function getFileMode(path: string, fs: FileSystem) {
   try {
     const stat = await fs.lstat(path);
-    return stat.permissionMode;
+    return stat.mode;
   } catch (error) {
     return 0o666;
   }

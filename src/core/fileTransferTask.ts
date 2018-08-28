@@ -8,7 +8,7 @@ import {
 } from './fileTransfer';
 import upath from './upath';
 import app from '../app';
-import FileSystem, { IFileEntry, FileType } from './Fs/FileSystem';
+import FileSystem, { FileEntry, FileType } from './Fs/FileSystem';
 import * as utils from '../utils';
 import { fileDepth, simplifyPath } from '../helper';
 import logger from '../logger';
@@ -242,7 +242,7 @@ async function fileTaskListFromDirectorForSync(
   }
 
   app.sftpBarItem.showMsg(`retrieving directory ${upath.basename(src)}`, simplifyPath(src));
-  const syncFiles = ([srcFileEntries, desFileEntries]: IFileEntry[][]) => {
+  const syncFiles = ([srcFileEntries, desFileEntries]: FileEntry[][]) => {
     app.sftpBarItem.showMsg('diff files...');
 
     const srcFileTable = toHash(srcFileEntries, 'id', fileEntry => ({

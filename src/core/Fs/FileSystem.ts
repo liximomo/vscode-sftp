@@ -6,29 +6,27 @@ export enum FileType {
   SymbolicLink,
 }
 
-export interface IFileEntry {
-  fspath: string;
-  type: FileType;
-  name: string;
-  size: number;
-  modifyTime: number;
-  accessTime: number;
-}
-
-export interface IFileOption {
+export interface FileOption {
   flags?: string;
   encoding?: string | null;
   mode?: number;
   autoClose?: boolean;
 }
 
-export interface IStats {
+export interface FileStats {
   type: FileType;
-  permissionMode: number;
-
+  mode: number;
+  size: number;
+  mtime: number;
+  atime: number;
   // symbol link target
   target?: string;
 }
+
+export type FileEntry = FileStats & {
+  fspath: string;
+  name: string;
+};
 
 export default abstract class FileSystem {
   static getFileTypecharacter(stat: fs.Stats): FileType {
@@ -47,13 +45,13 @@ export default abstract class FileSystem {
     this.pathResolver = pathResolver;
   }
 
-  abstract readFile(path: string, option?: IFileOption): Promise<string | Buffer>;
-  abstract get(path: string, option?: IFileOption): Promise<fs.ReadStream>;
-  abstract put(input: fs.ReadStream | Buffer, path, option?: IFileOption): Promise<void>;
+  abstract readFile(path: string, option?: FileOption): Promise<string | Buffer>;
+  abstract get(path: string, option?: FileOption): Promise<fs.ReadStream>;
+  abstract put(input: fs.ReadStream | Buffer, path, option?: FileOption): Promise<void>;
   abstract mkdir(dir: string): Promise<void>;
   abstract ensureDir(dir: string): Promise<void>;
-  abstract list(dir: string, option?): Promise<IFileEntry[]>;
-  abstract lstat(path: string): Promise<IStats>;
+  abstract list(dir: string, option?): Promise<FileEntry[]>;
+  abstract lstat(path: string): Promise<FileStats>;
   abstract readlink(path: string): Promise<string>;
   abstract symlink(targetPath: string, path: string): Promise<void>;
   abstract unlink(path: string): Promise<void>;

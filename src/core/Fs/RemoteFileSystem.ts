@@ -1,4 +1,4 @@
-import FileSystem, { IFileOption } from './FileSystem';
+import FileSystem, { FileOption } from './FileSystem';
 import RemoteClient, { ConnectOption, Config } from '../Client/RemoteClient';
 
 export default abstract class RemoteFileSystem extends FileSystem {
@@ -37,7 +37,7 @@ export default abstract class RemoteFileSystem extends FileSystem {
     this.client.end();
   }
 
-  async readFile(path: string, option?: IFileOption): Promise<string | Buffer> {
+  async readFile(path: string, option?: FileOption): Promise<string | Buffer> {
     return new Promise<string | Buffer>(async (resolve, reject) => {
       let stream;
       try {
