@@ -1,7 +1,8 @@
 import * as output from './ui/output';
-import { getConfig } from './host';
+import { getUserSetting } from './host';
+import { EXTENSION_NAME } from './constants';
 
-const config = getConfig();
+const config = getUserSetting(EXTENSION_NAME);
 const printDebugLog = config.printDebugLog;
 
 export interface Logger {

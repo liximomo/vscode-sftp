@@ -5,6 +5,10 @@
         "type": "string",
         "description": "A string to identify your config."
       },
+      "remote": {
+        "type": "string",
+        "description": "Name of remote which configs with `remoteFs.remote` in User Setting. Config will get merged to this remote."
+      },
       "context": {
         "type": "string",
         "description": "Relative path relative to the workspace root folder."

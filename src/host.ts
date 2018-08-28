@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import { EXTENSION_NAME } from './constants';
 
-export function getConfig() {
-  return vscode.workspace.getConfiguration(EXTENSION_NAME);
+export function getUserSetting(section: string) {
+  return vscode.workspace.getConfiguration(section);
 }
 
 export function executeCommand(command: string, ...rest: any[]): Thenable<{}> {

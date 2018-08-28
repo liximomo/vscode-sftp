@@ -3,6 +3,7 @@ import * as path from 'path';
 const VENDOR_FOLDER = '.vscode';
 
 export const EXTENSION_NAME = 'sftp';
+export const SETTING_KEY_REMOTE = 'remotefs.remote';
 
 export const REMOTE_SCHEME = 'remote';
 

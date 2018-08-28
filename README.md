@@ -39,6 +39,7 @@ You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/
 * [Profiles](#profiles)
 * [Multiple Context](#multiple-context)
 * [Connection Hopping](#connection-hopping)
+* [Congig in User Setting](#congig-in-user-setting)
 
 #### Password Free
 ```json
@@ -148,6 +149,44 @@ local -> hopA -> hopB -> target
       "username": "hopBUsername",
       "privateKeyPath": "/Users/hopBUsername/.ssh/id_rsa",
     },
+  ]
+}
+```
+
+#### Congig in User Setting
+You can use `remote` to tell sftp to get the config from (remote-fs)https://github.com/liximomo/vscode-remote-fs.
+
+In User Setting:
+
+```json
+"remotefs.remote": {
+  "dev": {
+    "scheme": "sftp",
+    "host": "host",
+    "username": "username",
+    "rootPath": "/path/to/somewhere"
+  },
+  "projectX": {
+    "scheme": "sftp",
+    "host": "host",
+    "username": "username",
+    "privateKeyPath": "/Users/xx/.ssh/id_rsa",
+    "rootPath": "/home/foo/some/projectx"
+  }
+}
+```
+
+In sftp.json:
+
+```json
+{
+  "remote": "dev",
+  "remotePath": "/home/xx/",
+  "uploadOnSave": true,
+  "ignore": [
+    ".vscode",
+    ".git",
+    ".DS_Store",
   ]
 }
 ```

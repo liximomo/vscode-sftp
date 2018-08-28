@@ -4,11 +4,11 @@ import * as path from 'path';
 import * as Joi from 'joi';
 import * as sshConfig from 'ssh-config';
 import app from '../app';
-import { CONFIG_PATH } from '../constants';
+import { CONFIG_PATH, SETTING_KEY_REMOTE } from '../constants';
 import { reportError, replaceHomePath, resolvePath } from '../helper';
 import Trie from '../core/Trie';
 import upath from '../core/upath';
-import { showTextDocument } from '../host';
+import { showTextDocument, getUserSetting } from '../host';
 import logger from '../logger';
 
 let id = 0;
@@ -123,33 +123,53 @@ function normalizeTriePath(pathname) {
 }
 
 async function extendConfig(config) {
+  const remoteMap = getUserSetting(SETTING_KEY_REMOTE);
   const protocol = config.protocol;
 
-  const merged = {
+  const defaultCfg = {
     ...defaultConfig,
     port: chooseDefaultPort(protocol), // override default port by protocol
+  };
+  if (remoteMap && remoteMap[config.remote]) {
+    const remote = remoteMap[config.remote];
+    const remoteKeyMapping = new Map([['scheme', 'protocol']]);
+
+    const remoteKeyIgnored = new Map([['rootPath', 1]]);
+
+    Object.keys(remote).forEach(key => {
+      if (remoteKeyIgnored.has(key)) {
+        return;
+      }
+
+      const targetKey = remoteKeyMapping.has(key) ? remoteKeyMapping.get(key) : key;
+      defaultCfg[targetKey] = remote[key];
+    });
+    Object.assign(defaultCfg);
+  }
+
+  const mergedCfg = {
+    ...defaultCfg,
     ...config,
   };
-
-  const sshConfigPath = replaceHomePath(merged.sshConfigPath);
+  const sshConfigPath = replaceHomePath(mergedCfg.sshConfigPath);
   if (protocol !== 'sftp' || !sshConfigPath) {
-    return merged;
+    return mergedCfg;
   }
 
   let content;
   try {
     content = await fse.readFile(sshConfigPath, 'utf8');
   } catch {
-    return merged;
+    return mergedCfg;
   }
 
   const parsedSSHConfig = sshConfig.parse(content);
   const section = parsedSSHConfig.find({
-    Host: merged.host,
+    Host: mergedCfg.host,
   });
 
   if (section === null) {
-    return merged;
+    return mergedCfg;
   }
 
   const mapping = new Map([
@@ -165,14 +185,14 @@ async function extendConfig(config) {
     const key = mapping.get(line.param);
 
     if (config[key] === undefined && key !== undefined) {
-      merged[key] = line.value;
+      mergedCfg[key] = line.value;
     }
   });
 
   // convert to integer
-  merged.port = parseInt(merged.port, 10);
+  mergedCfg.port = parseInt(mergedCfg.port, 10);
 
-  return merged;
+  return mergedCfg;
 }
 
 function logConfig(config) {
