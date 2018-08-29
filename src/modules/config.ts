@@ -123,15 +123,18 @@ function normalizeTriePath(pathname) {
 }
 
 async function extendConfig(config) {
-  const remoteMap = getUserSetting(SETTING_KEY_REMOTE);
   const protocol = config.protocol;
 
   const defaultCfg = {
     ...defaultConfig,
     port: chooseDefaultPort(protocol), // override default port by protocol
   };
-  if (remoteMap && remoteMap[config.remote]) {
-    const remote = remoteMap[config.remote];
+  if (config.remote) {
+    const remoteMap = getUserSetting(SETTING_KEY_REMOTE);
+    const remote = remoteMap.get(config.remote);
+    if (!remote) {
+      throw new Error(`Can\'t not find remote "${config.remote}"`);
+    }
     const remoteKeyMapping = new Map([['scheme', 'protocol']]);
 
     const remoteKeyIgnored = new Map([['rootPath', 1]]);
