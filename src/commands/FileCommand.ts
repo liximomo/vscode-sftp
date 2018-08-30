@@ -5,7 +5,6 @@ import app from '../app';
 import UResource from '../core/UResource';
 import { showWarningMessage } from '../host';
 import { reportError } from '../helper';
-import { REMOTE_SCHEME } from '../constants';
 import { getConfig } from '../modules/config';
 
 export type FileTarget = vscode.Uri;
@@ -53,7 +52,7 @@ export default class FileCommand extends BaseCommand {
 
     logger.trace(`execute ${this.getName()} for`, activityPath);
 
-    const isRemote: boolean = fileTarget.scheme === REMOTE_SCHEME;
+    const isRemote: boolean = UResource.isRemote(fileTarget);
     let config;
 
     if (isRemote) {

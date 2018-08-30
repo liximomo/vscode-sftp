@@ -10,16 +10,14 @@ function createUriString(authority: string, path: string, query: any) {
 }
 
 // tslint:disable-next-line class-name
-export class _Resource {
+class _Resource {
   private readonly _uri: Uri;
-  private readonly _isRemote: boolean;
   private readonly _fsPath: string;
   private readonly _remoteId: number;
 
   constructor(uri: Uri) {
     this._uri = uri;
-    this._isRemote = this._uri.scheme === REMOTE_SCHEME;
-    if (this._isRemote) {
+    if (UResource.isRemote(uri)) {
       const query = querystring.parse(this._uri.query);
       this._remoteId = parseInt(query.remoteId, 10);
 
@@ -35,10 +33,6 @@ export class _Resource {
 
   get remoteId(): number {
     return this._remoteId;
-  }
-
-  get isRemote(): boolean {
-    return this._isRemote;
   }
 
   get uri(): Uri {
@@ -67,13 +61,16 @@ export interface Resource {
   remoteId: number;
   fsPath: string;
   uri: Uri;
-  isRemote: boolean;
 }
 
 // Universal resource
 export default class UResource {
   private readonly _localResouce: Resource;
   private readonly _remoteResouce: Resource;
+
+  static isRemote(uri: Uri) {
+    return uri.scheme === REMOTE_SCHEME;
+  }
 
   static makeResource(config: RemoteResourceConfig & { fsPath: string } | Uri): Resource {
     if (config instanceof Uri) {
@@ -109,7 +106,6 @@ export default class UResource {
     return new _Resource(Uri.parse(createUriString(uri.authority, remotePath, query)));
   }
 
-  static from(uri: Uri, root: object): UResource;
   static from(uri: Uri, root: Resource | ResourceConfig): UResource {
     if ((root as Resource).fsPath) {
       return new UResource(new _Resource(uri), root as Resource);
@@ -120,7 +116,11 @@ export default class UResource {
     let localResouce: Resource;
     let remoteResouce: Resource;
     if (uri.scheme === REMOTE_SCHEME) {
-      const localFsPath = toLocalPath(UResource.makeResource(uri).fsPath, remoteBasePath, localBasePath);
+      const localFsPath = toLocalPath(
+        UResource.makeResource(uri).fsPath,
+        remoteBasePath,
+        localBasePath
+      );
       localResouce = new _Resource(Uri.file(localFsPath));
       remoteResouce = new _Resource(uri);
     } else {
