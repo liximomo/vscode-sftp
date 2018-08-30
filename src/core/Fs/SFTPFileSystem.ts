@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import * as FileStatus from 'stat-mode';
 import FileSystem, { FileEntry, FileType, FileStats, FileOption } from './FileSystem';
 import RemoteFileSystem from './RemoteFileSystem';
 import SFTPClient from '../Client/SFTPClient';
@@ -139,7 +138,6 @@ export default class SFTPFileSystem extends RemoteFileSystem {
   }
 
   toFileEntry(fullPath, item): FileEntry {
-    const stat = new FileStatus(item.attrs);
     return {
       fspath: fullPath,
       name: item.filename,
