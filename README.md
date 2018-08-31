@@ -39,7 +39,7 @@ You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/
 * [Profiles](#profiles)
 * [Multiple Context](#multiple-context)
 * [Connection Hopping](#connection-hopping)
-* [Congig in User Setting](#congig-in-user-setting)
+* [Config in User Setting](#config-in-user-setting)
 
 #### Password Free
 ```json
@@ -153,7 +153,7 @@ local -> hopA -> hopB -> target
 }
 ```
 
-#### Congig in User Setting
+#### Config in User Setting
 You can use `remote` to tell sftp to get the config from (remote-fs)https://github.com/liximomo/vscode-remote-fs.
 
 In User Setting:
