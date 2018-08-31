@@ -39,7 +39,7 @@ You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/
 * [Profiles](#profiles)
 * [Multiple Context](#multiple-context)
 * [Connection Hopping](#connection-hopping)
-* [Config in User Setting](#congig-in-user-setting)
+* [Config in User Setting](#config-in-user-setting)
 
 #### Password Free
 ```json
