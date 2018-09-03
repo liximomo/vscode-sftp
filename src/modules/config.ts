@@ -11,6 +11,8 @@ import upath from '../core/upath';
 import { showTextDocument, getUserSetting } from '../host';
 import logger from '../logger';
 
+const DEFAULT_SSHCONFIG_FILE = '~/.ssh/config';
+
 let id = 0;
 
 const configTrie = new Trie(
@@ -68,40 +70,39 @@ const configScheme = {
 
 const defaultConfig = {
   // common
-  name: undefined,
+  // name: undefined,
   remotePath: './',
   uploadOnSave: false,
   downloadOnOpen: false,
   syncMode: 'update',
   ignore: [],
-  ignoreFile: undefined,
-  watcher: {
-    files: false,
-    autoUpload: false,
-    autoDelete: false,
-  },
+  // ignoreFile: undefined,
+  // watcher: {
+  //   files: false,
+  //   autoUpload: false,
+  //   autoDelete: false,
+  // },
   concurrency: 4,
 
   protocol: 'sftp',
 
   // server common
-  host: undefined,
-  port: 22,
-  username: undefined,
-  password: undefined,
+  // host,
+  // port: 22,
+  // username,
+  // password,
   connectTimeout: 10 * 1000,
 
   // sftp
-  agent: undefined,
-  privateKeyPath: undefined,
-  passphrase: undefined,
+  // agent,
+  // privateKeyPath,
+  // passphrase,
   interactiveAuth: false,
-  algorithms: undefined,
-  sshConfigPath: '~/.ssh/config',
+  // algorithms,
 
   // ftp
   secure: false,
-  secureOptions: undefined,
+  // secureOptions,
   passive: false,
 };
 
@@ -122,13 +123,15 @@ function normalizeTriePath(pathname) {
   return path.normalize(pathname);
 }
 
-async function extendConfig(config) {
-  const protocol = config.protocol;
+function setConfigValue(config, key, value) {
+  if (config[key] === undefined) {
+    config[key] = value;
+  }
+}
 
-  const defaultCfg = {
-    ...defaultConfig,
-    port: chooseDefaultPort(protocol), // override default port by protocol
-  };
+async function extendConfig(config) {
+  const copyed = Object.assign({}, config);
+
   if (config.remote) {
     const remoteMap = getUserSetting(SETTING_KEY_REMOTE);
     const remote = remoteMap.get(config.remote);
@@ -145,34 +148,29 @@ async function extendConfig(config) {
       }
 
       const targetKey = remoteKeyMapping.has(key) ? remoteKeyMapping.get(key) : key;
-      defaultCfg[targetKey] = remote[key];
+      setConfigValue(copyed, targetKey, remote[key]);
     });
-    Object.assign(defaultCfg);
   }
 
-  const mergedCfg = {
-    ...defaultCfg,
-    ...config,
-  };
-  const sshConfigPath = replaceHomePath(mergedCfg.sshConfigPath);
-  if (protocol !== 'sftp' || !sshConfigPath) {
-    return mergedCfg;
+  if (config.protocol !== 'sftp') {
+    return copyed;
   }
 
+  const sshConfigPath = replaceHomePath(copyed.sshConfigPath || DEFAULT_SSHCONFIG_FILE);
   let content;
   try {
     content = await fse.readFile(sshConfigPath, 'utf8');
   } catch {
-    return mergedCfg;
+    return copyed;
   }
 
   const parsedSSHConfig = sshConfig.parse(content);
   const section = parsedSSHConfig.find({
-    Host: mergedCfg.host,
+    Host: copyed.host,
   });
 
   if (section === null) {
-    return mergedCfg;
+    return copyed;
   }
 
   const mapping = new Map([
@@ -187,15 +185,15 @@ async function extendConfig(config) {
   section.config.forEach(line => {
     const key = mapping.get(line.param);
 
-    if (config[key] === undefined && key !== undefined) {
-      mergedCfg[key] = line.value;
+    if (key !== undefined) {
+      setConfigValue(copyed, key, line.value);
     }
   });
 
   // convert to integer
-  mergedCfg.port = parseInt(mergedCfg.port, 10);
+  copyed.port = parseInt(copyed.port, 10);
 
-  return mergedCfg;
+  return copyed;
 }
 
 function logConfig(config) {
@@ -214,11 +212,17 @@ function logConfig(config) {
 }
 
 async function addConfig(config, workspace) {
-  if (config.defaultProfile) {
-    app.state.profile = config.defaultProfile;
+  let extendedConfig = await extendConfig(config);
+  extendedConfig = {
+    ...defaultConfig,
+    port: chooseDefaultPort(extendedConfig.protocol), // override default port by protocol
+    ...extendedConfig,
+  };
+
+  if (extendedConfig.defaultProfile) {
+    app.state.profile = extendedConfig.defaultProfile;
   }
 
-  const extendedConfig = await extendConfig(config);
   // tslint:disable triple-equals
   const context = extendedConfig.context != undefined ? extendedConfig.context : workspace;
   extendedConfig.context = normalizeTriePath(path.resolve(workspace, context));
