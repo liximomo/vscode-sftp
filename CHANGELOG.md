@@ -1,3 +1,10 @@
+## 1.4.1 - 2018-09-03
+### Feature
+  * [Config in User Setting](https://github.com/liximomo/vscode-sftp#config-in-user-setting) config your remote in User Setting
+
+### Fix
+  * fix sshConfig file not overwriting default config. ([#305](https://github.com/liximomo/vscode-sftp/issues/305))
+
 ## 1.4.0 - 2018-08-27
 ### Feature
   * [Connection Hopping](https://github.com/liximomo/vscode-sftp#connection-hopping) allow you to connection to a target server through a proxy with ssh protocol
