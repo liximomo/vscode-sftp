@@ -5,7 +5,7 @@ import app from '../app';
 import UResource from '../core/UResource';
 import { showWarningMessage } from '../host';
 import { reportError } from '../helper';
-import { getConfig } from '../modules/config';
+import { getFileService } from '../modules/serviceManager';
 
 export type FileTarget = vscode.Uri;
 type FileHandler = (resource: UResource, config: any) => any;
@@ -62,7 +62,8 @@ export default class FileCommand extends BaseCommand {
       }
       config = remoteRoot.explorerContext.config;
     } else {
-      config = getConfig(fileTarget.fsPath);
+      const fileService = getFileService(fileTarget.fsPath);
+      config = fileService.getConfig();
     }
 
     const resource = UResource.from(fileTarget, {

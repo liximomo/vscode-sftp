@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import upath from '../core/upath';
 import UResource, { Resource } from '../core/UResource';
 import { FileType } from '../core/Fs/FileSystem';
-import { getAllConfigs } from './config';
+import { getAllFileService } from './serviceManager';
 import { getRemotefsFromConfig } from '../helper';
 import { COMMAND_SHOWRESOURCE } from '../constants';
 
@@ -158,26 +158,28 @@ export class RemoteTreeData
 
     this._roots = [];
     this._rootsMap = new Map();
-    getAllConfigs().forEach(config => {
-      const id = config.id;
-      const item = {
-        resource: UResource.makeResource({
-          remote: {
-            host: config.host,
-            port: config.port,
+    getAllFileService()
+      .map(f => f.getConfig())
+      .forEach(config => {
+        const id = config.id;
+        const item = {
+          resource: UResource.makeResource({
+            remote: {
+              host: config.host,
+              port: config.port,
+            },
+            fsPath: config.remotePath,
+            remoteId: id,
+          }),
+          isDirectory: true,
+          explorerContext: {
+            config,
+            id,
           },
-          fsPath: config.remotePath,
-          remoteId: id,
-        }),
-        isDirectory: true,
-        explorerContext: {
-          config,
-          id,
-        },
-      };
-      this._roots.push(item);
-      this._rootsMap.set(id, item);
-    });
+        };
+        this._roots.push(item);
+        this._rootsMap.set(id, item);
+      });
     return this._roots;
   }
 }

@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import { getActiveTextEditor } from '../host';
-import { getAllRawConfigs } from './config';
 import { FileTarget } from '../commands/FileCommand';
 import {
   getRemotefsFromConfig,
@@ -11,18 +10,18 @@ import {
   simplifyPath,
 } from '../helper';
 import upath from '../core/upath';
-import { getAllConfigs } from './config';
+import { getAllFileService } from './serviceManager';
 import Ignore from './Ignore';
 
 export function selectContext(): Promise<FileTarget> {
   return new Promise((resolve, reject) => {
-    const configs = getAllRawConfigs();
-    const projectsList = configs
-      .map(cfg => ({
-        value: cfg.context,
-        label: cfg.name || simplifyPath(cfg.context),
+    const sercives = getAllFileService();
+    const projectsList = sercives
+      .map(sercive => ({
+        value: sercive.baseDir,
+        label: sercive.name || simplifyPath(sercive.baseDir),
         description: '',
-        detail: cfg.context,
+        detail: sercive.baseDir,
       }))
       .sort((l, r) => l.label.localeCompare(r.label));
 
@@ -81,7 +80,7 @@ function configIngoreFilterCreator(configs) {
 
 function createFileSelector({ filterCreator = null } = {}) {
   return async (): Promise<FileTarget> => {
-    const configs = getAllConfigs();
+    const configs = getAllFileService().map(f => f.getConfig());
     const remoteItems = configs.map((config, index) => ({
       name: config.name,
       description: config.host,

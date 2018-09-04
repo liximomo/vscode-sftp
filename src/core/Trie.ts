@@ -3,18 +3,18 @@ const defaultOption = {
   delimiter: '/',
 };
 
-interface ITrieNodeChildren {
-  [key: string]: TrieNode;
+interface ITrieNodeChildren<T> {
+  [key: string]: TrieNode<T>;
 }
 
-class TrieNode {
+class TrieNode<T> {
   token: string;
 
-  private value: any;
-  private children: ITrieNodeChildren;
-  private parent: TrieNode;
+  private value: T;
+  private children: ITrieNodeChildren<T>;
+  private parent: TrieNode<T>;
 
-  constructor(token: string, value = null) {
+  constructor(token: string, value: T = null) {
     this.token = token;
     this.value = value;
     this.children = {};
@@ -26,39 +26,39 @@ class TrieNode {
     return this.value !== null;
   }
 
-  setValue(value: any): TrieNode {
+  setValue(value: T): TrieNode<T> {
     this.value = value;
     return this;
   }
 
-  getValue(): any {
+  getValue(): T {
     return this.value;
   }
 
-  clearValue(): TrieNode {
+  clearValue(): TrieNode<T> {
     this.value = null;
     return this;
   }
 
-  getParent(): TrieNode {
+  getParent(): TrieNode<T> {
     return this.parent;
   }
 
-  getChildren(): TrieNode[] {
+  getChildren(): TrieNode<T>[] {
     return Object.keys(this.children).map(key => this.children[key]);
   }
 
-  addChild(token: string, childNode: TrieNode): TrieNode {
+  addChild(token: string, childNode: TrieNode<T>): TrieNode<T> {
     this.children[token] = childNode;
     childNode.parent = this;
     return this;
   }
 
-  getChild(token: string): TrieNode {
+  getChild(token: string): TrieNode<T> {
     return this.children[token];
   }
 
-  removeChild(node: TrieNode) {
+  removeChild(node: TrieNode<T>) {
     return delete this.children[node.token];
   }
 
@@ -71,13 +71,13 @@ class TrieNode {
   }
 }
 
-export default class Trie {
+export default class Trie<T> {
   private option: any;
-  private root: TrieNode;
+  private root: TrieNode<T>;
 
   constructor(dict: any, option?: any) {
     this.option = Object.assign({}, defaultOption, option);
-    this.root = new TrieNode('@root');
+    this.root = new TrieNode<T>('@root');
     Object.keys(dict).forEach(key => this.add(key, dict[key]));
   }
 
@@ -89,7 +89,7 @@ export default class Trie {
     return this.root.getChildrenNum() <= 0;
   }
 
-  add(path: string | string[], value): void {
+  add(path: string | string[], value: T): void {
     const tokens = Array.isArray(path) ? path : this.splitPath(path);
     const bottomNode = tokens.reduce((parent, token) => {
       let node = parent.getChild(token);
@@ -125,7 +125,7 @@ export default class Trie {
     return true;
   }
 
-  findPrefix(path: string | string[]): any {
+  findPrefix(path: string | string[]): T {
     const tokens = Array.isArray(path) ? path : this.splitPath(path);
     const node = this.findPrefixNode(this.root, tokens);
     return node.getValue();
@@ -137,7 +137,7 @@ export default class Trie {
     return node.clearValue();
   }
 
-  findPrefixNode(parent: TrieNode, tokens: string[]): TrieNode | null {
+  findPrefixNode(parent: TrieNode<T>, tokens: string[]): TrieNode<T> | null {
     let result = parent;
 
     const tokensQueue = tokens.slice().reverse();
@@ -157,7 +157,7 @@ export default class Trie {
     return result;
   }
 
-  findNode(parent: TrieNode, tokens: string[]): TrieNode | null {
+  findNode(parent: TrieNode<T>, tokens: string[]): TrieNode<T> | null {
     const [top, ...rest] = tokens;
     if (top === undefined) {
       return parent;
@@ -170,7 +170,7 @@ export default class Trie {
     return null;
   }
 
-  getAllValues(): any[] {
+  getAllValues(): T[] {
     const nodeQueue = [this.root];
     const result = [];
 
@@ -187,7 +187,7 @@ export default class Trie {
     return result;
   }
 
-  findValuesWithShortestBranch(): any[] {
+  findValuesWithShortestBranch(): T[] {
     const nodeQueue = [this.root];
     const result = [];
 

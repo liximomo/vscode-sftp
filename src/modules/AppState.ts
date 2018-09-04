@@ -1,5 +1,5 @@
 class AppState {
-  private _profile: string;
+  private _profile: string = null;
   private _observer: (x: any) => void;
 
   get profile(): string {

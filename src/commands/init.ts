@@ -13,7 +13,7 @@ import {
   selectContext,
 } from '../modules/targetSelectStrategy';
 import localFs from '../core/localFs';
-import { getAllRawConfigs } from '../modules/config';
+import { getAllFileService } from '../modules/serviceManager';
 import { ExplorerItem } from '../modules/RemoteTreeData';
 import * as output from '../ui/output';
 import {
@@ -59,22 +59,23 @@ export default function init(context: vscode.ExtensionContext) {
   });
 
   commandManager.createCommand(constants.COMMAND_SET_PROFILE, 'set profile', async () => {
-    const profiles: Array<vscode.QuickPickItem & { value: string }> = getAllRawConfigs().reduce(
-      (acc, config) => {
-        if (!config.profiles) {
+    const profiles: Array<vscode.QuickPickItem & { value: string }> = getAllFileService().reduce(
+      (acc, service) => {
+        if (service.getAvaliableProfiles().length <= 0) {
           return acc;
         }
 
-        Object.keys(config.profiles).forEach(key => {
+        service.getAvaliableProfiles().forEach(profile => {
           acc.push({
-            value: key,
-            label: app.state.profile === key ? `${key} (active)` : key,
+            value: profile,
+            label: app.state.profile === profile ? `${profile} (active)` : profile,
           });
         });
         return acc;
       },
       [
         {
+          value: null,
           label: 'UNSET',
         },
       ]

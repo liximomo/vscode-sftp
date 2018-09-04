@@ -8,32 +8,28 @@ import {
   onDidSaveTextDocument,
   showConfirmMessage,
 } from '../host';
-import { getConfig, loadConfig, getAllRawConfigs, removeConfig } from './config';
-import { watchFiles, removeWatcher } from './fileWatcher';
-import { removeRemote } from '../core/remoteFs';
-import { reportError, isValidFile, isConfigFile, getHostInfo, isInWorksapce } from '../helper';
+import { readConfigsFromFile } from './config';
+import {
+  createFileService,
+  getFileService,
+  findAllFileService,
+  disposeFileService,
+} from './serviceManager';
+import { reportError, isValidFile, isConfigFile, isInWorksapce } from '../helper';
 
 let workspaceWatcher: vscode.Disposable;
-
-function clearResource(config) {
-  removeConfig(config);
-  removeWatcher(config);
-  removeRemote(getHostInfo(config));
-}
 
 async function handleConfigSave(uri: vscode.Uri) {
   const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
   const workspacePath = workspaceFolder.uri.fsPath;
 
-  // clear old config
-  getAllRawConfigs()
-    .filter(config => config.workspace === workspacePath)
-    .forEach(clearResource);
+  // dispose old sercive
+  findAllFileService(sercive => sercive.workspace === workspacePath).forEach(disposeFileService);
 
-  // add new config
+  // create new sercive
   try {
-    const config = await loadConfig(uri.fsPath, workspacePath);
-    watchFiles(config);
+    const configs = await readConfigsFromFile(uri.fsPath, workspacePath);
+    configs.forEach(config => createFileService(workspacePath, config));
   } catch (error) {
     reportError(error);
   } finally {
@@ -45,7 +41,8 @@ async function handleFileSave(uri) {
   const activityPath = uri.fsPath;
   let config;
   try {
-    config = getConfig(activityPath);
+    const fileService = getFileService(activityPath);
+    config = fileService.getConfig();
   } catch (error) {
     logger.error(error);
     return;
@@ -61,7 +58,8 @@ async function downloadOnOpen(uri) {
   const activityPath = uri.fsPath;
   let config;
   try {
-    config = getConfig(activityPath);
+    const fileService = getFileService(activityPath);
+    config = fileService.getConfig();
   } catch (error) {
     // a new-created config
     if (!isConfigFile(uri)) {

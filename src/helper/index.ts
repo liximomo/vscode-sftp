@@ -1,4 +1,4 @@
-import getFileSystem from '../core/remoteFs';
+import { createRemoteIfNoneExist } from '../core/remoteFs';
 
 export * from './paths';
 export * from './config';
@@ -18,8 +18,6 @@ export function getHostInfo(config) {
     'watcher',
     'concurrency',
     'sshConfigPath',
-    'id',
-    'workspace',
   ];
 
   return Object.keys(config).reduce((obj, key) => {
@@ -30,6 +28,7 @@ export function getHostInfo(config) {
   }, {});
 }
 
+// to-remove
 export function getRemotefsFromConfig(config) {
-  return getFileSystem(getHostInfo(config));
+  return createRemoteIfNoneExist(getHostInfo(config));
 }

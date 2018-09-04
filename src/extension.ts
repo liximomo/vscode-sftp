@@ -6,14 +6,16 @@ import app from './app';
 import initCommand from './commands/init';
 import { reportError } from './helper';
 import fileActivityMonitor from './modules/fileActivityMonitor';
-import { initConfigs } from './modules/config';
-import { endAllRemote } from './core/remoteFs';
-import { watchFiles, clearAllWatcher } from './modules/fileWatcher';
+import { tryLoadConfigs } from './modules/config';
+import { createFileService } from './modules/serviceManager';
 import { getWorkspaceFolders, setContextValue } from './host';
 import RemoteExplorer from './modules/RemoteExplorer';
 
-function setupWorkspaceFolder(dir) {
-  return initConfigs(dir).then(watchFiles);
+async function setupWorkspaceFolder(dir) {
+  const configs = await tryLoadConfigs(dir);
+  configs.forEach(config => {
+    createFileService(dir, config);
+  });
 }
 
 function setup(workspaceFolders: vscode.WorkspaceFolder[]) {
@@ -50,7 +52,5 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {
-  clearAllWatcher();
-  endAllRemote();
   fileActivityMonitor.destory();
 }

@@ -3,24 +3,13 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as Joi from 'joi';
 import * as sshConfig from 'ssh-config';
-import app from '../app';
 import { CONFIG_PATH, SETTING_KEY_REMOTE } from '../constants';
 import { reportError, replaceHomePath, resolvePath } from '../helper';
-import Trie from '../core/Trie';
 import upath from '../core/upath';
 import { showTextDocument, getUserSetting } from '../host';
 import logger from '../logger';
 
 const DEFAULT_SSHCONFIG_FILE = '~/.ssh/config';
-
-let id = 0;
-
-const configTrie = new Trie(
-  {},
-  {
-    delimiter: path.sep,
-  }
-);
 
 const nullable = schema => schema.optional().allow(null);
 
@@ -110,19 +99,6 @@ function chooseDefaultPort(protocol) {
   return protocol === 'ftp' ? 21 : 22;
 }
 
-function normalizeTriePath(pathname) {
-  const isWindows = process.platform === 'win32';
-  if (isWindows) {
-    const device = pathname.substr(0, 2);
-    if (device.charAt(1) === ':') {
-      // lowercase drive letter
-      return pathname[0].toLowerCase() + pathname.substr(1);
-    }
-  }
-
-  return path.normalize(pathname);
-}
-
 function setConfigValue(config, key, value) {
   if (config[key] === undefined) {
     config[key] = value;
@@ -196,7 +172,7 @@ async function extendConfig(config) {
   return copyed;
 }
 
-function logConfig(config) {
+function maskConfig(config) {
   const copy = {};
   const privated = ['username', 'password', 'passphrase'];
   Object.keys(config).forEach(key => {
@@ -208,10 +184,10 @@ function logConfig(config) {
       copy[key] = configValue;
     }
   });
-  logger.info(`config at ${config.context}`, copy);
+  return maskConfig;
 }
 
-async function addConfig(config, workspace) {
+async function processConfig(config, workspace) {
   let extendedConfig = await extendConfig(config);
   extendedConfig = {
     ...defaultConfig,
@@ -219,13 +195,8 @@ async function addConfig(config, workspace) {
     ...extendedConfig,
   };
 
-  if (extendedConfig.defaultProfile) {
-    app.state.profile = extendedConfig.defaultProfile;
-  }
-
-  // tslint:disable triple-equals
-  const context = extendedConfig.context != undefined ? extendedConfig.context : workspace;
-  extendedConfig.context = normalizeTriePath(path.resolve(workspace, context));
+  // remove the './' part from a relative path
+  extendedConfig.remotePath = upath.normalize(extendedConfig.remotePath);
   if (extendedConfig.privateKeyPath) {
     extendedConfig.privateKeyPath = resolvePath(workspace, extendedConfig.privateKeyPath);
   }
@@ -233,47 +204,17 @@ async function addConfig(config, workspace) {
     extendedConfig.ignoreFile = resolvePath(workspace, extendedConfig.ignoreFile);
   }
 
-  logConfig(extendedConfig);
-
-  extendedConfig.id = ++id;
-  extendedConfig.workspace = workspace;
-  configTrie.add(extendedConfig.context, extendedConfig);
+  logger.info(`config at ${config.context || workspace}`, maskConfig(extendedConfig));
 
   return extendedConfig;
 }
 
-function normalizeConfig(config) {
-  const result = { ...config };
+function getConfigPath(basePath) {
+  return path.join(basePath, CONFIG_PATH);
+}
 
-  // remove the './' part from a relative path
-  result.remotePath = upath.normalize(result.remotePath);
-
-  if (result.agent && result.agent.startsWith('$')) {
-    const evnVarName = result.agent.slice(1);
-    const val = process.env[evnVarName];
-    if (!val) {
-      throw new Error(`Environment variable "${evnVarName}" not found`);
-    }
-    result.agent = val;
-  }
-
-  const hasProfile = config.profiles && Object.keys(config.profiles).length > 0;
-  if (hasProfile && app.state.profile) {
-    const profile = config.profiles[app.state.profile];
-    if (!profile) {
-      throw new Error(
-        `Unkown Profile "${app.state.profile}".` +
-          ' Please check your profile setting.' +
-          ' You can set a profile by running command `SFTP: Set Profile`.'
-      );
-    }
-
-    Object.assign(result, profile);
-    delete result.profiles;
-  }
-
-  // validate config
-  const { error: validationError } = Joi.validate(result, configScheme, {
+export function validateConfig(config) {
+  const { error } = Joi.validate(config, configScheme, {
     allowUnknown: true,
     convert: false,
     language: {
@@ -282,35 +223,23 @@ function normalizeConfig(config) {
       },
     },
   });
-  if (validationError) {
-    let errorMsg = `Config validation fail: ${validationError.message}.`;
-    if (hasProfile && app.state.profile == null) {
-      errorMsg += ' Maybe you should set a profile first.';
-    }
-    throw new Error(errorMsg);
-  }
-
-  return result;
+  return error;
 }
 
-function getConfigPath(basePath) {
-  return path.join(basePath, CONFIG_PATH);
-}
-
-export function loadConfig(configPath, workspace) {
+export function readConfigsFromFile(configPath, workspace): Promise<any[]> {
   // $todo? trie per workspace, so we can remove unused config
   return fse.readJson(configPath).then(config => {
     const configs = Array.isArray(config) ? config : [config];
-    return Promise.all(configs.map(cfg => addConfig(cfg, workspace)));
+    return Promise.all(configs.map(processConfig));
   });
 }
 
-export function initConfigs(workspace): Promise<Array<{}>> {
+export function tryLoadConfigs(workspace): Promise<any[]> {
   const configPath = getConfigPath(workspace);
   return fse.pathExists(configPath).then(
     exist => {
       if (exist) {
-        return loadConfig(configPath, workspace);
+        return readConfigsFromFile(configPath, workspace);
       }
       return [];
     },
@@ -318,38 +247,14 @@ export function initConfigs(workspace): Promise<Array<{}>> {
   );
 }
 
-export function getConfig(activityPath: string) {
-  const config = configTrie.findPrefix(normalizeTriePath(activityPath));
-  if (!config) {
-    throw new Error(`(${activityPath}) config file not found`);
-  }
+// export function getConfig(activityPath: string) {
+//   const config = configTrie.findPrefix(normalizePath(activityPath));
+//   if (!config) {
+//     throw new Error(`(${activityPath}) config file not found`);
+//   }
 
-  return normalizeConfig(config);
-}
-
-export function getAllRawConfigs() {
-  if (configTrie === undefined) {
-    return [];
-  }
-
-  return configTrie.getAllValues();
-}
-
-export function getAllConfigs() {
-  if (configTrie === undefined) {
-    return [];
-  }
-
-  return configTrie.getAllValues().map(normalizeConfig);
-}
-
-export function getShortestDistinctConfigs() {
-  if (configTrie === undefined) {
-    return [];
-  }
-
-  return configTrie.findValuesWithShortestBranch();
-}
+//   return normalizeConfig(config);
+// }
 
 export function newConfig(basePath) {
   const configPath = getConfigPath(basePath);
@@ -376,8 +281,4 @@ export function newConfig(basePath) {
         .then(() => showTextDocument(vscode.Uri.file(configPath)));
     })
     .catch(reportError);
-}
-
-export function removeConfig(config) {
-  return configTrie.remove(config.context);
 }

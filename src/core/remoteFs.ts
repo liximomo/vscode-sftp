@@ -101,7 +101,7 @@ const fsTable: {
   [x: string]: KeepAliveRemoteFs;
 } = {};
 
-export default function getFileSystem(option): Promise<FileSystem> {
+export function createRemoteIfNoneExist(option): Promise<FileSystem> {
   if (option.protocol === 'local') {
     return getLocalFs();
   }
@@ -124,12 +124,4 @@ export function removeRemote(option) {
     fs.end();
     delete fsTable[identity];
   }
-}
-
-export function endAllRemote() {
-  Object.keys(fsTable).forEach(key => {
-    const fs = fsTable[key];
-    fs.end();
-    delete fsTable[key];
-  });
 }

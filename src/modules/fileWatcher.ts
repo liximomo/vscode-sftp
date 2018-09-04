@@ -5,6 +5,7 @@ import { executeCommand } from '../host';
 import { COMMAND_UPLOAD, COMMAND_DELETEREMOTE } from '../constants';
 import { isValidFile, fileDepth } from '../helper';
 import logger from '../logger';
+import { WatcherService } from '../core/FileService';
 
 const watchers: {
   [x: string]: vscode.FileSystemWatcher;
@@ -63,47 +64,48 @@ function uploadHandler(uri: vscode.Uri) {
   debouncedUpload();
 }
 
-function addWatcher(config, watcher) {
-  watchers[config.context] = watcher;
+function addWatcher(id, watcher) {
+  watchers[id] = watcher;
 }
 
-function getWatcher(config) {
-  return watchers[config.context];
+function getWatcher(id) {
+  return watchers[id];
 }
 
-function getWatcheres() {
-  return Object.keys(watchers).map(key => watchers[key]);
-}
+function createWatcher(
+  watcherBase: string,
+  watcherConfig: { files: false | string; autoUpload: boolean; autoDelete: boolean }
+) {
+  if (!watcherConfig) {
+    return;
+  }
 
-export function createWatcher(config) {
-  const watchConfig = config.watcher !== undefined ? config.watcher : {};
-
-  let watcher = getWatcher(config);
+  let watcher = getWatcher(watcherBase);
   if (watcher) {
     // clear old watcher
     watcher.dispose();
   }
 
-  const shouldAddListenser = watchConfig.autoUpload || watchConfig.autoDelete;
+  const shouldAddListenser = watcherConfig.autoUpload || watcherConfig.autoDelete;
   // tslint:disable-next-line triple-equals
-  if (watchConfig.files == false || !shouldAddListenser) {
+  if (watcherConfig.files == false || !shouldAddListenser) {
     return;
   }
 
   watcher = vscode.workspace.createFileSystemWatcher(
-    new vscode.RelativePattern(config.context, watchConfig.files),
+    new vscode.RelativePattern(watcherBase, watcherConfig.files),
     false,
     false,
     false
   );
-  addWatcher(config, watcher);
+  addWatcher(watcherBase, watcher);
 
-  if (watchConfig.autoUpload) {
+  if (watcherConfig.autoUpload) {
     watcher.onDidCreate(uploadHandler);
     watcher.onDidChange(uploadHandler);
   }
 
-  if (watchConfig.autoDelete) {
+  if (watcherConfig.autoDelete) {
     watcher.onDidDelete(uri => {
       if (!isValidFile(uri)) {
         return;
@@ -115,20 +117,17 @@ export function createWatcher(config) {
   }
 }
 
-export function removeWatcher(config) {
-  const watcher = getWatcher(config);
+function removeWatcher(watcherBase: string) {
+  const watcher = getWatcher(watcherBase);
   if (watcher) {
     watcher.dispose();
-    delete watchers[config.context];
+    delete watchers[watcherBase];
   }
 }
 
-export function watchFiles(config) {
-  const configs = [].concat(config);
-  configs.forEach(createWatcher);
-}
+const watcherService: WatcherService = {
+  create: createWatcher,
+  dispose: removeWatcher,
+};
 
-export function clearAllWatcher() {
-  const disposable = vscode.Disposable.from(...getWatcheres());
-  disposable.dispose();
-}
+export default watcherService;
