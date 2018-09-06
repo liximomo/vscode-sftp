@@ -27,8 +27,3 @@ export function getHostInfo(config) {
     return obj;
   }, {});
 }
-
-// to-remove
-export function getRemotefsFromConfig(config) {
-  return createRemoteIfNoneExist(getHostInfo(config));
-}

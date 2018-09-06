@@ -5,7 +5,7 @@ import * as Joi from 'joi';
 import * as sshConfig from 'ssh-config';
 import { CONFIG_PATH, SETTING_KEY_REMOTE } from '../constants';
 import { reportError, replaceHomePath, resolvePath } from '../helper';
-import upath from '../core/upath';
+import { upath } from '../core';
 import { showTextDocument, getUserSetting } from '../host';
 import logger from '../logger';
 
@@ -184,7 +184,7 @@ function maskConfig(config) {
       copy[key] = configValue;
     }
   });
-  return maskConfig;
+  return copy;
 }
 
 async function processConfig(config, workspace) {
@@ -195,6 +195,10 @@ async function processConfig(config, workspace) {
     ...extendedConfig,
   };
 
+  if (extendedConfig.protocol === 'ftp') {
+    extendedConfig.concurrency = 1;
+  }
+
   // remove the './' part from a relative path
   extendedConfig.remotePath = upath.normalize(extendedConfig.remotePath);
   if (extendedConfig.privateKeyPath) {
@@ -204,7 +208,7 @@ async function processConfig(config, workspace) {
     extendedConfig.ignoreFile = resolvePath(workspace, extendedConfig.ignoreFile);
   }
 
-  logger.info(`config at ${config.context || workspace}`, maskConfig(extendedConfig));
+  logger.info(`config at ${workspace}`, maskConfig(extendedConfig));
 
   return extendedConfig;
 }
@@ -230,7 +234,7 @@ export function readConfigsFromFile(configPath, workspace): Promise<any[]> {
   // $todo? trie per workspace, so we can remove unused config
   return fse.readJson(configPath).then(config => {
     const configs = Array.isArray(config) ? config : [config];
-    return Promise.all(configs.map(processConfig));
+    return Promise.all(configs.map(c => processConfig(c, workspace)));
   });
 }
 

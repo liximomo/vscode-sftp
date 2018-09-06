@@ -10,7 +10,6 @@ interface IFileLookUp {
 
 interface IFilePickerOption {
   type?: FileType;
-  filter?: (file: IFilePickerItem) => boolean;
 }
 
 interface IFilePickerItem {
@@ -20,9 +19,11 @@ interface IFilePickerItem {
   type: FileType;
   description: string;
 
+  getFs?: () => Promise<FileSystem>;
+  filter: (x: string) => boolean;
+
   // config index
   index: number;
-  getFs?: () => Promise<FileSystem>;
 }
 
 async function showFiles(
@@ -31,24 +32,20 @@ async function showFiles(
   files: IFilePickerItem[],
   option: IFilePickerOption = {}
 ) {
-  let avalibleFiles = files.slice();
+  let avalibleFiles = files;
   let filter;
-  let fileFilter;
   if (option.type === FileType.Directory) {
-    fileFilter = file => file.type === FileType.Directory;
+    filter = file => file.type === FileType.Directory;
   } else {
     // don't show SymbolicLink
-    fileFilter = file => file.type !== FileType.SymbolicLink;
+    filter = file => file.type !== FileType.SymbolicLink;
   }
-
-  if (option.filter !== undefined) {
+  if (parent && parent.filter) {
+    const oldFilter = filter;
     filter = file => {
-      return fileFilter(file) && option.filter(file);
+      return oldFilter(file) && parent.filter(file);
     };
-  } else {
-    filter = fileFilter;
   }
-
   avalibleFiles = avalibleFiles.filter(filter);
 
   const items = avalibleFiles
@@ -108,6 +105,7 @@ async function showFiles(
       type: file.type,
       description: '',
       getFs: selectedValue.getFs,
+      filter: selectedValue.filter,
       index: selectedValue.index,
     }));
 
@@ -118,6 +116,7 @@ async function showFiles(
       type: FileType.Directory,
       description: 'go back',
       getFs: selectedValue.getFs,
+      filter: selectedValue.filter,
       index: selectedValue.index,
     });
 
@@ -129,6 +128,7 @@ async function showFiles(
         type: FileType.Directory,
         description: 'choose current folder',
         getFs: selectedValue.getFs,
+        filter: selectedValue.filter,
         index: selectedValue.index,
       });
     }
@@ -143,19 +143,17 @@ export function listFiles(
     name?: string;
     description: string;
     fsPath: string;
-    getFs?: () => Promise<FileSystem>;
+    getFs: () => Promise<FileSystem>;
+    filter: (x: string) => boolean;
     index: number;
   }>,
-  option: IFilePickerOption
+  option?: IFilePickerOption
 ) {
   const baseItems = items.map(item => ({
+    ...item,
     name: item.name || item.fsPath,
-    fsPath: item.fsPath,
     parentFsPath: ROOT,
     type: FileType.Directory,
-    description: item.description,
-    getFs: item.getFs,
-    index: item.index,
   }));
   const fileLookUp = {
     [ROOT]: baseItems,

@@ -2,11 +2,11 @@ import upath from './upath';
 import { promptForPassword } from '../host';
 import logger from '../logger';
 import app from '../app';
-import { ConnectOption } from './Client/RemoteClient';
-import FileSystem from './Fs/FileSystem';
-import RemoteFileSystem from './Fs/RemoteFileSystem';
-import SFTPFileSystem from './Fs/SFTPFileSystem';
-import FTPFileSystem from './Fs/FTPFileSystem';
+import { ConnectOption } from './remote-client/RemoteClient';
+import FileSystem from './fs/fileSystem';
+import RemoteFileSystem from './fs/remoteFileSystem';
+import SFTPFileSystem from './fs/sftpFileSystem';
+import FTPFileSystem from './fs/ftpFileSystem';
 import localFs from './localFs';
 
 function hashOption(opiton) {
@@ -85,6 +85,7 @@ class KeepAliveRemoteFs {
 
   invalid(reason: string) {
     this.pendingPromise = null;
+    this.fs.end();
     this.isValid = false;
   }
 

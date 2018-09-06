@@ -57,11 +57,7 @@ type ResourceConfig = RemoteResourceConfig & {
   remoteBasePath: string;
 };
 
-export interface Resource {
-  remoteId: number;
-  fsPath: string;
-  uri: Uri;
-}
+export type Resource = InstanceType<typeof _Resource>;
 
 // Universal resource
 export default class UResource {

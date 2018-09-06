@@ -104,7 +104,7 @@ export function openFolder(uri?: vscode.Uri, newWindow?: boolean) {
 export function registerCommand(
   context: vscode.ExtensionContext,
   name: string,
-  callback: (args: any[]) => any,
+  callback: (...args: any[]) => any,
   thisArg?: any
 ) {
   const disposable = vscode.commands.registerCommand(name, callback, thisArg);

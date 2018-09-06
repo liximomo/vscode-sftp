@@ -1,7 +1,7 @@
 import * as path from 'path';
 import app from '../app';
 import Trie from '../core/Trie';
-import FileService from '../core/FileService';
+import FileService from '../core/fileService';
 import { validateConfig } from './config';
 import watcherService from './fileWatcher';
 
@@ -37,7 +37,6 @@ export function createFileService(workspace: string, config: any) {
   service.name = config.name;
   service.setConfigValidator(validateConfig);
   service.setWatcherService(watcherService);
-  service.createWatcher();
 
   return service;
 }

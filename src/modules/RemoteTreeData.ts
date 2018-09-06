@@ -1,9 +1,8 @@
 import * as vscode from 'vscode';
-import upath from '../core/upath';
-import UResource, { Resource } from '../core/UResource';
+import { upath } from '../core';
+import { UResource, Resource, FileService } from '../core';
 import { FileType } from '../core/Fs/FileSystem';
 import { getAllFileService } from './serviceManager';
-import { getRemotefsFromConfig } from '../helper';
 import { COMMAND_SHOWRESOURCE } from '../constants';
 
 type Id = number;
@@ -15,7 +14,7 @@ interface ExplorerChild {
 
 export interface ExplorerRoot extends ExplorerChild {
   explorerContext: {
-    config: any;
+    fileService: FileService;
     id: Id;
   };
 }
@@ -89,7 +88,7 @@ export class RemoteTreeData
     if (!root) {
       throw new Error(`Can't find config for remote resource ${item.resource.uri}.`);
     }
-    const fs = await getRemotefsFromConfig(root.explorerContext.config);
+    const fs = await root.explorerContext.fileService.getRemoteFileSystem();
     const fileEntries = await fs.list(item.resource.fsPath);
 
     return fileEntries
@@ -130,7 +129,6 @@ export class RemoteTreeData
       return null;
     }
 
-    // todo
     const rootId = UResource.makeResource(uri).remoteId;
     return this._rootsMap.get(rootId);
   }
@@ -144,7 +142,7 @@ export class RemoteTreeData
       throw new Error(`Can't find remote for resource ${uri}.`);
     }
 
-    const fs = await getRemotefsFromConfig(root.explorerContext.config);
+    const fs = await root.explorerContext.fileService.getRemoteFileSystem();
     const buffer = await fs.readFile(
       UResource.makeResource(uri).fsPath || fs.pathResolver.normalize(uri.fsPath)
     );
@@ -158,28 +156,27 @@ export class RemoteTreeData
 
     this._roots = [];
     this._rootsMap = new Map();
-    getAllFileService()
-      .map(f => f.getConfig())
-      .forEach(config => {
-        const id = config.id;
-        const item = {
-          resource: UResource.makeResource({
-            remote: {
-              host: config.host,
-              port: config.port,
-            },
-            fsPath: config.remotePath,
-            remoteId: id,
-          }),
-          isDirectory: true,
-          explorerContext: {
-            config,
-            id,
+    getAllFileService().forEach(fileService => {
+      const config = fileService.getConfig();
+      const id = fileService.id;
+      const item = {
+        resource: UResource.makeResource({
+          remote: {
+            host: config.host,
+            port: config.port,
           },
-        };
-        this._roots.push(item);
-        this._rootsMap.set(id, item);
-      });
+          fsPath: config.remotePath,
+          remoteId: id,
+        }),
+        isDirectory: true,
+        explorerContext: {
+          fileService,
+          id,
+        },
+      };
+      this._roots.push(item);
+      this._rootsMap.set(id, item);
+    });
     return this._roots;
   }
 }

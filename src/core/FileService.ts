@@ -1,8 +1,11 @@
+import * as path from 'path';
 import app from '../app';
 import upath from './upath';
-import FileSystem from './Fs/FileSystem';
-import { getHostInfo } from '../helper';
+import Ignore from './ignore';
+import FileSystem from './Fs/fileSystem';
+import { getHostInfo, filesIgnoredFromConfig } from '../helper';
 import { createRemoteIfNoneExist, removeRemote } from './remoteFs';
+import localFs from './localFs';
 
 interface WatcherConfig {
   files: false | string;
@@ -35,12 +38,14 @@ export default class FileService {
   };
   id: number;
   baseDir: string;
+  remoteBaseDir: string;
   workspace: string;
 
   constructor(baseDir: string, workspace: string, config: any) {
     this.id = ++id;
     this.workspace = workspace;
     this.baseDir = baseDir;
+    this.remoteBaseDir = config.remotePath;
     this._watcher = config.watcher;
     this._config = config;
     if (config.profiles) {
@@ -65,32 +70,38 @@ export default class FileService {
   }
 
   setWatcherService(watcherService: WatcherService) {
+    if (this._watcherService) {
+      this._disposeWatcher();
+    }
+
     this._watcherService = watcherService;
+    this._createWatcher();
   }
 
   getAvaliableProfiles(): string[] {
     return this._profiles || [];
   }
 
-  createWatcher() {
-    this._watcherService.create(this.baseDir, this._watcher);
+  enableWatcher() {
+    this._createWatcher();
   }
 
-  getFileSystem(): Promise<FileSystem> {
+  disableWatcher() {
+    this._disposeWatcher();
+  }
+
+  getLocalFileSystem(): FileSystem {
+    return localFs;
+  }
+
+  getRemoteFileSystem(): Promise<FileSystem> {
     return createRemoteIfNoneExist(getHostInfo(this.getConfig()));
-  }
-
-  disposeFileSystem() {
-    return removeRemote(getHostInfo(this.getConfig()));
   }
 
   getConfig(): any {
     const config = this._config;
     const copied = Object.assign({}, config);
     delete copied.profiles;
-
-    // remove the './' part from a relative path
-    copied.remotePath = upath.normalize(config.remotePath);
 
     if (config.agent && config.agent.startsWith('$')) {
       const evnVarName = config.agent.slice(1);
@@ -125,11 +136,54 @@ export default class FileService {
       throw new Error(errorMsg);
     }
 
+    // convert ingore config to ignore function
+    copied.ignore = this._createIgnoreFn();
     return copied;
   }
 
   dispose() {
+    this._disposeWatcher();
+    this._disposeFileSystem();
+  }
+
+  private _createIgnoreFn(): (fsPath: string) => boolean {
+    const localContext = this.baseDir;
+    const remoteContext = this.remoteBaseDir;
+
+    const ignoreConfig = filesIgnoredFromConfig(this._config);
+    if (ignoreConfig.length <= 0) {
+      return null;
+    }
+
+    const ignore = Ignore.from(ignoreConfig);
+    const ignoreFunc = fsPath => {
+      // vscode will always return path with / as separator
+      const normalizedPath = path.normalize(fsPath);
+      let relativePath;
+      if (normalizedPath.indexOf(localContext) === 0) {
+        // local path
+        relativePath = path.relative(localContext, fsPath);
+      } else {
+        // remote path
+        relativePath = upath.relative(remoteContext, fsPath);
+      }
+
+      // skip root
+      return relativePath !== '' && ignore.ignores(relativePath);
+    };
+
+    return ignoreFunc;
+  }
+
+  private _createWatcher() {
+    this._watcherService.create(this.baseDir, this._watcher);
+  }
+
+  private _disposeWatcher() {
     this._watcherService.dispose(this.baseDir);
-    this.disposeFileSystem();
+  }
+
+  private _disposeFileSystem() {
+    return removeRemote(getHostInfo(this.getConfig()));
   }
 }

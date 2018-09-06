@@ -3,7 +3,7 @@ import app from '../app';
 
 const cache = app.ignoreFileCache;
 
-export function filesIgnoredFromConfig(config) {
+export function filesIgnoredFromConfig(config): string[] {
   const ignore: string[] = config.ignore && config.ignore.length ? config.ignore : [];
 
   const ignoreFile = config.ignoreFile;

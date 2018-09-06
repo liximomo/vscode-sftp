@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
-import { showTextDocument } from '../host';
-import UResource, { Resource } from '../core/UResource';
+import { showTextDocument, registerCommand } from '../host';
+import { UResource, Resource } from '../core';
 import { toRemotePath } from '../helper';
 import { REMOTE_SCHEME } from '../constants';
-import { getConfig } from './config';
+import { getFileService } from './serviceManager';
 import RemoteTreeData, { ExplorerItem } from './RemoteTreeData';
 import { COMMAND_REMOTEEXPLORER_REFRESH, COMMAND_SHOWRESOURCE } from '../constants';
 
@@ -21,8 +21,8 @@ export default class RemoteExplorer {
       treeDataProvider: this._treeDataProvider,
     });
 
-    vscode.commands.registerCommand(COMMAND_REMOTEEXPLORER_REFRESH, () => this._refreshSelection());
-    vscode.commands.registerCommand(COMMAND_SHOWRESOURCE, (resource: Resource) =>
+    registerCommand(context, COMMAND_REMOTEEXPLORER_REFRESH, () => this._refreshSelection());
+    registerCommand(context, COMMAND_SHOWRESOURCE, (resource: Resource) =>
       this._openResource(resource)
     );
   }
@@ -30,7 +30,8 @@ export default class RemoteExplorer {
   refresh(item?: ExplorerItem) {
     if (item && !UResource.isRemote(item.resource.uri)) {
       const localPath = item.resource.fsPath;
-      const config = getConfig(localPath);
+      const fileService = getFileService(localPath);
+      const config = fileService.getConfig();
       const remotePath = toRemotePath(localPath, config.context, config.remotePath);
       item.resource = UResource.makeResource({
         remote: {
@@ -38,7 +39,7 @@ export default class RemoteExplorer {
           port: config.port,
         },
         fsPath: remotePath,
-        remoteId: config.id,
+        remoteId: fileService.id,
       });
     }
 

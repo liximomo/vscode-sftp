@@ -3,11 +3,11 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import app from './app';
-import initCommand from './commands/init';
+import initCommands from './commands';
 import { reportError } from './helper';
 import fileActivityMonitor from './modules/fileActivityMonitor';
 import { tryLoadConfigs } from './modules/config';
-import { createFileService } from './modules/serviceManager';
+import { getAllFileService, createFileService, disposeFileService } from './modules/serviceManager';
 import { getWorkspaceFolders, setContextValue } from './host';
 import RemoteExplorer from './modules/RemoteExplorer';
 
@@ -28,7 +28,11 @@ function setup(workspaceFolders: vscode.WorkspaceFolder[]) {
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
-  initCommand(context);
+  try {
+    await initCommands(context);
+  } catch (error) {
+    reportError(error, 'initCommands');
+  }
 
   const workspaceFolders = getWorkspaceFolders();
   if (!workspaceFolders) {
@@ -37,8 +41,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
   setContextValue('enabled', true);
   app.sftpBarItem.show();
-  app.state.subscribe(state => {
+  app.state.subscribe(_ => {
     const currentText = app.sftpBarItem.getText();
+    // current is showing profile
     if (currentText.endsWith('SFTP')) {
       app.sftpBarItem.reset();
     }
@@ -53,4 +58,5 @@ export async function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {
   fileActivityMonitor.destory();
+  getAllFileService().forEach(disposeFileService);
 }

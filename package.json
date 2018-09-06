@@ -64,31 +64,35 @@
     },
     "commands": [
       {
-        "command": "sftp.config.default",
+        "command": "sftp.config",
         "title": "SFTP: Config"
       },
       {
-        "command": "sftp.list.default",
-        "title": "SFTP: List"
+        "command": "sftp.setProfile",
+        "title": "SFTP: Set Profile"
       },
       {
-        "command": "sftp.list.all",
-        "title": "SFTP: List All"
-      },
-      {
-        "command": "sftp.trans.remote",
+        "command": "sftp.upload.file",
         "title": "SFTP: Upload"
       },
       {
-        "command": "sftp.trans.local",
-        "title": "SFTP: Download"
+        "command": "sftp.upload.folder",
+        "title": "SFTP: Upload Folder"
       },
       {
-        "command": "sftp.trans.remote.project",
+        "command": "sftp.upload.project",
         "title": "SFTP: Upload Project"
       },
       {
-        "command": "sftp.trans.local.project",
+        "command": "sftp.download.file",
+        "title": "SFTP: Download"
+      },
+      {
+        "command": "sftp.download.folder",
+        "title": "SFTP: Download Folder"
+      },
+      {
+        "command": "sftp.download.project",
         "title": "SFTP: Download Project"
       },
       {
@@ -104,12 +108,16 @@
         "title": "SFTP: Diff"
       },
       {
-        "command": "ui.sftp.deleteRemote",
-        "title": "SFTP: Delete"
+        "command": "sftp.list",
+        "title": "SFTP: List"
       },
       {
-        "command": "sftp.setProfile",
-        "title": "SFTP: Set Profile"
+        "command": "sftp.listAll",
+        "title": "SFTP: List All"
+      },
+      {
+        "command": "sftp.delete.remote",
+        "title": "SFTP: Delete"
       },
       {
         "command": "sftp.revealInExplorer",
@@ -135,22 +143,18 @@
     "menus": {
       "commandPalette": [
         {
-          "command": "sftp.config.default"
+          "command": "sftp.config"
         },
         {
-          "command": "sftp.list.default",
+          "command": "sftp.setProfile",
           "when": "sftp.enabled"
         },
         {
-          "command": "sftp.list.all",
+          "command": "sftp.upload.project",
           "when": "sftp.enabled"
         },
         {
-          "command": "sftp.trans.remote.project",
-          "when": "sftp.enabled"
-        },
-        {
-          "command": "sftp.trans.local.project",
+          "command": "sftp.download.project",
           "when": "sftp.enabled"
         },
         {
@@ -162,15 +166,27 @@
           "when": "sftp.enabled"
         },
         {
-          "command": "sftp.setProfile",
+          "command": "sftp.list",
           "when": "sftp.enabled"
         },
         {
-          "command": "sftp.trans.remote",
+          "command": "sftp.listAll",
+          "when": "sftp.enabled"
+        },
+        {
+          "command": "sftp.upload.file",
           "when": "false"
         },
         {
-          "command": "sftp.trans.local",
+          "command": "sftp.upload.folder",
+          "when": "false"
+        },
+        {
+          "command": "sftp.download.file",
+          "when": "false"
+        },
+        {
+          "command": "sftp.download.folder",
           "when": "false"
         },
         {
@@ -178,7 +194,7 @@
           "when": "false"
         },
         {
-          "command": "ui.sftp.deleteRemote",
+          "command": "sftp.delete.remote",
           "when": "false"
         },
         {
@@ -220,24 +236,34 @@
           "when": "sftp.enabled && explorerResourceIsFolder"
         },
         {
-          "command": "sftp.trans.remote",
+          "command": "sftp.upload.file",
           "group": "sftp.trans@1",
-          "when": "sftp.enabled"
+          "when": "sftp.enabled && !explorerResourceIsFolder"
         },
         {
-          "command": "sftp.trans.local",
+          "command": "sftp.upload.folder",
+          "group": "sftp.trans@1",
+          "when": "sftp.enabled && explorerResourceIsFolder"
+        },
+        {
+          "command": "sftp.download.file",
           "group": "sftp.trans@2",
-          "when": "sftp.enabled"
+          "when": "sftp.enabled && !explorerResourceIsFolder"
+        },
+        {
+          "command": "sftp.download.folder",
+          "group": "sftp.trans@2",
+          "when": "sftp.enabled && explorerResourceIsFolder"
         }
       ],
       "editor/context": [
         {
-          "command": "sftp.trans.remote",
+          "command": "sftp.upload.file",
           "group": "sftp.trans@1",
           "when": "sftp.enabled && resourceScheme == file"
         },
         {
-          "command": "sftp.trans.local",
+          "command": "sftp.download.file",
           "group": "sftp.trans@2",
           "when": "sftp.enabled && resourceScheme == file"
         },
@@ -282,7 +308,7 @@
           "when": "view == remoteExplorer && viewItem != root"
         },
         {
-          "command": "ui.sftp.deleteRemote",
+          "command": "sftp.delete.remote",
           "group": "7_modification",
           "when": "view == remoteExplorer && viewItem != root"
         }
@@ -296,7 +322,7 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "tsc -p ./",
+    "vscode:prepublish": "rimraf out/* && tsc -p ./",
     "compile": "tsc -watch -p ./",
     "postinstall": "node ./node_modules/vscode/bin/install",
     "test": "node ./node_modules/vscode/bin/test",
@@ -311,15 +337,16 @@
     "@types/node": "^6.0.40",
     "jest": "^20.0.4",
     "mocha": "^2.3.3",
+    "rimraf": "^2.6.2",
     "tslint": "^5.9.1",
-    "typescript": "^2.7.2",
+    "typescript": "^3.0.3",
     "vscode": "^1.1.17"
   },
   "dependencies": {
     "async": "^2.6.0",
+    "fast-glob": "^2.2.2",
     "fs-extra": "^3.0.1",
     "ftp": "^0.3.10",
-    "glob": "^7.1.2",
     "ignore": "^3.3.7",
     "joi": "^10.6.0",
     "lodash.debounce": "^4.0.8",

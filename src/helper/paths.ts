@@ -1,6 +1,6 @@
 import * as os from 'os';
 import * as path from 'path';
-import upath from '../core/upath';
+import { upath } from '../core';
 import { pathRelativeToWorkspace, getWorkspaceFolders } from '../host';
 
 export function simplifyPath(absolutePath: string) {

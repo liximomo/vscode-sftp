@@ -10,25 +10,35 @@ export const REMOTE_SCHEME = 'remote';
 export const CONGIF_FILENAME = 'sftp.json';
 export const CONFIG_PATH = path.join(VENDOR_FOLDER, CONGIF_FILENAME);
 
-export const COMMAND_CONFIG = 'sftp.config.default';
+// command not in package.json
 export const COMMAND_TOGGLE_OUTPUT = 'sftp.toggleOutput';
+export const COMMAND_SHOWRESOURCE = 'sftp.showResource';
+
+// commands in package.json
+export const COMMAND_CONFIG = 'sftp.config';
 export const COMMAND_SET_PROFILE = 'sftp.setProfile';
+
+export const COMMAND_UPLOAD = 'sftp.upload';
+export const COMMAND_FORCE_UPLOAD = 'sftp.forceUpload';
+export const COMMAND_UPLOAD_FILE = 'sftp.upload.file';
+export const COMMAND_UPLOAD_FOLDER = 'sftp.upload.folder';
+export const COMMAND_UPLOAD_PROJECT = 'sftp.upload.project';
+export const COMMAND_DOWNLOAD = 'sftp.download';
+export const COMMAND_FORCE_DOWNLOAD = 'sftp.forceDownload';
+export const COMMAND_DOWNLOAD_FILE = 'sftp.download.file';
+export const COMMAND_DOWNLOAD_FOLDER = 'sftp.download.folder';
+export const COMMAND_DOWNLOAD_PROJECT = 'sftp.download.project';
 
 export const COMMAND_SYNC_TO_REMOTE = 'sftp.sync.remote';
 export const COMMAND_SYNC_TO_LOCAL = 'sftp.sync.local';
-export const COMMAND_UPLOAD = 'sftp.trans.remote';
-export const COMMAND_UPLOAD_PROJECT = 'sftp.trans.remote.project';
-export const COMMAND_DOWNLOAD = 'sftp.trans.local';
-export const COMMAND_DOWNLOAD_PROJECT = 'sftp.trans.local.project';
-export const COMMAND_LIST_DEFAULT = 'sftp.list.default';
-export const COMMAND_LIST_ALL = 'sftp.list.all';
-export const COMMAND_DIFF = 'sftp.diff';
-export const COMMAND_DELETEREMOTE = 'sftp.deleteRemote';
-export const COMMAND_REVEALINEXPLORER = 'sftp.revealInExplorer';
-export const COMMAND_REVEALRESOURCE = 'sftp.revealInRemoteExplorer';
-export const COMMAND_SHOWRESOURCE = 'sftp.showResource';
 
-export const UI_COMMAND_DELETEREMOTE = 'ui.sftp.deleteRemote';
-export const COMMAND_REMOTEEXPLORER_DELETE = 'sftp.remoteExplorer.delete';
+export const COMMAND_DIFF = 'sftp.diff';
+export const COMMAND_LIST = 'sftp.list';
+export const COMMAND_LIST_ALL = 'sftp.listAll';
+export const COMMAND_DELETE_REMOTE = 'sftp.delete.remote';
+export const COMMAND_SLIENT_DELETE_REMOTE = 'sftp.slientDelete.remote';
+export const COMMAND_REVEAL_IN_EXPLORER = 'sftp.revealInExplorer';
+export const COMMAND_REVEAL_IN_REMOTE_EXPLORER = 'sftp.revealInRemoteExplorer';
+
 export const COMMAND_REMOTEEXPLORER_REFRESH = 'sftp.remoteExplorer.refresh';
 export const COMMAND_REMOTEEXPLORER_EDITINLOCAL = 'sftp.remoteExplorer.editInLocal';

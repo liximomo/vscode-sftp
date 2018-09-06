@@ -1,55 +1,30 @@
 import * as vscode from 'vscode';
 import * as debounce from 'lodash.debounce';
-import * as output from '../ui/output';
 import { executeCommand } from '../host';
-import { COMMAND_UPLOAD, COMMAND_DELETEREMOTE } from '../constants';
+import { COMMAND_UPLOAD, COMMAND_SLIENT_DELETE_REMOTE } from '../constants';
 import { isValidFile, fileDepth } from '../helper';
-import logger from '../logger';
-import { WatcherService } from '../core/FileService';
+import { WatcherService } from '../core/fileService';
 
 const watchers: {
   [x: string]: vscode.FileSystemWatcher;
 } = {};
 
-const uploadQueue = new Set<string>();
-const deleteQueue = new Set<string>();
+const uploadQueue = new Set<vscode.Uri>();
+const deleteQueue = new Set<vscode.Uri>();
 
 // less than 550 will not work
 const ACTION_INTEVAL = 550;
 
-function fileError(event, file, showErrorWindow = true) {
-  return error => {
-    logger.error(`${event} ${file}`, '\n', error.stack);
-    if (showErrorWindow) {
-      output.show();
-    }
-  };
-}
-
 function doUpload() {
-  const files = Array.from(uploadQueue).sort((a, b) => fileDepth(b) - fileDepth(a));
+  const files = Array.from(uploadQueue).sort((a, b) => fileDepth(b.fsPath) - fileDepth(a.fsPath));
   uploadQueue.clear();
-  files.forEach(async file => {
-    logger.info('[watcher]', `${file} updated`);
-    try {
-      await executeCommand(COMMAND_UPLOAD, vscode.Uri.file(file));
-    } catch {
-      fileError('upload', file);
-    }
-  });
+  executeCommand(COMMAND_UPLOAD, files[0], files);
 }
 
 function doDelete() {
-  const files = Array.from(deleteQueue).sort((a, b) => fileDepth(b) - fileDepth(a));
+  const files = Array.from(deleteQueue).sort((a, b) => fileDepth(b.fsPath) - fileDepth(a.fsPath));
   deleteQueue.clear();
-  files.forEach(async file => {
-    logger.info('[watcher]', `${file} removed`);
-    try {
-      await executeCommand(COMMAND_DELETEREMOTE, vscode.Uri.file(file));
-    } catch {
-      fileError(`delete ${file}'s remote`, false);
-    }
-  });
+  executeCommand(COMMAND_SLIENT_DELETE_REMOTE, files[0], files);
 }
 
 const debouncedUpload = debounce(doUpload, ACTION_INTEVAL, { leading: true, trailing: true });
@@ -60,7 +35,7 @@ function uploadHandler(uri: vscode.Uri) {
     return;
   }
 
-  uploadQueue.add(uri.fsPath);
+  uploadQueue.add(uri);
   debouncedUpload();
 }
 
@@ -111,7 +86,7 @@ function createWatcher(
         return;
       }
 
-      deleteQueue.add(uri.fsPath);
+      deleteQueue.add(uri);
       debouncedDelete();
     });
   }

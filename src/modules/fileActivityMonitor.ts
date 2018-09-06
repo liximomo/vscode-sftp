@@ -23,10 +23,10 @@ async function handleConfigSave(uri: vscode.Uri) {
   const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
   const workspacePath = workspaceFolder.uri.fsPath;
 
-  // dispose old sercive
-  findAllFileService(sercive => sercive.workspace === workspacePath).forEach(disposeFileService);
+  // dispose old service
+  findAllFileService(service => service.workspace === workspacePath).forEach(disposeFileService);
 
-  // create new sercive
+  // create new service
   try {
     const configs = await readConfigsFromFile(uri.fsPath, workspacePath);
     configs.forEach(config => createFileService(workspacePath, config));
@@ -41,8 +41,7 @@ async function handleFileSave(uri) {
   const activityPath = uri.fsPath;
   let config;
   try {
-    const fileService = getFileService(activityPath);
-    config = fileService.getConfig();
+    config = getFileService(activityPath).getConfig();
   } catch (error) {
     logger.error(error);
     return;
@@ -58,8 +57,7 @@ async function downloadOnOpen(uri) {
   const activityPath = uri.fsPath;
   let config;
   try {
-    const fileService = getFileService(activityPath);
-    config = fileService.getConfig();
+    config = getFileService(activityPath).getConfig();
   } catch (error) {
     // a new-created config
     if (!isConfigFile(uri)) {

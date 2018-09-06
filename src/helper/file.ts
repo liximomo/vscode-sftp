@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as tmp from 'tmp';
 import * as vscode from 'vscode';
 import { CONGIF_FILENAME } from '../constants';
-import upath from '../core/upath';
+import { upath } from '../core';
 
 export function isValidFile(uri: vscode.Uri) {
   return uri.scheme === 'file';
