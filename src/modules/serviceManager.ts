@@ -31,7 +31,7 @@ export function createFileService(workspace: string, config: any) {
   }
 
   const baseDir = config.context ? config.context : workspace;
-  const normalizedBasePath = normalizePathForTrie(baseDir);
+  const normalizedBasePath = normalizePathForTrie(path.resolve(workspace, baseDir));
   const service = new FileService(normalizedBasePath, workspace, config);
   serviceManager.add(normalizedBasePath, service);
   service.name = config.name;
