@@ -1,7 +1,7 @@
+import { Uri } from 'vscode';
 import * as path from 'path';
 import app from '../app';
-import Trie from '../core/Trie';
-import FileService from '../core/fileService';
+import { Trie, UResource, FileService } from '../core';
 import { validateConfig } from './config';
 import watcherService from './fileWatcher';
 
@@ -41,10 +41,15 @@ export function createFileService(workspace: string, config: any) {
   return service;
 }
 
-export function getFileService(filePath: string) {
-  const fileService = serviceManager.findPrefix(normalizePathForTrie(filePath));
-  if (!fileService) {
-    throw new Error(`(${filePath}) config file not found`);
+export function getFileService(uri: Uri): FileService {
+  let fileService;
+  if (UResource.isRemote(uri)) {
+    const remoteRoot = app.remoteExplorer.findRoot(uri);
+    if (remoteRoot) {
+      fileService = remoteRoot.explorerContext.fileService;
+    }
+  } else {
+    fileService = serviceManager.findPrefix(normalizePathForTrie(uri.fsPath));
   }
 
   return fileService;

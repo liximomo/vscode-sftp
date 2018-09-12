@@ -29,9 +29,13 @@ export default class RemoteExplorer {
 
   refresh(item?: ExplorerItem) {
     if (item && !UResource.isRemote(item.resource.uri)) {
-      const localPath = item.resource.fsPath;
-      const fileService = getFileService(localPath);
+      const uri = item.resource.uri;
+      const fileService = getFileService(uri);
+      if (!fileService) {
+        throw new Error(`FileService Not Found. (${uri.toString(true)}) `);
+      }
       const config = fileService.getConfig();
+      const localPath = item.resource.fsPath;
       const remotePath = toRemotePath(localPath, config.context, config.remotePath);
       item.resource = UResource.makeResource({
         remote: {

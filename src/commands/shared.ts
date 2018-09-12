@@ -4,7 +4,7 @@ import { getAllFileService } from '../modules/serviceManager';
 import { ExplorerItem } from '../modules/RemoteTreeData';
 import app from '../app';
 import { getActiveTextEditor } from '../host';
-import { listFiles, isSubpathOf, toLocalPath, simplifyPath } from '../helper';
+import { listFiles, toLocalPath, simplifyPath } from '../helper';
 
 // NEED_VSCODE_UPDATE: detect explorer view visible
 // refresh will open explorer view which cause a problem https://github.com/liximomo/vscode-sftp/issues/286

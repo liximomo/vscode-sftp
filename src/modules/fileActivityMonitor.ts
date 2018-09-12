@@ -37,42 +37,35 @@ async function handleConfigSave(uri: vscode.Uri) {
   }
 }
 
-async function handleFileSave(uri) {
-  const activityPath = uri.fsPath;
-  let config;
-  try {
-    config = getFileService(activityPath).getConfig();
-  } catch (error) {
-    logger.error(error);
+async function handleFileSave(uri: vscode.Uri) {
+  const fileService = getFileService(uri);
+  if (!fileService) {
+    logger.error(new Error(`FileService Not Found. (${uri.toString(true)}) `));
     return;
   }
 
+  const config = fileService.getConfig();
   if (config.uploadOnSave) {
-    logger.info(`[file-save] ${activityPath}`);
+    logger.info(`[file-save] ${uri.fsPath}`);
     await executeCommand(COMMAND_UPLOAD, uri);
   }
 }
 
-async function downloadOnOpen(uri) {
-  const activityPath = uri.fsPath;
-  let config;
-  try {
-    config = getFileService(activityPath).getConfig();
-  } catch (error) {
-    // a new-created config
-    if (!isConfigFile(uri)) {
-      logger.error(error);
-    }
+async function downloadOnOpen(uri: vscode.Uri) {
+  const fileService = getFileService(uri);
+  if (!fileService && /* a new-created config */ !isConfigFile(uri)) {
+    logger.error(new Error(`FileService Not Found. (${uri.toString(true)}) `));
     return;
   }
 
+  const config = fileService.getConfig();
   if (config.downloadOnOpen) {
     if (config.downloadOnOpen === 'confirm') {
       const isConfirm = await showConfirmMessage('Do you want SFTP to download this file?');
       if (!isConfirm) return;
     }
 
-    logger.info(`[file-open] download ${activityPath}`);
+    logger.info(`[file-open] download ${uri.fsPath}`);
     await executeCommand(COMMAND_DOWNLOAD, uri);
   }
 }

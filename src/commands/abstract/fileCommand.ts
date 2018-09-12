@@ -26,16 +26,9 @@ export default abstract class FileCommand extends Command {
   protected abstract handleFile(uResource: UResource, fileService: FileService): Promise<any>;
 
   private _handleFile(uri: Uri): Promise<any> {
-    let fileService: FileService;
-
-    if (UResource.isRemote(uri)) {
-      const remoteRoot = app.remoteExplorer.findRoot(uri);
-      if (!remoteRoot) {
-        throw new Error(`Can't find config for remote resource ${uri}.`);
-      }
-      fileService = remoteRoot.explorerContext.fileService;
-    } else {
-      fileService = getFileService(uri.fsPath);
+    const fileService = getFileService(uri);
+    if (!fileService) {
+      throw new Error(`FileService Not Found. (${uri.toString(true)}) `);
     }
 
     const config = fileService.getConfig();

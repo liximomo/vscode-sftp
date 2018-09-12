@@ -3,7 +3,7 @@ import app from '../app';
 import upath from './upath';
 import Ignore from './ignore';
 import FileSystem from './Fs/fileSystem';
-import { getHostInfo, filesIgnoredFromConfig } from '../helper';
+import { filesIgnoredFromConfig } from '../helper';
 import { createRemoteIfNoneExist, removeRemote } from './remoteFs';
 import localFs from './localFs';
 
@@ -22,12 +22,34 @@ type ConfigValidator = (x: any) => { message: string };
 
 let id = 0;
 
+function getHostInfo(config) {
+  const ignoreOptions = [
+    'name',
+    'remotePath',
+    'uploadOnSave',
+    'downloadOnOpen',
+    'syncMode',
+    'ignore',
+    'ignoreFile',
+    'watcher',
+    'concurrency',
+    'sshConfigPath',
+  ];
+
+  return Object.keys(config).reduce((obj, key) => {
+    if (ignoreOptions.indexOf(key) === -1) {
+      obj[key] = config[key];
+    }
+    return obj;
+  }, {});
+}
+
 export default class FileService {
   private _name: string;
   private _watcher: WatcherConfig;
+  private _profiles: string[];
   private _config: any;
   private _configValidator: ConfigValidator;
-  private _profiles: string[];
   private _watcherService: WatcherService = {
     create() {
       /* do nothing  */
