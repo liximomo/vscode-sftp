@@ -25,11 +25,16 @@ export function toggle() {
 export function print(...args) {
   const msg = args
     .map(arg => {
+      if (!arg) {
+        return arg;
+      }
+
       if (arg instanceof Error) {
         return arg.stack;
       } else if (!arg.toString || arg.toString() === '[object Object]') {
         return JSON.stringify(arg);
       }
+
       return arg;
     })
     .join(' ');

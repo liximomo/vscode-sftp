@@ -65,67 +65,108 @@
     "commands": [
       {
         "command": "sftp.config",
-        "title": "SFTP: Config"
+        "title": "Config",
+        "category": "SFTP"
       },
       {
         "command": "sftp.setProfile",
-        "title": "SFTP: Set Profile"
+        "title": "Set Profile",
+        "category": "SFTP"
+      },
+      {
+        "command": "sftp.upload.activeFile",
+        "title": "Upload Active File",
+        "category": "SFTP"
       },
       {
         "command": "sftp.upload.file",
-        "title": "SFTP: Upload"
+        "title": "Upload",
+        "category": "SFTP"
       },
       {
         "command": "sftp.upload.folder",
-        "title": "SFTP: Upload Folder"
+        "title": "Upload Folder",
+        "category": "SFTP"
       },
       {
         "command": "sftp.upload.project",
-        "title": "SFTP: Upload Project"
+        "title": "Upload Project",
+        "category": "SFTP"
+      },
+      {
+        "command": "sftp.forceUpload",
+        "title": "Force Upload",
+        "category": "SFTP"
+      },
+      {
+        "command": "sftp.download.activeFile",
+        "title": "Download Active File",
+        "category": "SFTP"
       },
       {
         "command": "sftp.download.file",
-        "title": "SFTP: Download"
+        "title": "Download",
+        "category": "SFTP"
       },
       {
         "command": "sftp.download.folder",
-        "title": "SFTP: Download Folder"
+        "title": "Download Folder",
+        "category": "SFTP"
       },
       {
         "command": "sftp.download.project",
-        "title": "SFTP: Download Project"
+        "title": "Download Project",
+        "category": "SFTP"
+      },
+      {
+        "command": "sftp.forceDownload",
+        "title": "Force Download",
+        "category": "SFTP"
       },
       {
         "command": "sftp.sync.remote",
-        "title": "SFTP: Sync To Remote"
+        "title": "Sync To Remote",
+        "category": "SFTP"
       },
       {
         "command": "sftp.sync.local",
-        "title": "SFTP: Sync To Local"
+        "title": "Sync To Local",
+        "category": "SFTP"
       },
       {
         "command": "sftp.diff",
-        "title": "SFTP: Diff"
+        "title": "Diff",
+        "category": "SFTP"
       },
       {
         "command": "sftp.list",
-        "title": "SFTP: List"
+        "title": "List",
+        "category": "SFTP"
       },
       {
         "command": "sftp.listAll",
-        "title": "SFTP: List All"
+        "title": "List All",
+        "category": "SFTP"
       },
       {
         "command": "sftp.delete.remote",
-        "title": "SFTP: Delete"
+        "title": "Delete",
+        "category": "SFTP"
       },
       {
         "command": "sftp.revealInExplorer",
-        "title": "SFTP: Reveal in Explorer"
+        "title": "Reveal in Explorer",
+        "category": "SFTP"
       },
       {
         "command": "sftp.revealInRemoteExplorer",
-        "title": "SFTP: Reveal in Remote Explorer"
+        "title": "Reveal in Remote Explorer",
+        "category": "SFTP"
+      },
+      {
+        "command": "sftp.remoteExplorer.editInLocal",
+        "title": "Edit in Local",
+        "category": "SFTP"
       },
       {
         "command": "sftp.remoteExplorer.refresh",
@@ -134,10 +175,6 @@
           "light": "resources/light/refresh.svg",
           "dark": "resources/dark/refresh.svg"
         }
-      },
-      {
-        "command": "sftp.remoteExplorer.editInLocal",
-        "title": "SFTP: Edit in Local"
       }
     ],
     "menus": {
@@ -182,11 +219,19 @@
           "when": "false"
         },
         {
+          "command": "sftp.forceUpload",
+          "when": "false"
+        },
+        {
           "command": "sftp.download.file",
           "when": "false"
         },
         {
           "command": "sftp.download.folder",
+          "when": "false"
+        },
+        {
+          "command": "sftp.forceDownload",
           "when": "false"
         },
         {
@@ -206,11 +251,11 @@
           "when": "false"
         },
         {
-          "command": "sftp.remoteExplorer.refresh",
+          "command": "sftp.remoteExplorer.editInLocal",
           "when": "false"
         },
         {
-          "command": "sftp.remoteExplorer.editInLocal",
+          "command": "sftp.remoteExplorer.refresh",
           "when": "false"
         }
       ],
@@ -243,6 +288,7 @@
         {
           "command": "sftp.upload.folder",
           "group": "sftp.trans@1",
+          "alt": "sftp.forceUpload",
           "when": "sftp.enabled && explorerResourceIsFolder"
         },
         {
@@ -253,6 +299,7 @@
         {
           "command": "sftp.download.folder",
           "group": "sftp.trans@2",
+          "alt": "sftp.forceDownload",
           "when": "sftp.enabled && explorerResourceIsFolder"
         }
       ],

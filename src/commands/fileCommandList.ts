@@ -8,13 +8,10 @@ import { selectFile, refreshLocalExplorer } from './shared';
 
 export default class List extends FileCommand {
   static id = COMMAND_LIST;
-  static option = {
-    requireTarget: false,
-  };
   static getFileTarget = selectFile;
 
-  async handleFile(uResource: UResource, fileService: FileService) {
-    await download(uResource, fileService);
+  async handleFile(uResource: UResource, fileService: FileService, config: any) {
+    await download(uResource, fileService, config);
     const localFs = fileService.getLocalFileSystem();
     const fileEntry = await localFs.lstat(uResource.localFsPath);
     if (fileEntry.type !== fs.FileType.Directory) {

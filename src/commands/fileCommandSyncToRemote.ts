@@ -6,13 +6,10 @@ import { selectFolderFallbackToConfigContext, refreshRemoteExplorer } from './sh
 
 export default class SyncToRemote extends FileCommand {
   static id = COMMAND_SYNC_TO_REMOTE;
-  static option = {
-    requireTarget: true,
-  };
   static getFileTarget = selectFolderFallbackToConfigContext;
 
-  async handleFile(uResource: UResource, fileService: FileService) {
-    await sync2Remote(uResource, fileService);
+  async handleFile(uResource: UResource, fileService: FileService, config: any) {
+    await sync2Remote(uResource, fileService, config);
     refreshRemoteExplorer(uResource, true);
   }
 }

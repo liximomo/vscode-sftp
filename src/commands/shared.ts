@@ -57,17 +57,6 @@ export function selectContext(): Promise<Uri> {
   });
 }
 
-function getActiveTarget(): Promise<Uri> {
-  return new Promise((resolve, reject) => {
-    const active = getActiveTextEditor();
-    if (!active || !active.document) {
-      throw new Error('Action must have a file or directory as target!');
-    }
-
-    resolve(active.document.uri);
-  });
-}
-
 function configIngoreFilterCreator(config) {
   if (!config || !config.ignore) {
     return null;
@@ -108,24 +97,31 @@ function createFileSelector({ filterCreator = null } = {}) {
   };
 }
 
-// selected file or activeTarget or configContext
-export function selectActivedFile(item, items): Promise<Uri | Uri[]> {
-  // from explorer or editor context
-  if (item) {
-    if (item instanceof Uri) {
-      if (Array.isArray(items) && items[0] instanceof Uri) {
-        // multi-select in explorer
-        return Promise.resolve(items);
-      } else {
-        return Promise.resolve(item);
-      }
-    } else if ((item as ExplorerItem).resource) {
-      // from remote explorer
-      return Promise.resolve(item.resource.uri);
-    }
+export function getActiveDocumentUri() {
+  const active = getActiveTextEditor();
+  if (!active || !active.document) {
+    return null;
   }
 
-  return getActiveTarget();
+  return active.document.uri;
+}
+
+// selected file or activeTarget or configContext
+export function uriFromExplorerContextOrEditorContext(item, items): Promise<Uri | Uri[]> {
+  // from explorer or editor context
+  if (item instanceof Uri) {
+    if (Array.isArray(items) && items[0] instanceof Uri) {
+      // multi-select in explorer
+      return Promise.resolve(items);
+    } else {
+      return Promise.resolve(item);
+    }
+  } else if ((item as ExplorerItem).resource) {
+    // from remote explorer
+    return Promise.resolve(item.resource.uri);
+  }
+
+  return null;
 }
 
 // selected folder or configContext

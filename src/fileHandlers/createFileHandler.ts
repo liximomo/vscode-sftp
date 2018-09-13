@@ -1,9 +1,11 @@
+import { Uri } from 'vscode';
 import * as path from 'path';
 import { showErrorMessage } from '../host';
 import { fs, fileOps, UResource, FileService } from '../core';
 import { simplifyPath } from '../helper';
 import app from '../app';
 import logger from '../logger';
+import { getFileService } from '../modules/serviceManager';
 
 interface FileHandlerOption {
   name: string;
@@ -16,7 +18,10 @@ interface FileHandlerConfig {
   doNotTriggerWatcher?: boolean;
 }
 
-type FileHandler<T> = (target: UResource, fileService: FileService, option?: T) => Promise<any>;
+interface FileHandler<T> {
+  (target: UResource, fileService: FileService, config: any, option?: T): Promise<any>;
+  (target: Uri, option?: T): Promise<any>;
+}
 
 type FileHandlerImpl = (
   uResource: UResource,
@@ -41,12 +46,36 @@ function onProgress(error: Error, task: fileOps.FileTask) {
 export default function createFileHandler<T>(
   handlerOption: FileHandlerOption
 ): FileHandler<Partial<T>> {
-  return async (target: UResource, fileService: FileService, option: T) => {
+  async function fileHandle(
+    target: UResource | Uri,
+    fileService?: FileService | Partial<T>,
+    config?: any,
+    option?: Partial<T>
+  ) {
+    if (target instanceof Uri) {
+      if (fileService) {
+        option = fileService as Partial<T>;
+      }
+      fileService = getFileService(target);
+      if (!fileService) {
+        throw new Error(`FileService Not Found. (${target.toString(true)}) `);
+      }
+      config = fileService.getConfig();
+      target = UResource.from(target, {
+        localBasePath: fileService.baseDir,
+        remoteBasePath: fileService.remoteBaseDir,
+        remoteId: fileService.id,
+        remote: {
+          host: config.host,
+          port: config.port,
+        },
+      });
+    }
+
     logger.trace(`handle ${handlerOption.name} for`, target.localFsPath);
 
+    fileService = fileService as FileService;
     const handleConfig = handlerOption.config || {};
-
-    const config = fileService.getConfig();
     const remoteFs = await fileService.getRemoteFileSystem();
     const optionFromConfig = handlerOption.transformOption
       ? handlerOption.transformOption(config)
@@ -58,11 +87,9 @@ export default function createFileHandler<T>(
     if (option) {
       Object.assign(invokeOption, option);
     }
-
     if (handleConfig.doNotTriggerWatcher) {
       fileService.disableWatcher();
     }
-
     try {
       return await handlerOption.handler(
         target,
@@ -76,9 +103,11 @@ export default function createFileHandler<T>(
       if (handleConfig.doNotTriggerWatcher) {
         // delay setup watcher to avoid download event
         setTimeout(() => {
-          fileService.enableWatcher();
+          (fileService as FileService).enableWatcher();
         }, 1000 * 3);
       }
     }
-  };
+  }
+
+  return fileHandle;
 }

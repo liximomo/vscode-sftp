@@ -6,13 +6,10 @@ import FileCommand from './abstract/fileCommand';
 
 export default class UploadProject extends FileCommand {
   static id = COMMAND_UPLOAD_PROJECT;
-  static option = {
-    requireTarget: false,
-  };
   static getFileTarget = selectContext;
 
-  async handleFile(uResource: UResource, fileService: FileService) {
-    await upload(uResource, fileService);
+  async handleFile(uResource: UResource, fileService: FileService, config: any) {
+    await upload(uResource, fileService, config);
     refreshRemoteExplorer(uResource, true);
   }
 }

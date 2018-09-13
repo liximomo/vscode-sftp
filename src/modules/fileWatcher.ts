@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
 import * as debounce from 'lodash.debounce';
 import { executeCommand } from '../host';
-import { COMMAND_UPLOAD, COMMAND_SLIENT_DELETE_REMOTE } from '../constants';
 import { isValidFile, fileDepth } from '../helper';
-import { WatcherService } from '../core/fileService';
+import { upload, removeRemote } from '../fileHandlers';
+import { WatcherService } from '../core';
 
 const watchers: {
   [x: string]: vscode.FileSystemWatcher;
@@ -18,13 +18,13 @@ const ACTION_INTEVAL = 550;
 function doUpload() {
   const files = Array.from(uploadQueue).sort((a, b) => fileDepth(b.fsPath) - fileDepth(a.fsPath));
   uploadQueue.clear();
-  executeCommand(COMMAND_UPLOAD, files[0], files);
+  files.forEach(uri => upload(uri));
 }
 
 function doDelete() {
   const files = Array.from(deleteQueue).sort((a, b) => fileDepth(b.fsPath) - fileDepth(a.fsPath));
   deleteQueue.clear();
-  executeCommand(COMMAND_SLIENT_DELETE_REMOTE, files[0], files);
+  files.forEach(uri => removeRemote(uri));
 }
 
 const debouncedUpload = debounce(doUpload, ACTION_INTEVAL, { leading: true, trailing: true });

@@ -6,7 +6,8 @@ export interface ITarget {
 }
 
 export interface CommandOption {
-  [x: string]: any;
+  // [x: string]: any;
+  noLog?: boolean;
 }
 
 export default abstract class Command {

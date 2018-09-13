@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import logger from '../logger';
 import app from '../app';
-import { COMMAND_DOWNLOAD, COMMAND_UPLOAD } from '../constants';
 import {
   executeCommand,
   onDidOpenTextDocument,
@@ -16,6 +15,7 @@ import {
   disposeFileService,
 } from './serviceManager';
 import { reportError, isValidFile, isConfigFile, isInWorksapce } from '../helper';
+import { upload, download} from '../fileHandlers';
 
 let workspaceWatcher: vscode.Disposable;
 
@@ -37,7 +37,7 @@ async function handleConfigSave(uri: vscode.Uri) {
   }
 }
 
-async function handleFileSave(uri: vscode.Uri) {
+function handleFileSave(uri: vscode.Uri) {
   const fileService = getFileService(uri);
   if (!fileService) {
     logger.error(new Error(`FileService Not Found. (${uri.toString(true)}) `));
@@ -47,7 +47,7 @@ async function handleFileSave(uri: vscode.Uri) {
   const config = fileService.getConfig();
   if (config.uploadOnSave) {
     logger.info(`[file-save] ${uri.fsPath}`);
-    await executeCommand(COMMAND_UPLOAD, uri);
+    upload(uri);
   }
 }
 
@@ -66,7 +66,7 @@ async function downloadOnOpen(uri: vscode.Uri) {
     }
 
     logger.info(`[file-open] download ${uri.fsPath}`);
-    await executeCommand(COMMAND_DOWNLOAD, uri);
+    download(uri);
   }
 }
 
@@ -87,14 +87,14 @@ function watchWorkspace({
       return;
     }
 
-    if (isConfigFile(uri)) {
-      onDidSaveSftpConfig(uri);
-      return;
-    }
-
     // remove staled cache
     if (app.ignoreFileCache.has(uri.fsPath)) {
       app.ignoreFileCache.del(uri.fsPath);
+    }
+
+    if (isConfigFile(uri)) {
+      onDidSaveSftpConfig(uri);
+      return;
     }
 
     onDidSaveFile(uri);

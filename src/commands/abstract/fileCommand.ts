@@ -5,15 +5,11 @@ import { getFileService } from '../../modules/serviceManager';
 import { reportError } from '../../helper';
 import { FileService, UResource } from '../../core';
 import Command, { CommandOption } from './command';
+import logger from '../../logger';
 
-type TargetGetter = (item, items?) => Uri | Uri[] | Promise<Uri | Uri[]>;
-
-export interface FileCommandOption extends CommandOption {
-  requireTarget?: boolean;
-}
+type TargetGetter = (...args: any[]) => Uri | Uri[] | Promise<Uri | Uri[]>;
 
 export default abstract class FileCommand extends Command {
-  static option: FileCommandOption;
   static getFileTarget: TargetGetter;
 
   constructor(name: string) {
@@ -23,7 +19,7 @@ export default abstract class FileCommand extends Command {
     });
   }
 
-  protected abstract handleFile(uResource: UResource, fileService: FileService): Promise<any>;
+  protected abstract handleFile(uResource: UResource, fileService: FileService, config: any): Promise<any>;
 
   private _handleFile(uri: Uri): Promise<any> {
     const fileService = getFileService(uri);
@@ -42,17 +38,14 @@ export default abstract class FileCommand extends Command {
       },
     });
 
-    return this.handleFile(uResource, fileService);
+    return this.handleFile(uResource, fileService, config);
   }
 
-  protected async doCommandRun(item, items) {
+  protected async doCommandRun(...args) {
     const clz = this.constructor as typeof FileCommand;
-    const target = await clz.getFileTarget(item, items);
+    const target = await clz.getFileTarget(...args);
     if (!target) {
-      if (clz.option.requireTarget) {
-        showWarningMessage(`The "${this._name}" command can not find a target.`);
-      }
-
+      logger.warn(`The "${this._name}" command get canceled without because of missing targets.`);
       return;
     }
 
