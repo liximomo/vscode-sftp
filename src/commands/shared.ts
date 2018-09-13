@@ -1,7 +1,7 @@
 import { Uri, window } from 'vscode';
 import { UResource, FileService, fs } from '../core';
 import { getAllFileService } from '../modules/serviceManager';
-import { ExplorerItem } from '../modules/RemoteTreeData';
+import { ExplorerItem } from '../modules/remoteExplorer';
 import app from '../app';
 import { getActiveTextEditor } from '../host';
 import { listFiles, toLocalPath, simplifyPath } from '../helper';

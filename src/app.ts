@@ -1,8 +1,8 @@
 import * as LRU from 'lru-cache';
-import StatusBarItem from './ui/StatusBarItem';
+import StatusBarItem from './ui/statusBarItem';
 import { COMMAND_TOGGLE_OUTPUT } from './constants';
-import AppState from './modules/AppState';
-import RemoteExplorer from './modules/RemoteExplorer';
+import AppState from './modules/appState';
+import RemoteExplorer from './modules/remoteExplorer';
 
 interface App {
   ignoreFileCache: LRU.Cache<string, string[]>;

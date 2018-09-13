@@ -1,18 +1,18 @@
 import * as vscode from 'vscode';
-import { showTextDocument, registerCommand } from '../host';
-import { UResource, Resource } from '../core';
-import { toRemotePath } from '../helper';
-import { REMOTE_SCHEME } from '../constants';
-import { getFileService } from './serviceManager';
-import RemoteTreeData, { ExplorerItem } from './RemoteTreeData';
-import { COMMAND_REMOTEEXPLORER_REFRESH, COMMAND_SHOWRESOURCE } from '../constants';
+import { showTextDocument, registerCommand } from '../../host';
+import { COMMAND_REMOTEEXPLORER_REFRESH, COMMAND_SHOWRESOURCE } from '../../constants';
+import { UResource, Resource } from '../../core';
+import { toRemotePath } from '../../helper';
+import { REMOTE_SCHEME } from '../../constants';
+import { getFileService } from '../serviceManager';
+import RemoteTreeDataProvider, { ExplorerItem } from './treeDataProvider';
 
 export default class RemoteExplorer {
   private _explorerView: vscode.TreeView<ExplorerItem>;
-  private _treeDataProvider: RemoteTreeData;
+  private _treeDataProvider: RemoteTreeDataProvider;
 
   constructor(context: vscode.ExtensionContext) {
-    this._treeDataProvider = new RemoteTreeData();
+    this._treeDataProvider = new RemoteTreeDataProvider();
     context.subscriptions.push(
       vscode.workspace.registerTextDocumentContentProvider(REMOTE_SCHEME, this._treeDataProvider)
     );

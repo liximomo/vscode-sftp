@@ -1,11 +1,11 @@
 import * as path from 'path';
 import { ExtensionContext } from 'vscode';
 import * as fg from 'fast-glob';
-import logger from '../logger';
-import { registerCommand } from '../host';
-import Command from './abstract/command';
+import logger from './logger';
+import { registerCommand } from './host';
+import Command from './commands/abstract/command';
 
-const COMMAND_FILENAME_PATTERN = '@(command|fileCommand)*.js';
+const COMMAND_FILENAME_PATTERN = `${__dirname}/commands/@(command|fileCommand)*.js`;
 
 interface CommandConstructor {
   new (name: string): Command;
@@ -22,7 +22,7 @@ function nomalizeCommandName(rawName) {
 }
 
 async function loadCommands(pattern, nameRegex, context: ExtensionContext) {
-  const entries = await fg<string>(`${__dirname}/${pattern}`, {
+  const entries = await fg<string>(pattern, {
     deep: false,
     onlyFiles: true,
     transform: entry => (typeof entry === 'string' ? entry : entry.path),

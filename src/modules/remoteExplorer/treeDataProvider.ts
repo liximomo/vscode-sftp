@@ -1,9 +1,7 @@
 import * as vscode from 'vscode';
-import { upath } from '../core';
-import { UResource, Resource, FileService } from '../core';
-import { FileType } from '../core/Fs/FileSystem';
-import { getAllFileService } from './serviceManager';
-import { COMMAND_SHOWRESOURCE } from '../constants';
+import { upath, UResource, Resource, FileService, fs } from '../../core';
+import { COMMAND_SHOWRESOURCE } from '../../constants';
+import { getAllFileService } from '../serviceManager';
 
 type Id = number;
 
@@ -29,7 +27,7 @@ function dirFisrtSort(fileA: ExplorerItem, fileB: ExplorerItem) {
   return fileA.isDirectory ? -1 : 1;
 }
 
-export class RemoteTreeData
+export default class RemoteTreeData
   implements vscode.TreeDataProvider<ExplorerItem>, vscode.TextDocumentContentProvider {
   private _roots: ExplorerRoot[];
   private _rootsMap: Map<Id, ExplorerRoot>;
@@ -88,12 +86,12 @@ export class RemoteTreeData
     if (!root) {
       throw new Error(`Can't find config for remote resource ${item.resource.uri}.`);
     }
-    const fs = await root.explorerContext.fileService.getRemoteFileSystem();
-    const fileEntries = await fs.list(item.resource.fsPath);
+    const remotefs = await root.explorerContext.fileService.getRemoteFileSystem();
+    const fileEntries = await remotefs.list(item.resource.fsPath);
 
     return fileEntries
       .map(file => {
-        const isDirectory = file.type === FileType.Directory;
+        const isDirectory = file.type === fs.FileType.Directory;
 
         return {
           resource: UResource.updateResource(item.resource, {
@@ -142,9 +140,9 @@ export class RemoteTreeData
       throw new Error(`Can't find remote for resource ${uri}.`);
     }
 
-    const fs = await root.explorerContext.fileService.getRemoteFileSystem();
-    const buffer = await fs.readFile(
-      UResource.makeResource(uri).fsPath || fs.pathResolver.normalize(uri.fsPath)
+    const remotefs = await root.explorerContext.fileService.getRemoteFileSystem();
+    const buffer = await remotefs.readFile(
+      UResource.makeResource(uri).fsPath || remotefs.pathResolver.normalize(uri.fsPath)
     );
     return buffer.toString();
   }
@@ -180,5 +178,3 @@ export class RemoteTreeData
     return this._roots;
   }
 }
-
-export default RemoteTreeData;
