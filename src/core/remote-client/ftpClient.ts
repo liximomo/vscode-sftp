@@ -1,5 +1,5 @@
 import * as Client from 'ftp';
-import RemoteClient, { ConnectOption } from './RemoteClient';
+import RemoteClient, { ConnectOption } from './remoteClient';
 
 export default class FTPClient extends RemoteClient {
   private connected: boolean = false;

@@ -2,7 +2,7 @@ import upath from './upath';
 import { promptForPassword } from '../host';
 import logger from '../logger';
 import app from '../app';
-import { ConnectOption } from './remote-client/RemoteClient';
+import { ConnectOption } from './remote-client/remoteClient';
 import { FileSystem, RemoteFileSystem, SFTPFileSystem, FTPFileSystem } from './fs';
 import localFs from './localFs';
 
