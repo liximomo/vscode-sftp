@@ -1,3 +1,13 @@
+## 1.5.0 - 2018-09-13
+### New Features
+  * new [alt commands](https://github.com/liximomo/vscode-sftp#alt-commands) `Force Download` and `Force Upload`. This allow you to download/upload files but disregard ignore rules.
+
+### Breaking Changes
+  * Rename command `sftp.trans.remote(SFTP: Upload)` to `sftp.upload.activeFile` and command `sftp.trans.local(SFTP: Download)` to `sftp.download.activeFile`. Please update your keybinding if you've used one of these commands. 
+
+### Deprecated
+  * Commands `SFTP: List` and `SFTP: List All` will be removed in favor of `Remote Explorer` in next release.
+
 ## 1.4.1 - 2018-09-03
 ### Feature
   * [Config in User Setting](https://github.com/liximomo/vscode-sftp#config-in-user-setting) config your remote in User Setting
