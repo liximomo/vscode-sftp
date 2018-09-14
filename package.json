@@ -2,7 +2,7 @@
   "name": "sftp",
   "displayName": "sftp",
   "description": "SFTP/FTP sync",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "publisher": "liximomo",
   "author": "liximomo <liximomo@gmail.com> (https://liximomo.github.io/)",
   "engines": {
@@ -27,7 +27,7 @@
     "remote"
   ],
   "activationEvents": [
-    "onCommand:sftp.config.default",
+    "onCommand:sftp.config",
     "workspaceContains:.vscode/sftp.json"
   ],
   "icon": "resources/icon.png",
