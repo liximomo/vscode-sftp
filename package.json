@@ -187,7 +187,15 @@
           "when": "sftp.enabled"
         },
         {
+          "command": "sftp.upload.activeFile",
+          "when": "sftp.enabled"
+        },
+        {
           "command": "sftp.upload.project",
+          "when": "sftp.enabled"
+        },
+        {
+          "command": "sftp.download.activeFile",
           "when": "sftp.enabled"
         },
         {
