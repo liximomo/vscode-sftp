@@ -1,5 +1,5 @@
 import * as path from 'path';
-import LocalFileSystem from './fs/localFileSystem';
+import { LocalFileSystem } from './fs';
 
 const fs = new LocalFileSystem(path);
 

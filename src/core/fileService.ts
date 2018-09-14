@@ -2,7 +2,7 @@ import * as path from 'path';
 import app from '../app';
 import upath from './upath';
 import Ignore from './ignore';
-import FileSystem from './Fs/fileSystem';
+import { FileSystem } from './fs';
 import { filesIgnoredFromConfig } from '../helper';
 import { createRemoteIfNoneExist, removeRemote } from './remoteFs';
 import localFs from './localFs';

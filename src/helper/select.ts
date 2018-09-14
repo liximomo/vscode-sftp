@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import FileSystem, { FileType } from '../core/Fs/FileSystem';
+import { FileSystem, FileType } from '../core/fs';
 import * as path from 'path';
 
 const ROOT = '@root';

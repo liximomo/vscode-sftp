@@ -1,6 +1,6 @@
 import * as fs from 'fs';
-import FileSystem, { FileEntry, FileType, FileStats, FileOption } from './FileSystem';
-import RemoteFileSystem from './RemoteFileSystem';
+import FileSystem, { FileEntry, FileType, FileStats, FileOption } from './fileSystem';
+import RemoteFileSystem from './remoteFileSystem';
 import { SSHClient } from '../remote-client';
 
 function toSimpleFileMode(mode: number) {

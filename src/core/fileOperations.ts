@@ -8,7 +8,7 @@ import {
 } from './fileBaseOperations';
 import upath from './upath';
 import app from '../app';
-import FileSystem, { FileEntry, FileType } from './Fs/FileSystem';
+import { FileSystem, FileEntry, FileType } from './fs';
 import * as utils from '../utils';
 import { fileDepth, simplifyPath } from '../helper';
 import logger from '../logger';

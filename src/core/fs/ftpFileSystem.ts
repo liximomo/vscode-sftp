@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as PQueue from 'p-queue';
 import logger from '../../logger';
-import { FileEntry, FileType, FileStats, FileOption } from './FileSystem';
+import { FileEntry, FileType, FileStats, FileOption } from './fileSystem';
 import RemoteFileSystem from './remoteFileSystem';
 import { FTPClient } from '../remote-client';
 

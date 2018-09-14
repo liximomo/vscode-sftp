@@ -3,10 +3,7 @@ import { promptForPassword } from '../host';
 import logger from '../logger';
 import app from '../app';
 import { ConnectOption } from './remote-client/RemoteClient';
-import FileSystem from './fs/fileSystem';
-import RemoteFileSystem from './fs/remoteFileSystem';
-import SFTPFileSystem from './fs/sftpFileSystem';
-import FTPFileSystem from './fs/ftpFileSystem';
+import { FileSystem, RemoteFileSystem, SFTPFileSystem, FTPFileSystem } from './fs';
 import localFs from './localFs';
 
 function hashOption(opiton) {

@@ -1,10 +1,8 @@
 import { Client } from 'ssh2';
 import upath from '../upath';
 import RemoteClient, { ConnectOption, Config } from './remoteClient';
-import SFTPFileSystem from '../fs/sftpFileSystem';
 import localFs from '../localFs';
-import FileSystem from '../fs/fileSystem';
-import RemoteFileSystem from '../fs/remoteFileSystem';
+import { FileSystem, RemoteFileSystem, SFTPFileSystem } from '../fs';
 import logger from '../../logger';
 
 export default class SSHClient extends RemoteClient {

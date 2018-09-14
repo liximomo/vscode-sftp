@@ -6,3 +6,8 @@ src/**
 **/*.map
 .gitignore
 tsconfig.json
+_debug
+ISSUE_TEMPLATE.md
+INSTALL_DEBUG.md
+TODO.md
+tslint.json

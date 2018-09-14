@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
-import FileSystem, { FileEntry, FileStats, FileOption } from './FileSystem';
+import FileSystem, { FileEntry, FileStats, FileOption } from './fileSystem';
 
 function toFileStat(stat: fs.Stats): FileStats {
   return {

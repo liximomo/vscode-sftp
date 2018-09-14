@@ -1,4 +1,4 @@
-import FileSystem, { FileOption } from './FileSystem';
+import FileSystem, { FileOption } from './fileSystem';
 import { RemoteClient, ConnectOption, RemoteClientConfig } from '../remote-client';
 
 export default abstract class RemoteFileSystem extends FileSystem {
