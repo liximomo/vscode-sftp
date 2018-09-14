@@ -22,7 +22,6 @@ async function loadCommands(pattern, nameRegex, context: ExtensionContext) {
     deep: false,
     onlyFiles: true,
     transform: entry => (typeof entry === 'string' ? entry : entry.path),
-    absolute: false,
   });
   entries.forEach(file => {
     const basename = path.basename(file);
