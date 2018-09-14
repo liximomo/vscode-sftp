@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import * as debounce from 'lodash.debounce';
-import { executeCommand } from '../host';
 import { isValidFile, fileDepth } from '../helper';
 import { upload, removeRemote } from '../fileHandlers';
 import { WatcherService } from '../core';

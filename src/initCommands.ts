@@ -4,13 +4,9 @@ import * as fg from 'fast-glob';
 import logger from './logger';
 import { registerCommand } from './host';
 import Command from './commands/abstract/command';
+import { createCommand, createFileCommand } from './commands/abstract/createCommand';
 
 const COMMAND_FILENAME_PATTERN = `${__dirname}/commands/@(command|fileCommand)*.js`;
-
-interface CommandConstructor {
-  new (name: string): Command;
-  id: string;
-}
 
 export default function init(context: ExtensionContext) {
   return loadCommands(COMMAND_FILENAME_PATTERN, /[Cc]ommand([^.]+)\.js$/, context);
@@ -29,18 +25,26 @@ async function loadCommands(pattern, nameRegex, context: ExtensionContext) {
     absolute: false,
   });
   entries.forEach(file => {
-    const match = nameRegex.exec(path.basename(file));
+    const basename = path.basename(file);
+    const match = nameRegex.exec(basename);
     if (!match || !match[1]) {
       logger.warn(`Command name not found from ${file}`);
       return;
     }
 
-    const commandName = match[1];
-    const commandClz: CommandConstructor = require(file).default;
+    const commandOption = require(file).default;
+    commandOption.name = nomalizeCommandName(match[1]);
 
     try {
-      const cmd = new commandClz(nomalizeCommandName(commandName));
-      registerCommand(context, commandClz.id, cmd.run, cmd);
+      // tslint:disable-next-line variable-name
+      let Cmd;
+      if (basename.startsWith('command')) {
+        Cmd = createCommand(commandOption);
+      } else {
+        Cmd = createFileCommand(commandOption);
+      }
+      const cmdInstance: Command = new Cmd();
+      registerCommand(context, commandOption.id, cmdInstance.run, cmdInstance);
     } catch (error) {
       logger.error(error, `load command "${file}"`);
     }

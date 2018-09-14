@@ -1,18 +1,18 @@
 import { UResource } from '../core';
 import app from '../app';
 import { COMMAND_REVEAL_IN_REMOTE_EXPLORER } from '../constants';
-import FileCommand from './abstract/fileCommand';
+import { checkFileCommand } from './abstract/createCommand';
 import { uriFromExplorerContextOrEditorContext } from './shared';
 
-export default class RevealInRemoteExplorer extends FileCommand {
-  static id = COMMAND_REVEAL_IN_REMOTE_EXPLORER;
-  static getFileTarget = uriFromExplorerContextOrEditorContext;
+export default checkFileCommand({
+  id: COMMAND_REVEAL_IN_REMOTE_EXPLORER,
+  getFileTarget: uriFromExplorerContextOrEditorContext,
 
-  async handleFile(uResource: UResource) {
+  async handleFile({ target }) {
     // todo: make this to a method of remoteExplorer
     await app.remoteExplorer.reveal({
-      resource: UResource.makeResource(uResource.remoteUri),
+      resource: UResource.makeResource(target.remoteUri),
       isDirectory: false,
     });
-  }
-}
+  },
+});

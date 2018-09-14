@@ -3,8 +3,10 @@ import createFileHandler from './createFileHandler';
 
 export const removeRemote = createFileHandler({
   name: 'removeRemote',
-  handler(uResource, localFs, remoteFs, option) {
-    return remove(uResource.remoteFsPath, remoteFs, {
+  async handle(option) {
+    const remoteFs = await this.fileService.getRemoteFileSystem();
+    const { remoteFsPath } = this.target;
+    return remove(remoteFsPath, remoteFs, {
       ignore: option.ignore,
       skipDir: option.skipDir,
     });

@@ -1,23 +1,22 @@
-import { UResource, FileService } from '../core';
 import { COMMAND_LIST_ALL } from '../constants';
 import { showTextDocument } from '../host';
 import { fs } from '../core';
-import { download } from '../fileHandlers';
-import FileCommand from './abstract/fileCommand';
-import { selectFileFromAll, refreshLocalExplorer } from './shared';
+import { downloadFile, downloadFolder } from '../fileHandlers';
+import { checkFileCommand } from './abstract/createCommand';
+import { selectFileFromAll } from './shared';
 
-export default class ListAll extends FileCommand {
-  static id = COMMAND_LIST_ALL;
-  static getFileTarget = selectFileFromAll;
+export default checkFileCommand({
+  id: COMMAND_LIST_ALL,
+  getFileTarget: selectFileFromAll,
 
-  async handleFile(uResource: UResource, fileService: FileService, config: any) {
-    await download(uResource, fileService, config, { ignore: null });
-    const localFs = fileService.getLocalFileSystem();
-    const fileEntry = await localFs.lstat(uResource.localFsPath);
+  async handleFile(ctx) {
+    const localFs = ctx.fileService.getLocalFileSystem();
+    const fileEntry = await localFs.lstat(ctx.target.localFsPath);
     if (fileEntry.type !== fs.FileType.Directory) {
-      await showTextDocument(uResource.localUri);
+      await downloadFile(ctx, { ignore: null });
+      await showTextDocument(ctx.target.localUri);
     } else {
-      refreshLocalExplorer(uResource.localUri);
+      await downloadFolder(ctx, { ignore: null });
     }
-  }
-}
+  },
+});

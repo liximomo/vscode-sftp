@@ -135,7 +135,7 @@
       },
       {
         "command": "sftp.diff",
-        "title": "Diff",
+        "title": "Diff with Remote",
         "category": "SFTP"
       },
       {

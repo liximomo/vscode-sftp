@@ -1,14 +1,13 @@
-import { UResource, FileService } from '../core';
 import { COMMAND_DOWNLOAD_ACTIVEFILE } from '../constants';
-import { download } from '../fileHandlers';
-import FileCommand from './abstract/fileCommand';
+import { downloadFile } from '../fileHandlers';
+import { checkFileCommand } from './abstract/createCommand';
 import { getActiveDocumentUri } from './shared';
 
-export default class DownloadActiveFile extends FileCommand {
-  static id = COMMAND_DOWNLOAD_ACTIVEFILE;
-  static getFileTarget = getActiveDocumentUri;
+export default checkFileCommand({
+  id: COMMAND_DOWNLOAD_ACTIVEFILE,
+  getFileTarget: getActiveDocumentUri,
 
-  async handleFile(uResource: UResource, fileService: FileService, config: any) {
-    await download(uResource, fileService, config, { ignore: null });
-  }
-}
+  async handleFile(ctx) {
+    await downloadFile(ctx, { ignore: null });
+  },
+});

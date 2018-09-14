@@ -3,12 +3,12 @@ import { COMMAND_SET_PROFILE } from '../constants';
 import { showInformationMessage } from '../host';
 import app from '../app';
 import { getAllFileService } from '../modules/serviceManager';
-import Command from './abstract/command';
+import { checkCommand } from './abstract/createCommand';
 
-export default class SetProfile extends Command {
-  static id = COMMAND_SET_PROFILE;
+export default checkCommand({
+  id: COMMAND_SET_PROFILE,
 
-  async doCommandRun() {
+  async handleCommand() {
     const profiles: Array<vscode.QuickPickItem & { value: string }> = getAllFileService().reduce(
       (acc, service) => {
         if (service.getAvaliableProfiles().length <= 0) {
@@ -40,5 +40,5 @@ export default class SetProfile extends Command {
     if (item === undefined) return;
 
     app.state.profile = item.value;
-  }
-}
+  },
+});

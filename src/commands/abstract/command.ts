@@ -6,19 +6,15 @@ export interface ITarget {
 }
 
 export interface CommandOption {
-  // [x: string]: any;
-  noLog?: boolean;
+  [x: string]: any;
 }
 
 export default abstract class Command {
-  static id: string;
-  static option: CommandOption;
-
-  protected _name: string;
+  id: string;
+  name: string;
   private _commandDoneListeners: Array<(...args: any[]) => void>;
 
-  constructor(name: string) {
-    this._name = name;
+  constructor() {
     this._commandDoneListeners = [];
   }
 
@@ -34,8 +30,7 @@ export default abstract class Command {
   protected abstract async doCommandRun(...args: any[]);
 
   async run(...args) {
-    const clz = this.constructor as typeof Command;
-    logger.trace(`run command ${clz.name}`);
+    logger.trace(`run command '${this.name}'`);
     try {
       await this.doCommandRun(...args);
     } catch (error) {

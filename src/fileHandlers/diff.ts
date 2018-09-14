@@ -7,14 +7,16 @@ import createFileHandler from './createFileHandler';
 
 export const diff = createFileHandler({
   name: 'diff',
-  async handler(uResource, localFs, remoteFs, option) {
-    const localFsPath = uResource.localFsPath;
+  async handle(option) {
+    const remoteFs = await this.fileService.getRemoteFileSystem();
+    const localFs = this.fileService.getLocalFileSystem();
+    const { localFsPath, remoteFsPath } = this.target;
     const tmpPath = await makeTmpFile({
       prefix: `${EXTENSION_NAME}-`,
       postfix: path.extname(localFsPath),
     });
 
-    await transfer(uResource.remoteFsPath, tmpPath, remoteFs, localFs, {
+    await transfer(remoteFsPath, tmpPath, remoteFs, localFs, {
       perserveTargetMode: false,
     });
     await diffFiles(

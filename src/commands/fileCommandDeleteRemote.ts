@@ -1,13 +1,13 @@
 import { COMMAND_DELETE_REMOTE } from '../constants';
-import { upath, UResource, FileService } from '../core';
+import { upath } from '../core';
 import { removeRemote } from '../fileHandlers';
 import { showConfirmMessage } from '../host';
-import FileCommand from './abstract/fileCommand';
+import { checkFileCommand } from './abstract/createCommand';
 import { uriFromExplorerContextOrEditorContext } from './shared';
 
-export default class DeleteRemote extends FileCommand {
-  static id = COMMAND_DELETE_REMOTE;
-  static async getFileTarget(item, items) {
+export default checkFileCommand({
+  id: COMMAND_DELETE_REMOTE,
+  async getFileTarget(item, items) {
     const targets = await uriFromExplorerContextOrEditorContext(item, items);
 
     const filename = Array.isArray(targets)
@@ -20,9 +20,7 @@ export default class DeleteRemote extends FileCommand {
     );
 
     return result ? targets : null;
-  }
+  },
 
-  async handleFile(uResource: UResource, fileService: FileService, config: any) {
-    return removeRemote(uResource, fileService, config);
-  }
-}
+  handleFile: removeRemote,
+});

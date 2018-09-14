@@ -1,23 +1,22 @@
-import { UResource, FileService } from '../core';
 import { COMMAND_LIST } from '../constants';
 import { showTextDocument } from '../host';
 import { fs } from '../core';
-import { download } from '../fileHandlers';
-import FileCommand from './abstract/fileCommand';
-import { selectFile, refreshLocalExplorer } from './shared';
+import { downloadFile, downloadFolder } from '../fileHandlers';
+import { checkFileCommand } from './abstract/createCommand';
+import { selectFile } from './shared';
 
-export default class List extends FileCommand {
-  static id = COMMAND_LIST;
-  static getFileTarget = selectFile;
+export default checkFileCommand({
+  id: COMMAND_LIST,
+  getFileTarget: selectFile,
 
-  async handleFile(uResource: UResource, fileService: FileService, config: any) {
-    await download(uResource, fileService, config);
-    const localFs = fileService.getLocalFileSystem();
-    const fileEntry = await localFs.lstat(uResource.localFsPath);
+  async handleFile(ctx) {
+    const localFs = ctx.fileService.getLocalFileSystem();
+    const fileEntry = await localFs.lstat(ctx.target.localFsPath);
     if (fileEntry.type !== fs.FileType.Directory) {
-      await showTextDocument(uResource.localUri);
+      await downloadFile(ctx);
+      await showTextDocument(ctx.target.localUri);
     } else {
-      refreshLocalExplorer(uResource.localUri);
+      await downloadFolder(ctx);
     }
-  }
-}
+  },
+});

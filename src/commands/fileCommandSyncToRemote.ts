@@ -1,15 +1,11 @@
-import { UResource, FileService } from '../core';
 import { COMMAND_SYNC_TO_REMOTE } from '../constants';
 import { sync2Remote } from '../fileHandlers';
-import FileCommand from './abstract/fileCommand';
-import { selectFolderFallbackToConfigContext, refreshRemoteExplorer } from './shared';
+import { checkFileCommand } from './abstract/createCommand';
+import { selectFolderFallbackToConfigContext } from './shared';
 
-export default class SyncToRemote extends FileCommand {
-  static id = COMMAND_SYNC_TO_REMOTE;
-  static getFileTarget = selectFolderFallbackToConfigContext;
+export default checkFileCommand({
+  id: COMMAND_SYNC_TO_REMOTE,
+  getFileTarget: selectFolderFallbackToConfigContext,
 
-  async handleFile(uResource: UResource, fileService: FileService, config: any) {
-    await sync2Remote(uResource, fileService, config);
-    refreshRemoteExplorer(uResource, true);
-  }
-}
+  handleFile: sync2Remote,
+});

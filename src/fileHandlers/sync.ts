@@ -1,12 +1,19 @@
 import { sync, SyncOption } from '../core/fileOperations';
+import { refreshRemoteExplorer } from './shared';
 import createFileHandler from './createFileHandler';
 
-export const sync2Remote = createFileHandler<SyncOption>({
+type OptSyncOption = Partial<SyncOption>;
+
+export const sync2Remote = createFileHandler<OptSyncOption>({
   name: 'syncToRemote',
-  handler(uResource, localFs, remoteFs, option) {
-    return sync(uResource.localFsPath, uResource.remoteFsPath, localFs, remoteFs, option);
+  async handle(option) {
+    const remoteFs = await this.fileService.getRemoteFileSystem();
+    const localFs = this.fileService.getLocalFileSystem();
+    const { localFsPath, remoteFsPath } = this.target;
+    return sync(localFsPath, remoteFsPath, localFs, remoteFs, option);
   },
-  transformOption(config) {
+  transformOption() {
+    const config = this.config;
     return {
       concurrency: config.concurrency,
       ignore: config.ignore,
@@ -14,14 +21,24 @@ export const sync2Remote = createFileHandler<SyncOption>({
       perserveTargetMode: config.protocol === 'sftp',
     };
   },
+  afterHandle() {
+    refreshRemoteExplorer(this.target, true);
+  },
 });
 
-export const sync2Local = createFileHandler<SyncOption>({
+export const sync2Local = createFileHandler<OptSyncOption>({
   name: 'syncToLocal',
-  handler(uResource, localFs, remoteFs, option) {
-    return sync(uResource.remoteFsPath, uResource.localFsPath, remoteFs, localFs, option);
+  config: {
+    doNotTriggerWatcher: true,
   },
-  transformOption(config) {
+  async handle(option) {
+    const remoteFs = await this.fileService.getRemoteFileSystem();
+    const localFs = this.fileService.getLocalFileSystem();
+    const { localFsPath, remoteFsPath } = this.target;
+    return sync(remoteFsPath, localFsPath, remoteFs, localFs, option);
+  },
+  transformOption() {
+    const config = this.config;
     return {
       concurrency: config.concurrency,
       ignore: config.ignore,
@@ -29,7 +46,7 @@ export const sync2Local = createFileHandler<SyncOption>({
       perserveTargetMode: false,
     };
   },
-  config: {
-    doNotTriggerWatcher: true,
+  afterHandle() {
+    refreshRemoteExplorer(this.target, true);
   },
 });

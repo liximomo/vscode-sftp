@@ -8,12 +8,12 @@ import {
   openFolder,
   addWorkspaceFolder,
 } from '../host';
-import Command from './abstract/command';
+import { checkCommand } from './abstract/createCommand';
 
-export default class Config extends Command {
-  static id = COMMAND_CONFIG;
+export default checkCommand({
+  id: COMMAND_CONFIG,
 
-  async doCommandRun() {
+  async handleCommand() {
     const workspaceFolders = getWorkspaceFolders();
     if (!workspaceFolders) {
       const result = await showConfirmMessage(
@@ -76,5 +76,5 @@ export default class Config extends Command {
 
         newConfig(item.value);
       });
-  }
-}
+  },
+});

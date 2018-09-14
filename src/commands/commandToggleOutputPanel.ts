@@ -1,11 +1,11 @@
 import { COMMAND_TOGGLE_OUTPUT } from '../constants';
 import * as output from '../ui/output';
-import Command from './abstract/command';
+import { checkCommand } from './abstract/createCommand';
 
-export default class ToggleOutputPanel extends Command {
-  static id = COMMAND_TOGGLE_OUTPUT;
+export default checkCommand({
+  id: COMMAND_TOGGLE_OUTPUT,
 
-  doCommandRun() {
+  handleCommand() {
     output.toggle();
-  }
-}
+  },
+});

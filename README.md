@@ -2,46 +2,44 @@
 Very simple, requires just three lines of config! Very fast, finished in a blink.
 
 ## Features
-
-* Remote explorer
+* Browser remote with Remote Explorer
+* Diff local and remote
+* Sync directory
+* Upload/Download
+* Upload on save
+* File Watcher
 * Multiple configs
 * Switchable profiles
-* Browser remote files
-* Compare a local file with remote file
-* Sync directory to remote
-* Sync directory to local
-* Download file/directory to local
-* Upload file/directory to remote
-* Upload to remote on save
-* Dual authentication
-* Watch project directory for external changes and automatically update remote
 
 ## Usage
 1. `Ctrl+Shift+P` on Windows/Linux open command palette, run `SFTP: config` command.
 2. Enjoy.
 
-*Note* ：Sync commands will only be available to a directory. Try not to bind shortcuts to those commands because there is no way to figure out the target directory.
 
-### Main Commands
-| Command              | Description                                  |Detailed description|
-| -------------------- |----------------------------------------------|---------------|
-| `SFTP: Config`         | create a new config file at workspace root  | see below for an explained config file |
-| `SFTP: Upload`         | upload file/directory                       | copies selected files from the local to the remote directory, overwriting the remote ones. Files that are only present on the remote side won't be affected. Files that are only present on the local side will be created remotely|
-| `SFTP: Download`       | download file/directory                     | same as above, but in the opposite direction |
-| `SFTP: Sync To Remote` | sync local directory to remote               | only available for directories. Copies common files (that exist on both sides) from local dir to remote, overwriting destination. If syncMode is set to full, files that exist only on the local side will be created remotely, and files that exist only on the remote side will be deleted|
-| `SFTP: Sync To Local`  | sync remote directory to local               | same as above, but in the opposite direction|
-  
+## Main Commands
+| Command              | Description                                    |
+| -------------------- |------------------------------------------------|
+| `SFTP: Config`       | create a new config file for selected project  |
+| `SFTP: Set Profile`  | set a active profile                           |
+| `SFTP: Upload Active File`         | upload active file to remote, overwriting the remote one |
+| `SFTP: Download Active File`       | same as above, but in the opposite direction             |
+| `SFTP: Sync To Remote` | sync local directory to remote, only available for a directory. Copy common files (that exist on both sides) from local dir to remote, overwriting destination. (If syncMode is set to `full`, files that exist only on the local side will be created remotely, and files that exist only on the remote side will be deleted. The remote will be exactly same as the local after `sync`)|
+| `SFTP: Sync To Local`  | same as above, but in the opposite direction |
+
+## Alt Commands
+An alternative command can be found when pressing `Alt` while opening a menu. (e.g. `Force Download` and `Force Upload`)
+
 ## Config
 You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/config).
 
-### Config Example
+Example Configs
 * [Simple](#password-free)
 * [Profiles](#profiles)
 * [Multiple Context](#multiple-context)
 * [Connection Hopping](#connection-hopping)
 * [Config in User Setting](#config-in-user-setting)
 
-#### Password Free
+### Password Free
 ```json
 {
   "host": "host",
@@ -50,7 +48,7 @@ You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/
 }
 ```
 
-#### Profiles
+### Profiles
 ```json
 { 
   "context": "/workspace/a",
@@ -79,7 +77,7 @@ You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/
 
 Use `SFTP: Set Profile` to swtich profile.
 
-#### Multiple Context
+### Multiple Context
 ```json
 [
   {
@@ -102,13 +100,13 @@ Use `SFTP: Set Profile` to swtich profile.
 ```
 *Note：* `name` is required in this mode.
 
-#### Connection Hopping.
+### Connection Hopping.
 
 You can connection to a target server through a proxy with ssh protocol.
 
 *Note：* **Variable substitution is not working in a hop config.**
 
-##### Single Hop
+#### Single Hop
 
 local -> hop -> target
 
@@ -127,7 +125,7 @@ local -> hop -> target
   }
 }
 ```
-##### Multiple Hop
+#### Multiple Hop
 local -> hopA -> hopB -> target
 
 ```json
@@ -153,7 +151,7 @@ local -> hopA -> hopB -> target
 }
 ```
 
-#### Config in User Setting
+### Config in User Setting
 You can use `remote` to tell sftp to get the config from (remote-fs)https://github.com/liximomo/vscode-remote-fs.
 
 In User Setting:

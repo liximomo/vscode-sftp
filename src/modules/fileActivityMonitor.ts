@@ -1,12 +1,7 @@
 import * as vscode from 'vscode';
 import logger from '../logger';
 import app from '../app';
-import {
-  executeCommand,
-  onDidOpenTextDocument,
-  onDidSaveTextDocument,
-  showConfirmMessage,
-} from '../host';
+import { onDidOpenTextDocument, onDidSaveTextDocument, showConfirmMessage } from '../host';
 import { readConfigsFromFile } from './config';
 import {
   createFileService,
@@ -15,7 +10,7 @@ import {
   disposeFileService,
 } from './serviceManager';
 import { reportError, isValidFile, isConfigFile, isInWorksapce } from '../helper';
-import { upload, download} from '../fileHandlers';
+import { downloadFile, uploadFile } from '../fileHandlers';
 
 let workspaceWatcher: vscode.Disposable;
 
@@ -47,7 +42,7 @@ function handleFileSave(uri: vscode.Uri) {
   const config = fileService.getConfig();
   if (config.uploadOnSave) {
     logger.info(`[file-save] ${uri.fsPath}`);
-    upload(uri);
+    uploadFile(uri);
   }
 }
 
@@ -66,7 +61,7 @@ async function downloadOnOpen(uri: vscode.Uri) {
     }
 
     logger.info(`[file-open] download ${uri.fsPath}`);
-    download(uri);
+    downloadFile(uri);
   }
 }
 

@@ -7,28 +7,26 @@ import app from '../app';
 import logger from '../logger';
 import { getFileService } from '../modules/serviceManager';
 
-interface FileHandlerOption {
-  name: string;
-  handler: FileHandlerImpl;
-  config?: FileHandlerConfig;
-  transformOption?: (x: any) => any;
-}
-
 interface FileHandlerConfig {
   doNotTriggerWatcher?: boolean;
 }
 
-interface FileHandler<T> {
-  (target: UResource, fileService: FileService, config: any, option?: T): Promise<any>;
-  (target: Uri, option?: T): Promise<any>;
+export interface FileHandlerContext {
+  target: UResource;
+  fileService: FileService;
+  config: any;
 }
 
-type FileHandlerImpl = (
-  uResource: UResource,
-  localFs: fs.FileSystem,
-  remoteFs: fs.FileSystem,
-  option: any
-) => any;
+type FileHandlerContextMethod<R = void> = (this: FileHandlerContext) => R;
+type FileHandlerContextMethodArg1<A, R = void> = (this: FileHandlerContext, a: A) => R;
+
+interface FileHandlerOption<T> {
+  name: string;
+  handle: FileHandlerContextMethodArg1<any, Promise<any>>;
+  afterHandle?: FileHandlerContextMethod;
+  config?: FileHandlerConfig;
+  transformOption?: FileHandlerContextMethod<any>;
+}
 
 function onProgress(error: Error, task: fileOps.FileTask) {
   const localFsPath = task.file.fsPath;
@@ -43,60 +41,59 @@ function onProgress(error: Error, task: fileOps.FileTask) {
   app.sftpBarItem.showMsg(`${task.type} ${path.basename(localFsPath)}`, simplifyPath(localFsPath));
 }
 
+export function handleCtxFromUri(uri: Uri): FileHandlerContext {
+  const fileService = getFileService(uri);
+  if (!fileService) {
+    throw new Error(`FileService Not Found. (${uri.toString(true)}) `);
+  }
+  const config = fileService.getConfig();
+  const target = UResource.from(uri, {
+    localBasePath: fileService.baseDir,
+    remoteBasePath: fileService.remoteBaseDir,
+    remoteId: fileService.id,
+    remote: {
+      host: config.host,
+      port: config.port,
+    },
+  });
+
+  return {
+    fileService,
+    config,
+    target,
+  };
+}
+
 export default function createFileHandler<T>(
-  handlerOption: FileHandlerOption
-): FileHandler<Partial<T>> {
-  async function fileHandle(
-    target: UResource | Uri,
-    fileService?: FileService | Partial<T>,
-    config?: any,
-    option?: Partial<T>
-  ) {
-    if (target instanceof Uri) {
-      if (fileService) {
-        option = fileService as Partial<T>;
-      }
-      fileService = getFileService(target);
-      if (!fileService) {
-        throw new Error(`FileService Not Found. (${target.toString(true)}) `);
-      }
-      config = fileService.getConfig();
-      target = UResource.from(target, {
-        localBasePath: fileService.baseDir,
-        remoteBasePath: fileService.remoteBaseDir,
-        remoteId: fileService.id,
-        remote: {
-          host: config.host,
-          port: config.port,
-        },
-      });
-    }
+  handlerOption: FileHandlerOption<T>
+): (ctx: FileHandlerContext | Uri, option?: T) => Promise<void> {
+  async function fileHandle(ctx: Uri | FileHandlerContext, option?: T) {
+    const handleCtx = ctx instanceof Uri ? handleCtxFromUri(ctx) : ctx;
+    const { fileService, target } = handleCtx;
 
     logger.trace(`handle ${handlerOption.name} for`, target.localFsPath);
 
-    fileService = fileService as FileService;
     const handleConfig = handlerOption.config || {};
-    const remoteFs = await fileService.getRemoteFileSystem();
-    const optionFromConfig = handlerOption.transformOption
-      ? handlerOption.transformOption(config)
-      : {};
-    const invokeOption = {
-      onProgress,
-      ...optionFromConfig,
-    };
-    if (option) {
-      Object.assign(invokeOption, option);
-    }
     if (handleConfig.doNotTriggerWatcher) {
       fileService.disableWatcher();
     }
     try {
-      return await handlerOption.handler(
-        target,
-        fileService.getLocalFileSystem(),
-        remoteFs,
-        invokeOption
-      );
+      const optionFromConfig = handlerOption.transformOption
+        ? handlerOption.transformOption.call(handleCtx)
+        : {};
+      const invokeOption = {
+        onProgress,
+        ...optionFromConfig,
+      };
+      if (option) {
+        Object.assign(invokeOption, option);
+      }
+
+      await handlerOption.handle.call(handleCtx, invokeOption);
+
+      if (handlerOption.afterHandle) {
+        handlerOption.afterHandle.call(handleCtx);
+      }
     } catch (error) {
       throw error;
     } finally {
