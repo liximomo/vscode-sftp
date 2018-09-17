@@ -1,6 +1,9 @@
 import * as vscode from 'vscode';
 import * as debounce from 'lodash.debounce';
-import { isValidFile, fileDepth } from '../helper';
+import * as path from 'path';
+import logger from '../logger';
+import app from '../app';
+import { isValidFile, fileDepth, simplifyPath } from '../helper';
 import { upload, removeRemote } from '../fileHandlers';
 import { WatcherService } from '../core';
 
@@ -17,13 +20,33 @@ const ACTION_INTEVAL = 550;
 function doUpload() {
   const files = Array.from(uploadQueue).sort((a, b) => fileDepth(b.fsPath) - fileDepth(a.fsPath));
   uploadQueue.clear();
-  files.forEach(uri => upload(uri));
+  files.forEach(async uri => {
+    const fspath = uri.fsPath;
+    logger.info(`[watcher-update] ${fspath}`);
+    try {
+      await upload(uri);
+      app.sftpBarItem.showMsg(`uploaded ${path.basename(fspath)}`, simplifyPath(fspath), 2 * 1000);
+    } catch (error) {
+      logger.error(error, `upload ${fspath}`);
+      app.sftpBarItem.showMsg('fail', 4 * 1000);
+    }
+  });
 }
 
 function doDelete() {
   const files = Array.from(deleteQueue).sort((a, b) => fileDepth(b.fsPath) - fileDepth(a.fsPath));
   deleteQueue.clear();
-  files.forEach(uri => removeRemote(uri));
+  files.forEach(async uri => {
+    const fspath = uri.fsPath;
+    logger.info(`[watcher-update] ${fspath}`);
+    try {
+      await removeRemote(uri);
+      app.sftpBarItem.showMsg(`removed ${path.basename(fspath)}`, simplifyPath(fspath), 2 * 1000);
+    } catch (error) {
+      logger.error(error, `remove ${fspath}`);
+      app.sftpBarItem.showMsg('fail', 4 * 1000);
+    }
+  });
 }
 
 const debouncedUpload = debounce(doUpload, ACTION_INTEVAL, { leading: true, trailing: true });

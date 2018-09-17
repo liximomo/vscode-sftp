@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import logger from '../logger';
 import app from '../app';
 import { onDidOpenTextDocument, onDidSaveTextDocument, showConfirmMessage } from '../host';
@@ -9,7 +10,7 @@ import {
   findAllFileService,
   disposeFileService,
 } from './serviceManager';
-import { reportError, isValidFile, isConfigFile, isInWorksapce } from '../helper';
+import { reportError, isValidFile, isConfigFile, isInWorksapce, simplifyPath } from '../helper';
 import { downloadFile, uploadFile } from '../fileHandlers';
 
 let workspaceWatcher: vscode.Disposable;
@@ -32,7 +33,7 @@ async function handleConfigSave(uri: vscode.Uri) {
   }
 }
 
-function handleFileSave(uri: vscode.Uri) {
+async function handleFileSave(uri: vscode.Uri) {
   const fileService = getFileService(uri);
   if (!fileService) {
     logger.error(new Error(`FileService Not Found. (${uri.toString(true)}) `));
@@ -41,8 +42,16 @@ function handleFileSave(uri: vscode.Uri) {
 
   const config = fileService.getConfig();
   if (config.uploadOnSave) {
-    logger.info(`[file-save] ${uri.fsPath}`);
-    uploadFile(uri);
+    const fspath = uri.fsPath;
+    logger.info(`[file-save] ${fspath}`);
+    try {
+      app.sftpBarItem.showMsg(`upload ${path.basename(fspath)}`, simplifyPath(fspath));
+      await uploadFile(uri);
+      app.sftpBarItem.showMsg(`done`, 2 * 1000);
+    } catch (error) {
+      logger.error(error, `upload ${fspath}`);
+      app.sftpBarItem.showMsg('fail', 4 * 1000);
+    }
   }
 }
 
@@ -60,8 +69,16 @@ async function downloadOnOpen(uri: vscode.Uri) {
       if (!isConfirm) return;
     }
 
-    logger.info(`[file-open] download ${uri.fsPath}`);
-    downloadFile(uri);
+    const fspath = uri.fsPath;
+    logger.info(`[file-open] ${fspath}`);
+    try {
+      app.sftpBarItem.showMsg(`download ${path.basename(fspath)}`, simplifyPath(fspath));
+      await downloadFile(uri);
+      app.sftpBarItem.showMsg(`done`, 2 * 1000);
+    } catch (error) {
+      logger.error(error, `download ${fspath}`);
+      app.sftpBarItem.showMsg('fail', 4 * 1000);
+    }
   }
 }
 
