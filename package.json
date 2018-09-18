@@ -431,7 +431,7 @@
       "^.+\\.ts$": "<rootDir>/test/preprocessor.js"
     },
     "testMatch": [
-      "**/test/*.spec.js"
+      "<rootDir>/test/**/*.spec.js"
     ]
   }
 }
