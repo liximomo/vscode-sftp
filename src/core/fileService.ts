@@ -60,14 +60,12 @@ export default class FileService {
   };
   id: number;
   baseDir: string;
-  remoteBaseDir: string;
   workspace: string;
 
   constructor(baseDir: string, workspace: string, config: any) {
     this.id = ++id;
     this.workspace = workspace;
     this.baseDir = baseDir;
-    this.remoteBaseDir = config.remotePath;
     this._watcher = config.watcher;
     this._config = config;
     if (config.profiles) {
@@ -159,7 +157,7 @@ export default class FileService {
     }
 
     // convert ingore config to ignore function
-    copied.ignore = this._createIgnoreFn();
+    copied.ignore = this._createIgnoreFn(copied.remotePath);
     return copied;
   }
 
@@ -168,9 +166,8 @@ export default class FileService {
     this._disposeFileSystem();
   }
 
-  private _createIgnoreFn(): (fsPath: string) => boolean {
+  private _createIgnoreFn(remoteContext: string): (fsPath: string) => boolean {
     const localContext = this.baseDir;
-    const remoteContext = this.remoteBaseDir;
 
     const ignoreConfig = filesIgnoredFromConfig(this._config);
     if (ignoreConfig.length <= 0) {

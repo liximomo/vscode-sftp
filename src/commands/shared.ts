@@ -47,8 +47,7 @@ function configIngoreFilterCreator(config) {
 
 function createFileSelector({ filterCreator = null } = {}) {
   return async (): Promise<Uri> => {
-    const serviceList = getAllFileService();
-    const remoteItems = serviceList.map((fileService, index) => {
+    const remoteItems = getAllFileService().map((fileService, index) => {
       const config = fileService.getConfig();
       return {
         name: config.name,
@@ -57,6 +56,8 @@ function createFileSelector({ filterCreator = null } = {}) {
         filter: filterCreator ? filterCreator(config) : undefined,
         getFs: () => fileService.getRemoteFileSystem(),
         index,
+        remoteBaseDir: config.remotePath,
+        baseDir: fileService.baseDir,
       };
     });
 
@@ -66,12 +67,8 @@ function createFileSelector({ filterCreator = null } = {}) {
       return;
     }
 
-    const targetService = serviceList[selected.index];
-    const localTarget = toLocalPath(
-      selected.fsPath,
-      targetService.remoteBaseDir,
-      targetService.baseDir
-    );
+    const rootItem = remoteItems[selected.index];
+    const localTarget = toLocalPath(selected.fsPath, rootItem.remoteBaseDir, rootItem.baseDir);
 
     return Uri.file(localTarget);
   };

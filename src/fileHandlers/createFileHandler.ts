@@ -49,7 +49,7 @@ export function handleCtxFromUri(uri: Uri): FileHandlerContext {
   const config = fileService.getConfig();
   const target = UResource.from(uri, {
     localBasePath: fileService.baseDir,
-    remoteBasePath: fileService.remoteBaseDir,
+    remoteBasePath: config.remotePath,
     remoteId: fileService.id,
     remote: {
       host: config.host,
