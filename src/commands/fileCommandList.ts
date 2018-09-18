@@ -10,8 +10,8 @@ export default checkFileCommand({
   getFileTarget: selectFile,
 
   async handleFile(ctx) {
-    const localFs = ctx.fileService.getLocalFileSystem();
-    const fileEntry = await localFs.lstat(ctx.target.localFsPath);
+    const remotefs = await ctx.fileService.getRemoteFileSystem();
+    const fileEntry = await remotefs.lstat(ctx.target.remoteFsPath);
     if (fileEntry.type !== fs.FileType.Directory) {
       await downloadFile(ctx);
       await showTextDocument(ctx.target.localUri);
