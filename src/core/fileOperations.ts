@@ -374,7 +374,7 @@ export async function sync(
   return await taskBatchProcess(tasks, srcFs, desFs, option);
 }
 
-export function transfer(
+export async function transfer(
   src: string,
   des: string,
   srcFs: FileSystem,
@@ -382,28 +382,26 @@ export function transfer(
   option: TransferOption
 ) {
   if (shouldSkip(src, option.ignore)) {
-    return Promise.resolve();
+    return;
   }
 
   logger.trace(`transfer from ${src} to ${des}`);
-  return srcFs.lstat(src).then(async stat => {
-    let tasks;
+  const stat = await srcFs.lstat(src);
+  let tasks;
+  switch (stat.type) {
+    case FileType.Directory:
+      tasks = await fileTaskListFromDirector(src, des, srcFs, desFs, option);
+      break;
+    case FileType.File:
+    case FileType.SymbolicLink:
+      await desFs.ensureDir(desFs.pathResolver.dirname(des));
+      tasks = [createTransferFileTask(src, des, stat.type)];
+      break;
+    default:
+      throw new Error(`Unsupported file type (type = ${stat.type})`);
+  }
 
-    switch (stat.type) {
-      case FileType.Directory:
-        tasks = await fileTaskListFromDirector(src, des, srcFs, desFs, option);
-        break;
-      case FileType.File:
-      case FileType.SymbolicLink:
-        await desFs.ensureDir(desFs.pathResolver.dirname(des));
-        tasks = [createTransferFileTask(src, des, stat.type)];
-        break;
-      default:
-        throw new Error(`Unsupported file type (type = ${stat.type})`);
-    }
-
-    return taskBatchProcess(tasks, srcFs, desFs, option);
-  });
+  return taskBatchProcess(tasks, srcFs, desFs, option);
 }
 
 export function remove(path: string, fs: FileSystem, option) {
