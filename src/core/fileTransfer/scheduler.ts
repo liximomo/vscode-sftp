@@ -27,7 +27,7 @@ function lowerBound<T>(array: T[], value: T, comp: (a: T, b: T) => number) {
 
 type TaskReturn = any | Promise<any>;
 
-interface Task {
+export interface Task {
   run(): TaskReturn;
 }
 
@@ -79,7 +79,7 @@ class Scheduler {
   private _concurrency: number;
   private _isPaused: boolean;
 
-  constructor(opts: { concurrency: number; autoStart: boolean }) {
+  constructor(opts?: { concurrency: number; autoStart: boolean }) {
     opts = Object.assign(
       {
         concurrency: Infinity,
@@ -98,6 +98,10 @@ class Scheduler {
 
     this._concurrency = opts.concurrency;
     this._isPaused = opts.autoStart === false;
+  }
+
+  setConcurrency(concurrency: number) {
+    this._concurrency = concurrency;
   }
 
   add(task: Task | CallableTask, opt?: { priority: number }) {

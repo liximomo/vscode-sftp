@@ -1,4 +1,4 @@
-const Scheduler = require('../../src/core/scheduler').default;
+const Scheduler = require('../../src/core/fileTransfer/scheduler').default;
 
 const randomInt = function(min, max) {
   if (max === undefined) {
