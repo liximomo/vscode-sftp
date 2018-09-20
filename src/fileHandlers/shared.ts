@@ -1,5 +1,4 @@
-// import { Uri } from 'vscode';
-import { UResource, FileService, fs } from '../core';
+import { UResource, FileService, FileType } from '../core';
 import app from '../app';
 
 // NEED_VSCODE_UPDATE: detect explorer view visible
@@ -13,7 +12,7 @@ export async function refreshRemoteExplorer(target: UResource, isDirectory: File
     const fileService = isDirectory;
     const localFs = fileService.getLocalFileSystem();
     const fileEntry = await localFs.lstat(target.localFsPath);
-    isDirectory = fileEntry.type === fs.FileType.Directory;
+    isDirectory = fileEntry.type === FileType.Directory;
   }
 
   app.remoteExplorer.refresh({

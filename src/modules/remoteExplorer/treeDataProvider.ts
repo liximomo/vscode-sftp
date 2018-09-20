@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { upath, UResource, Resource, FileService, fs } from '../../core';
+import { upath, UResource, Resource, FileService, FileType } from '../../core';
 import { COMMAND_SHOWRESOURCE } from '../../constants';
 import { getAllFileService } from '../serviceManager';
 
@@ -103,7 +103,7 @@ export default class RemoteTreeData
 
     return fileEntries
       .map(file => {
-        const isDirectory = file.type === fs.FileType.Directory;
+        const isDirectory = file.type === FileType.Directory;
 
         return {
           resource: UResource.updateResource(item.resource, {

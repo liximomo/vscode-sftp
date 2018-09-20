@@ -27,8 +27,10 @@ function lowerBound<T>(array: T[], value: T, comp: (a: T, b: T) => number) {
 
 type TaskReturn = any | Promise<any>;
 
+type CallableTask = () => TaskReturn;
+
 export interface Task {
-  run(): TaskReturn;
+  run: CallableTask;
 }
 
 interface Queue<T> {
@@ -36,8 +38,6 @@ interface Queue<T> {
   dequeue(): T;
   size: number;
 }
-
-type CallableTask = () => TaskReturn;
 
 class PriorityQueue<T> implements Queue<T> {
   constructor(private _queue: { priority: number; item: T }[] = []) {}
@@ -70,16 +70,16 @@ class PriorityQueue<T> implements Queue<T> {
 }
 
 const EVENT_TASK_DONE = 'task.done';
-const EVENT_PEDNING_CHANGE = 'pendingQueue.change';
+const EVENT_PROGRESS = 'progress';
 
-class Scheduler {
-  private _queue: PriorityQueue<Task> = new PriorityQueue<Task>();
-  private _pendingQueue: Set<Task> = new Set<Task>();
+class Scheduler<T extends Task> {
+  private _queue: PriorityQueue<T> = new PriorityQueue<T>();
+  private _pendingQueue: Set<T> = new Set<T>();
   private _eventEmitter: EventEmitter = new EventEmitter();
   private _concurrency: number;
   private _isPaused: boolean;
 
-  constructor(opts?: { concurrency: number; autoStart: boolean }) {
+  constructor(opts: { concurrency?: number; autoStart?: boolean } = {}) {
     opts = Object.assign(
       {
         concurrency: Infinity,
@@ -104,11 +104,11 @@ class Scheduler {
     this._concurrency = concurrency;
   }
 
-  add(task: Task | CallableTask, opt?: { priority: number }) {
+  add(task: T | CallableTask, opt?: { priority: number }) {
     if (typeof task === 'function') {
       task = {
         run: task,
-      };
+      } as T;
     }
 
     if (!this._isPaused && this.pendingCount < this._concurrency) {
@@ -118,7 +118,7 @@ class Scheduler {
     }
   }
 
-  addAll(tasks: (Task | CallableTask)[]) {
+  addAll(tasks: (T | CallableTask)[]) {
     tasks.forEach(t => this.add(t));
   }
 
@@ -137,12 +137,12 @@ class Scheduler {
     this._isPaused = true;
   }
 
-  onTaskDone(listener: (err: Error | null, task: Task) => void) {
+  onTaskDone(listener: (err: Error | null, task: T) => void) {
     this._eventEmitter.on(EVENT_TASK_DONE, listener);
   }
 
-  onPendingChange(listener: () => void) {
-    this._eventEmitter.on(EVENT_PEDNING_CHANGE, listener);
+  onProgress(listener: () => void) {
+    this._eventEmitter.on(EVENT_PROGRESS, listener);
   }
 
   get size() {
@@ -159,8 +159,9 @@ class Scheduler {
     }
   }
 
-  private async _runTask(task: Task) {
+  private async _runTask(task: T) {
     this._pendingQueue.add(task);
+    this._eventEmitter.emit(EVENT_PROGRESS);
 
     let error = null;
     try {
@@ -170,7 +171,7 @@ class Scheduler {
     } finally {
       this._pendingQueue.delete(task);
       this._eventEmitter.emit(EVENT_TASK_DONE, error, task);
-      this._eventEmitter.emit(EVENT_PEDNING_CHANGE);
+      this._eventEmitter.emit(EVENT_PROGRESS);
       this._next();
     }
   }

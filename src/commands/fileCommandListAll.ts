@@ -1,6 +1,6 @@
 import { COMMAND_LIST_ALL } from '../constants';
 import { showTextDocument } from '../host';
-import { fs } from '../core';
+import { FileType } from '../core';
 import { downloadFile, downloadFolder } from '../fileHandlers';
 import { checkFileCommand } from './abstract/createCommand';
 import { selectFileFromAll } from './shared';
@@ -12,7 +12,7 @@ export default checkFileCommand({
   async handleFile(ctx) {
     const remotefs = await ctx.fileService.getRemoteFileSystem();
     const fileEntry = await remotefs.lstat(ctx.target.remoteFsPath);
-    if (fileEntry.type !== fs.FileType.Directory) {
+    if (fileEntry.type !== FileType.Directory) {
       await downloadFile(ctx, { ignore: null });
       await showTextDocument(ctx.target.localUri);
     } else {

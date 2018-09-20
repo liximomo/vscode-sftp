@@ -1,10 +1,12 @@
 import { Uri } from 'vscode';
 import * as path from 'path';
 import app from '../../app';
-import Trie from './trie';
+import { showErrorMessage } from '../../host';
+import logger from '../../logger';
 import { FileService, UResource } from '../../core';
 import { validateConfig } from '../config';
 import watcherService from '../fileWatcher';
+import Trie from './trie';
 
 const serviceManager = new Trie<FileService>(
   {},
@@ -26,18 +28,41 @@ function normalizePathForTrie(pathname) {
   return path.normalize(pathname);
 }
 
-export function createFileService(workspace: string, config: any) {
+export function getBasePath(context: any, workspace: string) {
+  const baseDir = context ? context : workspace;
+  return normalizePathForTrie(path.resolve(workspace, baseDir));
+}
+
+export function createFileService(config: any, workspace: string) {
   if (config.defaultProfile) {
     app.state.profile = config.defaultProfile;
   }
 
-  const baseDir = config.context ? config.context : workspace;
-  const normalizedBasePath = normalizePathForTrie(path.resolve(workspace, baseDir));
+  const normalizedBasePath = getBasePath(config.context, workspace);
   const service = new FileService(normalizedBasePath, workspace, config);
   serviceManager.add(normalizedBasePath, service);
   service.name = config.name;
   service.setConfigValidator(validateConfig);
   service.setWatcherService(watcherService);
+  const scheduler = service.getScheduler();
+  scheduler.onTaskDone((error, task) => {
+    const { localFsPath, transferType } = task;
+    if (error) {
+      const errorMsg = `${error.message} when ${transferType} ${localFsPath}`;
+      logger.error(errorMsg);
+      showErrorMessage(errorMsg);
+      return;
+    }
+    logger.info(`${transferType} ${localFsPath}`);
+  });
+  scheduler.onProgress(() => {
+    if (scheduler.pendingCount > 0) {
+      app.sftpBarItem.startSpinner();
+    } else {
+      app.sftpBarItem.stopSpinner();
+      app.sftpBarItem.reset();
+    }
+  });
 
   return service;
 }

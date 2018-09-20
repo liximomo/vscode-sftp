@@ -14,7 +14,7 @@ import RemoteExplorer from './modules/remoteExplorer';
 async function setupWorkspaceFolder(dir) {
   const configs = await tryLoadConfigs(dir);
   configs.forEach(config => {
-    createFileService(dir, config);
+    createFileService(config, dir);
   });
 }
 

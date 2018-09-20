@@ -1,4 +1,4 @@
-import { transfer, TransferOption } from '../core/fileOperations';
+import { transfer, TransferOption, TransferDirection } from '../core/transfer';
 import { refreshRemoteExplorer } from './shared';
 import createFileHandler from './createFileHandler';
 
@@ -10,7 +10,14 @@ export const upload = createFileHandler<OptTransferOption>({
     const remoteFs = await this.fileService.getRemoteFileSystem();
     const localFs = this.fileService.getLocalFileSystem();
     const { localFsPath, remoteFsPath } = this.target;
-    return transfer(localFsPath, remoteFsPath, localFs, remoteFs, option);
+    transfer(this.fileService.getScheduler(), {
+      localFsPath,
+      localFs,
+      remoteFsPath,
+      remoteFs,
+      option,
+      transferDirection: TransferDirection.Upload,
+    });
   },
   transformOption() {
     const config = this.config;
@@ -31,8 +38,14 @@ export const uploadFile = createFileHandler<OptTransferOption>({
     const remoteFs = await this.fileService.getRemoteFileSystem();
     const localFs = this.fileService.getLocalFileSystem();
     const { localFsPath, remoteFsPath } = this.target;
-
-    return transfer(localFsPath, remoteFsPath, localFs, remoteFs, option);
+    transfer(this.fileService.getScheduler(), {
+      localFsPath,
+      localFs,
+      remoteFsPath,
+      remoteFs,
+      option,
+      transferDirection: TransferDirection.Upload,
+    });
   },
   transformOption() {
     const config = this.config;
@@ -53,7 +66,14 @@ export const uploadFolder = createFileHandler<OptTransferOption>({
     const remoteFs = await this.fileService.getRemoteFileSystem();
     const localFs = this.fileService.getLocalFileSystem();
     const { localFsPath, remoteFsPath } = this.target;
-    return transfer(localFsPath, remoteFsPath, localFs, remoteFs, option);
+    transfer(this.fileService.getScheduler(), {
+      localFsPath,
+      localFs,
+      remoteFsPath,
+      remoteFs,
+      option,
+      transferDirection: TransferDirection.Upload,
+    });
   },
   transformOption() {
     const config = this.config;
@@ -77,7 +97,14 @@ export const download = createFileHandler<OptTransferOption>({
     const remoteFs = await this.fileService.getRemoteFileSystem();
     const localFs = this.fileService.getLocalFileSystem();
     const { localFsPath, remoteFsPath } = this.target;
-    return transfer(remoteFsPath, localFsPath, remoteFs, localFs, option);
+    transfer(this.fileService.getScheduler(), {
+      localFsPath,
+      localFs,
+      remoteFsPath,
+      remoteFs,
+      option,
+      transferDirection: TransferDirection.Download,
+    });
   },
   transformOption() {
     const config = this.config;
@@ -98,7 +125,14 @@ export const downloadFile = createFileHandler<OptTransferOption>({
     const remoteFs = await this.fileService.getRemoteFileSystem();
     const localFs = this.fileService.getLocalFileSystem();
     const { localFsPath, remoteFsPath } = this.target;
-    return transfer(remoteFsPath, localFsPath, remoteFs, localFs, option);
+    transfer(this.fileService.getScheduler(), {
+      localFsPath,
+      localFs,
+      remoteFsPath,
+      remoteFs,
+      option,
+      transferDirection: TransferDirection.Download,
+    });
   },
   transformOption() {
     const config = this.config;
@@ -119,7 +153,14 @@ export const downloadFolder = createFileHandler<OptTransferOption>({
     const remoteFs = await this.fileService.getRemoteFileSystem();
     const localFs = this.fileService.getLocalFileSystem();
     const { localFsPath, remoteFsPath } = this.target;
-    return transfer(remoteFsPath, localFsPath, remoteFs, localFs, option);
+    transfer(this.fileService.getScheduler(), {
+      localFsPath,
+      localFs,
+      remoteFsPath,
+      remoteFs,
+      option,
+      transferDirection: TransferDirection.Download,
+    });
   },
   transformOption() {
     const config = this.config;

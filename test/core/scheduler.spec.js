@@ -1,4 +1,4 @@
-const Scheduler = require('../../src/core/fileTransfer/scheduler').default;
+const Scheduler = require('../../src/core/scheduler').default;
 
 const randomInt = function(min, max) {
   if (max === undefined) {
@@ -50,7 +50,7 @@ describe('scheduler', () => {
     const startTime = new Date().getTime();
     const queue = new Scheduler({ concurrency: 1 });
     input.forEach(([val, ms]) => queue.add(() => delay(ms).then(() => val)));
-    queue.onPendingChange(() => {
+    queue.onProgress(() => {
       if (queue.size === 0 && queue.pendingCount === 0) {
         const time = new Date().getTime() - startTime;
         expect(50 <= time && time <= 100).toBeTruthy();
@@ -74,7 +74,7 @@ describe('scheduler', () => {
       })
     );
 
-    queue.onPendingChange(() => {
+    queue.onProgress(() => {
       if (queue.size === 0 && queue.pendingCount === 0) {
         done();
       }
@@ -88,7 +88,7 @@ describe('scheduler', () => {
     queue.add(async () => result.push(1), { priority: 1 });
     queue.add(async () => result.push(2), { priority: 1 });
     queue.add(async () => result.push(3), { priority: 2 });
-    queue.onPendingChange(() => {
+    queue.onProgress(() => {
       if (queue.size === 0 && queue.pendingCount === 0) {
         expect(result).toEqual([0, 3, 1, 2]);
         done();
@@ -133,18 +133,18 @@ describe('scheduler', () => {
     });
   });
 
-  test('onPendingChange', done => {
+  test('onProgress', done => {
     const queue = new Scheduler({ concurrency: 1 });
     const task = { run: () => Promise.reject(new Error('error')) };
     let count = 0;
     queue.add(() => delay(10));
     queue.add(() => delay(20));
     queue.add(() => delay(30));
-    queue.onPendingChange(() => {
+    queue.onProgress(() => {
       count++;
 
       if (queue.size === 0 && queue.pendingCount === 0) {
-        expect(count).toEqual(3);
+        expect(count).toEqual(5);
         done();
       }
     });

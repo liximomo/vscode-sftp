@@ -3,9 +3,11 @@ import app from '../app';
 import upath from './upath';
 import Ignore from './ignore';
 import { FileSystem } from './fs';
+import Scheduler from './scheduler';
 import { filesIgnoredFromConfig } from '../helper';
 import { createRemoteIfNoneExist, removeRemote } from './remoteFs';
 import localFs from './localFs';
+import { TransferTask } from './transfer';
 
 interface WatcherConfig {
   files: false | string;
@@ -48,6 +50,7 @@ export default class FileService {
   private _name: string;
   private _watcher: WatcherConfig;
   private _profiles: string[];
+  private _scheduler: Scheduler<TransferTask>;
   private _config: any;
   private _configValidator: ConfigValidator;
   private _watcherService: WatcherService = {
@@ -71,6 +74,9 @@ export default class FileService {
     if (config.profiles) {
       this._profiles = Object.keys(config.profiles);
     }
+    this._scheduler = new Scheduler({
+      concurrency: config.concurrency,
+    });
   }
 
   get name(): string {
@@ -104,6 +110,10 @@ export default class FileService {
 
   disableWatcher() {
     this._disposeWatcher();
+  }
+
+  getScheduler(): Scheduler<TransferTask> {
+    return this._scheduler;
   }
 
   getLocalFileSystem(): FileSystem {
