@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
 import * as debounce from 'lodash.debounce';
-import * as path from 'path';
 import logger from '../logger';
-import app from '../app';
-import { isValidFile, fileDepth, simplifyPath } from '../helper';
+import { isValidFile, fileDepth } from '../helper';
 import { upload, removeRemote } from '../fileHandlers';
 import { WatcherService } from '../core';
+import app from '../app';
+import StatusBarItem from '../ui/statusBarItem';
 
 const watchers: {
   [x: string]: vscode.FileSystemWatcher;
@@ -25,10 +25,9 @@ function doUpload() {
     logger.info(`[watcher-update] ${fspath}`);
     try {
       await upload(uri);
-      app.sftpBarItem.showMsg(`uploaded ${path.basename(fspath)}`, simplifyPath(fspath), 2 * 1000);
     } catch (error) {
       logger.error(error, `upload ${fspath}`);
-      app.sftpBarItem.showMsg('fail', 4 * 1000);
+      app.sftpBarItem.updateStatus(StatusBarItem.Status.error);
     }
   });
 }
@@ -41,10 +40,9 @@ function doDelete() {
     logger.info(`[watcher-update] ${fspath}`);
     try {
       await removeRemote(uri);
-      app.sftpBarItem.showMsg(`removed ${path.basename(fspath)}`, simplifyPath(fspath), 2 * 1000);
     } catch (error) {
       logger.error(error, `remove ${fspath}`);
-      app.sftpBarItem.showMsg('fail', 4 * 1000);
+      app.sftpBarItem.updateStatus(StatusBarItem.Status.error);
     }
   });
 }

@@ -20,6 +20,10 @@ const delay = millisecends =>
   });
 const fixture = Symbol('fixture');
 
+const wrapTask = fn => ({
+  run: fn,
+});
+
 describe('scheduler', () => {
   test('.add()', () => {
     let result;
@@ -29,7 +33,7 @@ describe('scheduler', () => {
         result = 1;
       },
     });
-    queue.add(async () => fixture);
+    queue.add(wrapTask(async () => fixture));
     expect(queue.size).toEqual(0);
     expect(queue.pendingCount).toEqual(2);
     expect(result).toEqual(1);
@@ -37,9 +41,9 @@ describe('scheduler', () => {
 
   test('.add() - limited concurrency', () => {
     const queue = new Scheduler({ concurrency: 2 });
-    queue.add(async () => fixture);
-    queue.add(async () => delay(100).then(() => fixture));
-    queue.add(async () => fixture);
+    queue.add(wrapTask(async () => fixture));
+    queue.add(wrapTask(async () => delay(100).then(() => fixture)));
+    queue.add(wrapTask(async () => fixture));
     expect(queue.size).toEqual(1);
     expect(queue.pendingCount).toEqual(2);
   });
@@ -49,7 +53,7 @@ describe('scheduler', () => {
 
     const startTime = new Date().getTime();
     const queue = new Scheduler({ concurrency: 1 });
-    input.forEach(([val, ms]) => queue.add(() => delay(ms).then(() => val)));
+    input.forEach(([val, ms]) => queue.add(wrapTask(() => delay(ms).then(() => val))));
     queue.onProgress(() => {
       if (queue.size === 0 && queue.pendingCount === 0) {
         const time = new Date().getTime() - startTime;
@@ -65,13 +69,15 @@ describe('scheduler', () => {
     let running = 0;
 
     new Array(50).fill(0).forEach(() =>
-      queue.add(async () => {
-        running++;
-        expect(running <= concurrency).toBeTruthy();
-        expect(queue.pendingCount <= concurrency).toBeTruthy();
-        await delay(randomInt(0, 30));
-        running--;
-      })
+      queue.add(
+        wrapTask(async () => {
+          running++;
+          expect(running <= concurrency).toBeTruthy();
+          expect(queue.pendingCount <= concurrency).toBeTruthy();
+          await delay(randomInt(0, 30));
+          running--;
+        })
+      )
     );
 
     queue.onProgress(() => {
@@ -84,10 +90,10 @@ describe('scheduler', () => {
   test('.add() - priority', done => {
     const result = [];
     const queue = new Scheduler({ concurrency: 1 });
-    queue.add(async () => result.push(0), { priority: 0 });
-    queue.add(async () => result.push(1), { priority: 1 });
-    queue.add(async () => result.push(2), { priority: 1 });
-    queue.add(async () => result.push(3), { priority: 2 });
+    queue.add(wrapTask(async () => result.push(0)), { priority: 0 });
+    queue.add(wrapTask(async () => result.push(1)), { priority: 1 });
+    queue.add(wrapTask(async () => result.push(2)), { priority: 1 });
+    queue.add(wrapTask(async () => result.push(3)), { priority: 2 });
     queue.onProgress(() => {
       if (queue.size === 0 && queue.pendingCount === 0) {
         expect(result).toEqual([0, 3, 1, 2]);
@@ -100,7 +106,7 @@ describe('scheduler', () => {
     const queue = new Scheduler();
     const fn = async () => fixture;
     const fns = [fn, fn];
-    queue.addAll(fns);
+    queue.addAll(fns.map(wrapTask));
     expect(queue.size).toEqual(0);
     expect(queue.pendingCount).toEqual(2);
   });
@@ -137,9 +143,9 @@ describe('scheduler', () => {
     const queue = new Scheduler({ concurrency: 1 });
     const task = { run: () => Promise.reject(new Error('error')) };
     let count = 0;
-    queue.add(() => delay(10));
-    queue.add(() => delay(20));
-    queue.add(() => delay(30));
+    queue.add(wrapTask(() => delay(10)));
+    queue.add(wrapTask(() => delay(20)));
+    queue.add(wrapTask(() => delay(30)));
     queue.onProgress(() => {
       count++;
 
@@ -171,10 +177,10 @@ describe('scheduler', () => {
   test('autoStart: false', () => {
     const queue = new Scheduler({ concurrency: 2, autoStart: false });
 
-    queue.add(() => delay(20000));
-    queue.add(() => delay(20000));
-    queue.add(() => delay(20000));
-    queue.add(() => delay(20000));
+    queue.add(wrapTask(() => delay(20000)));
+    queue.add(wrapTask(() => delay(20000)));
+    queue.add(wrapTask(() => delay(20000)));
+    queue.add(wrapTask(() => delay(20000)));
     expect(queue.size).toEqual(4);
     expect(queue.pendingCount).toEqual(0);
     expect(queue._isPaused).toEqual(true);
@@ -189,11 +195,11 @@ describe('scheduler', () => {
     const queue = new Scheduler({ concurrency: 2 });
 
     queue.pause();
-    queue.add(() => delay(20000));
-    queue.add(() => delay(20000));
-    queue.add(() => delay(20000));
-    queue.add(() => delay(20000));
-    queue.add(() => delay(20000));
+    queue.add(wrapTask(() => delay(20000)));
+    queue.add(wrapTask(() => delay(20000)));
+    queue.add(wrapTask(() => delay(20000)));
+    queue.add(wrapTask(() => delay(20000)));
+    queue.add(wrapTask(() => delay(20000)));
     expect(queue.size).toEqual(5);
     expect(queue.pendingCount).toEqual(0);
     expect(queue._isPaused).toEqual(true);
@@ -203,7 +209,7 @@ describe('scheduler', () => {
     expect(queue.pendingCount).toEqual(2);
     expect(queue._isPaused).toEqual(false);
 
-    queue.add(() => delay(20000));
+    queue.add(wrapTask(() => delay(20000)));
     queue.pause();
     expect(queue.size).toEqual(4);
     expect(queue.pendingCount).toEqual(2);
@@ -217,10 +223,10 @@ describe('scheduler', () => {
 
   test('.add() sync/async mixed tasks', () => {
     const queue = new Scheduler({ concurrency: 1 });
-    queue.add(() => 'sync 1');
-    queue.add(() => delay(1000));
-    queue.add(() => 'sync 2');
-    queue.add(() => fixture);
+    queue.add(wrapTask(() => 'sync 1'));
+    queue.add(wrapTask(() => delay(1000)));
+    queue.add(wrapTask(() => 'sync 2'));
+    queue.add(wrapTask(() => fixture));
     expect(queue.size).toEqual(3);
     expect(queue.pendingCount).toEqual(1);
   });
@@ -228,7 +234,7 @@ describe('scheduler', () => {
   test('.addAll() sync/async mixed tasks', () => {
     const queue = new Scheduler();
     const fns = [() => 'sync 1', () => delay(2000), () => 'sync 2', async () => fixture];
-    queue.addAll(fns);
+    queue.addAll(fns.map(wrapTask));
     expect(queue.size).toEqual(0);
     expect(queue.pendingCount).toEqual(4);
   });

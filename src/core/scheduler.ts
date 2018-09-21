@@ -25,12 +25,8 @@ function lowerBound<T>(array: T[], value: T, comp: (a: T, b: T) => number) {
   return first;
 }
 
-type TaskReturn = any | Promise<any>;
-
-type CallableTask = () => TaskReturn;
-
 export interface Task {
-  run: CallableTask;
+  run(): any | Promise<any>;
 }
 
 interface Queue<T> {
@@ -69,6 +65,7 @@ class PriorityQueue<T> implements Queue<T> {
   }
 }
 
+const EVENT_TASK_START = 'task.start';
 const EVENT_TASK_DONE = 'task.done';
 const EVENT_PROGRESS = 'progress';
 
@@ -104,13 +101,7 @@ class Scheduler<T extends Task> {
     this._concurrency = concurrency;
   }
 
-  add(task: T | CallableTask, opt?: { priority: number }) {
-    if (typeof task === 'function') {
-      task = {
-        run: task,
-      } as T;
-    }
-
+  add(task: T, opt?: { priority: number }) {
     if (!this._isPaused && this.pendingCount < this._concurrency) {
       this._runTask(task);
     } else {
@@ -118,7 +109,7 @@ class Scheduler<T extends Task> {
     }
   }
 
-  addAll(tasks: (T | CallableTask)[]) {
+  addAll(tasks: T[]) {
     tasks.forEach(t => this.add(t));
   }
 
@@ -135,6 +126,10 @@ class Scheduler<T extends Task> {
 
   pause() {
     this._isPaused = true;
+  }
+
+  onTaskStart(listener: (task: T) => void) {
+    this._eventEmitter.on(EVENT_TASK_START, listener);
   }
 
   onTaskDone(listener: (err: Error | null, task: T) => void) {
@@ -162,6 +157,7 @@ class Scheduler<T extends Task> {
   private async _runTask(task: T) {
     this._pendingQueue.add(task);
     this._eventEmitter.emit(EVENT_PROGRESS);
+    this._eventEmitter.emit(EVENT_TASK_START, task);
 
     let error = null;
     try {
@@ -170,8 +166,8 @@ class Scheduler<T extends Task> {
       error = err;
     } finally {
       this._pendingQueue.delete(task);
-      this._eventEmitter.emit(EVENT_TASK_DONE, error, task);
       this._eventEmitter.emit(EVENT_PROGRESS);
+      this._eventEmitter.emit(EVENT_TASK_DONE, error, task);
       this._next();
     }
   }

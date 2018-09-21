@@ -1,5 +1,4 @@
 import { Uri } from 'vscode';
-import app from '../../app';
 import logger from '../../logger';
 import { reportError } from '../../helper';
 import { handleCtxFromUri, FileHandlerContext } from '../../fileHandlers';
@@ -46,10 +45,6 @@ export function createFileCommand(commandOption: FileCommandOption) {
       super();
       this.id = commandOption.id;
       this.name = commandOption.name;
-
-      this.onCommandDone(() => {
-        app.sftpBarItem.showMsg(`${this.name} done`, 2000);
-      });
     }
 
     protected async doCommandRun(...args) {
@@ -60,7 +55,6 @@ export function createFileCommand(commandOption: FileCommandOption) {
       }
 
       const targetList: Uri[] = Array.isArray(target) ? target : [target];
-      app.sftpBarItem.showMsg(`${this.name}...`);
       const pendingTasks = targetList.map(async uri => {
         try {
           await commandOption.handleFile(handleCtxFromUri(uri));

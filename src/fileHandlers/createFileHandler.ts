@@ -1,9 +1,5 @@
 import { Uri } from 'vscode';
-import * as path from 'path';
-import { showErrorMessage } from '../host';
-import { fileOps, UResource, FileService } from '../core';
-import { simplifyPath } from '../helper';
-import app from '../app';
+import { UResource, FileService } from '../core';
 import logger from '../logger';
 import { getFileService } from '../modules/serviceManager';
 
@@ -26,19 +22,6 @@ interface FileHandlerOption<T> {
   afterHandle?: FileHandlerContextMethod;
   config?: FileHandlerConfig;
   transformOption?: FileHandlerContextMethod<any>;
-}
-
-function onProgress(error: Error, task: fileOps.FileTask) {
-  const localFsPath = task.file.fsPath;
-  if (error) {
-    const errorMsg = `${error.message} when ${task.type} ${localFsPath}`;
-    logger.error(errorMsg);
-    showErrorMessage(errorMsg);
-    return;
-  }
-
-  logger.info(`${task.type} done - ${localFsPath}`);
-  app.sftpBarItem.showMsg(`${task.type} ${path.basename(localFsPath)}`, simplifyPath(localFsPath));
 }
 
 export function handleCtxFromUri(uri: Uri): FileHandlerContext {
@@ -81,20 +64,17 @@ export default function createFileHandler<T>(
       const optionFromConfig = handlerOption.transformOption
         ? handlerOption.transformOption.call(handleCtx)
         : {};
-      const invokeOption = {
-        onProgress,
-        ...optionFromConfig,
-      };
       if (option) {
-        Object.assign(invokeOption, option);
+        Object.assign(optionFromConfig, option);
       }
 
-      await handlerOption.handle.call(handleCtx, invokeOption);
+      await handlerOption.handle.call(handleCtx, optionFromConfig);
 
       if (handlerOption.afterHandle) {
         handlerOption.afterHandle.call(handleCtx);
       }
     } catch (error) {
+      // todo: catchError
       throw error;
     } finally {
       if (handleConfig.doNotTriggerWatcher) {

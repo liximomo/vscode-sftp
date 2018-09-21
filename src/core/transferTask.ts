@@ -1,6 +1,6 @@
-import { FileSystem, FileType } from '..';
-import { fileOperations } from '..';
-import { Task } from '../scheduler';
+import { FileSystem, FileType } from '.';
+import { fileOperations } from '.';
+import { Task } from './scheduler';
 
 export enum TransferDirection {
   Upload = 'upload',
@@ -16,60 +16,52 @@ export interface TransferOption extends fileOperations.TransferOption {
   ignore?: (fsPath: string) => boolean;
 }
 
-export function getTransferSrcAndTarget(
-  local: FileHandle,
-  remote: FileHandle,
-  transferDirection: TransferDirection
-) {
-  if (transferDirection === TransferDirection.Upload) {
-    return {
-      src: local.fsPath,
-      target: remote.fsPath,
-      srcFs: local.fileSystem,
-      targetFs: remote.fileSystem,
-    };
-  } else if (transferDirection === TransferDirection.Download) {
-    return {
-      src: remote.fsPath,
-      target: local.fsPath,
-      srcFs: remote.fileSystem,
-      targetFs: local.fileSystem,
-    };
-  } else {
-    throw new Error(`Unsupported TransferDirection(${this._transferDirection})`);
-  }
-}
-
 export default class TransferTask implements Task {
   readonly fileType: FileType;
-  private readonly _local: FileHandle;
-  private readonly _remote: FileHandle;
+  private readonly _src: FileHandle;
+  private readonly _target: FileHandle;
   private readonly _transferDirection: TransferDirection;
   private readonly _transferOption: TransferOption;
   // private _fileStatus: FileStatus;
 
   constructor(
-    local: FileHandle,
-    remote: FileHandle,
+    src: FileHandle,
+    target: FileHandle,
     option: {
       fileType: FileType;
       transferDirection: TransferDirection;
       transferOption: TransferOption;
     }
   ) {
-    this._local = local;
-    this._remote = remote;
+    this._src = src;
+    this._target = target;
     this.fileType = option.fileType;
     this._transferOption = option.transferOption;
     this._transferDirection = option.transferDirection;
   }
 
   get localFsPath() {
-    return this._local.fsPath;
+    if (this._transferDirection === TransferDirection.Download) {
+      return this.targetFsPath;
+    } else {
+      return this.srcFsPath;
+    }
   }
 
-  get remoteFsPath() {
-    return this._remote.fsPath;
+  private get srcFsPath() {
+    return this._src.fsPath;
+  }
+
+  private get srcFs() {
+    return this._src.fileSystem;
+  }
+
+  private get targetFsPath() {
+    return this._target.fsPath;
+  }
+
+  private get targetFs() {
+    return this._target.fileSystem;
   }
 
   get transferType() {
@@ -81,11 +73,10 @@ export default class TransferTask implements Task {
   // }
 
   async run() {
-    const { src, target, srcFs, targetFs } = getTransferSrcAndTarget(
-      this._local,
-      this._remote,
-      this._transferDirection
-    );
+    const src = this.srcFsPath;
+    const target = this.targetFsPath;
+    const srcFs = this.srcFs;
+    const targetFs = this.targetFs;
 
     switch (this.fileType) {
       case FileType.File:

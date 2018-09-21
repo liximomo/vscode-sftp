@@ -7,10 +7,9 @@ import {
   TransferOption as BaseTransferOption,
 } from './fileBaseOperations';
 import upath from './upath';
-import app from '../app';
 import { FileSystem, FileEntry, FileType } from './fs';
 import * as utils from '../utils';
-import { fileDepth, simplifyPath } from '../helper';
+import { fileDepth } from '../helper';
 import logger from '../logger';
 
 type SyncModel = 'full' | 'update';
@@ -206,8 +205,6 @@ async function fileTaskListFromDirector(
     return Promise.resolve([]);
   }
 
-  app.sftpBarItem.showMsg(`retrieving directory ${upath.basename(src)}`, simplifyPath(src));
-
   // $caution side effect
   // Need this to make sure file can correct transfer
   // This is the bset place current I can find.
@@ -241,10 +238,7 @@ async function fileTaskListFromDirectorForSync(
     return Promise.resolve([]);
   }
 
-  app.sftpBarItem.showMsg(`retrieving directory ${upath.basename(src)}`, simplifyPath(src));
   const syncFiles = ([srcFileEntries, desFileEntries]: FileEntry[][]) => {
-    app.sftpBarItem.showMsg('diff files...');
-
     const srcFileTable = toHash(srcFileEntries, 'id', fileEntry => ({
       ...fileEntry,
       id: upath.normalize(srcFs.pathResolver.relative(src, fileEntry.fspath)),

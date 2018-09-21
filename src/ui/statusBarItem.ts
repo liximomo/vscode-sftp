@@ -7,27 +7,45 @@ const spinners = {
   },
 };
 
+enum Status {
+  ok = 1,
+  warn,
+  error,
+}
+
 export default class StatusBarItem {
-  private name: () => string | string;
+  static Status = Status;
+
+  private _name: () => string | string;
   private tooltip: string;
   private statusBarItem: vscode.StatusBarItem;
   private spinnerTimer: any = null;
   private resetTimer: any = null;
   private curFrameOfSpinner: number = 0;
   private text: string;
+  private status: Status = Status.ok;
   private spinner: {
     interval: number;
     frames: string[];
   };
 
   constructor(name, tooltip, command) {
-    this.name = name;
+    this._name = name;
     this.tooltip = tooltip;
     this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
     this.statusBarItem.command = command;
     this.spinner = spinners.dots;
     this.reset = this.reset.bind(this);
     this.reset();
+  }
+
+  private get name() {
+    return typeof this._name === 'function' ? this._name() : this._name;
+  }
+
+  updateStatus(status: Status) {
+    this.status = status;
+    this._render();
   }
 
   getText() {
@@ -86,6 +104,20 @@ export default class StatusBarItem {
   private _render() {
     if (this.isSpinning()) {
       this.statusBarItem.text = this.spinner.frames[this.curFrameOfSpinner] + ' ' + this.text;
+    } else if (this.name === this.text) {
+      switch (this.status) {
+        case Status.ok:
+          this.statusBarItem.text = this.text;
+          break;
+        case Status.warn:
+          this.statusBarItem.text = `$(alert) ${this.text}`;
+          break;
+        case Status.error:
+          this.statusBarItem.text = `$(issue-opened) ${this.text}`;
+          break;
+        default:
+          this.statusBarItem.text = this.text;
+      }
     } else {
       this.statusBarItem.text = this.text;
     }
@@ -95,7 +127,7 @@ export default class StatusBarItem {
     if (this.isSpinning()) {
       this.stopSpinner();
     }
-    this.text = typeof this.name === 'function' ? this.name() : this.name;
+    this.text = this.name;
     this.statusBarItem.tooltip = this.tooltip;
     this._render();
   }

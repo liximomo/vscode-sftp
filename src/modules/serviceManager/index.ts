@@ -3,7 +3,8 @@ import * as path from 'path';
 import app from '../../app';
 import { showErrorMessage } from '../../host';
 import logger from '../../logger';
-import { FileService, UResource } from '../../core';
+import { simplifyPath } from '../../helper';
+import { UResource, FileService } from '../../core';
 import { validateConfig } from '../config';
 import watcherService from '../fileWatcher';
 import Trie from './trie';
@@ -45,24 +46,31 @@ export function createFileService(config: any, workspace: string) {
   service.setConfigValidator(validateConfig);
   service.setWatcherService(watcherService);
   const scheduler = service.getScheduler();
+  scheduler.onTaskStart(task => {
+    const { localFsPath, transferType } = task;
+    app.sftpBarItem.showMsg(
+      `${transferType} ${path.basename(localFsPath)}`,
+      simplifyPath(localFsPath)
+    );
+  });
   scheduler.onTaskDone((error, task) => {
     const { localFsPath, transferType } = task;
     if (error) {
       const errorMsg = `${error.message} when ${transferType} ${localFsPath}`;
       logger.error(errorMsg);
       showErrorMessage(errorMsg);
-      return;
-    }
-    logger.info(`${transferType} ${localFsPath}`);
-  });
-  scheduler.onProgress(() => {
-    if (scheduler.pendingCount > 0) {
-      app.sftpBarItem.startSpinner();
     } else {
-      app.sftpBarItem.stopSpinner();
-      app.sftpBarItem.reset();
+      logger.info(`${transferType} ${localFsPath}`);
+      app.sftpBarItem.showMsg('done', 2000 * 2);
     }
   });
+  // scheduler.onProgress(() => {
+  //   if (scheduler.pendingCount > 0) {
+  //     app.sftpBarItem.startSpinner();
+  //   } else {
+  //     app.sftpBarItem.stopSpinner();
+  //   }
+  // });
 
   return service;
 }

@@ -7,7 +7,7 @@ import Scheduler from './scheduler';
 import { filesIgnoredFromConfig } from '../helper';
 import { createRemoteIfNoneExist, removeRemote } from './remoteFs';
 import localFs from './localFs';
-import { TransferTask } from './transfer';
+import TransferTask from './transferTask';
 
 interface WatcherConfig {
   files: false | string;
