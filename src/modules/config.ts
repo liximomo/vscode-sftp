@@ -231,7 +231,6 @@ export function validateConfig(config) {
 }
 
 export function readConfigsFromFile(configPath, workspace): Promise<any[]> {
-  // $todo? trie per workspace, so we can remove unused config
   return fse.readJson(configPath).then(config => {
     const configs = Array.isArray(config) ? config : [config];
     return Promise.all(configs.map(c => processConfig(c, workspace)));

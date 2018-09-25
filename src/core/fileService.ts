@@ -74,11 +74,7 @@ export default class FileService {
   }
 
   get name(): string {
-    if (this._name) {
-      return this._name;
-    }
-
-    return `${this.baseDir}`;
+    return this._name ? this._name : '';
   }
 
   set name(name: string) {

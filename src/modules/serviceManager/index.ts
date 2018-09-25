@@ -1,9 +1,10 @@
 import { Uri } from 'vscode';
 import * as path from 'path';
-import app from '../app';
-import { Trie, UResource, FileService } from '../core';
-import { validateConfig } from './config';
-import watcherService from './fileWatcher';
+import app from '../../app';
+import Trie from './trie';
+import { FileService, UResource } from '../../core';
+import { validateConfig } from '../config';
+import watcherService from '../fileWatcher';
 
 const serviceManager = new Trie<FileService>(
   {},

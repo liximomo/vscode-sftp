@@ -63,7 +63,19 @@ export default class RemoteTreeData
 
   getTreeItem(item: ExplorerItem): vscode.TreeItem {
     const isRoot = (item as ExplorerRoot).explorerContext !== undefined;
+    let customLabel;
+    if (isRoot) {
+      customLabel = (item as ExplorerRoot).explorerContext.fileService.name;
+      if (!customLabel) {
+        customLabel = upath.basename(item.resource.fsPath);
+      }
+    }
     return {
+      ...(customLabel
+        ? {
+            label: customLabel,
+          }
+        : {}),
       resourceUri: item.resource.uri,
       collapsibleState: item.isDirectory ? vscode.TreeItemCollapsibleState.Collapsed : undefined,
       contextValue: isRoot ? 'root' : item.isDirectory ? 'folder' : 'file',

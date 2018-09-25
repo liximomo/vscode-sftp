@@ -1,7 +1,7 @@
 import { Uri } from 'vscode';
 import * as path from 'path';
 import { showErrorMessage } from '../host';
-import { fs, fileOps, UResource, FileService } from '../core';
+import { fileOps, UResource, FileService } from '../core';
 import { simplifyPath } from '../helper';
 import app from '../app';
 import logger from '../logger';

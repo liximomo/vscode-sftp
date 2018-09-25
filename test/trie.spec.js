@@ -1,4 +1,4 @@
-const Trie = require('../src/core/Trie').default;
+const Trie = require('../src/modules/serviceManager/trie').default;
 
 describe('Trie Tests', () => {
   describe('find all values', () => {
