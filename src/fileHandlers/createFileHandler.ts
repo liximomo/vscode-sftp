@@ -4,7 +4,7 @@ import logger from '../logger';
 import { getFileService } from '../modules/serviceManager';
 
 interface FileHandlerConfig {
-  doNotTriggerWatcher?: boolean;
+  _?: boolean;
 }
 
 export interface FileHandlerContext {
@@ -52,14 +52,10 @@ export default function createFileHandler<T>(
 ): (ctx: FileHandlerContext | Uri, option?: T) => Promise<void> {
   async function fileHandle(ctx: Uri | FileHandlerContext, option?: T) {
     const handleCtx = ctx instanceof Uri ? handleCtxFromUri(ctx) : ctx;
-    const { fileService, target } = handleCtx;
+    const { target } = handleCtx;
 
     logger.trace(`handle ${handlerOption.name} for`, target.localFsPath);
 
-    const handleConfig = handlerOption.config || {};
-    if (handleConfig.doNotTriggerWatcher) {
-      fileService.disableWatcher();
-    }
     try {
       const optionFromConfig = handlerOption.transformOption
         ? handlerOption.transformOption.call(handleCtx)
@@ -76,13 +72,6 @@ export default function createFileHandler<T>(
     } catch (error) {
       // todo: catchError
       throw error;
-    } finally {
-      if (handleConfig.doNotTriggerWatcher) {
-        // delay setup watcher to avoid download event
-        setTimeout(() => {
-          (fileService as FileService).enableWatcher();
-        }, 1000 * 3);
-      }
     }
   }
 

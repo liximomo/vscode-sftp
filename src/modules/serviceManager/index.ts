@@ -64,13 +64,6 @@ export function createFileService(config: any, workspace: string) {
       app.sftpBarItem.showMsg('done', 2000 * 2);
     }
   });
-  // scheduler.onProgress(() => {
-  //   if (scheduler.pendingCount > 0) {
-  //     app.sftpBarItem.startSpinner();
-  //   } else {
-  //     app.sftpBarItem.stopSpinner();
-  //   }
-  // });
 
   return service;
 }

@@ -38,9 +38,6 @@ export const sync2Remote = createFileHandler<OptSyncOption>({
 
 export const sync2Local = createFileHandler<OptSyncOption>({
   name: 'syncToLocal',
-  config: {
-    doNotTriggerWatcher: true,
-  },
   async handle(option) {
     const remoteFs = await this.fileService.getRemoteFileSystem();
     const localFs = this.fileService.getLocalFileSystem();
@@ -150,9 +147,6 @@ export const uploadFolder = createFileHandler<OptTransferOption>({
 
 export const download = createFileHandler<OptTransferOption>({
   name: 'download',
-  config: {
-    doNotTriggerWatcher: true,
-  },
   async handle(option) {
     const remoteFs = await this.fileService.getRemoteFileSystem();
     const localFs = this.fileService.getLocalFileSystem();
@@ -177,9 +171,6 @@ export const download = createFileHandler<OptTransferOption>({
 
 export const downloadFile = createFileHandler<OptTransferOption>({
   name: 'download file',
-  config: {
-    doNotTriggerWatcher: true,
-  },
   async handle(option) {
     const remoteFs = await this.fileService.getRemoteFileSystem();
     const localFs = this.fileService.getLocalFileSystem();
@@ -204,9 +195,6 @@ export const downloadFile = createFileHandler<OptTransferOption>({
 
 export const downloadFolder = createFileHandler<OptTransferOption>({
   name: 'download folder',
-  config: {
-    doNotTriggerWatcher: true,
-  },
   async handle(option) {
     const remoteFs = await this.fileService.getRemoteFileSystem();
     const localFs = this.fileService.getLocalFileSystem();

@@ -25,7 +25,4 @@ export const diff = createFileHandler({
       `${simplifyPath(localFsPath)} (local ↔ ${option.name || 'remote'})`
     );
   },
-  config: {
-    doNotTriggerWatcher: true,
-  },
 });

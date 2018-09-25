@@ -48,7 +48,7 @@ function getHostInfo(config) {
 
 export default class FileService {
   private _name: string;
-  private _watcher: WatcherConfig;
+  private _watcherConfig: WatcherConfig;
   private _profiles: string[];
   private _scheduler: Scheduler<TransferTask>;
   private _config: any;
@@ -69,7 +69,7 @@ export default class FileService {
     this.id = ++id;
     this.workspace = workspace;
     this.baseDir = baseDir;
-    this._watcher = config.watcher;
+    this._watcherConfig = config.watcher;
     this._config = config;
     if (config.profiles) {
       this._profiles = Object.keys(config.profiles);
@@ -104,13 +104,13 @@ export default class FileService {
     return this._profiles || [];
   }
 
-  enableWatcher() {
-    this._createWatcher();
-  }
+  // enableWatcher() {
+  //   this._createWatcher();
+  // }
 
-  disableWatcher() {
-    this._disposeWatcher();
-  }
+  // disableWatcher() {
+  //   this._disposeWatcher();
+  // }
 
   getScheduler(): Scheduler<TransferTask> {
     return this._scheduler;
@@ -201,7 +201,7 @@ export default class FileService {
   }
 
   private _createWatcher() {
-    this._watcherService.create(this.baseDir, this._watcher);
+    this._watcherService.create(this.baseDir, this._watcherConfig);
   }
 
   private _disposeWatcher() {
