@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events';
 import * as path from 'path';
 import app from '../app';
 import upath from './upath';
@@ -6,8 +7,8 @@ import { FileSystem } from './fs';
 import Scheduler from './scheduler';
 import { filesIgnoredFromConfig } from '../helper';
 import { createRemoteIfNoneExist, removeRemote } from './remoteFs';
-import localFs from './localFs';
 import TransferTask from './transferTask';
+import localFs from './localFs';
 
 interface WatcherConfig {
   files: false | string;
@@ -18,6 +19,11 @@ interface WatcherConfig {
 export interface WatcherService {
   create(watcherBase: string, watcherConfig: WatcherConfig): any;
   dispose(watcherBase: string): void;
+}
+
+interface TransferScheduler {
+  add(x: TransferTask): void;
+  run(): Promise<void>;
 }
 
 type ConfigValidator = (x: any) => { message: string };
@@ -46,11 +52,17 @@ function getHostInfo(config) {
   }, {});
 }
 
+enum Event {
+  BEFORE_TRANSFER = 'BEFORE_TRANSFER',
+  AFTER_TRANSFER = 'AFTER_TRANSFER',
+}
+
 export default class FileService {
+  private _eventEmitter: EventEmitter = new EventEmitter();
   private _name: string;
   private _watcherConfig: WatcherConfig;
   private _profiles: string[];
-  private _scheduler: Scheduler<TransferTask>;
+  private _pendingTransferTasks: Set<TransferTask> = new Set();
   private _config: any;
   private _configValidator: ConfigValidator;
   private _watcherService: WatcherService = {
@@ -74,9 +86,6 @@ export default class FileService {
     if (config.profiles) {
       this._profiles = Object.keys(config.profiles);
     }
-    this._scheduler = new Scheduler({
-      concurrency: config.concurrency,
-    });
   }
 
   get name(): string {
@@ -104,16 +113,44 @@ export default class FileService {
     return this._profiles || [];
   }
 
-  // enableWatcher() {
-  //   this._createWatcher();
-  // }
+  getPendingTransferTasks(): Readonly<TransferTask[]> {
+    return Array.from(this._pendingTransferTasks);
+  }
 
-  // disableWatcher() {
-  //   this._disposeWatcher();
-  // }
+  beforeTransfer(listener: (task: TransferTask) => void) {
+    this._eventEmitter.on(Event.BEFORE_TRANSFER, listener);
+  }
 
-  getScheduler(): Scheduler<TransferTask> {
-    return this._scheduler;
+  afterTransfer(listener: (err: Error | null, task: TransferTask) => void) {
+    this._eventEmitter.on(Event.AFTER_TRANSFER, listener);
+  }
+
+  createTransferScheduler(concurrency): TransferScheduler {
+    const scheduler = new Scheduler({
+      autoStart: false,
+      concurrency,
+    });
+
+    scheduler.onTaskStart(task => {
+      this._pendingTransferTasks.add(task as TransferTask);
+      this._eventEmitter.emit(Event.BEFORE_TRANSFER, task);
+    });
+    scheduler.onTaskDone((err, task) => {
+      this._pendingTransferTasks.delete(task as TransferTask);
+      this._eventEmitter.emit(Event.AFTER_TRANSFER, err, task);
+    });
+
+    return {
+      add(task: TransferTask) {
+        scheduler.add(task);
+      },
+      run() {
+        return new Promise(resolve => {
+          scheduler.onIdle(resolve);
+          scheduler.start();
+        });
+      },
+    };
   }
 
   getLocalFileSystem(): FileSystem {

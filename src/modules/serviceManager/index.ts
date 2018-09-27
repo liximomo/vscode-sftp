@@ -45,15 +45,14 @@ export function createFileService(config: any, workspace: string) {
   service.name = config.name;
   service.setConfigValidator(validateConfig);
   service.setWatcherService(watcherService);
-  const scheduler = service.getScheduler();
-  scheduler.onTaskStart(task => {
+  service.beforeTransfer(task => {
     const { localFsPath, transferType } = task;
     app.sftpBarItem.showMsg(
       `${transferType} ${path.basename(localFsPath)}`,
       simplifyPath(localFsPath)
     );
   });
-  scheduler.onTaskDone((error, task) => {
+  service.afterTransfer((error, task) => {
     const { localFsPath, transferType } = task;
     if (error) {
       const errorMsg = `${error.message} when ${transferType} ${localFsPath}`;

@@ -25,9 +25,11 @@ function lowerBound<T>(array: T[], value: T, comp: (a: T, b: T) => number) {
   return first;
 }
 
-export interface Task {
-  run(): any | Promise<any>;
+interface Task {
+  run(): void | Promise<void>;
 }
+
+type taskFunc = Task['run'];
 
 interface Queue<T> {
   enqueue(r: T): void;
@@ -67,11 +69,11 @@ class PriorityQueue<T> implements Queue<T> {
 
 const EVENT_TASK_START = 'task.start';
 const EVENT_TASK_DONE = 'task.done';
-const EVENT_PROGRESS = 'progress';
+const EVENT_IDLE = 'idle';
 
-class Scheduler<T extends Task> {
-  private _queue: PriorityQueue<T> = new PriorityQueue<T>();
-  private _pendingQueue: Set<T> = new Set<T>();
+class Scheduler {
+  private _queue: PriorityQueue<Task> = new PriorityQueue<Task>();
+  private _pendingCount: number;
   private _eventEmitter: EventEmitter = new EventEmitter();
   private _concurrency: number;
   private _isPaused: boolean;
@@ -101,7 +103,13 @@ class Scheduler<T extends Task> {
     this._concurrency = concurrency;
   }
 
-  add(task: T, opt?: { priority: number }) {
+  add(task: Task | taskFunc, opt?: { priority: number }) {
+    if (typeof task === 'function') {
+      task = {
+        run: task,
+      };
+    }
+
     if (!this._isPaused && this.pendingCount < this._concurrency) {
       this._runTask(task);
     } else {
@@ -109,7 +117,7 @@ class Scheduler<T extends Task> {
     }
   }
 
-  addAll(tasks: T[]) {
+  addAll(tasks: Task[]) {
     tasks.forEach(t => this.add(t));
   }
 
@@ -128,16 +136,16 @@ class Scheduler<T extends Task> {
     this._isPaused = true;
   }
 
-  onTaskStart(listener: (task: T) => void) {
+  onTaskStart(listener: (task: Task) => void) {
     this._eventEmitter.on(EVENT_TASK_START, listener);
   }
 
-  onTaskDone(listener: (err: Error | null, task: T) => void) {
+  onTaskDone(listener: (err: Error | null, task: Task) => void) {
     this._eventEmitter.on(EVENT_TASK_DONE, listener);
   }
 
-  onProgress(listener: () => void) {
-    this._eventEmitter.on(EVENT_PROGRESS, listener);
+  onIdle(listener: () => void) {
+    this._eventEmitter.on(EVENT_IDLE, listener);
   }
 
   get size() {
@@ -145,18 +153,21 @@ class Scheduler<T extends Task> {
   }
 
   get pendingCount() {
-    return this._pendingQueue.size;
+    return this._pendingCount;
   }
 
   private _next() {
-    if (this.size > 0 && !this._isPaused) {
-      this._runTask(this._queue.dequeue());
+    if (this.size > 0) {
+      if (!this._isPaused) {
+        this._runTask(this._queue.dequeue());
+      }
+    } else if (this._pendingCount <= 0) {
+      this._eventEmitter.emit(EVENT_IDLE);
     }
   }
 
-  private async _runTask(task: T) {
-    this._pendingQueue.add(task);
-    this._eventEmitter.emit(EVENT_PROGRESS);
+  private async _runTask(task: Task) {
+    this._pendingCount += 1;
     this._eventEmitter.emit(EVENT_TASK_START, task);
 
     let error = null;
@@ -165,8 +176,7 @@ class Scheduler<T extends Task> {
     } catch (err) {
       error = err;
     } finally {
-      this._pendingQueue.delete(task);
-      this._eventEmitter.emit(EVENT_PROGRESS);
+      this._pendingCount -= 1;
       this._eventEmitter.emit(EVENT_TASK_DONE, error, task);
       this._next();
     }
