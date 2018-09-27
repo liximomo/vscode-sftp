@@ -37,7 +37,7 @@ function onProgress(error: Error, task: fileOps.FileTask) {
     return;
   }
 
-  logger.info(`${task.type} ${localFsPath}`);
+  logger.info(`${task.type} done - ${localFsPath}`);
   app.sftpBarItem.showMsg(`${task.type} ${path.basename(localFsPath)}`, simplifyPath(localFsPath));
 }
 

@@ -4,37 +4,6 @@ import { ExplorerItem } from '../modules/remoteExplorer';
 import { getActiveTextEditor } from '../host';
 import { listFiles, toLocalPath, simplifyPath } from '../helper';
 
-export function selectContext(): Promise<Uri> {
-  return new Promise((resolve, reject) => {
-    const sercives = getAllFileService();
-    const projectsList = sercives
-      .map(service => ({
-        value: service.baseDir,
-        label: service.name || simplifyPath(service.baseDir),
-        description: '',
-        detail: service.baseDir,
-      }))
-      .sort((l, r) => l.label.localeCompare(r.label));
-
-    // if (projectsList.length === 1) {
-    // return resolve(projectsList[0].value);
-    // }
-
-    window
-      .showQuickPick(projectsList, {
-        placeHolder: 'Select a folder...',
-      })
-      .then(selection => {
-        if (selection) {
-          return resolve(Uri.file(selection.value));
-        }
-
-        // cancel selection
-        resolve(null);
-      }, reject);
-  });
-}
-
 function configIngoreFilterCreator(config) {
   if (!config || !config.ignore) {
     return null;
@@ -72,6 +41,59 @@ function createFileSelector({ filterCreator = null } = {}) {
   };
 }
 
+export function selectContext(): Promise<Uri> {
+  return new Promise((resolve, reject) => {
+    const sercives = getAllFileService();
+    const projectsList = sercives
+      .map(service => ({
+        value: service.baseDir,
+        label: service.name || simplifyPath(service.baseDir),
+        description: '',
+        detail: service.baseDir,
+      }))
+      .sort((l, r) => l.label.localeCompare(r.label));
+
+    // if (projectsList.length === 1) {
+    // return resolve(projectsList[0].value);
+    // }
+
+    window
+      .showQuickPick(projectsList, {
+        placeHolder: 'Select a folder...',
+      })
+      .then(selection => {
+        if (selection) {
+          return resolve(Uri.file(selection.value));
+        }
+
+        // cancel selection
+        resolve(null);
+      }, reject);
+  });
+}
+
+export function applySelector<T>(...selectors: ((...args: any[]) => T | Promise<T>)[]) {
+  return function combinedSelector(...args: any[]): T | Promise<T> {
+    let result;
+    for (const selector of selectors) {
+      result = selector.apply(this, args);
+      if (result) {
+        break;
+      }
+    }
+
+    return result;
+  };
+}
+
+export function uriFromfspath(fileList: string[]): Uri[] {
+  if (fileList.length <= 0 || typeof fileList[0] !== 'string') {
+    return null;
+  }
+
+  return fileList.map(file => Uri.file(file));
+}
+
 export function getActiveDocumentUri() {
   const active = getActiveTextEditor();
   if (!active || !active.document) {
@@ -82,18 +104,18 @@ export function getActiveDocumentUri() {
 }
 
 // selected file or activeTarget or configContext
-export function uriFromExplorerContextOrEditorContext(item, items): Promise<Uri | Uri[]> {
+export function uriFromExplorerContextOrEditorContext(item, items): Uri | Uri[] {
   // from explorer or editor context
   if (item instanceof Uri) {
     if (Array.isArray(items) && items[0] instanceof Uri) {
       // multi-select in explorer
-      return Promise.resolve(items);
+      return items;
     } else {
-      return Promise.resolve(item);
+      return item;
     }
   } else if ((item as ExplorerItem).resource) {
     // from remote explorer
-    return Promise.resolve(item.resource.uri);
+    return item.resource.uri;
   }
 
   return null;

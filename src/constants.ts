@@ -19,18 +19,20 @@ export const COMMAND_CONFIG = 'sftp.config';
 export const COMMAND_SET_PROFILE = 'sftp.setProfile';
 
 export const COMMAND_FORCE_UPLOAD = 'sftp.forceUpload';
+export const COMMAND_UPLOAD = 'sftp.upload';
 export const COMMAND_UPLOAD_FILE = 'sftp.upload.file';
 export const COMMAND_UPLOAD_ACTIVEFILE = 'sftp.upload.activeFile';
 export const COMMAND_UPLOAD_FOLDER = 'sftp.upload.folder';
 export const COMMAND_UPLOAD_PROJECT = 'sftp.upload.project';
 export const COMMAND_FORCE_DOWNLOAD = 'sftp.forceDownload';
+export const COMMAND_DOWNLOAD = 'sftp.download';
 export const COMMAND_DOWNLOAD_FILE = 'sftp.download.file';
 export const COMMAND_DOWNLOAD_ACTIVEFILE = 'sftp.download.activeFile';
 export const COMMAND_DOWNLOAD_FOLDER = 'sftp.download.folder';
 export const COMMAND_DOWNLOAD_PROJECT = 'sftp.download.project';
 
-export const COMMAND_SYNC_TO_REMOTE = 'sftp.sync.remote';
-export const COMMAND_SYNC_TO_LOCAL = 'sftp.sync.local';
+export const COMMAND_SYNC_TO_REMOTE = 'sftp.syncToRemote';
+export const COMMAND_SYNC_TO_LOCAL = 'sftp.syncTolocal';
 
 export const COMMAND_DIFF = 'sftp.diff';
 export const COMMAND_LIST = 'sftp.list';
