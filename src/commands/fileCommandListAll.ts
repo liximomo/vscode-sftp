@@ -11,7 +11,7 @@ export default checkFileCommand({
 
   async handleFile(ctx) {
     const remotefs = await ctx.fileService.getRemoteFileSystem();
-    const fileEntry = await remotefs.lstat(ctx.target.localFsPath);
+    const fileEntry = await remotefs.lstat(ctx.target.remoteFsPath);
     if (fileEntry.type !== fs.FileType.Directory) {
       await downloadFile(ctx, { ignore: null });
       await showTextDocument(ctx.target.localUri);
