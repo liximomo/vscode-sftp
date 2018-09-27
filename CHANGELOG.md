@@ -1,7 +1,9 @@
+## 1.5.9 - 2018-09-27
+* Fix [#330](https://github.com/liximomo/vscode-sftp/issues/330)
+
 ## 1.5.8 - 2018-09-25
 * Show name in the remote explorer. [#315](https://github.com/liximomo/vscode-sftp/issues/315)
 * Fix [#308](https://github.com/liximomo/vscode-sftp/issues/308)
-
 
 ## 1.5.0 - 2018-09-13
 ### New Features
