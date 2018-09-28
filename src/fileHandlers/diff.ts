@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { diffFiles } from '../host';
 import { EXTENSION_NAME } from '../constants';
-import { transfer } from '../core/fileOperations';
+import { fileOperations } from '../core';
 import { makeTmpFile, simplifyPath } from '../helper';
 import createFileHandler from './createFileHandler';
 
@@ -16,7 +16,7 @@ export const diff = createFileHandler({
       postfix: path.extname(localFsPath),
     });
 
-    await transfer(remoteFsPath, tmpPath, remoteFs, localFs, {
+    await fileOperations.transferFile(remoteFsPath, tmpPath, remoteFs, localFs, {
       perserveTargetMode: false,
     });
     await diffFiles(

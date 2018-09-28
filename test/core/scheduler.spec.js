@@ -41,7 +41,7 @@ describe('scheduler', () => {
 
   test('.add() - limited concurrency', () => {
     const queue = new Scheduler({ concurrency: 2 });
-    queue.add(wrapTask(async () => fixture));
+    queue.add(async () => fixture);
     queue.add(wrapTask(async () => delay(100).then(() => fixture)));
     queue.add(wrapTask(async () => fixture));
     expect(queue.size).toEqual(1);
@@ -54,12 +54,10 @@ describe('scheduler', () => {
     const startTime = new Date().getTime();
     const queue = new Scheduler({ concurrency: 1 });
     input.forEach(([val, ms]) => queue.add(wrapTask(() => delay(ms).then(() => val))));
-    queue.onProgress(() => {
-      if (queue.size === 0 && queue.pendingCount === 0) {
-        const time = new Date().getTime() - startTime;
-        expect(50 <= time && time <= 100).toBeTruthy();
-        done();
-      }
+    queue.onIdle(() => {
+      const time = new Date().getTime() - startTime;
+      expect(50 <= time && time <= 100).toBeTruthy();
+      done();
     });
   });
 
@@ -80,11 +78,7 @@ describe('scheduler', () => {
       )
     );
 
-    queue.onProgress(() => {
-      if (queue.size === 0 && queue.pendingCount === 0) {
-        done();
-      }
-    });
+    queue.onIdle(done);
   });
 
   test('.add() - priority', done => {
@@ -94,11 +88,9 @@ describe('scheduler', () => {
     queue.add(wrapTask(async () => result.push(1)), { priority: 1 });
     queue.add(wrapTask(async () => result.push(2)), { priority: 1 });
     queue.add(wrapTask(async () => result.push(3)), { priority: 2 });
-    queue.onProgress(() => {
-      if (queue.size === 0 && queue.pendingCount === 0) {
-        expect(result).toEqual([0, 3, 1, 2]);
-        done();
-      }
+    queue.onIdle(() => {
+      expect(result).toEqual([0, 3, 1, 2]);
+      done();
     });
   });
 
@@ -139,20 +131,16 @@ describe('scheduler', () => {
     });
   });
 
-  test('onProgress', done => {
+  test('onIdle', done => {
     const queue = new Scheduler({ concurrency: 1 });
     const task = { run: () => Promise.reject(new Error('error')) };
-    let count = 0;
-    queue.add(wrapTask(() => delay(10)));
-    queue.add(wrapTask(() => delay(20)));
-    queue.add(wrapTask(() => delay(30)));
-    queue.onProgress(() => {
-      count++;
-
-      if (queue.size === 0 && queue.pendingCount === 0) {
-        expect(count).toEqual(5);
-        done();
-      }
+    const result = [];
+    queue.add(wrapTask(() => delay(10).then(_ => result.push(1))));
+    queue.add(wrapTask(() => delay(20).then(_ => result.push(2))));
+    queue.add(wrapTask(() => delay(30).then(_ => result.push(3))));
+    queue.onIdle(() => {
+      expect(result).toEqual([1, 2, 3]);
+      done();
     });
   });
 
@@ -183,12 +171,12 @@ describe('scheduler', () => {
     queue.add(wrapTask(() => delay(20000)));
     expect(queue.size).toEqual(4);
     expect(queue.pendingCount).toEqual(0);
-    expect(queue._isPaused).toEqual(true);
+    expect(queue.isRunning).toEqual(false);
 
     queue.start();
     expect(queue.size).toEqual(2);
     expect(queue.pendingCount).toEqual(2);
-    expect(queue._isPaused).toEqual(false);
+    expect(queue.isRunning).toEqual(true);
   });
 
   test('.pause()', () => {
@@ -202,23 +190,23 @@ describe('scheduler', () => {
     queue.add(wrapTask(() => delay(20000)));
     expect(queue.size).toEqual(5);
     expect(queue.pendingCount).toEqual(0);
-    expect(queue._isPaused).toEqual(true);
+    expect(queue.isRunning).toEqual(false);
 
     queue.start();
     expect(queue.size).toEqual(3);
     expect(queue.pendingCount).toEqual(2);
-    expect(queue._isPaused).toEqual(false);
+    expect(queue.isRunning).toEqual(true);
 
     queue.add(wrapTask(() => delay(20000)));
     queue.pause();
     expect(queue.size).toEqual(4);
     expect(queue.pendingCount).toEqual(2);
-    expect(queue._isPaused).toEqual(true);
+    expect(queue.isRunning).toEqual(false);
 
     queue.start();
     expect(queue.size).toEqual(4);
     expect(queue.pendingCount).toEqual(2);
-    expect(queue._isPaused).toEqual(false);
+    expect(queue.isRunning).toEqual(true);
   });
 
   test('.add() sync/async mixed tasks', () => {

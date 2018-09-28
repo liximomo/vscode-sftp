@@ -1,15 +1,22 @@
 import {
-  Scheduler,
   FileSystem,
   FileEntry,
   FileType,
   TransferTask,
-  TransferOption,
   TransferDirection,
   fileOperations,
 } from '../../core';
+import { flatten } from '../../utils';
+
+interface TransferOption extends fileOperations.TransferOption {
+  ignore?: (filepath: string) => boolean;
+}
 
 type SyncModel = 'full' | 'update';
+
+interface SyncOption extends TransferOption {
+  model: SyncModel;
+}
 
 function toHash<T, R = T>(items: T[], key: string, transform?: (a: T) => R): { [key: string]: R } {
   return items.reduce((hash, item) => {
@@ -20,7 +27,6 @@ function toHash<T, R = T>(items: T[], key: string, transform?: (a: T) => R): { [
 }
 
 async function transferFolder(
-  scheduler: Scheduler<TransferTask>,
   config: {
     srcFsPath: string;
     targetFsPath: string;
@@ -28,7 +34,8 @@ async function transferFolder(
     targetFs: FileSystem;
     option: TransferOption;
     transferDirection: TransferDirection;
-  }
+  },
+  collect: (t: TransferTask) => void
 ) {
   const { srcFsPath, targetFsPath, srcFs, targetFs, option } = config;
 
@@ -43,20 +50,19 @@ async function transferFolder(
   await Promise.all(
     fileEntries.map(file =>
       transferWithType(
-        scheduler,
         {
           ...config,
           srcFsPath: file.fspath,
           targetFsPath: targetFs.pathResolver.join(targetFsPath, file.name),
         },
-        file.type
+        file.type,
+        collect
       )
     )
   );
 }
 
 function transferFile(
-  scheduler: Scheduler<TransferTask>,
   config: {
     srcFsPath: string;
     targetFsPath: string;
@@ -65,9 +71,14 @@ function transferFile(
     option: TransferOption;
     transferDirection: TransferDirection;
   },
-  fileType: FileType
+  fileType: FileType,
+  collect: (t: TransferTask) => void
 ) {
-  scheduler.add(
+  if (config.option.ignore && config.option.ignore(config.srcFsPath)) {
+    return;
+  }
+
+  collect(
     new TransferTask(
       {
         fsPath: config.srcFsPath,
@@ -87,7 +98,6 @@ function transferFile(
 }
 
 async function transferWithType(
-  scheduler: Scheduler<TransferTask>,
   config: {
     srcFsPath: string;
     targetFsPath: string;
@@ -96,29 +106,43 @@ async function transferWithType(
     option: TransferOption;
     transferDirection: TransferDirection;
   },
-  fileType: FileType
+  fileType: FileType,
+  collect: (t: TransferTask) => void
 ) {
-  if (config.option.ignore && config.option.ignore(config.srcFsPath)) {
-    return;
-  }
-
   switch (fileType) {
     case FileType.Directory:
-      await transferFolder(scheduler, config);
+      await transferFolder(config, collect);
       break;
     case FileType.File:
     case FileType.SymbolicLink:
-      transferFile(scheduler, config, fileType);
+      transferFile(config, fileType, collect);
       break;
     default:
       throw new Error(`Unsupported file type (type = ${fileType})`);
   }
 }
 
-export { TransferOption, TransferDirection };
+async function removeFile(file: string, fs: FileSystem, fileType: FileType, option) {
+  if (option.ignore && option.ignore(file)) {
+    return;
+  }
+
+  switch (fileType) {
+    case FileType.Directory:
+      await fileOperations.removeDir(file, fs, option);
+      break;
+    case FileType.File:
+    case FileType.SymbolicLink:
+      await fileOperations.removeFile(file, fs, option);
+      break;
+    default:
+      break;
+  }
+}
+
+export { TransferOption, SyncOption, TransferDirection };
 
 export async function transfer(
-  scheduler: Scheduler<TransferTask>,
   config: {
     srcFsPath: string;
     targetFsPath: string;
@@ -126,18 +150,14 @@ export async function transfer(
     targetFs: FileSystem;
     option: TransferOption;
     transferDirection: TransferDirection;
-  }
+  },
+  collect: (t: TransferTask) => void
 ) {
   const stat = await config.srcFs.lstat(config.srcFsPath);
-  await transferWithType(scheduler, config, stat.type);
-}
-
-export interface SyncOption extends TransferOption {
-  model: SyncModel;
+  await transferWithType(config, stat.type, collect);
 }
 
 export async function sync(
-  scheduler: Scheduler<TransferTask>,
   config: {
     srcFsPath: string;
     targetFsPath: string;
@@ -145,7 +165,8 @@ export async function sync(
     targetFs: FileSystem;
     option: SyncOption;
     transferDirection: TransferDirection;
-  }
+  },
+  collect: (t: TransferTask) => void
 ) {
   const { srcFsPath, targetFsPath, srcFs, targetFs, option } = config;
   if (option.ignore && option.ignore(srcFsPath)) {
@@ -223,39 +244,45 @@ export async function sync(
       });
     }
 
-    file2trans.forEach(([src, target]) =>
+    // side-effect
+    fileMissed.forEach(file => removeFile(file, targetFs, FileType.File, config.option));
+    dirMissed.forEach(file => removeFile(file, targetFs, FileType.Directory, config.option));
+
+    const transFilePromise = file2trans.map(([src, target]) =>
       transferFile(
-        scheduler,
         {
           ...config,
           srcFsPath: src,
           targetFsPath: target,
         },
-        FileType.File
+        FileType.File,
+        collect
       )
     );
 
-    dir2trans.forEach(([src, target]) =>
-      transferFolder(scheduler, {
-        ...config,
-        srcFsPath: src,
-        targetFsPath: target,
-      })
-    );
-
-    fileMissed.forEach(file => fileOperations.removeFile(file, targetFs, config.option));
-
-    dirMissed.forEach(file => fileOperations.removeDir(file, targetFs, config.option));
-
-    return Promise.all(
-      dir2sync.map(([src, target]) =>
-        sync(scheduler, {
+    const transDirPromise = dir2trans.map(([src, target]) =>
+      transferFolder(
+        {
           ...config,
           srcFsPath: src,
           targetFsPath: target,
-        })
+        },
+        collect
       )
     );
+
+    const syncPromise = dir2sync.map(([src, target]) =>
+      sync(
+        {
+          ...config,
+          srcFsPath: src,
+          targetFsPath: target,
+        },
+        collect
+      )
+    );
+
+    return Promise.all([...transFilePromise, ...transDirPromise, ...syncPromise]).then(flatten);
   };
 
   // create dir here so we don't have to ensure it for children files.

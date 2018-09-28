@@ -22,6 +22,7 @@ export interface WatcherService {
 }
 
 interface TransferScheduler {
+  size: number;
   add(x: TransferTask): void;
   run(): Promise<void>;
 }
@@ -141,6 +142,9 @@ export default class FileService {
     });
 
     return {
+      get size() {
+        return scheduler.size;
+      },
       add(task: TransferTask) {
         scheduler.add(task);
       },

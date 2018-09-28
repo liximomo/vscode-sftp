@@ -25,8 +25,8 @@ function lowerBound<T>(array: T[], value: T, comp: (a: T, b: T) => number) {
   return first;
 }
 
-interface Task {
-  run(): void | Promise<void>;
+export interface Task {
+  run(): unknown | Promise<unknown>;
 }
 
 type taskFunc = Task['run'];
@@ -73,7 +73,7 @@ const EVENT_IDLE = 'idle';
 
 class Scheduler {
   private _queue: PriorityQueue<Task> = new PriorityQueue<Task>();
-  private _pendingCount: number;
+  private _pendingCount: number = 0;
   private _eventEmitter: EventEmitter = new EventEmitter();
   private _concurrency: number;
   private _isPaused: boolean;
@@ -110,14 +110,14 @@ class Scheduler {
       };
     }
 
-    if (!this._isPaused && this.pendingCount < this._concurrency) {
+    if (!this._isPaused && this._pendingCount < this._concurrency) {
       this._runTask(task);
     } else {
       this._queue.enqueue(task, opt);
     }
   }
 
-  addAll(tasks: Task[]) {
+  addAll(tasks: (Task | taskFunc)[]) {
     tasks.forEach(t => this.add(t));
   }
 
@@ -127,7 +127,7 @@ class Scheduler {
     }
 
     this._isPaused = false;
-    while (this.size > 0 && this.pendingCount < this._concurrency) {
+    while (this.size > 0 && this._pendingCount < this._concurrency) {
       this._runTask(this._queue.dequeue());
     }
   }
@@ -146,6 +146,10 @@ class Scheduler {
 
   onIdle(listener: () => void) {
     this._eventEmitter.on(EVENT_IDLE, listener);
+  }
+
+  get isRunning() {
+    return !this._isPaused;
   }
 
   get size() {

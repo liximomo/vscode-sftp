@@ -54,23 +54,25 @@ export default function createFileHandler<T>(
     const handleCtx = ctx instanceof Uri ? handleCtxFromUri(ctx) : ctx;
     const { target } = handleCtx;
 
-    logger.trace(`handle ${handlerOption.name} for`, target.localFsPath);
-
     try {
-      const optionFromConfig = handlerOption.transformOption
+      const invokeOption = handlerOption.transformOption
         ? handlerOption.transformOption.call(handleCtx)
         : {};
       if (option) {
-        Object.assign(optionFromConfig, option);
+        Object.assign(invokeOption, option);
       }
 
-      await handlerOption.handle.call(handleCtx, optionFromConfig);
+      if (invokeOption.ignore && invokeOption.ignore(target.localFsPath)) {
+        return;
+      }
 
+      logger.trace(`handle ${handlerOption.name} for`, target.localFsPath);
+
+      await handlerOption.handle.call(handleCtx, invokeOption);
       if (handlerOption.afterHandle) {
         handlerOption.afterHandle.call(handleCtx);
       }
     } catch (error) {
-      // todo: catchError
       throw error;
     }
   }

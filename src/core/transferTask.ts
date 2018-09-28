@@ -12,9 +12,7 @@ interface FileHandle {
   fileSystem: FileSystem;
 }
 
-export interface TransferOption extends fileOperations.TransferOption {
-  ignore?: (fsPath: string) => boolean;
-}
+import TransferOption = fileOperations.TransferOption;
 
 export default class TransferTask implements Task {
   readonly fileType: FileType;
