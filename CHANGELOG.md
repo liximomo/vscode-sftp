@@ -1,3 +1,6 @@
+## 1.5.10 - 2018-09-28
+* Fix [#332](https://github.com/liximomo/vscode-sftp/issues/332)
+
 ## 1.5.9 - 2018-09-27
 * Fix [#330](https://github.com/liximomo/vscode-sftp/issues/330)
 
