@@ -8,7 +8,7 @@ import { checkCommand } from './abstract/createCommand';
 export default checkCommand({
   id: COMMAND_SET_PROFILE,
 
-  async handleCommand() {
+  async handleCommand(arg) {
     const profiles: Array<vscode.QuickPickItem & { value: string }> = getAllFileService().reduce(
       (acc, service) => {
         if (service.getAvaliableProfiles().length <= 0) {
@@ -36,9 +36,13 @@ export default checkCommand({
       return;
     }
 
-    const item = await vscode.window.showQuickPick(profiles, { placeHolder: 'select a profile' });
-    if (item === undefined) return;
-
-    app.state.profile = item.value;
+    if (arg !== undefined) {
+        app_1.default.state.profile = arg;
+    } else {
+        const item = yield vscode.window.showQuickPick(profiles, { placeHolder: 'select a profile' });
+        if (item === undefined)
+            return;
+        app_1.default.state.profile = item.value;
+    }
   },
 });
