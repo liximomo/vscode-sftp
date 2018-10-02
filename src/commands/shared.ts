@@ -87,7 +87,7 @@ export function applySelector<T>(...selectors: ((...args: any[]) => T | Promise<
 }
 
 export function uriFromfspath(fileList: string[]): Uri[] {
-  if (fileList.length <= 0 || typeof fileList[0] !== 'string') {
+  if (!Array.isArray(fileList) || typeof fileList[0] !== 'string') {
     return null;
   }
 
