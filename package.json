@@ -411,7 +411,7 @@
     "fast-glob": "^2.2.2",
     "fs-extra": "^3.0.1",
     "ftp": "^0.3.10",
-    "ignore": "^3.3.7",
+    "ignore": "^5.0.2",
     "joi": "^10.6.0",
     "lodash.debounce": "^4.0.8",
     "lru-cache": "^4.1.3",
