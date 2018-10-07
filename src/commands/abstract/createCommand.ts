@@ -11,11 +11,11 @@ interface BaseCommandOption {
 }
 
 interface CommandOption extends BaseCommandOption {
-  handleCommand: (this: Command) => any | Promise<any>;
+  handleCommand: (this: Command, ...args: any[]) => unknown | Promise<unknown>;
 }
 
 interface FileCommandOption extends BaseCommandOption {
-  handleFile: (ctx: FileHandlerContext) => Promise<any>;
+  handleFile: (ctx: FileHandlerContext) => Promise<unknown>;
   getFileTarget: (...args: any[]) => Uri | Uri[] | Promise<Uri | Uri[]>;
 }
 
