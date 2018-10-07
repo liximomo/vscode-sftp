@@ -139,6 +139,11 @@
         "category": "SFTP"
       },
       {
+        "command": "sftp.diff.activeFile",
+        "title": "Diff Active File with Remote",
+        "category": "SFTP"
+      },
+      {
         "command": "sftp.list",
         "title": "List",
         "category": "SFTP"
@@ -208,6 +213,10 @@
         },
         {
           "command": "sftp.syncTolocal",
+          "when": "sftp.enabled"
+        },
+        {
+          "command": "sftp.diff.activeFile",
           "when": "sftp.enabled"
         },
         {

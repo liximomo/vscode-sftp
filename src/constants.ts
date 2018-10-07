@@ -35,6 +35,7 @@ export const COMMAND_SYNC_TO_REMOTE = 'sftp.syncToRemote';
 export const COMMAND_SYNC_TO_LOCAL = 'sftp.syncTolocal';
 
 export const COMMAND_DIFF = 'sftp.diff';
+export const COMMAND_DIFF_ACTIVEFILE = 'sftp.diff.activeFile';
 export const COMMAND_LIST = 'sftp.list';
 export const COMMAND_LIST_ALL = 'sftp.listAll';
 export const COMMAND_DELETE_REMOTE = 'sftp.delete.remote';
