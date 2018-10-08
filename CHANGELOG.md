@@ -1,3 +1,6 @@
+## 1.5.13 - 2018-10-08
+* Fix [#344](https://github.com/liximomo/vscode-sftp/issues/344)
+
 ## 1.5.12 - 2018-10-07
 * New command `Diff Active File with Remote`.
 * Command `Set Profile` can receive an argument from keybindings.
