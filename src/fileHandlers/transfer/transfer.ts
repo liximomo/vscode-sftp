@@ -54,6 +54,7 @@ async function transferFolder(
           ...config,
           srcFsPath: file.fspath,
           targetFsPath: targetFs.pathResolver.join(targetFsPath, file.name),
+          ensureDirExist: false,
         },
         file.type,
         collect
@@ -105,6 +106,7 @@ async function transferWithType(
     targetFs: FileSystem;
     option: TransferOption;
     transferDirection: TransferDirection;
+    ensureDirExist: boolean;
   },
   fileType: FileType,
   collect: (t: TransferTask) => void
@@ -115,6 +117,10 @@ async function transferWithType(
       break;
     case FileType.File:
     case FileType.SymbolicLink:
+      if (config.ensureDirExist) {
+        const { targetFs, targetFsPath } = config;
+        await targetFs.ensureDir(targetFs.pathResolver.dirname(targetFsPath));
+      }
       transferFile(config, fileType, collect);
       break;
     default:
@@ -154,7 +160,7 @@ export async function transfer(
   collect: (t: TransferTask) => void
 ) {
   const stat = await config.srcFs.lstat(config.srcFsPath);
-  await transferWithType(config, stat.type, collect);
+  await transferWithType({ ...config, ensureDirExist: true }, stat.type, collect);
 }
 
 export async function sync(

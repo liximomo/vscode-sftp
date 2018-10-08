@@ -81,7 +81,6 @@ export default class TransferTask implements Task {
         await fileOperations.transferFile(src, target, srcFs, targetFs, this._transferOption);
         break;
       case FileType.SymbolicLink:
-        await targetFs.ensureDir(targetFs.pathResolver.dirname(target));
         await fileOperations.transferSymlink(src, target, srcFs, targetFs, this._transferOption);
         break;
       default:

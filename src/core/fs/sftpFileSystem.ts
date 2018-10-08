@@ -104,6 +104,13 @@ export default class SFTPFileSystem extends RemoteFileSystem {
   }
 
   async ensureDir(dir: string): Promise<void> {
+    // test is root path
+    // win: c:/, c://, c:\, c:\\
+    // *nix: /
+    if (dir === '/' || dir.match(/^[a-zA-Z]:(\/|\\)\1?$/)) {
+      return;
+    }
+
     let err;
     try {
       await this.mkdir(dir);
