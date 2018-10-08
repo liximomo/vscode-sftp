@@ -46,7 +46,13 @@ async function showFiles(
       return oldFilter(file) && parent.filter(file);
     };
   }
-  avalibleFiles = avalibleFiles.filter(filter);
+  avalibleFiles = avalibleFiles.filter(file => {
+    if (file.name === '.' || file.name === '..') {
+      return true;
+    }
+
+    return filter(file);
+  });
 
   const items = avalibleFiles
     .map(file => ({
