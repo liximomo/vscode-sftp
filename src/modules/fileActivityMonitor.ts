@@ -72,8 +72,8 @@ async function downloadOnOpen(uri: vscode.Uri) {
     try {
       await downloadFile(uri);
     } catch (error) {
-      app.sftpBarItem.updateStatus(StatusBarItem.Status.error);
       logger.error(error, `download ${fspath}`);
+      app.sftpBarItem.updateStatus(StatusBarItem.Status.error);
     }
   }
 }

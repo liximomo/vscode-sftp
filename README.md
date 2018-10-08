@@ -1,38 +1,26 @@
 # sftp sync extension for VS Code
 Very simple, requires just three lines of config! Very fast, finished in a blink.
 
-## Features
-* Browser remote with Remote Explorer
-* Diff local and remote
-* Sync directory
-* Upload/Download
-* Upload on save
-* File Watcher
-* Multiple configs
-* Switchable profiles
+* Features
+    * [Browser remote with Remote Explorer](#remote-explorer)
+  * Diff local and remote
+  * Sync directory
+  * Upload/Download
+  * Upload on save
+  * File Watcher
+  * Multiple configs
+  * Switchable profiles
+* [Command](https://github.com/liximomo/vscode-sftp/wiki/Command)
+* [Debug](#debug)
+* [Support SFTP Project](#Donation)
 
 ## Usage
 1. `Ctrl+Shift+P` on Windows/Linux open command palette, run `SFTP: config` command.
 2. Enjoy.
 
-
-## Main Commands
-| Command              | Description                                    |
-| -------------------- |------------------------------------------------|
-| `SFTP: Config`       | create a new config file for selected project  |
-| `SFTP: Set Profile`  | set a active profile                           |
-| `SFTP: Upload Active File`         | upload active file to remote, overwriting the remote one |
-| `SFTP: Download Active File`       | same as above, but in the opposite direction             |
-| `SFTP: Sync To Remote` | sync local directory to remote, only available for a directory. Copy common files (that exist on both sides) from local dir to remote, overwriting destination. (If syncMode is set to `full`, files that exist only on the local side will be created remotely, and files that exist only on the remote side will be deleted. The remote will be exactly same as the local after `sync`)|
-| `SFTP: Sync To Local`  | same as above, but in the opposite direction |
-
-## Alt Commands
-An alternative command can be found when pressing `Alt` while opening a menu. (e.g. `Force Download` and `Force Upload`)
-
-## Config
+## Example Configs
 You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/config).
 
-Example Configs
 * [Simple](#password-free)
 * [Profiles](#profiles)
 * [Multiple Context](#multiple-context)
@@ -200,6 +188,14 @@ Remote Explorer let you explore files in remote. You can open Remote Explorer by
 You can only view files content with Remote Explorer. Run command `SFTP: Edit in Local` to edit it in local.
 
 *Note：* You need manually refresh the parent folder after **delete** a file to make the explorer updated.
+
+## Debug
+1.  Open User Settings.
+
+    * On Windows/Linux - `File > Preferences > Settings`
+    * On macOS - `Code > Preferences > Settings`
+2. Set `sftp.printDebugLog` to `true` and reload vscode.
+3. View the logs in `View > Output > sftp`.
 
 -----------------------------------------------------------------------------------------------------------
 
