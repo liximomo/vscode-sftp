@@ -31,8 +31,8 @@ export const COMMAND_DOWNLOAD_ACTIVEFILE = 'sftp.download.activeFile';
 export const COMMAND_DOWNLOAD_FOLDER = 'sftp.download.folder';
 export const COMMAND_DOWNLOAD_PROJECT = 'sftp.download.project';
 
-export const COMMAND_SYNC_TO_REMOTE = 'sftp.syncToRemote';
-export const COMMAND_SYNC_TO_LOCAL = 'sftp.syncTolocal';
+export const COMMAND_SYNC_LOCAL_TO_REMOTE = 'sftp.sync.localToRemote';
+export const COMMAND_SYNC_REMOTE_TO_LOCAL = 'sftp.sync.remoteToLocal';
 
 export const COMMAND_DIFF = 'sftp.diff';
 export const COMMAND_DIFF_ACTIVEFILE = 'sftp.diff.activeFile';
