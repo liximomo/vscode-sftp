@@ -1,5 +1,5 @@
-import * as fs from 'fs';
 import * as PQueue from 'p-queue';
+import { Readable } from 'stream';
 import logger from '../../logger';
 import { FileEntry, FileType, FileStats, FileOption } from './fileSystem';
 import RemoteFileSystem from './remoteFileSystem';
@@ -85,7 +85,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
     return fileStat;
   }
 
-  async get(path, option?: FileOption): Promise<fs.ReadStream> {
+  async get(path, option?: FileOption): Promise<Readable> {
     const stream = await this.atomicGet(path);
 
     if (!stream) {
@@ -100,7 +100,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
     await this.atomicSite(command);
   }
 
-  async put(input: fs.ReadStream | Buffer, path, option?: FileOption): Promise<void> {
+  async put(input: Readable | Buffer, path, option?: FileOption): Promise<void> {
     await this.atomicPut(input, path);
   }
 
@@ -219,9 +219,9 @@ export default class FTPFileSystem extends RemoteFileSystem {
     return this.queue.add(task);
   }
 
-  private async atomicGet(path: string): Promise<fs.ReadStream> {
+  private async atomicGet(path: string): Promise<Readable> {
     const task = () =>
-      new Promise<fs.ReadStream>((resolve, reject) => {
+      new Promise<Readable>((resolve, reject) => {
         this.ftp.get(path, (err, stream) => {
           if (err) {
             return reject(err);
@@ -234,7 +234,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
     return this.queue.add(task);
   }
 
-  private async atomicPut(input: fs.ReadStream | Buffer, path: string): Promise<void> {
+  private async atomicPut(input: Readable | Buffer, path: string): Promise<void> {
     const task = () =>
       new Promise<void>((resolve, reject) => {
         this.ftp.put(input, path, err => {

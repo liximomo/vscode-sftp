@@ -8,14 +8,34 @@ import {
 } from '../../core';
 import { flatten } from '../../utils';
 
-interface TransferOption extends fileOperations.TransferOption {
+interface InternalTransferOption extends fileOperations.FileOption {
   ignore?: (filepath: string) => boolean;
 }
 
 type SyncModel = 'full' | 'update';
 
-interface SyncOption extends TransferOption {
+interface InternalSyncOption extends InternalTransferOption {
   model: SyncModel;
+}
+
+interface BaseTransferHandleConfig {
+  srcFsPath: string;
+  targetFsPath: string;
+  srcFs: FileSystem;
+  targetFs: FileSystem;
+  transferDirection: TransferDirection;
+}
+
+type ExternalTransferOption<T extends InternalTransferOption> = Pick<
+  T,
+  Exclude<keyof T, 'mtime' | 'atime' | 'mode'>
+>;
+
+type TransferOption = ExternalTransferOption<InternalTransferOption>;
+type SyncOption = ExternalTransferOption<InternalSyncOption>;
+
+interface TransferHandleConfig<T> extends BaseTransferHandleConfig {
+  transferOption: T;
 }
 
 function toHash<T, R = T>(items: T[], key: string, transform?: (a: T) => R): { [key: string]: R } {
@@ -27,19 +47,12 @@ function toHash<T, R = T>(items: T[], key: string, transform?: (a: T) => R): { [
 }
 
 async function transferFolder(
-  config: {
-    srcFsPath: string;
-    targetFsPath: string;
-    srcFs: FileSystem;
-    targetFs: FileSystem;
-    option: TransferOption;
-    transferDirection: TransferDirection;
-  },
+  config: TransferHandleConfig<InternalTransferOption>,
   collect: (t: TransferTask) => void
 ) {
-  const { srcFsPath, targetFsPath, srcFs, targetFs, option } = config;
+  const { srcFsPath, targetFsPath, srcFs, targetFs, transferOption } = config;
 
-  if (option.ignore && option.ignore(srcFsPath)) {
+  if (transferOption.ignore && transferOption.ignore(srcFsPath)) {
     return;
   }
 
@@ -52,6 +65,11 @@ async function transferFolder(
       transferWithType(
         {
           ...config,
+          transferOption: {
+            ...config.transferOption,
+            mtime: file.mtime,
+            atime: file.atime,
+          },
           srcFsPath: file.fspath,
           targetFsPath: targetFs.pathResolver.join(targetFsPath, file.name),
           ensureDirExist: false,
@@ -64,18 +82,11 @@ async function transferFolder(
 }
 
 function transferFile(
-  config: {
-    srcFsPath: string;
-    targetFsPath: string;
-    srcFs: FileSystem;
-    targetFs: FileSystem;
-    option: TransferOption;
-    transferDirection: TransferDirection;
-  },
+  config: TransferHandleConfig<InternalTransferOption>,
   fileType: FileType,
   collect: (t: TransferTask) => void
 ) {
-  if (config.option.ignore && config.option.ignore(config.srcFsPath)) {
+  if (config.transferOption.ignore && config.transferOption.ignore(config.srcFsPath)) {
     return;
   }
 
@@ -92,20 +103,14 @@ function transferFile(
       {
         fileType,
         transferDirection: config.transferDirection,
-        transferOption: config.option,
+        transferOption: config.transferOption,
       }
     )
   );
 }
 
 async function transferWithType(
-  config: {
-    srcFsPath: string;
-    targetFsPath: string;
-    srcFs: FileSystem;
-    targetFs: FileSystem;
-    option: TransferOption;
-    transferDirection: TransferDirection;
+  config: TransferHandleConfig<InternalTransferOption> & {
     ensureDirExist: boolean;
   },
   fileType: FileType,
@@ -149,33 +154,24 @@ async function removeFile(file: string, fs: FileSystem, fileType: FileType, opti
 export { TransferOption, SyncOption, TransferDirection };
 
 export async function transfer(
-  config: {
-    srcFsPath: string;
-    targetFsPath: string;
-    srcFs: FileSystem;
-    targetFs: FileSystem;
-    option: TransferOption;
-    transferDirection: TransferDirection;
-  },
+  config: TransferHandleConfig<TransferOption>,
   collect: (t: TransferTask) => void
 ) {
   const stat = await config.srcFs.lstat(config.srcFsPath);
-  await transferWithType({ ...config, ensureDirExist: true }, stat.type, collect);
+  const transferOption = {
+    ...config.transferOption,
+    mtime: stat.mtime,
+    atime: stat.atime,
+  };
+  await transferWithType({ ...config, transferOption, ensureDirExist: true }, stat.type, collect);
 }
 
 export async function sync(
-  config: {
-    srcFsPath: string;
-    targetFsPath: string;
-    srcFs: FileSystem;
-    targetFs: FileSystem;
-    option: SyncOption;
-    transferDirection: TransferDirection;
-  },
+  config: TransferHandleConfig<SyncOption>,
   collect: (t: TransferTask) => void
 ) {
-  const { srcFsPath, targetFsPath, srcFs, targetFs, option } = config;
-  if (option.ignore && option.ignore(srcFsPath)) {
+  const { srcFsPath, targetFsPath, srcFs, targetFs, transferOption } = config;
+  if (transferOption.ignore && transferOption.ignore(srcFsPath)) {
     return;
   }
 
@@ -190,8 +186,8 @@ export async function sync(
       id: fileEntry.name,
     }));
 
-    const file2trans: [string, string][] = [];
-    const dir2trans: [string, string][] = [];
+    const file2trans: [string, string, InternalTransferOption][] = [];
+    const dir2trans: [string, string, InternalTransferOption][] = [];
     const dir2sync: [string, string][] = [];
 
     const fileMissed: string[] = [];
@@ -202,29 +198,37 @@ export async function sync(
       const file = desFileTable[id];
       delete desFileTable[id];
 
+      const option = {
+        ...config.transferOption,
+        mode: undefined,
+        mtime: srcFile.mtime,
+        atime: srcFile.atime,
+      } as InternalTransferOption;
       if (file) {
         // files exist on both side
+        option.mode = file.mode; // prefer target mode
         switch (srcFile.type) {
           case FileType.Directory:
             dir2sync.push([srcFile.fspath, file.fspath]);
             break;
           case FileType.File:
           case FileType.SymbolicLink:
-            file2trans.push([srcFile.fspath, file.fspath]);
+            file2trans.push([srcFile.fspath, file.fspath, option]);
             break;
           default:
           // do not process
         }
-      } else if (option.model === 'full') {
-        const _targetFsPath = targetFs.pathResolver.join(targetFsPath, srcFile.name);
+      } else if (transferOption.model === 'full') {
         // files exist only on src
+        option.mode = srcFile.mode; // fallback to srcFile mode
+        const _targetFsPath = targetFs.pathResolver.join(targetFsPath, srcFile.name);
         switch (srcFile.type) {
           case FileType.Directory:
-            dir2trans.push([srcFile.fspath, _targetFsPath]);
+            dir2trans.push([srcFile.fspath, _targetFsPath, option]);
             break;
           case FileType.File:
           case FileType.SymbolicLink:
-            file2trans.push([srcFile.fspath, _targetFsPath]);
+            file2trans.push([srcFile.fspath, _targetFsPath, option]);
             break;
           default:
           // do not process
@@ -232,7 +236,7 @@ export async function sync(
       }
     });
 
-    if (option.model === 'full') {
+    if (transferOption.model === 'full') {
       // for files exist only on target
       Object.keys(desFileTable).forEach(id => {
         const file = desFileTable[id];
@@ -251,13 +255,16 @@ export async function sync(
     }
 
     // side-effect
-    fileMissed.forEach(file => removeFile(file, targetFs, FileType.File, config.option));
-    dirMissed.forEach(file => removeFile(file, targetFs, FileType.Directory, config.option));
+    fileMissed.forEach(file => removeFile(file, targetFs, FileType.File, config.transferOption));
+    dirMissed.forEach(file =>
+      removeFile(file, targetFs, FileType.Directory, config.transferOption)
+    );
 
-    const transFilePromise = file2trans.map(([src, target]) =>
+    const transFilePromise = file2trans.map(([src, target, option]) =>
       transferFile(
         {
           ...config,
+          transferOption: option,
           srcFsPath: src,
           targetFsPath: target,
         },
@@ -266,10 +273,11 @@ export async function sync(
       )
     );
 
-    const transDirPromise = dir2trans.map(([src, target]) =>
+    const transDirPromise = dir2trans.map(([src, target, option]) =>
       transferFolder(
         {
           ...config,
+          transferOption: option,
           srcFsPath: src,
           targetFsPath: target,
         },

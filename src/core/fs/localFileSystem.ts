@@ -55,22 +55,21 @@ export default class LocalFileSystem extends FileSystem {
 
   put(input: fs.ReadStream | Buffer, path, option?: FileOption): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      const stream = fs.createWriteStream(path, option);
+      const writer = fs.createWriteStream(path, option);
 
-      stream.on('error', err => {
-        reject(err);
-      });
-      stream.on('finish', _ => {
-        resolve();
-      });
+      writer.on('error', reject);
+      writer.on('finish', resolve);
 
       if (input instanceof Buffer) {
-        stream.end(input);
+        writer.end(input);
         return;
       }
 
-      input.on('error', reject);
-      input.pipe(stream);
+      input.on('error', err => {
+        reject(err);
+        writer.end();
+      });
+      input.pipe(writer);
     });
   }
 

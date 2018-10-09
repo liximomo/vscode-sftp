@@ -56,7 +56,7 @@ export function createFileService(config: any, workspace: string) {
     const { localFsPath, transferType } = task;
     if (error) {
       const errorMsg = `${error.message} when ${transferType} ${localFsPath}`;
-      logger.error(errorMsg);
+      logger.error(error, errorMsg);
       showErrorMessage(errorMsg);
     } else {
       logger.info(`${transferType} ${localFsPath}`);

@@ -1,10 +1,13 @@
 import { FileSystem } from './fs';
 
-export interface TransferOption {
+export interface FileOption {
+  mode?: number;
+  atime: number;
+  mtime: number;
   perserveTargetMode: boolean;
 }
 
-async function getFileMode(path: string, fs: FileSystem) {
+export async function getFileMode(path: string, fs: FileSystem) {
   try {
     const stat = await fs.lstat(path);
     return stat.mode;
@@ -13,21 +16,22 @@ async function getFileMode(path: string, fs: FileSystem) {
   }
 }
 
-export function transferFile(
+export async function transferFile(
   src: string,
   des: string,
   srcFs: FileSystem,
   desFs: FileSystem,
-  option: TransferOption
+  option: FileOption
 ): Promise<void> {
-  const transPromise = option.perserveTargetMode
-    ? // $caution with ftp, mutilple remote cmd will cause previously opened inputstream to be closed.
-      Promise.all([srcFs.get(src), getFileMode(des, desFs)]).then(([inputStream, mode]) =>
-        desFs.put(inputStream, des, { mode })
-      )
-    : srcFs.get(src).then(inputStream => desFs.put(inputStream, des));
-
-  return transPromise;
+  const { perserveTargetMode } = option;
+  let { mode } = option;
+  let inputStream;
+  if (mode === undefined && perserveTargetMode) {
+    [inputStream, mode] = await Promise.all([srcFs.get(src), getFileMode(des, desFs)]);
+  } else {
+    inputStream = await srcFs.get(src);
+  }
+  await desFs.put(inputStream, des, { mode });
 }
 
 export function transferSymlink(
@@ -35,7 +39,7 @@ export function transferSymlink(
   des: string,
   srcFs: FileSystem,
   desFs: FileSystem,
-  option: TransferOption
+  option: FileOption
 ): Promise<void> {
   return srcFs.readlink(src).then(targetPath => {
     return desFs.symlink(targetPath, des).catch(err => {

@@ -1,4 +1,4 @@
-import * as fs from 'fs';
+import { Readable } from 'stream';
 import FileSystem, { FileEntry, FileType, FileStats, FileOption } from './fileSystem';
 import RemoteFileSystem from './remoteFileSystem';
 import { SSHClient } from '../remote-client';
@@ -39,7 +39,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
     });
   }
 
-  get(path, option?: FileOption): Promise<fs.ReadStream> {
+  get(path, option?: FileOption): Promise<Readable> {
     return new Promise((resolve, reject) => {
       try {
         const stream = this.sftp.createReadStream(path, option);
@@ -50,20 +50,23 @@ export default class SFTPFileSystem extends RemoteFileSystem {
     });
   }
 
-  put(input: fs.ReadStream | Buffer, path, option?: FileOption): Promise<void> {
+  put(input: Readable | Buffer, path, option?: FileOption): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      const stream = this.sftp.createWriteStream(path, option);
+      const writer = this.sftp.createWriteStream(path, option);
 
-      stream.on('error', reject);
-      stream.on('finish', resolve);
+      writer.on('error', reject);
+      writer.on('finish', resolve);
 
       if (input instanceof Buffer) {
-        stream.end(input);
+        writer.end(input);
         return;
       }
 
-      input.on('error', reject);
-      input.pipe(stream);
+      input.on('error', err => {
+        reject(err);
+        writer.end();
+      });
+      input.pipe(writer);
     });
   }
 

@@ -1,5 +1,5 @@
-import { FileSystem, FileType } from '.';
-import { fileOperations } from '.';
+import * as fileOperations from './fileBaseOperations';
+import { FileSystem, FileType } from './fs';
 import { Task } from './scheduler';
 
 export enum TransferDirection {
@@ -12,14 +12,16 @@ interface FileHandle {
   fileSystem: FileSystem;
 }
 
-import TransferOption = fileOperations.TransferOption;
+import FileOption = fileOperations.FileOption;
 
 export default class TransferTask implements Task {
   readonly fileType: FileType;
-  private readonly _src: FileHandle;
-  private readonly _target: FileHandle;
+  private readonly _srcFsPath: string;
+  private readonly _targetFsPath: string;
+  private readonly _srcFs: FileSystem;
+  private readonly _targetFs: FileSystem;
   private readonly _transferDirection: TransferDirection;
-  private readonly _transferOption: TransferOption;
+  private readonly _fileOption: FileOption;
   // private _fileStatus: FileStatus;
 
   constructor(
@@ -28,63 +30,65 @@ export default class TransferTask implements Task {
     option: {
       fileType: FileType;
       transferDirection: TransferDirection;
-      transferOption: TransferOption;
+      transferOption: FileOption;
     }
   ) {
-    this._src = src;
-    this._target = target;
-    this.fileType = option.fileType;
-    this._transferOption = option.transferOption;
+    this._srcFsPath = src.fsPath;
+    this._targetFsPath = target.fsPath;
+    this._srcFs = src.fileSystem;
+    this._targetFs = target.fileSystem;
+    this._fileOption = option.transferOption;
     this._transferDirection = option.transferDirection;
+    this.fileType = option.fileType;
   }
 
   get localFsPath() {
     if (this._transferDirection === TransferDirection.Download) {
-      return this.targetFsPath;
+      return this._targetFsPath;
     } else {
-      return this.srcFsPath;
+      return this._srcFsPath;
     }
-  }
-
-  private get srcFsPath() {
-    return this._src.fsPath;
-  }
-
-  private get srcFs() {
-    return this._src.fileSystem;
-  }
-
-  private get targetFsPath() {
-    return this._target.fsPath;
-  }
-
-  private get targetFs() {
-    return this._target.fileSystem;
   }
 
   get transferType() {
     return this._transferDirection;
   }
 
-  // setFileStatus(fileStatus: FileStatus) {
-  //   this._fileStatus = fileStatus;
-  // }
-
   async run() {
-    const src = this.srcFsPath;
-    const target = this.targetFsPath;
-    const srcFs = this.srcFs;
-    const targetFs = this.targetFs;
+    const src = this._srcFsPath;
+    const target = this._targetFsPath;
+    const srcFs = this._srcFs;
+    const targetFs = this._targetFs;
 
     switch (this.fileType) {
       case FileType.File:
-        await fileOperations.transferFile(src, target, srcFs, targetFs, this._transferOption);
+        await this._transferFile();
         break;
       case FileType.SymbolicLink:
-        await fileOperations.transferSymlink(src, target, srcFs, targetFs, this._transferOption);
+        await fileOperations.transferSymlink(src, target, srcFs, targetFs, this._fileOption);
         break;
       default:
         throw new Error(`Unsupported file type (type = ${this.fileType})`);
     }
+  }
+
+  async _transferFile() {
+    const src = this._srcFsPath;
+    const target = this._targetFsPath;
+    const srcFs = this._srcFs;
+    const targetFs = this._targetFs;
+    const { perserveTargetMode } = this._fileOption;
+    let { mode } = this._fileOption;
+    let inputStream;
+    if (mode === undefined && perserveTargetMode) {
+      [inputStream, mode] = await Promise.all([
+        srcFs.get(src),
+        fileOperations.getFileMode(target, targetFs),
+      ]);
+    } else {
+      inputStream = await srcFs.get(src);
+    }
+    await targetFs.put(inputStream, target, { mode });
+    // await inputStream.handle;
   }
 }

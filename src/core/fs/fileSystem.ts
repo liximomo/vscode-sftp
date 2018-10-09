@@ -1,3 +1,4 @@
+import { Readable } from 'stream';
 import * as fs from 'fs';
 
 export enum FileType {
@@ -46,8 +47,8 @@ export default abstract class FileSystem {
   }
 
   abstract readFile(path: string, option?: FileOption): Promise<string | Buffer>;
-  abstract get(path: string, option?: FileOption): Promise<fs.ReadStream>;
-  abstract put(input: fs.ReadStream | Buffer, path, option?: FileOption): Promise<void>;
+  abstract get(path: string, option?: FileOption): Promise<Readable>;
+  abstract put(input: Readable | Buffer, path, option?: FileOption): Promise<void>;
   abstract mkdir(dir: string): Promise<void>;
   abstract ensureDir(dir: string): Promise<void>;
   abstract list(dir: string, option?): Promise<FileEntry[]>;

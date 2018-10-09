@@ -20,7 +20,7 @@ function createTransferHandle(direction: TransferDirection) {
         srcFs: remoteFs,
         targetFsPath: localFsPath,
         targetFs: localFs,
-        option,
+        transferOption: option,
         transferDirection: TransferDirection.Download,
       };
     } else {
@@ -29,7 +29,7 @@ function createTransferHandle(direction: TransferDirection) {
         srcFs: localFs,
         targetFsPath: remoteFsPath,
         targetFs: remoteFs,
-        option,
+        transferOption: option,
         transferDirection: TransferDirection.Upload,
       };
     }
@@ -56,7 +56,7 @@ export const sync2Remote = createFileHandler<OptSyncOption>({
         srcFs: localFs,
         targetFsPath: remoteFsPath,
         targetFs: remoteFs,
-        option,
+        transferOption: option,
         transferDirection: TransferDirection.Upload,
       },
       t => scheduler.add(t)
@@ -89,7 +89,7 @@ export const sync2Local = createFileHandler<OptSyncOption>({
         srcFs: remoteFs,
         targetFsPath: localFsPath,
         targetFs: localFs,
-        option,
+        transferOption: option,
         transferDirection: TransferDirection.Download,
       },
       t => scheduler.add(t)
