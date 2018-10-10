@@ -13,6 +13,12 @@
   version "1.1.2"
   resolved "http://registry.npm.taobao.org/@nodelib/fs.stat/download/@nodelib/fs.stat-1.1.2.tgz#54c5a964462be3d4d78af631363c18d6fa91ac26"
 
+"@types/fs-extra@^5.0.4":
+  version "5.0.4"
+  resolved "http://registry.npm.taobao.org/@types/fs-extra/download/@types/fs-extra-5.0.4.tgz#b971134d162cc0497d221adde3dbb67502225599"
+  dependencies:
+    "@types/node" "*"
+
 "@types/lru-cache@^4.1.1":
   version "4.1.1"
   resolved "http://registry.npm.taobao.org/@types/lru-cache/download/@types/lru-cache-4.1.1.tgz#b2d87a5e3df8d4b18ca426c5105cd701c2306d40"
@@ -20,6 +26,10 @@
 "@types/mocha@^2.2.32":
   version "2.2.41"
   resolved "http://registry.npm.taobao.org/@types/mocha/download/@types/mocha-2.2.41.tgz#e27cf0817153eb9f2713b2d3f6c68f1e1c3ca608"
+
+"@types/node@*":
+  version "10.11.6"
+  resolved "http://registry.npm.taobao.org/@types/node/download/@types/node-10.11.6.tgz#ce5690df6cd917a9178439a1013e39a7e565c46e"
 
 "@types/node@^6.0.40":
   version "6.0.73"
@@ -1122,12 +1132,12 @@ from@~0:
   version "0.1.7"
   resolved "http://registry.npm.taobao.org/from/download/from-0.1.7.tgz#83c60afc58b9c56997007ed1a768b3ab303a44fe"
 
-fs-extra@^3.0.1:
-  version "3.0.1"
-  resolved "http://registry.npm.taobao.org/fs-extra/download/fs-extra-3.0.1.tgz#3794f378c58b342ea7dbbb23095109c4b3b62291"
+fs-extra@^5.0.0:
+  version "5.0.0"
+  resolved "http://registry.npm.taobao.org/fs-extra/download/fs-extra-5.0.0.tgz#414d0110cdd06705734d055652c5411260c31abd"
   dependencies:
     graceful-fs "^4.1.2"
-    jsonfile "^3.0.0"
+    jsonfile "^4.0.0"
     universalify "^0.1.0"
 
 fs.realpath@^1.0.0:
@@ -2111,9 +2121,9 @@ json5@^0.5.0:
   version "0.5.1"
   resolved "http://registry.npm.taobao.org/json5/download/json5-0.5.1.tgz#1eade7acc012034ad84e2396767ead9fa5495821"
 
-jsonfile@^3.0.0:
-  version "3.0.0"
-  resolved "http://registry.npm.taobao.org/jsonfile/download/jsonfile-3.0.0.tgz#92e7c7444e5ffd5fa32e6a9ae8b85034df8347d0"
+jsonfile@^4.0.0:
+  version "4.0.0"
+  resolved "http://registry.npm.taobao.org/jsonfile/download/jsonfile-4.0.0.tgz#8771aae0799b64076b76640fca058f9c10e33ecb"
   optionalDependencies:
     graceful-fs "^4.1.6"
 

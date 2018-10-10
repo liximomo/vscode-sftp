@@ -397,6 +397,7 @@
     "lint": "tslint --project tsconfig.json src/**/*.ts"
   },
   "devDependencies": {
+    "@types/fs-extra": "^5.0.4",
     "@types/lru-cache": "^4.1.1",
     "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.40",
@@ -410,7 +411,7 @@
   "dependencies": {
     "async": "^2.6.0",
     "fast-glob": "^2.2.2",
-    "fs-extra": "^3.0.1",
+    "fs-extra": "^5.0.0",
     "ftp": "^0.3.10",
     "ignore": "^5.0.2",
     "joi": "^10.6.0",

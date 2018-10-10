@@ -124,9 +124,6 @@ export default class StatusBarItem {
   }
 
   reset() {
-    if (this.isSpinning()) {
-      this.stopSpinner();
-    }
     this.text = this.name;
     this.statusBarItem.tooltip = this.tooltip;
     this._render();

@@ -5,6 +5,12 @@ import { FileEntry, FileType, FileStats, FileOption } from './fileSystem';
 import RemoteFileSystem from './remoteFileSystem';
 import { FTPClient } from '../remote-client';
 
+interface FtpFileHandle {
+  path: string;
+  flags: string;
+  mode: number;
+}
+
 const numMap = {
   r: 4,
   w: 2,
@@ -85,7 +91,30 @@ export default class FTPFileSystem extends RemoteFileSystem {
     return fileStat;
   }
 
-  async get(path, option?: FileOption): Promise<Readable> {
+  open(path: string, flags: string, mode?: number): Promise<FtpFileHandle> {
+    return Promise.resolve({
+      path,
+      flags,
+      mode,
+    });
+  }
+
+  close(_fd: FtpFileHandle): Promise<void> {
+    return Promise.resolve();
+  }
+
+  fstat(fd: FtpFileHandle): Promise<FileStats> {
+    return this.lstat(fd.path);
+  }
+
+  futimes(fd: FtpFileHandle, _atime: number, mtime: number): Promise<void> {
+    return this.atomicSetLastMod(fd.path, mtime).catch(err => {
+      // swallow the err
+      logger.error(err, `fail to set modified time to ${fd.path}`);
+    });
+  }
+
+  async get(path, _option?: FileOption): Promise<Readable> {
     const stream = await this.atomicGet(path);
 
     if (!stream) {
@@ -100,7 +129,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
     await this.atomicSite(command);
   }
 
-  async put(input: Readable | Buffer, path, option?: FileOption): Promise<void> {
+  async put(input: Readable | Buffer, path, _option?: FileOption): Promise<void> {
     await this.atomicPut(input, path);
   }
 
@@ -108,7 +137,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
     return this.lstat(path).then(stat => stat.target);
   }
 
-  symlink(targetPath: string, path: string): Promise<void> {
+  symlink(_targetPath: string, _path: string): Promise<void> {
     // TO-DO implement
     return Promise.resolve();
   }
@@ -298,6 +327,21 @@ export default class FTPFileSystem extends RemoteFileSystem {
     const task = () =>
       new Promise<void>((resolve, reject) => {
         this.ftp.site(command, err => {
+          if (err) {
+            return reject(err);
+          }
+
+          resolve();
+        });
+      });
+
+    return this.queue.add(task);
+  }
+
+  private async atomicSetLastMod(path: string, time: number): Promise<void> {
+    const task = () =>
+      new Promise<void>((resolve, reject) => {
+        this.ftp.setLastMod(path, time, err => {
           if (err) {
             return reject(err);
           }

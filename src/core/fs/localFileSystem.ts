@@ -42,6 +42,22 @@ export default class LocalFileSystem extends FileSystem {
     });
   }
 
+  open(path: string, flags: string, mode?: number): Promise<number> {
+    return fse.open(path, flags, mode);
+  }
+
+  close(fd: number): Promise<void> {
+    return fse.close(fd);
+  }
+
+  fstat(fd: number): Promise<FileStats> {
+    return fse.fstat(fd).then(stat => toFileStat(stat));
+  }
+
+  futimes(fd: number, atime: number, mtime: number): Promise<void> {
+    return fse.futimes(fd, atime, mtime);
+  }
+
   get(path, option?): Promise<fs.ReadStream> {
     return new Promise((resolve, reject) => {
       try {
@@ -55,17 +71,20 @@ export default class LocalFileSystem extends FileSystem {
 
   put(input: fs.ReadStream | Buffer, path, option?: FileOption): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      const writer = fs.createWriteStream(path, option);
+      if (option && option.fd && typeof option.fd !== 'number') {
+        return reject(new Error('fd is not a number'));
+      }
 
-      writer.on('error', reject);
-      writer.on('finish', resolve);
+      const writer = fs.createWriteStream(path, option as any);
+      writer.once('error', reject);
+      writer.once('finish', resolve);
 
       if (input instanceof Buffer) {
         writer.end(input);
         return;
       }
 
-      input.on('error', err => {
+      input.once('error', err => {
         reject(err);
         writer.end();
       });

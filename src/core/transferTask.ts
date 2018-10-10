@@ -13,8 +13,8 @@ interface FileHandle {
 }
 
 export interface TransferOption {
-  atime?: number;
-  mtime?: number;
+  atime: number;
+  mtime: number;
   mode?: number;
   fallbackMode?: number;
   perserveTargetMode: boolean;
@@ -83,20 +83,32 @@ export default class TransferTask implements Task {
     const target = this._targetFsPath;
     const srcFs = this._srcFs;
     const targetFs = this._targetFs;
-    const { perserveTargetMode, fallbackMode } = this._TransferOption;
+    const { perserveTargetMode, fallbackMode, atime, mtime } = this._TransferOption;
     let { mode } = this._TransferOption;
     let inputStream;
+    let targetFd;
     // Use mode first.
     // Then check perserveTargetMode and fallback to fallbackMode if fail to get mode of target
     if (mode === undefined && perserveTargetMode) {
+      targetFd = await targetFs.open(target, 'w');
       [inputStream, mode] = await Promise.all([
         srcFs.get(src),
-        fileOperations.getFileMode(target, targetFs, fallbackMode),
+        targetFs
+          .fstat(targetFd)
+          .then(stat => stat.mode)
+          .catch(() => fallbackMode),
       ]);
     } else {
-      inputStream = await srcFs.get(src);
+      [inputStream, targetFd] = await Promise.all([srcFs.get(src), targetFs.open(target, 'w')]);
     }
-    await targetFs.put(inputStream, target, { mode });
-    // await inputStream.handle;
+
+    try {
+      await targetFs.put(inputStream, target, { mode, fd: targetFd, autoClose: false });
+    } finally {
+      if (atime && mtime) {
+        await targetFs.futimes(targetFd, atime, mtime);
+      }
+      targetFs.close(targetFd);
+    }
   }
 }

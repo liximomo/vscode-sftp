@@ -4,15 +4,6 @@ interface FileOption {
   mode?: number;
 }
 
-export async function getFileMode(path: string, fs: FileSystem, fallbackMode: number) {
-  try {
-    const stat = await fs.lstat(path);
-    return stat.mode;
-  } catch (error) {
-    return fallbackMode !== undefined ? fallbackMode : 0o666;
-  }
-}
-
 export async function transferFile(
   src: string,
   des: string,

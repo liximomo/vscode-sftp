@@ -1,4 +1,5 @@
 import { Uri } from 'vscode';
+import app from '../app';
 import { UResource, FileService } from '../core';
 import logger from '../logger';
 import { getFileService } from '../modules/serviceManager';
@@ -16,12 +17,12 @@ export interface FileHandlerContext {
 type FileHandlerContextMethod<R = void> = (this: FileHandlerContext) => R;
 type FileHandlerContextMethodArg1<A, R = void> = (this: FileHandlerContext, a: A) => R;
 
-interface FileHandlerOption<T> {
+interface FileHandlerOption {
   name: string;
   handle: FileHandlerContextMethodArg1<any, Promise<any>>;
   afterHandle?: FileHandlerContextMethod;
   config?: FileHandlerConfig;
-  transformOption?: FileHandlerContextMethod<any>;
+  transformOption?: FileHandlerContextMethod<{ [x: string]: any }>;
 }
 
 export function handleCtxFromUri(uri: Uri): FileHandlerContext {
@@ -48,32 +49,33 @@ export function handleCtxFromUri(uri: Uri): FileHandlerContext {
 }
 
 export default function createFileHandler<T>(
-  handlerOption: FileHandlerOption<T>
+  handlerOption: FileHandlerOption
 ): (ctx: FileHandlerContext | Uri, option?: T) => Promise<void> {
   async function fileHandle(ctx: Uri | FileHandlerContext, option?: T) {
     const handleCtx = ctx instanceof Uri ? handleCtxFromUri(ctx) : ctx;
     const { target } = handleCtx;
 
+    const invokeOption = handlerOption.transformOption
+      ? handlerOption.transformOption.call(handleCtx)
+      : {};
+    if (option) {
+      Object.assign(invokeOption, option);
+    }
+
+    if (invokeOption.ignore && invokeOption.ignore(target.localFsPath)) {
+      return;
+    }
+
+    logger.trace(`handle ${handlerOption.name} for`, target.localFsPath);
+
+    app.sftpBarItem.startSpinner();
     try {
-      const invokeOption = handlerOption.transformOption
-        ? handlerOption.transformOption.call(handleCtx)
-        : {};
-      if (option) {
-        Object.assign(invokeOption, option);
-      }
-
-      if (invokeOption.ignore && invokeOption.ignore(target.localFsPath)) {
-        return;
-      }
-
-      logger.trace(`handle ${handlerOption.name} for`, target.localFsPath);
-
       await handlerOption.handle.call(handleCtx, invokeOption);
-      if (handlerOption.afterHandle) {
-        handlerOption.afterHandle.call(handleCtx);
-      }
-    } catch (error) {
-      throw error;
+    } finally {
+      app.sftpBarItem.stopSpinner();
+    }
+    if (handlerOption.afterHandle) {
+      handlerOption.afterHandle.call(handleCtx);
     }
   }
 

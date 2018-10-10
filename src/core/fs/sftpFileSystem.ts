@@ -1,7 +1,16 @@
-import { Readable } from 'stream';
+import { Readable, Writable } from 'stream';
 import FileSystem, { FileEntry, FileType, FileStats, FileOption } from './fileSystem';
 import RemoteFileSystem from './remoteFileSystem';
 import { SSHClient } from '../remote-client';
+
+interface WriteStream extends Writable {
+  handle: Buffer;
+  path: string;
+  flags: string;
+  mode: number;
+  destroy(): void;
+  close(): void;
+}
 
 function toSimpleFileMode(mode: number) {
   return mode & parseInt('777', 8); // tslint:disable-line:no-bitwise
@@ -39,6 +48,57 @@ export default class SFTPFileSystem extends RemoteFileSystem {
     });
   }
 
+  open(path: string, flags: string, mode?: number): Promise<Buffer> {
+    return new Promise((resolve, reject) => {
+      this.sftp.open(path, flags, mode, (err, handle) => {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve(handle);
+      });
+    });
+  }
+
+  close(fd: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.sftp.close(fd, err => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve();
+      });
+    });
+  }
+
+  fstat(fd: Buffer): Promise<FileStats> {
+    return new Promise((resolve, reject) => {
+      this.sftp.fstat(fd, (err, stat) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve(toFileStat(stat));
+      });
+    });
+  }
+
+  futimes(fd: Buffer, atime: number, mtime: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.sftp.futimes(fd, Math.floor(atime / 1000), Math.floor(mtime / 1000), err => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve();
+      });
+    });
+  }
+
   get(path, option?: FileOption): Promise<Readable> {
     return new Promise((resolve, reject) => {
       try {
@@ -52,17 +112,16 @@ export default class SFTPFileSystem extends RemoteFileSystem {
 
   put(input: Readable | Buffer, path, option?: FileOption): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      const writer = this.sftp.createWriteStream(path, option);
-
-      writer.on('error', reject);
-      writer.on('finish', resolve);
+      const writer: WriteStream = this.sftp.createWriteStream(path, option);
+      writer.once('error', reject);
+      writer.once('finish', resolve);
 
       if (input instanceof Buffer) {
         writer.end(input);
         return;
       }
 
-      input.on('error', err => {
+      input.once('error', err => {
         reject(err);
         writer.end();
       });

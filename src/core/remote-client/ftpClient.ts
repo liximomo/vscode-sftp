@@ -1,6 +1,19 @@
 import * as Client from 'ftp';
 import RemoteClient, { ConnectOption } from './remoteClient';
 
+Client.prototype.setLastMod = function(path: string, time: number, cb) {
+  const date = new Date(time);
+  const dateStr =
+    date.getUTCFullYear() +
+    ('00' + (date.getUTCMonth() + 1)).slice(-2) +
+    ('00' + date.getUTCDate()).slice(-2) +
+    ('00' + date.getUTCHours()).slice(-2) +
+    ('00' + date.getUTCMinutes()).slice(-2) +
+    ('00' + date.getUTCSeconds()).slice(-2);
+
+  this._send('MFMT ' + dateStr + ' ' + path, cb);
+};
+
 export default class FTPClient extends RemoteClient {
   private connected: boolean = false;
 
