@@ -16,9 +16,7 @@ export const diff = createFileHandler({
       postfix: path.extname(localFsPath),
     });
 
-    await fileOperations.transferFile(remoteFsPath, tmpPath, remoteFs, localFs, {
-      perserveTargetMode: false,
-    });
+    await fileOperations.transferFile(remoteFsPath, tmpPath, remoteFs, localFs);
     await diffFiles(
       localFsPath,
       tmpPath,

@@ -12,7 +12,13 @@ interface FileHandle {
   fileSystem: FileSystem;
 }
 
-import FileOption = fileOperations.FileOption;
+export interface TransferOption {
+  atime?: number;
+  mtime?: number;
+  mode?: number;
+  fallbackMode?: number;
+  perserveTargetMode: boolean;
+}
 
 export default class TransferTask implements Task {
   readonly fileType: FileType;
@@ -21,7 +27,7 @@ export default class TransferTask implements Task {
   private readonly _srcFs: FileSystem;
   private readonly _targetFs: FileSystem;
   private readonly _transferDirection: TransferDirection;
-  private readonly _fileOption: FileOption;
+  private readonly _TransferOption: TransferOption;
   // private _fileStatus: FileStatus;
 
   constructor(
@@ -30,14 +36,14 @@ export default class TransferTask implements Task {
     option: {
       fileType: FileType;
       transferDirection: TransferDirection;
-      transferOption: FileOption;
+      transferOption: TransferOption;
     }
   ) {
     this._srcFsPath = src.fsPath;
     this._targetFsPath = target.fsPath;
     this._srcFs = src.fileSystem;
     this._targetFs = target.fileSystem;
-    this._fileOption = option.transferOption;
+    this._TransferOption = option.transferOption;
     this._transferDirection = option.transferDirection;
     this.fileType = option.fileType;
   }
@@ -65,7 +71,7 @@ export default class TransferTask implements Task {
         await this._transferFile();
         break;
       case FileType.SymbolicLink:
-        await fileOperations.transferSymlink(src, target, srcFs, targetFs, this._fileOption);
+        await fileOperations.transferSymlink(src, target, srcFs, targetFs, this._TransferOption);
         break;
       default:
         throw new Error(`Unsupported file type (type = ${this.fileType})`);
@@ -77,13 +83,15 @@ export default class TransferTask implements Task {
     const target = this._targetFsPath;
     const srcFs = this._srcFs;
     const targetFs = this._targetFs;
-    const { perserveTargetMode } = this._fileOption;
-    let { mode } = this._fileOption;
+    const { perserveTargetMode, fallbackMode } = this._TransferOption;
+    let { mode } = this._TransferOption;
     let inputStream;
+    // Use mode first.
+    // Then check perserveTargetMode and fallback to fallbackMode if fail to get mode of target
     if (mode === undefined && perserveTargetMode) {
       [inputStream, mode] = await Promise.all([
         srcFs.get(src),
-        fileOperations.getFileMode(target, targetFs),
+        fileOperations.getFileMode(target, targetFs, fallbackMode),
       ]);
     } else {
       inputStream = await srcFs.get(src);

@@ -1,18 +1,15 @@
 import { FileSystem } from './fs';
 
-export interface FileOption {
+interface FileOption {
   mode?: number;
-  atime: number;
-  mtime: number;
-  perserveTargetMode: boolean;
 }
 
-export async function getFileMode(path: string, fs: FileSystem) {
+export async function getFileMode(path: string, fs: FileSystem, fallbackMode: number) {
   try {
     const stat = await fs.lstat(path);
     return stat.mode;
   } catch (error) {
-    return 0o666;
+    return fallbackMode !== undefined ? fallbackMode : 0o666;
   }
 }
 
@@ -21,17 +18,10 @@ export async function transferFile(
   des: string,
   srcFs: FileSystem,
   desFs: FileSystem,
-  option: FileOption
+  option?: FileOption
 ): Promise<void> {
-  const { perserveTargetMode } = option;
-  let { mode } = option;
-  let inputStream;
-  if (mode === undefined && perserveTargetMode) {
-    [inputStream, mode] = await Promise.all([srcFs.get(src), getFileMode(des, desFs)]);
-  } else {
-    inputStream = await srcFs.get(src);
-  }
-  await desFs.put(inputStream, des, { mode });
+  const inputStream = await srcFs.get(src, option);
+  await desFs.put(inputStream, des, option);
 }
 
 export function transferSymlink(

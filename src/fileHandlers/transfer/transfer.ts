@@ -3,12 +3,13 @@ import {
   FileEntry,
   FileType,
   TransferTask,
+  TransferOption as TransferTaskTransferOption,
   TransferDirection,
   fileOperations,
 } from '../../core';
 import { flatten } from '../../utils';
 
-interface InternalTransferOption extends fileOperations.FileOption {
+interface InternalTransferOption extends TransferTaskTransferOption {
   ignore?: (filepath: string) => boolean;
 }
 
@@ -28,7 +29,7 @@ interface BaseTransferHandleConfig {
 
 type ExternalTransferOption<T extends InternalTransferOption> = Pick<
   T,
-  Exclude<keyof T, 'mtime' | 'atime' | 'mode'>
+  Exclude<keyof T, 'mtime' | 'atime' | 'mode' | 'fallbackMode'>
 >;
 
 type TransferOption = ExternalTransferOption<InternalTransferOption>;
@@ -160,6 +161,7 @@ export async function transfer(
   const stat = await config.srcFs.lstat(config.srcFsPath);
   const transferOption = {
     ...config.transferOption,
+    fallbackMode: stat.mode,
     mtime: stat.mtime,
     atime: stat.atime,
   };
@@ -200,7 +202,6 @@ export async function sync(
 
       const option = {
         ...config.transferOption,
-        mode: undefined,
         mtime: srcFile.mtime,
         atime: srcFile.atime,
       } as InternalTransferOption;
@@ -220,7 +221,7 @@ export async function sync(
         }
       } else if (transferOption.model === 'full') {
         // files exist only on src
-        option.mode = srcFile.mode; // fallback to srcFile mode
+        option.fallbackMode = srcFile.mode; // fallback to srcFile mode
         const _targetFsPath = targetFs.pathResolver.join(targetFsPath, srcFile.name);
         switch (srcFile.type) {
           case FileType.Directory:
