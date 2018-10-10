@@ -339,17 +339,18 @@
         {
           "command": "sftp.remoteExplorer.editInLocal",
           "group": "2_files",
-          "when": "resourceScheme == remote"
+          "when": "sftp.enabled && resourceScheme == remote"
         }
       ],
       "editor/title/context": [
         {
           "command": "sftp.revealInExplorer",
           "group": "2_files",
-          "when": "resourceScheme == remote"
+          "when": "sftp.enabled && resourceScheme == remote"
         },
         {
           "command": "sftp.revealInRemoteExplorer",
+          "when": "sftp.enabled",
           "group": "2_files"
         }
       ],
