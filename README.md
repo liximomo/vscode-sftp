@@ -10,7 +10,7 @@ Very simple, requires just three lines of config! Very fast, finished in a blink
   * File Watcher
   * Multiple configs
   * Switchable profiles
-* [Command](https://github.com/liximomo/vscode-sftp/wiki/Command)
+* [Commands](https://github.com/liximomo/vscode-sftp/wiki/Command)
 * [Debug](#debug)
 * [Support SFTP Project](#Donation)
 

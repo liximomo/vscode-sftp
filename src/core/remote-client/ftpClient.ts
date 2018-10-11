@@ -1,8 +1,7 @@
 import * as Client from 'ftp';
 import RemoteClient, { ConnectOption } from './remoteClient';
 
-Client.prototype.setLastMod = function(path: string, time: number, cb) {
-  const date = new Date(time);
+Client.prototype.setLastMod = function(path: string, date: Date, cb) {
   const dateStr =
     date.getUTCFullYear() +
     ('00' + (date.getUTCMonth() + 1)).slice(-2) +

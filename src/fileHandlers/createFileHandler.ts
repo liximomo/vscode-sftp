@@ -17,12 +17,12 @@ export interface FileHandlerContext {
 type FileHandlerContextMethod<R = void> = (this: FileHandlerContext) => R;
 type FileHandlerContextMethodArg1<A, R = void> = (this: FileHandlerContext, a: A) => R;
 
-interface FileHandlerOption {
+interface FileHandlerOption<T> {
   name: string;
-  handle: FileHandlerContextMethodArg1<any, Promise<any>>;
+  handle: FileHandlerContextMethodArg1<T, Promise<any>>;
   afterHandle?: FileHandlerContextMethod;
   config?: FileHandlerConfig;
-  transformOption?: FileHandlerContextMethod<{ [x: string]: any }>;
+  transformOption?: FileHandlerContextMethod<T>;
 }
 
 export function handleCtxFromUri(uri: Uri): FileHandlerContext {
@@ -49,8 +49,8 @@ export function handleCtxFromUri(uri: Uri): FileHandlerContext {
 }
 
 export default function createFileHandler<T>(
-  handlerOption: FileHandlerOption
-): (ctx: FileHandlerContext | Uri, option?: T) => Promise<void> {
+  handlerOption: FileHandlerOption<T>
+): (ctx: FileHandlerContext | Uri, option?: Partial<T>) => Promise<void> {
   async function fileHandle(ctx: Uri | FileHandlerContext, option?: T) {
     const handleCtx = ctx instanceof Uri ? handleCtxFromUri(ctx) : ctx;
     const { target } = handleCtx;

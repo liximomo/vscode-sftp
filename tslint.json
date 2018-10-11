@@ -1,6 +1,7 @@
 {
   "extends": "tslint:recommended",
   "rules": {
+    "object-literal-key-quotes": false,
     "no-angle-bracket-type-assertion": false,
     "max-classes-per-file": false,
     "member-ordering": false,

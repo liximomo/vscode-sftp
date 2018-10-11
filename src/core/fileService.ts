@@ -150,6 +150,10 @@ export default class FileService {
       },
       run() {
         return new Promise(resolve => {
+          if (scheduler.size <= 0) {
+            return resolve();
+          }
+
           scheduler.onIdle(resolve);
           scheduler.start();
         });

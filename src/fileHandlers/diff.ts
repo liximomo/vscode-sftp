@@ -7,7 +7,7 @@ import createFileHandler from './createFileHandler';
 
 export const diff = createFileHandler({
   name: 'diff',
-  async handle(option) {
+  async handle() {
     const remoteFs = await this.fileService.getRemoteFileSystem();
     const localFs = this.fileService.getLocalFileSystem();
     const { localFsPath, remoteFsPath } = this.target;
@@ -20,7 +20,7 @@ export const diff = createFileHandler({
     await diffFiles(
       localFsPath,
       tmpPath,
-      `${simplifyPath(localFsPath)} (local ↔ ${option.name || 'remote'})`
+      `${simplifyPath(localFsPath)} (local ↔ ${this.fileService.name || 'remote'})`
     );
   },
 });

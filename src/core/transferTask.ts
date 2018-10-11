@@ -3,8 +3,8 @@ import { FileSystem, FileType } from './fs';
 import { Task } from './scheduler';
 
 export enum TransferDirection {
-  Upload = 'upload',
-  Download = 'download',
+  LOCAL_TO_REMOTE = 'local -> remote',
+  REMOTE_TO_LOCAL = 'remote -> local',
 }
 
 interface FileHandle {
@@ -49,11 +49,19 @@ export default class TransferTask implements Task {
   }
 
   get localFsPath() {
-    if (this._transferDirection === TransferDirection.Download) {
+    if (this._transferDirection === TransferDirection.REMOTE_TO_LOCAL) {
       return this._targetFsPath;
     } else {
       return this._srcFsPath;
     }
+  }
+
+  get srcFsPath() {
+    return this._srcFsPath;
+  }
+
+  get targetFsPath() {
+    return this._targetFsPath;
   }
 
   get transferType() {
@@ -78,7 +86,7 @@ export default class TransferTask implements Task {
     }
   }
 
-  async _transferFile() {
+  private async _transferFile() {
     const src = this._srcFsPath;
     const target = this._targetFsPath;
     const srcFs = this._srcFs;
@@ -106,7 +114,7 @@ export default class TransferTask implements Task {
       await targetFs.put(inputStream, target, { mode, fd: targetFd, autoClose: false });
     } finally {
       if (atime && mtime) {
-        await targetFs.futimes(targetFd, atime, mtime);
+        await targetFs.futimes(targetFd, Math.floor(atime / 1000), Math.floor(mtime / 1000));
       }
       targetFs.close(targetFd);
     }

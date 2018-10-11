@@ -88,7 +88,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
 
   futimes(fd: Buffer, atime: number, mtime: number): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.sftp.futimes(fd, Math.floor(atime / 1000), Math.floor(mtime / 1000), err => {
+      this.sftp.futimes(fd, atime, mtime, err => {
         if (err) {
           reject(err);
           return;
@@ -112,7 +112,14 @@ export default class SFTPFileSystem extends RemoteFileSystem {
 
   put(input: Readable | Buffer, path, option?: FileOption): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      const writer: WriteStream = this.sftp.createWriteStream(path, option);
+      let writer: WriteStream;
+      if (option && option.fd) {
+        const opt = { ...option, handle: option.fd };
+        delete opt.fd;
+        writer = this.sftp.createWriteStream(path, opt);
+      } else {
+        writer = this.sftp.createWriteStream(path, option);
+      }
       writer.once('error', reject);
       writer.once('finish', resolve);
 

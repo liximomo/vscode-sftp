@@ -13,10 +13,10 @@ interface InternalTransferOption extends TransferTaskTransferOption {
   ignore?: (filepath: string) => boolean;
 }
 
-type SyncModel = 'full' | 'update';
-
-interface InternalSyncOption extends InternalTransferOption {
-  model: SyncModel;
+export enum SyncModel {
+  FULL = 'FULL',
+  UPDATE = 'UPDATE',
+  BOTH_DIRECTIONS = 'BOTH_DIRECTIONS',
 }
 
 interface BaseTransferHandleConfig {
@@ -33,10 +33,23 @@ type ExternalTransferOption<T extends InternalTransferOption> = Pick<
 >;
 
 type TransferOption = ExternalTransferOption<InternalTransferOption>;
-type SyncOption = ExternalTransferOption<InternalSyncOption>;
+interface SyncOption extends TransferOption {
+  model: SyncModel;
+}
 
 interface TransferHandleConfig<T> extends BaseTransferHandleConfig {
   transferOption: T;
+}
+
+function getAltDirection(direction: TransferDirection) {
+  return direction === TransferDirection.LOCAL_TO_REMOTE
+    ? TransferDirection.REMOTE_TO_LOCAL
+    : TransferDirection.LOCAL_TO_REMOTE;
+}
+
+function isFileModified(a: FileEntry, b: FileEntry): boolean {
+  // check if time is same at seconds
+  return Math.floor(a.mtime / 1000) !== Math.floor(b.mtime / 1000);
 }
 
 function toHash<T, R = T>(items: T[], key: string, transform?: (a: T) => R): { [key: string]: R } {
@@ -48,7 +61,7 @@ function toHash<T, R = T>(items: T[], key: string, transform?: (a: T) => R): { [
 }
 
 async function transferFolder(
-  config: TransferHandleConfig<InternalTransferOption>,
+  config: TransferHandleConfig<TransferOption>,
   collect: (t: TransferTask) => void
 ) {
   const { srcFsPath, targetFsPath, srcFs, targetFs, transferOption } = config;
@@ -152,6 +165,214 @@ async function removeFile(file: string, fs: FileSystem, fileType: FileType, opti
   }
 }
 
+async function _sync(
+  config: TransferHandleConfig<SyncOption>,
+  collect: (t: TransferTask) => void,
+  deleted: FileEntry[]
+) {
+  const { srcFsPath, targetFsPath, srcFs, targetFs, transferOption, transferDirection } = config;
+  if (transferOption.ignore && transferOption.ignore(srcFsPath)) {
+    return;
+  }
+
+  const altDirection = getAltDirection(transferDirection);
+  const syncFiles = (srcFileEntries: FileEntry[], desFileEntries: FileEntry[]) => {
+    const srcFileTable = toHash(srcFileEntries, 'id', fileEntry => ({
+      ...fileEntry,
+      id: fileEntry.name,
+    }));
+
+    const desFileTable = toHash(desFileEntries, 'id', fileEntry => ({
+      ...fileEntry,
+      id: fileEntry.name,
+    }));
+
+    const file2trans: [string, string, TransferDirection, InternalTransferOption][] = [];
+    const dir2trans: [string, string][] = [];
+    const dir2sync: [string, string][] = [];
+
+    const fileMissed: string[] = [];
+    const dirMissed: string[] = [];
+
+    Object.keys(srcFileTable).forEach(id => {
+      const srcFile = srcFileTable[id];
+      const desFile = desFileTable[id];
+      delete desFileTable[id];
+
+      if (desFile) {
+        // files exist on both side
+        let from: FileEntry;
+        let to: FileEntry;
+        let direction: TransferDirection;
+        switch (transferOption.model) {
+          case SyncModel.FULL:
+          case SyncModel.UPDATE:
+            from = srcFile;
+            to = desFile;
+            direction = transferDirection;
+            break;
+          case SyncModel.BOTH_DIRECTIONS:
+            // from new to old
+            if (srcFile.mtime > desFile.mtime) {
+              from = srcFile;
+              to = desFile;
+              direction = transferDirection;
+            } else {
+              // todo change transferDirection
+              from = desFile;
+              to = srcFile;
+              direction = altDirection;
+            }
+            break;
+          default:
+            throw new Error(`Unkown Sync Mode: ${transferOption.model}`);
+        }
+
+        const option = {
+          ...transferOption,
+          mode: to.mode, // prefer target mode
+          mtime: from.mtime,
+          atime: from.atime,
+        } as InternalTransferOption;
+        switch (from.type) {
+          case FileType.Directory:
+            dir2sync.push([from.fspath, to.fspath]);
+            break;
+          case FileType.File:
+          case FileType.SymbolicLink:
+            // do not transfer file not changed
+            if (isFileModified(from, to)) {
+              file2trans.push([from.fspath, to.fspath, direction, option]);
+            }
+            break;
+          default:
+          // do not process
+        }
+      } else if (
+        // files exist only on src
+        transferOption.model === SyncModel.FULL ||
+        transferOption.model === SyncModel.BOTH_DIRECTIONS
+      ) {
+        const option = {
+          ...transferOption,
+          fallbackMode: srcFile.mode,
+          mtime: srcFile.mtime,
+          atime: srcFile.atime,
+        } as InternalTransferOption;
+        const fspath = targetFs.pathResolver.join(targetFsPath, srcFile.name);
+        switch (srcFile.type) {
+          case FileType.Directory:
+            dir2trans.push([srcFile.fspath, fspath]);
+            break;
+          case FileType.File:
+          case FileType.SymbolicLink:
+            file2trans.push([srcFile.fspath, fspath, transferDirection, option]);
+            break;
+          default:
+          // do not process
+        }
+      }
+    });
+
+    // files exist only on target
+    if (transferOption.model === SyncModel.FULL) {
+      Object.keys(desFileTable).forEach(id => {
+        const file = desFileTable[id];
+        deleted.push(file);
+        switch (file.type) {
+          case FileType.Directory:
+            dirMissed.push(file.fspath);
+            break;
+          case FileType.File:
+          case FileType.SymbolicLink:
+            fileMissed.push(file.fspath);
+            break;
+          default:
+          // do not process
+        }
+      });
+    } else if (transferOption.model === SyncModel.BOTH_DIRECTIONS) {
+      // todo change transferDirection
+      const fs = srcFs;
+      const basePath = srcFsPath;
+      const direction = transferDirection;
+      Object.keys(desFileTable).forEach(id => {
+        const file = desFileTable[id];
+        const option = {
+          ...transferOption,
+          fallbackMode: file.mode,
+          mtime: file.mtime,
+          atime: file.atime,
+        } as InternalTransferOption;
+        const fspath = fs.pathResolver.join(basePath, file.name);
+        switch (file.type) {
+          case FileType.Directory:
+            dir2trans.push([file.fspath, fspath]);
+            break;
+          case FileType.File:
+          case FileType.SymbolicLink:
+            file2trans.push([file.fspath, fspath, direction, option]);
+            break;
+          default:
+          // do not process
+        }
+      });
+    }
+
+    // side-effect
+    fileMissed.forEach(file => removeFile(file, targetFs, FileType.File, transferOption));
+    dirMissed.forEach(file => removeFile(file, targetFs, FileType.Directory, transferOption));
+
+    const transFilePromise = file2trans.map(([src, target, direction, option]) =>
+      transferFile(
+        {
+          ...config,
+          transferDirection: direction,
+          transferOption: option,
+          srcFsPath: src,
+          targetFsPath: target,
+        },
+        FileType.File,
+        collect
+      )
+    );
+
+    const transDirPromise = dir2trans.map(([src, target]) =>
+      transferFolder(
+        {
+          ...config,
+          srcFsPath: src,
+          targetFsPath: target,
+        },
+        collect
+      )
+    );
+
+    const syncPromise = dir2sync.map(([src, target]) =>
+      _sync(
+        {
+          ...config,
+          srcFsPath: src,
+          targetFsPath: target,
+        },
+        collect,
+        deleted
+      )
+    );
+
+    return Promise.all([...transFilePromise, ...transDirPromise, ...syncPromise]).then(flatten);
+  };
+
+  // create dir here so we don't have to ensure it for children files.
+  await targetFs.ensureDir(targetFsPath);
+
+  const files = await Promise.all([
+    srcFs.list(srcFsPath).catch(err => []),
+    targetFs.list(targetFsPath).catch(err => []),
+  ]);
+  await syncFiles(...files);
+}
+
 export { TransferOption, SyncOption, TransferDirection };
 
 export async function transfer(
@@ -171,141 +392,8 @@ export async function transfer(
 export async function sync(
   config: TransferHandleConfig<SyncOption>,
   collect: (t: TransferTask) => void
-) {
-  const { srcFsPath, targetFsPath, srcFs, targetFs, transferOption } = config;
-  if (transferOption.ignore && transferOption.ignore(srcFsPath)) {
-    return;
-  }
-
-  const syncFiles = (srcFileEntries: FileEntry[], desFileEntries: FileEntry[]) => {
-    const srcFileTable = toHash(srcFileEntries, 'id', fileEntry => ({
-      ...fileEntry,
-      id: fileEntry.name,
-    }));
-
-    const desFileTable = toHash(desFileEntries, 'id', fileEntry => ({
-      ...fileEntry,
-      id: fileEntry.name,
-    }));
-
-    const file2trans: [string, string, InternalTransferOption][] = [];
-    const dir2trans: [string, string, InternalTransferOption][] = [];
-    const dir2sync: [string, string][] = [];
-
-    const fileMissed: string[] = [];
-    const dirMissed: string[] = [];
-
-    Object.keys(srcFileTable).forEach(id => {
-      const srcFile = srcFileTable[id];
-      const file = desFileTable[id];
-      delete desFileTable[id];
-
-      const option = {
-        ...config.transferOption,
-        mtime: srcFile.mtime,
-        atime: srcFile.atime,
-      } as InternalTransferOption;
-      if (file) {
-        // files exist on both side
-        option.mode = file.mode; // prefer target mode
-        switch (srcFile.type) {
-          case FileType.Directory:
-            dir2sync.push([srcFile.fspath, file.fspath]);
-            break;
-          case FileType.File:
-          case FileType.SymbolicLink:
-            file2trans.push([srcFile.fspath, file.fspath, option]);
-            break;
-          default:
-          // do not process
-        }
-      } else if (transferOption.model === 'full') {
-        // files exist only on src
-        option.fallbackMode = srcFile.mode; // fallback to srcFile mode
-        const _targetFsPath = targetFs.pathResolver.join(targetFsPath, srcFile.name);
-        switch (srcFile.type) {
-          case FileType.Directory:
-            dir2trans.push([srcFile.fspath, _targetFsPath, option]);
-            break;
-          case FileType.File:
-          case FileType.SymbolicLink:
-            file2trans.push([srcFile.fspath, _targetFsPath, option]);
-            break;
-          default:
-          // do not process
-        }
-      }
-    });
-
-    if (transferOption.model === 'full') {
-      // for files exist only on target
-      Object.keys(desFileTable).forEach(id => {
-        const file = desFileTable[id];
-        switch (file.type) {
-          case FileType.Directory:
-            dirMissed.push(file.fspath);
-            break;
-          case FileType.File:
-          case FileType.SymbolicLink:
-            fileMissed.push(file.fspath);
-            break;
-          default:
-          // do not process
-        }
-      });
-    }
-
-    // side-effect
-    fileMissed.forEach(file => removeFile(file, targetFs, FileType.File, config.transferOption));
-    dirMissed.forEach(file =>
-      removeFile(file, targetFs, FileType.Directory, config.transferOption)
-    );
-
-    const transFilePromise = file2trans.map(([src, target, option]) =>
-      transferFile(
-        {
-          ...config,
-          transferOption: option,
-          srcFsPath: src,
-          targetFsPath: target,
-        },
-        FileType.File,
-        collect
-      )
-    );
-
-    const transDirPromise = dir2trans.map(([src, target, option]) =>
-      transferFolder(
-        {
-          ...config,
-          transferOption: option,
-          srcFsPath: src,
-          targetFsPath: target,
-        },
-        collect
-      )
-    );
-
-    const syncPromise = dir2sync.map(([src, target]) =>
-      sync(
-        {
-          ...config,
-          srcFsPath: src,
-          targetFsPath: target,
-        },
-        collect
-      )
-    );
-
-    return Promise.all([...transFilePromise, ...transDirPromise, ...syncPromise]).then(flatten);
-  };
-
-  // create dir here so we don't have to ensure it for children files.
-  await targetFs.ensureDir(targetFsPath);
-
-  const files = await Promise.all([
-    srcFs.list(srcFsPath).catch(err => []),
-    targetFs.list(targetFsPath).catch(err => []),
-  ]);
-  await syncFiles(...files);
+): Promise<FileEntry[]> {
+  const deleted: FileEntry[] = [];
+  await _sync(config, collect, deleted);
+  return deleted;
 }

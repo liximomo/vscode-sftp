@@ -53,6 +53,16 @@ export default abstract class FileSystem {
   abstract open(path: string, flags: string, mode?: number): Promise<FileHandle>;
   abstract close(fd: FileHandle): Promise<void>;
   abstract fstat(fd: FileHandle): Promise<FileStats>;
+  /**
+   * Change the file system timestamps of the object referenced by the supplied file descriptor.
+   *
+   * @abstract
+   * @param {FileHandle} fd
+   * @param {number} atime time in seconds
+   * @param {number} mtime time in seconds
+   * @returns {Promise<void>}
+   * @memberof FileSystem
+   */
   abstract futimes(fd: FileHandle, atime: number, mtime: number): Promise<void>;
   abstract get(path: string, option?: FileOption): Promise<Readable>;
   abstract put(input: Readable | Buffer, path, option?: FileOption): Promise<void>;

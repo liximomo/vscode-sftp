@@ -108,7 +108,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
   }
 
   futimes(fd: FtpFileHandle, _atime: number, mtime: number): Promise<void> {
-    return this.atomicSetLastMod(fd.path, mtime).catch(err => {
+    return this.atomicSetLastMod(fd.path, new Date(mtime * 1000)).catch(err => {
       // swallow the err
       logger.error(err, `fail to set modified time to ${fd.path}`);
     });
@@ -338,10 +338,10 @@ export default class FTPFileSystem extends RemoteFileSystem {
     return this.queue.add(task);
   }
 
-  private async atomicSetLastMod(path: string, time: number): Promise<void> {
+  private async atomicSetLastMod(path: string, date: Date): Promise<void> {
     const task = () =>
       new Promise<void>((resolve, reject) => {
-        this.ftp.setLastMod(path, time, err => {
+        this.ftp.setLastMod(path, date, err => {
           if (err) {
             return reject(err);
           }

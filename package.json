@@ -129,8 +129,23 @@
         "category": "SFTP"
       },
       {
+        "command": "sftp.update.localToRemote",
+        "title": "Update Local -> Remote",
+        "category": "SFTP"
+      },
+      {
         "command": "sftp.sync.remoteToLocal",
         "title": "Sync Remote -> Local",
+        "category": "SFTP"
+      },
+      {
+        "command": "sftp.update.remoteToLocal",
+        "title": "Update Remote -> Local",
+        "category": "SFTP"
+      },
+      {
+        "command": "sftp.sync.bothDirections",
+        "title": "Sync Both Directions",
         "category": "SFTP"
       },
       {
@@ -212,7 +227,19 @@
           "when": "sftp.enabled"
         },
         {
+          "command": "sftp.update.localToRemote",
+          "when": "sftp.enabled"
+        },
+        {
           "command": "sftp.sync.remoteToLocal",
+          "when": "sftp.enabled"
+        },
+        {
+          "command": "sftp.update.remoteToLocal",
+          "when": "sftp.enabled"
+        },
+        {
+          "command": "sftp.sync.bothDirections",
           "when": "sftp.enabled"
         },
         {
@@ -290,11 +317,18 @@
         {
           "command": "sftp.sync.localToRemote",
           "group": "sftp.sync@1",
+          "alt": "sftp.update.localToRemote",
           "when": "sftp.enabled && explorerResourceIsFolder"
         },
         {
           "command": "sftp.sync.remoteToLocal",
           "group": "sftp.sync@2",
+          "alt": "sftp.update.remoteToLocal",
+          "when": "sftp.enabled && explorerResourceIsFolder"
+        },
+        {
+          "command": "sftp.sync.bothDirections",
+          "group": "sftp.sync@3",
           "when": "sftp.enabled && explorerResourceIsFolder"
         },
         {
@@ -390,19 +424,18 @@
     "vscode:prepublish": "rimraf out/* && tsc -p ./",
     "compile": "tsc -watch -p ./",
     "postinstall": "node ./node_modules/vscode/bin/install",
-    "test": "node ./node_modules/vscode/bin/test",
-    "test:spec": "jest",
+    "test": "jest",
     "package": "vsce package",
     "pub:debug": "rm -rf _debug && mkdir _debug && vsce package --out _debug/sftp-debug.vsix && cd _debug && git init && git commit --allow-empty -m 'update debug package' && git checkout -b debug-pacakge && cp ../INSTALL_DEBUG.md README.md  && git add . && git commit -am 'update debug package' && git push git@github.com:liximomo/vscode-sftp.git debug-pacakge --force",
     "lint": "tslint --project tsconfig.json src/**/*.ts"
   },
   "devDependencies": {
     "@types/fs-extra": "^5.0.4",
+    "@types/jest": "^23.3.5",
     "@types/lru-cache": "^4.1.1",
-    "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.40",
     "jest": "^20.0.4",
-    "mocha": "^2.3.3",
+    "mock-fs": "^4.7.0",
     "rimraf": "^2.6.2",
     "tslint": "^5.11.0",
     "typescript": "^3.0.3",
@@ -433,7 +466,8 @@
       "^.+\\.ts$": "<rootDir>/test/preprocessor.js"
     },
     "testMatch": [
-      "<rootDir>/test/**/*.spec.js"
+      "<rootDir>/test/**/*.spec.js",
+      "<rootDir>/**/*/__tests__/*.ts"
     ]
   }
 }

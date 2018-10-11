@@ -1,7 +1,7 @@
 import { fileOperations, FileType } from '../core';
 import createFileHandler from './createFileHandler';
 
-export const removeRemote = createFileHandler({
+export const removeRemote = createFileHandler<{ skipDir?: boolean }>({
   name: 'removeRemote',
   async handle(option) {
     const remoteFs = await this.fileService.getRemoteFileSystem();

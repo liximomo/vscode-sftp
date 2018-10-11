@@ -1,10 +1,6 @@
 import { refreshRemoteExplorer } from '../shared';
 import createFileHandler, { FileHandlerContext } from '../createFileHandler';
-import { transfer, sync, TransferOption, SyncOption, TransferDirection } from './transfer';
-
-type OptTransferOption = Partial<TransferOption>;
-
-type OptSyncOption = Partial<SyncOption>;
+import { transfer, sync, TransferOption, SyncOption, TransferDirection, SyncModel } from './transfer';
 
 function createTransferHandle(direction: TransferDirection) {
   return async function handle(this: FileHandlerContext, option) {
@@ -14,14 +10,14 @@ function createTransferHandle(direction: TransferDirection) {
     const scheduler = this.fileService.createTransferScheduler(this.config.concurrency);
     let transferConfig;
 
-    if (direction === TransferDirection.Download) {
+    if (direction === TransferDirection.REMOTE_TO_LOCAL) {
       transferConfig = {
         srcFsPath: remoteFsPath,
         srcFs: remoteFs,
         targetFsPath: localFsPath,
         targetFs: localFs,
         transferOption: option,
-        transferDirection: TransferDirection.Download,
+        transferDirection: TransferDirection.REMOTE_TO_LOCAL,
       };
     } else {
       transferConfig = {
@@ -30,7 +26,7 @@ function createTransferHandle(direction: TransferDirection) {
         targetFsPath: remoteFsPath,
         targetFs: remoteFs,
         transferOption: option,
-        transferDirection: TransferDirection.Upload,
+        transferDirection: TransferDirection.LOCAL_TO_REMOTE,
       };
     }
     await transfer(transferConfig, t => scheduler.add(t));
@@ -38,12 +34,12 @@ function createTransferHandle(direction: TransferDirection) {
   };
 }
 
-const uploadHandle = createTransferHandle(TransferDirection.Upload);
-const downloadHandle = createTransferHandle(TransferDirection.Download);
+const uploadHandle = createTransferHandle(TransferDirection.LOCAL_TO_REMOTE);
+const downloadHandle = createTransferHandle(TransferDirection.REMOTE_TO_LOCAL);
 
-export { transfer };
+export { SyncModel };
 
-export const sync2Remote = createFileHandler<OptSyncOption>({
+export const sync2Remote = createFileHandler<SyncOption>({
   name: 'syncToRemote',
   async handle(option) {
     const remoteFs = await this.fileService.getRemoteFileSystem();
@@ -57,7 +53,7 @@ export const sync2Remote = createFileHandler<OptSyncOption>({
         targetFsPath: remoteFsPath,
         targetFs: remoteFs,
         transferOption: option,
-        transferDirection: TransferDirection.Upload,
+        transferDirection: TransferDirection.LOCAL_TO_REMOTE,
       },
       t => scheduler.add(t)
     );
@@ -67,7 +63,7 @@ export const sync2Remote = createFileHandler<OptSyncOption>({
     const config = this.config;
     return {
       ignore: config.ignore,
-      model: config.syncMode,
+      model: SyncModel.FULL,
       perserveTargetMode: config.protocol === 'sftp',
     };
   },
@@ -76,7 +72,7 @@ export const sync2Remote = createFileHandler<OptSyncOption>({
   },
 });
 
-export const sync2Local = createFileHandler<OptSyncOption>({
+export const sync2Local = createFileHandler<SyncOption>({
   name: 'syncToLocal',
   async handle(option) {
     const remoteFs = await this.fileService.getRemoteFileSystem();
@@ -90,7 +86,7 @@ export const sync2Local = createFileHandler<OptSyncOption>({
         targetFsPath: localFsPath,
         targetFs: localFs,
         transferOption: option,
-        transferDirection: TransferDirection.Download,
+        transferDirection: TransferDirection.REMOTE_TO_LOCAL,
       },
       t => scheduler.add(t)
     );
@@ -100,16 +96,13 @@ export const sync2Local = createFileHandler<OptSyncOption>({
     const config = this.config;
     return {
       ignore: config.ignore,
-      model: config.syncMode,
+      model: SyncModel.FULL,
       perserveTargetMode: false,
     };
   },
-  afterHandle() {
-    refreshRemoteExplorer(this.target, true);
-  },
 });
 
-export const upload = createFileHandler<OptTransferOption>({
+export const upload = createFileHandler<TransferOption>({
   name: 'upload',
   handle: uploadHandle,
   transformOption() {
@@ -124,7 +117,7 @@ export const upload = createFileHandler<OptTransferOption>({
   },
 });
 
-export const uploadFile = createFileHandler<OptTransferOption>({
+export const uploadFile = createFileHandler<TransferOption>({
   name: 'upload file',
   handle: uploadHandle,
   transformOption() {
@@ -139,7 +132,7 @@ export const uploadFile = createFileHandler<OptTransferOption>({
   },
 });
 
-export const uploadFolder = createFileHandler<OptTransferOption>({
+export const uploadFolder = createFileHandler<TransferOption>({
   name: 'upload folder',
   handle: uploadHandle,
   transformOption() {
@@ -154,7 +147,7 @@ export const uploadFolder = createFileHandler<OptTransferOption>({
   },
 });
 
-export const download = createFileHandler<OptTransferOption>({
+export const download = createFileHandler<TransferOption>({
   name: 'download',
   handle: downloadHandle,
   transformOption() {
@@ -166,7 +159,7 @@ export const download = createFileHandler<OptTransferOption>({
   },
 });
 
-export const downloadFile = createFileHandler<OptTransferOption>({
+export const downloadFile = createFileHandler<TransferOption>({
   name: 'download file',
   handle: downloadHandle,
   transformOption() {
@@ -178,7 +171,7 @@ export const downloadFile = createFileHandler<OptTransferOption>({
   },
 });
 
-export const downloadFolder = createFileHandler<OptTransferOption>({
+export const downloadFolder = createFileHandler<TransferOption>({
   name: 'download folder',
   handle: downloadHandle,
   transformOption() {
