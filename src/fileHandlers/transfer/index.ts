@@ -59,13 +59,14 @@ export const sync2Remote = createFileHandler<SyncOption>({
   },
   transformOption() {
     const config = this.config;
+    const syncOption = config.syncOption || {};
     return {
       perserveTargetMode: config.protocol === 'sftp',
       ignore: config.ignore,
-      delete: config.syncOption.delete,
-      skipCreate: config.syncOption.skipCreate,
-      ignoreExisting: config.syncOption.ignoreExisting,
-      update: config.syncOption.update,
+      delete: syncOption.delete,
+      skipCreate: syncOption.skipCreate,
+      ignoreExisting: syncOption.ignoreExisting,
+      update: syncOption.update,
     };
   },
   afterHandle() {
@@ -95,13 +96,14 @@ export const sync2Local = createFileHandler<SyncOption>({
   },
   transformOption() {
     const config = this.config;
+    const syncOption = config.syncOption || {};
     return {
       perserveTargetMode: false,
       ignore: config.ignore,
-      delete: config.syncOption.delete,
-      skipCreate: config.syncOption.skipCreate,
-      ignoreExisting: config.syncOption.ignoreExisting,
-      update: config.syncOption.update,
+      delete: syncOption.delete,
+      skipCreate: syncOption.skipCreate,
+      ignoreExisting: syncOption.ignoreExisting,
+      update: syncOption.update,
     };
   },
 });

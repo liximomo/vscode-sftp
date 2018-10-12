@@ -70,7 +70,6 @@ const defaultConfig = {
   remotePath: './',
   uploadOnSave: false,
   downloadOnOpen: false,
-  syncMode: 'update',
   ignore: [],
   // ignoreFile: undefined,
   // watcher: {
