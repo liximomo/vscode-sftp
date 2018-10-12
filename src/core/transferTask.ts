@@ -123,13 +123,14 @@ export default class TransferTask implements Task {
             hasWarnedUtimeError = true;
             // tslint:disable-next-line
             throw new Error(
-              'Can\'t set modified time to the file. This will cause `Sync` command to transfer unnecessary files.' +
+              `Can't set modified time to the file because ${error.message}.` +
+                'This will cause "Sync" command to transfer unnecessary files.' +
                 '(this error will only show once)'
             );
           }
         }
       }
-      targetFs.close(targetFd);
+      await targetFs.close(targetFd);
     }
   }
 }
