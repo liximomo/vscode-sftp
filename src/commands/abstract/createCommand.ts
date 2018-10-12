@@ -50,7 +50,7 @@ export function createFileCommand(commandOption: FileCommandOption) {
     protected async doCommandRun(...args) {
       const target = await commandOption.getFileTarget(...args);
       if (!target) {
-        logger.warn(`The "${this.name}" command get canceled without because of missing targets.`);
+        logger.warn(`The "${this.name}" command get canceled because of missing targets.`);
         return;
       }
 

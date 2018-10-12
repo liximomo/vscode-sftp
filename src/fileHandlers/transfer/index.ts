@@ -1,6 +1,6 @@
 import { refreshRemoteExplorer } from '../shared';
 import createFileHandler, { FileHandlerContext } from '../createFileHandler';
-import { transfer, sync, TransferOption, SyncOption, TransferDirection, SyncModel } from './transfer';
+import { transfer, sync, TransferOption, SyncOption, TransferDirection } from './transfer';
 
 function createTransferHandle(direction: TransferDirection) {
   return async function handle(this: FileHandlerContext, option) {
@@ -37,10 +37,8 @@ function createTransferHandle(direction: TransferDirection) {
 const uploadHandle = createTransferHandle(TransferDirection.LOCAL_TO_REMOTE);
 const downloadHandle = createTransferHandle(TransferDirection.REMOTE_TO_LOCAL);
 
-export { SyncModel };
-
 export const sync2Remote = createFileHandler<SyncOption>({
-  name: 'syncToRemote',
+  name: 'sync',
   async handle(option) {
     const remoteFs = await this.fileService.getRemoteFileSystem();
     const localFs = this.fileService.getLocalFileSystem();
@@ -62,9 +60,12 @@ export const sync2Remote = createFileHandler<SyncOption>({
   transformOption() {
     const config = this.config;
     return {
-      ignore: config.ignore,
-      model: SyncModel.FULL,
       perserveTargetMode: config.protocol === 'sftp',
+      ignore: config.ignore,
+      delete: config.syncOption.delete,
+      skipCreate: config.syncOption.skipCreate,
+      ignoreExisting: config.syncOption.ignoreExisting,
+      update: config.syncOption.update,
     };
   },
   afterHandle() {
@@ -73,7 +74,7 @@ export const sync2Remote = createFileHandler<SyncOption>({
 });
 
 export const sync2Local = createFileHandler<SyncOption>({
-  name: 'syncToLocal',
+  name: 'sync',
   async handle(option) {
     const remoteFs = await this.fileService.getRemoteFileSystem();
     const localFs = this.fileService.getLocalFileSystem();
@@ -95,9 +96,12 @@ export const sync2Local = createFileHandler<SyncOption>({
   transformOption() {
     const config = this.config;
     return {
-      ignore: config.ignore,
-      model: SyncModel.FULL,
       perserveTargetMode: false,
+      ignore: config.ignore,
+      delete: config.syncOption.delete,
+      skipCreate: config.syncOption.skipCreate,
+      ignoreExisting: config.syncOption.ignoreExisting,
+      update: config.syncOption.update,
     };
   },
 });

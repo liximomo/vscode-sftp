@@ -129,18 +129,8 @@
         "category": "SFTP"
       },
       {
-        "command": "sftp.update.localToRemote",
-        "title": "Update Local -> Remote",
-        "category": "SFTP"
-      },
-      {
         "command": "sftp.sync.remoteToLocal",
         "title": "Sync Remote -> Local",
-        "category": "SFTP"
-      },
-      {
-        "command": "sftp.update.remoteToLocal",
-        "title": "Update Remote -> Local",
         "category": "SFTP"
       },
       {
@@ -227,15 +217,7 @@
           "when": "sftp.enabled"
         },
         {
-          "command": "sftp.update.localToRemote",
-          "when": "sftp.enabled"
-        },
-        {
           "command": "sftp.sync.remoteToLocal",
-          "when": "sftp.enabled"
-        },
-        {
-          "command": "sftp.update.remoteToLocal",
           "when": "sftp.enabled"
         },
         {
@@ -317,13 +299,11 @@
         {
           "command": "sftp.sync.localToRemote",
           "group": "sftp.sync@1",
-          "alt": "sftp.update.localToRemote",
           "when": "sftp.enabled && explorerResourceIsFolder"
         },
         {
           "command": "sftp.sync.remoteToLocal",
           "group": "sftp.sync@2",
-          "alt": "sftp.update.remoteToLocal",
           "when": "sftp.enabled && explorerResourceIsFolder"
         },
         {

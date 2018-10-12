@@ -1,5 +1,5 @@
 import { COMMAND_SYNC_BOTH_DIRECTIONS } from '../constants';
-import { sync2Remote, SyncModel } from '../fileHandlers';
+import { sync2Remote } from '../fileHandlers';
 import { checkFileCommand } from './abstract/createCommand';
 import { selectFolderFallbackToConfigContext, uriFromfspath, applySelector } from './shared';
 
@@ -8,6 +8,6 @@ export default checkFileCommand({
   getFileTarget: applySelector(uriFromfspath, selectFolderFallbackToConfigContext),
 
   handleFile(ctx) {
-    return sync2Remote(ctx, { model: SyncModel.BOTH_DIRECTIONS });
+    return sync2Remote(ctx, { bothDiretions: true });
   },
 });

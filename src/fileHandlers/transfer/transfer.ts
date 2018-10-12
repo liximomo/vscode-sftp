@@ -13,12 +13,6 @@ interface InternalTransferOption extends TransferTaskTransferOption {
   ignore?: (filepath: string) => boolean;
 }
 
-export enum SyncModel {
-  FULL = 'FULL',
-  UPDATE = 'UPDATE',
-  BOTH_DIRECTIONS = 'BOTH_DIRECTIONS',
-}
-
 interface BaseTransferHandleConfig {
   srcFsPath: string;
   targetFsPath: string;
@@ -34,7 +28,20 @@ type ExternalTransferOption<T extends InternalTransferOption> = Pick<
 
 type TransferOption = ExternalTransferOption<InternalTransferOption>;
 interface SyncOption extends TransferOption {
-  model: SyncModel;
+  // delete extraneous files from dest dirs
+  delete?: boolean;
+
+  // skip creating new files on dest
+  skipCreate?: boolean;
+
+  // skip updating files that exist on dest
+  ignoreExisting?: boolean;
+
+  // update the dest only if a newer version is on the src filesystem
+  update?: boolean;
+
+  // make newest file to be present in both locations.
+  bothDiretions?: boolean;
 }
 
 interface TransferHandleConfig<T> extends BaseTransferHandleConfig {
@@ -49,6 +56,7 @@ function getAltDirection(direction: TransferDirection) {
 
 function isFileModified(a: FileEntry, b: FileEntry): boolean {
   // check if time is same at seconds
+  // todo: check size if mtime is equal
   return Math.floor(a.mtime / 1000) !== Math.floor(b.mtime / 1000);
 }
 
@@ -199,83 +207,118 @@ async function _sync(
       const desFile = desFileTable[id];
       delete desFileTable[id];
 
+      // files exist on both side
       if (desFile) {
-        // files exist on both side
-        let from: FileEntry;
-        let to: FileEntry;
-        let direction: TransferDirection;
-        switch (transferOption.model) {
-          case SyncModel.FULL:
-          case SyncModel.UPDATE:
-            from = srcFile;
-            to = desFile;
-            direction = transferDirection;
-            break;
-          case SyncModel.BOTH_DIRECTIONS:
-            // from new to old
-            if (srcFile.mtime > desFile.mtime) {
-              from = srcFile;
-              to = desFile;
-              direction = transferDirection;
-            } else {
-              // todo change transferDirection
-              from = desFile;
-              to = srcFile;
-              direction = altDirection;
-            }
-            break;
-          default:
-            throw new Error(`Unkown Sync Mode: ${transferOption.model}`);
+        if (transferOption.ignoreExisting) {
+          return;
         }
 
-        const option = {
-          ...transferOption,
-          mode: to.mode, // prefer target mode
-          mtime: from.mtime,
-          atime: from.atime,
-        } as InternalTransferOption;
+        let from: FileEntry = srcFile;
+        let to: FileEntry = desFile;
+        let direction: TransferDirection = transferDirection;
+
         switch (from.type) {
           case FileType.Directory:
             dir2sync.push([from.fspath, to.fspath]);
             break;
           case FileType.File:
           case FileType.SymbolicLink:
-            // do not transfer file not changed
+            if (transferOption.bothDiretions) {
+              // from new to old
+              if (desFile.mtime > srcFile.mtime) {
+                from = desFile;
+                to = srcFile;
+                direction = altDirection;
+              }
+            }
+
+            if (transferOption.update) {
+              if (from.mtime <= to.mtime) {
+                return;
+              }
+            }
+
+            // only transfer changed files
             if (isFileModified(from, to)) {
-              file2trans.push([from.fspath, to.fspath, direction, option]);
+              file2trans.push([
+                from.fspath,
+                to.fspath,
+                direction,
+                {
+                  ...transferOption,
+                  mode: to.mode, // prefer target mode
+                  mtime: from.mtime,
+                  atime: from.atime,
+                },
+              ]);
             }
             break;
           default:
           // do not process
         }
-      } else if (
-        // files exist only on src
-        transferOption.model === SyncModel.FULL ||
-        transferOption.model === SyncModel.BOTH_DIRECTIONS
-      ) {
-        const option = {
-          ...transferOption,
-          fallbackMode: srcFile.mode,
-          mtime: srcFile.mtime,
-          atime: srcFile.atime,
-        } as InternalTransferOption;
-        const fspath = targetFs.pathResolver.join(targetFsPath, srcFile.name);
-        switch (srcFile.type) {
-          case FileType.Directory:
-            dir2trans.push([srcFile.fspath, fspath]);
-            break;
-          case FileType.File:
-          case FileType.SymbolicLink:
-            file2trans.push([srcFile.fspath, fspath, transferDirection, option]);
-            break;
-          default:
-          // do not process
-        }
+        return;
+      }
+
+      // files exist only on src
+      if (transferOption.skipCreate) {
+        return;
+      }
+
+      const fspath = targetFs.pathResolver.join(targetFsPath, srcFile.name);
+      switch (srcFile.type) {
+        case FileType.Directory:
+          dir2trans.push([srcFile.fspath, fspath]);
+          break;
+        case FileType.File:
+        case FileType.SymbolicLink:
+          file2trans.push([
+            srcFile.fspath,
+            fspath,
+            transferDirection,
+            {
+              ...transferOption,
+              fallbackMode: srcFile.mode,
+              mtime: srcFile.mtime,
+              atime: srcFile.atime,
+            },
+          ]);
+          break;
+        default:
+        // do not process
       }
     });
 
     // files exist only on target
-    if (transferOption.model === SyncModel.FULL) {
+    if (transferOption.bothDiretions) {
+      if (transferOption.skipCreate !== true) {
+        // todo change transferDirection
+        Object.keys(desFileTable).forEach(id => {
+          const file = desFileTable[id];
+          const fspath = srcFs.pathResolver.join(srcFsPath, file.name);
+          switch (file.type) {
+            case FileType.Directory:
+              dir2trans.push([file.fspath, fspath]);
+              break;
+            case FileType.File:
+            case FileType.SymbolicLink:
+              file2trans.push([
+                file.fspath,
+                fspath,
+                altDirection,
+                {
+                  ...transferOption,
+                  fallbackMode: file.mode,
+                  mtime: file.mtime,
+                  atime: file.atime,
+                },
+              ]);
+              break;
+            default:
+            // do not process
+          }
+        });
+      }
+    } else if (transferOption.delete) {
       Object.keys(desFileTable).forEach(id => {
         const file = desFileTable[id];
         deleted.push(file);
@@ -286,32 +329,6 @@ async function _sync(
           case FileType.File:
           case FileType.SymbolicLink:
             fileMissed.push(file.fspath);
-            break;
-          default:
-          // do not process
-        }
-      });
-    } else if (transferOption.model === SyncModel.BOTH_DIRECTIONS) {
-      // todo change transferDirection
-      const fs = srcFs;
-      const basePath = srcFsPath;
-      const direction = transferDirection;
-      Object.keys(desFileTable).forEach(id => {
-        const file = desFileTable[id];
-        const option = {
-          ...transferOption,
-          fallbackMode: file.mode,
-          mtime: file.mtime,
-          atime: file.atime,
-        } as InternalTransferOption;
-        const fspath = fs.pathResolver.join(basePath, file.name);
-        switch (file.type) {
-          case FileType.Directory:
-            dir2trans.push([file.fspath, fspath]);
-            break;
-          case FileType.File:
-          case FileType.SymbolicLink:
-            file2trans.push([file.fspath, fspath, direction, option]);
             break;
           default:
           // do not process

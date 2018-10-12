@@ -42,7 +42,14 @@ const configScheme = {
   downloadOnOpen: Joi.boolean()
     .optional()
     .allow('confirm'),
-  syncMode: Joi.any().valid('update', 'full'),
+
+  syncOption: {
+    delete: Joi.boolean(),
+    skipCreate: Joi.boolean(),
+    ignoreExisting: Joi.boolean(),
+    update: Joi.boolean(),
+  },
+
   ignore: Joi.array()
     .min(0)
     .items(Joi.string()),
