@@ -2,6 +2,8 @@ import * as fileOperations from './fileBaseOperations';
 import { FileSystem, FileType } from './fs';
 import { Task } from './scheduler';
 
+let hasWarnedUtimeError = false;
+
 export enum TransferDirection {
   LOCAL_TO_REMOTE = 'local -> remote',
   REMOTE_TO_LOCAL = 'remote -> local',
@@ -114,7 +116,18 @@ export default class TransferTask implements Task {
       await targetFs.put(inputStream, target, { mode, fd: targetFd, autoClose: false });
     } finally {
       if (atime && mtime) {
-        await targetFs.futimes(targetFd, Math.floor(atime / 1000), Math.floor(mtime / 1000));
+        try {
+          await targetFs.futimes(targetFd, Math.floor(atime / 1000), Math.floor(mtime / 1000));
+        } catch (error) {
+          if (!hasWarnedUtimeError) {
+            hasWarnedUtimeError = true;
+            // tslint:disable-next-line
+            throw new Error(
+              'Can\'t set modified time to the file. This will cause `Sync` command to transfer unnecessary files.' +
+                '(this error will only show once)'
+            );
+          }
+        }
       }
       targetFs.close(targetFd);
     }
