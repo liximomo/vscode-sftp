@@ -43,6 +43,32 @@
       "defaultProfile": {
         "type": "string",
         "description": "Profile name you want to set as default."
+      },
+      "syncOption": {
+        "type": "object",
+        "description": "Config the behavior of `Sync` command.",
+        "properties": {
+          "delete": {
+            "type": "boolean",
+            "description": "Delete extraneous files from dest dirs.",
+            "default": true
+          },
+          "skipCreate": {
+            "type": "boolean",
+            "description": "Skip creating new files on dest.",
+            "default": true
+          },
+          "ignoreExisting": {
+            "type": "boolean",
+            "description": "Skip updating files that exist on dest.",
+            "default": true
+          },
+          "update": {
+            "type": "boolean",
+            "description": "Update the dest only if a newer version is on the src filesystem.",
+            "default": true
+          }
+        }
       }
     },
     "required": ["name"]
@@ -115,8 +141,7 @@
     "properties": {
       "agent": {
         "type": "string",
-        "description":
-          "Path to ssh-agent's UNIX socket for ssh-agent-based user authentication.  Windows users: set to 'pageant' for authenticating with Pageant or (actual) path to a cygwin \"UNIX socket\"."
+        "description": "Path to ssh-agent's UNIX socket for ssh-agent-based user authentication.  Windows users: set to 'pageant' for authenticating with Pageant or (actual) path to a cygwin \"UNIX socket\"."
       },
       "privateKeyPath": {
         "type": "string",
@@ -131,19 +156,16 @@
             "enum": [true]
           }
         ],
-        "description":
-          "For an encrypted private key, this is the passphrase string used to decrypt it. Set to true for enable passphrase dialog. This will prevent from using cleartext passphrase in this config."
+        "description": "For an encrypted private key, this is the passphrase string used to decrypt it. Set to true for enable passphrase dialog. This will prevent from using cleartext passphrase in this config."
       },
       "interactiveAuth": {
         "type": "boolean",
-        "description":
-          "True to enable verifyCode dialog. Keyboard interaction authentication mechanism. For example using Google Authentication.",
+        "description": "True to enable verifyCode dialog. Keyboard interaction authentication mechanism. For example using Google Authentication.",
         "default": true
       },
       "algorithms": {
         "type": "object",
-        "description":
-          "Explicit overrides for the default transport layer algorithms used for the connection.",
+        "description": "Explicit overrides for the default transport layer algorithms used for the connection.",
         "properties": {
           "kex": {
             "type": "array",
@@ -195,8 +217,7 @@
                 "ssh-dss"
               ]
             },
-            "description":
-              "Server host key formats. In server mode, this list must agree with the host private keys set in the hostKeys config setting."
+            "description": "Server host key formats. In server mode, this list must agree with the host private keys set in the hostKeys config setting."
           },
           "hmac": {
             "type": "array",
@@ -228,8 +249,7 @@
     "properties": {
       "secure": {
         "type": ["string", "boolean"],
-        "description":
-          "Set to true for both control and data connection encryption, 'control' for control connection encryption only, or 'implicit' for\nimplicitly encrypted control connection (this mode is deprecated in modern times, but usually uses port 990).",
+        "description": "Set to true for both control and data connection encryption, 'control' for control connection encryption only, or 'implicit' for\nimplicitly encrypted control connection (this mode is deprecated in modern times, but usually uses port 990).",
         "default": false
       },
       "secureOptions": {
@@ -246,26 +266,22 @@
           },
           "path": {
             "type": "string",
-            "description":
-              "Creates unix socket connection to path. If this option is specified, host and port are ignored."
+            "description": "Creates unix socket connection to path. If this option is specified, host and port are ignored."
           },
           "rejectUnauthorized": {
             "type": "boolean",
-            "description":
-              "If true, the server certificate is verified against the list of supplied CAs. An 'error' event is emitted if verification fails; err.code contains the OpenSSL error code. Defaults to true."
+            "description": "If true, the server certificate is verified against the list of supplied CAs. An 'error' event is emitted if verification fails; err.code contains the OpenSSL error code. Defaults to true."
           },
           "NPNProtocols": {
             "type": "array",
-            "description":
-              "An array of strings or Buffers containing supported NPN protocols. Buffers should have the format [len][name][len][name]... e.g. 0x05hello0x05world, where the first byte is the length of the next protocol name. Passing an array is usually much simpler, e.g. ['hello', 'world'].",
+            "description": "An array of strings or Buffers containing supported NPN protocols. Buffers should have the format [len][name][len][name]... e.g. 0x05hello0x05world, where the first byte is the length of the next protocol name. Passing an array is usually much simpler, e.g. ['hello', 'world'].",
             "items": {
               "type": "string"
             }
           },
           "ALPNProtocols": {
             "type": "array",
-            "description":
-              "An array of strings or Buffers containing the supported ALPN protocols. Buffers should have the format [len][name][len][name]... e.g. 0x05hello0x05world, where the first byte is the length of the next protocol name. Passing an array is usually much simpler: ['hello', 'world'].)",
+            "description": "An array of strings or Buffers containing the supported ALPN protocols. Buffers should have the format [len][name][len][name]... e.g. 0x05hello0x05world, where the first byte is the length of the next protocol name. Passing an array is usually much simpler: ['hello', 'world'].)",
             "items": {
               "type": "string"
             }
@@ -276,18 +292,15 @@
           },
           "minDHSize": {
             "type": "number",
-            "description":
-              "Minimum size of the DH parameter in bits to accept a TLS connection. When a server offers a DH parameter with a size less than minDHSize, the TLS connection is destroyed and an error is thrown. Defaults to 1024."
+            "description": "Minimum size of the DH parameter in bits to accept a TLS connection. When a server offers a DH parameter with a size less than minDHSize, the TLS connection is destroyed and an error is thrown. Defaults to 1024."
           },
           "pfx": {
             "type": "string",
-            "description":
-              "Optional PFX or PKCS12 encoded private key and certificate chain. pfx is an alternative to providing key and cert individually. PFX is usually encrypted, if it is, passphrase will be used to decrypt it."
+            "description": "Optional PFX or PKCS12 encoded private key and certificate chain. pfx is an alternative to providing key and cert individually. PFX is usually encrypted, if it is, passphrase will be used to decrypt it."
           },
           "key": {
             "type": ["string", "array"],
-            "description":
-              "Optional private keys in PEM format. PEM allows the option of private keys being encrypted. Encrypted keys will be decrypted with options.passphrase. Multiple keys using different algorithms can be provided either as an array of unencrypted key strings or buffers, or an array of objects in the form {pem: <string|buffer>[, passphrase: <string>]}. The object form can only occur in an array. object.passphrase is optional. Encrypted keys will be decrypted with object.passphrase if provided, or options.passphrase if it is not.",
+            "description": "Optional private keys in PEM format. PEM allows the option of private keys being encrypted. Encrypted keys will be decrypted with options.passphrase. Multiple keys using different algorithms can be provided either as an array of unencrypted key strings or buffers, or an array of objects in the form {pem: <string|buffer>[, passphrase: <string>]}. The object form can only occur in an array. object.passphrase is optional. Encrypted keys will be decrypted with object.passphrase if provided, or options.passphrase if it is not.",
             "items": {
               "type": "string"
             }
@@ -298,16 +311,14 @@
           },
           "cert": {
             "type": ["string", "array"],
-            "description":
-              "Optional cert chains in PEM format. One cert chain should be provided per private key. Each cert chain should consist of the PEM formatted certificate for a provided private key, followed by the PEM formatted intermediate certificates (if any), in order, and not including the root CA (the root CA must be pre-known to the peer, see ca). When providing multiple cert chains, they do not have to be in the same order as their private keys in key. If the intermediate certificates are not provided, the peer will not be able to validate the certificate, and the handshake will fail.",
+            "description": "Optional cert chains in PEM format. One cert chain should be provided per private key. Each cert chain should consist of the PEM formatted certificate for a provided private key, followed by the PEM formatted intermediate certificates (if any), in order, and not including the root CA (the root CA must be pre-known to the peer, see ca). When providing multiple cert chains, they do not have to be in the same order as their private keys in key. If the intermediate certificates are not provided, the peer will not be able to validate the certificate, and the handshake will fail.",
             "items": {
               "type": "string"
             }
           },
           "ca": {
             "type": ["string", "array"],
-            "description":
-              "Optionally override the trusted CA certificates. Default is to trust the well-known CAs curated by Mozilla. Mozilla's CAs are completely replaced when CAs are explicitly specified using this option. The value can be a string or Buffer, or an Array of strings and/or Buffers. Any string or Buffer can contain multiple PEM CAs concatenated together. The peer's certificate must be chainable to a CA trusted by the server for the connection to be authenticated. When using certificates that are not chainable to a well-known CA, the certificate's CA must be explicitly specified as a trusted or the connection will fail to authenticate. If the peer uses a certificate that doesn't match or chain to one of the default CAs, use the ca option to provide a CA certificate that the peer's certificate can match or chain to. For self-signed certificates, the certificate is its own CA, and must be provided.",
+            "description": "Optionally override the trusted CA certificates. Default is to trust the well-known CAs curated by Mozilla. Mozilla's CAs are completely replaced when CAs are explicitly specified using this option. The value can be a string or Buffer, or an Array of strings and/or Buffers. Any string or Buffer can contain multiple PEM CAs concatenated together. The peer's certificate must be chainable to a CA trusted by the server for the connection to be authenticated. When using certificates that are not chainable to a well-known CA, the certificate's CA must be explicitly specified as a trusted or the connection will fail to authenticate. If the peer uses a certificate that doesn't match or chain to one of the default CAs, use the ca option to provide a CA certificate that the peer's certificate can match or chain to. For self-signed certificates, the certificate is its own CA, and must be provided.",
             "items": {
               "type": "string"
             }
@@ -321,38 +332,31 @@
           },
           "ciphers": {
             "type": "string",
-            "description":
-              "Optional cipher suite specification, replacing the default. For more information, see modifying the default cipher suite."
+            "description": "Optional cipher suite specification, replacing the default. For more information, see modifying the default cipher suite."
           },
           "honorCipherOrder": {
             "type": "boolean",
-            "description":
-              "Attempt to use the server's cipher suite preferences instead of the client's. When true, causes SSL_OP_CIPHER_SERVER_PREFERENCE to be set in secureOptions, see OpenSSL Options for more information. Note: tls.createServer() sets the default value to true, other APIs that create secure contexts leave it unset."
+            "description": "Attempt to use the server's cipher suite preferences instead of the client's. When true, causes SSL_OP_CIPHER_SERVER_PREFERENCE to be set in secureOptions, see OpenSSL Options for more information. Note: tls.createServer() sets the default value to true, other APIs that create secure contexts leave it unset."
           },
           "ecdhCurve": {
             "type": "string",
-            "description":
-              "A string describing a named curve to use for ECDH key agreement or false to disable ECDH. Defaults to tls.DEFAULT_ECDH_CURVE. Use crypto.getCurves() to obtain a list of available curve names. On recent releases, openssl ecparam -list_curves will also display the name and description of each available elliptic curve."
+            "description": "A string describing a named curve to use for ECDH key agreement or false to disable ECDH. Defaults to tls.DEFAULT_ECDH_CURVE. Use crypto.getCurves() to obtain a list of available curve names. On recent releases, openssl ecparam -list_curves will also display the name and description of each available elliptic curve."
           },
           "dhparam": {
             "type": "string",
-            "description":
-              "Diffie Hellman parameters, required for Perfect Forward Secrecy. Use openssl dhparam to create the parameters. The key length must be greater than or equal to 1024 bits, otherwise an error will be thrown. It is strongly recommended to use 2048 bits or larger for stronger security. If omitted or invalid, the parameters are silently discarded and DHE ciphers will not be available."
+            "description": "Diffie Hellman parameters, required for Perfect Forward Secrecy. Use openssl dhparam to create the parameters. The key length must be greater than or equal to 1024 bits, otherwise an error will be thrown. It is strongly recommended to use 2048 bits or larger for stronger security. If omitted or invalid, the parameters are silently discarded and DHE ciphers will not be available."
           },
           "secureProtocol": {
             "type": "string",
-            "description":
-              "Optional SSL method to use, default is \"SSLv23_method\". The possible values are listed as SSL_METHODS, use the function names as strings. For example, \"SSLv3_method\" to force SSL version 3."
+            "description": "Optional SSL method to use, default is \"SSLv23_method\". The possible values are listed as SSL_METHODS, use the function names as strings. For example, \"SSLv3_method\" to force SSL version 3."
           },
           "secureOptions": {
             "type": "number",
-            "description":
-              "Optionally affect the OpenSSL protocol behaviour, which is not usually necessary. This should be used carefully if at all! Value is a numeric bitmask of the SSL_OP_* options from OpenSSL Options."
+            "description": "Optionally affect the OpenSSL protocol behaviour, which is not usually necessary. This should be used carefully if at all! Value is a numeric bitmask of the SSL_OP_* options from OpenSSL Options."
           },
           "sessionIdContext": {
             "type": "string",
-            "description":
-              "Optional opaque identifier used by servers to ensure session state is not shared between applications. Unused by clients. Note: tls.createServer() uses a 128 bit truncated SHA1 hash value generated from process.argv, other APIs that create secure contexts have no default value."
+            "description": "Optional opaque identifier used by servers to ensure session state is not shared between applications. Unused by clients. Note: tls.createServer() uses a 128 bit truncated SHA1 hash value generated from process.argv, other APIs that create secure contexts have no default value."
           }
         }
       }
