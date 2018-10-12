@@ -35,6 +35,16 @@ class KeepAliveRemoteFs {
       new (path: any, option: any): RemoteFileSystem;
     };
     if (option.protocol === 'sftp') {
+      connectOption.debug = function debug(str) {
+        const log = str.match(/^DEBUG(?:\[SFTP\])?: (.*?): (.*?)$/);
+
+        if (log) {
+          if (log[1] === 'Parser') return;
+          logger.debug(`${log[1]}: ${log[2]}`);
+        } else {
+          logger.debug(str);
+        }
+      };
       FsConstructor = SFTPFileSystem;
     } else if (option.protocol === 'ftp') {
       connectOption.debug = function debug(str) {
