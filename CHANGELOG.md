@@ -1,3 +1,15 @@
+## 1.6.0 - 2018-10-12
+### New Features
+  * New command [Sync Local -> Remote](https://github.com/liximomo/vscode-sftp/wiki/Commands#sftp-sync-local---remote).
+  * New command [Sync Remote -> Local](https://github.com/liximomo/vscode-sftp/wiki/Commands#sftp-sync-remote---local).
+  * New command [Sync Both Directions](https://github.com/liximomo/vscode-sftp/wiki/Commands#sftp-sync-both-directions).
+  * New config [syncOption](https://github.com/liximomo/vscode-sftp/wiki/Config#syncoption) for `Sync` command.
+
+### Breaking Changes
+  * Remove Command `SFTP: Sync To Remote`.
+  * Remove Command `SFTP: Sync To Local`.
+  * Remove config option `syncModel`.
+
 ## 1.5.13 - 2018-10-08
 * Fix [#344](https://github.com/liximomo/vscode-sftp/issues/344)
 
