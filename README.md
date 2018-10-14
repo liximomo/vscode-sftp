@@ -1,5 +1,5 @@
 # sftp sync extension for VS Code
-Very simple, requires just three lines of config! Very fast, finished in a blink.
+Very powerful, with smart features. Very simple, requires just three lines of config! Very fast, finished in a blink.
 
 * Features
     * [Browser remote with Remote Explorer](#remote-explorer)
@@ -15,7 +15,7 @@ Very simple, requires just three lines of config! Very fast, finished in a blink
 * [Support SFTP Project](#Donation)
 
 ## Usage
-1. `Ctrl+Shift+P` on Windows/Linux open command palette, run `SFTP: config` command.
+1. `Ctrl+Shift+P` on Windows/Linux or `Cmd+Shift+P` on Mac open command palette, run `SFTP: config` command.
 2. Enjoy.
 
 ## Example Configs
@@ -38,8 +38,7 @@ You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/
 
 ### Profiles
 ```json
-{ 
-  "context": "/workspace/a",
+{
   "username": "username",
   "password": "password",
   "remotePath": "/remote/workspace/a", 
@@ -58,7 +57,8 @@ You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/
       "host": "prod-host",
       "remotePath" : "/prod"
     }
-  }
+  },
+  "defaultProfile": "dev"
 }
 ```
 *Note：* `context` and `watcher` are only avaliable at root level.
@@ -70,19 +70,19 @@ Use `SFTP: Set Profile` to swtich profile.
 [
   {
     "name": "server1",
-    "context": "/workspace/a",
+    "context": "/project/build",
     "host": "host",
     "username": "username",
     "password": "password",
-    "remotePath": "/remote/workspace/a", 
+    "remotePath": "/remote/project/build", 
   },
   {
     "name": "server2",
-    "context": "/workspace/b",
+    "context": "/project/src",
     "host": "host",
     "username": "username",
     "password": "password",
-    "remotePath": "/remote/workspace/b", 
+    "remotePath": "/remote/project/src", 
   }
 ]
 ```
@@ -101,7 +101,6 @@ local -> hop -> target
 ```json
 {
   "name": "target",
-  "context": "/workspace/a",
   "host": "targetHost",
   "username": "targetUsername",
   "privateKeyPath": "~/.ssh/id_rsa",
@@ -119,7 +118,6 @@ local -> hopA -> hopB -> target
 ```json
 {
   "name": "target",
-  "context": "/workspace/a",
   "host": "targetHost",
   "username": "targetUsername",
   "privateKeyPath": "~/.ssh/id_rsa",
@@ -140,7 +138,7 @@ local -> hopA -> hopB -> target
 ```
 
 ### Config in User Setting
-You can use `remote` to tell sftp to get the config from (remote-fs)https://github.com/liximomo/vscode-remote-fs.
+You can use `remote` to tell sftp to get the config from [remote-fs](https://github.com/liximomo/vscode-remote-fs).
 
 In User Setting:
 
@@ -182,7 +180,7 @@ In sftp.json:
 
 Remote Explorer let you explore files in remote. You can open Remote Explorer by:
 
-1. View: Show SFTP.
+1. Run Command `View: Show SFTP`.
 2. Click SFTP view in Activity Bar.
 
 You can only view files content with Remote Explorer. Run command `SFTP: Edit in Local` to edit it in local.
