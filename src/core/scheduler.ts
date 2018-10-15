@@ -62,6 +62,10 @@ class PriorityQueue<T> implements Queue<T> {
     return this._queue.shift().item;
   }
 
+  clear() {
+    this._queue.length = 0;
+  }
+
   get size(): number {
     return this._queue.length;
   }
@@ -134,6 +138,10 @@ class Scheduler {
 
   pause() {
     this._isPaused = true;
+  }
+
+  empty() {
+    this._queue.clear();
   }
 
   onTaskStart(listener: (task: Task) => void) {

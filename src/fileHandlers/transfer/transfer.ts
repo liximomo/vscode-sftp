@@ -55,9 +55,8 @@ function getAltDirection(direction: TransferDirection) {
 }
 
 function isFileModified(a: FileEntry, b: FileEntry): boolean {
-  // check if time is same at seconds
-  // todo: check size if mtime is equal
-  return Math.floor(a.mtime / 1000) !== Math.floor(b.mtime / 1000);
+  // compare time at seconds
+  return Math.floor(a.mtime / 1000) !== Math.floor(b.mtime / 1000) || a.size !== b.size;
 }
 
 function toHash<T, R = T>(items: T[], key: string, transform?: (a: T) => R): { [key: string]: R } {

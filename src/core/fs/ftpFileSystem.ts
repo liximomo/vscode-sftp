@@ -129,8 +129,22 @@ export default class FTPFileSystem extends RemoteFileSystem {
     await this.atomicSite(command);
   }
 
-  async put(input: Readable | Buffer, path, _option?: FileOption): Promise<void> {
-    await this.atomicPut(input, path);
+  async put(input: Readable, path, _option?: FileOption): Promise<void> {
+    let inputError: Error;
+    input.once('error', err => {
+      inputError = err;
+      this.ftp.abort(abortErr => {
+        if (abortErr) {
+          logger.error(abortErr, 'fail to abort');
+        }
+      });
+    });
+
+    try {
+      await this.atomicPut(input, path);
+    } catch (error) {
+      throw inputError || error;
+    }
   }
 
   readlink(path: string): Promise<string> {
@@ -263,7 +277,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
     return this.queue.add(task);
   }
 
-  private async atomicPut(input: Readable | Buffer, path: string): Promise<void> {
+  private async atomicPut(input: Readable, path: string): Promise<void> {
     const task = () =>
       new Promise<void>((resolve, reject) => {
         this.ftp.put(input, path, err => {

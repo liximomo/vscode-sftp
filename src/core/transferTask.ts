@@ -1,3 +1,4 @@
+import { Readable } from 'stream';
 import * as fileOperations from './fileBaseOperations';
 import { FileSystem, FileType } from './fs';
 import { Task } from './scheduler';
@@ -30,6 +31,8 @@ export default class TransferTask implements Task {
   private readonly _targetFs: FileSystem;
   private readonly _transferDirection: TransferDirection;
   private readonly _TransferOption: TransferOption;
+  private _handle: Readable;
+  private _cancelled: boolean;
   // private _fileStatus: FileStatus;
 
   constructor(
@@ -88,6 +91,17 @@ export default class TransferTask implements Task {
     }
   }
 
+  cancel() {
+    if (this._handle && !this._cancelled) {
+      this._cancelled = true;
+      FileSystem.abortReadableStream(this._handle);
+    }
+  }
+
+  isCancelled(): boolean {
+    return this._cancelled;
+  }
+
   private async _transferFile() {
     const src = this._srcFsPath;
     const target = this._targetFsPath;
@@ -95,13 +109,12 @@ export default class TransferTask implements Task {
     const targetFs = this._targetFs;
     const { perserveTargetMode, fallbackMode, atime, mtime } = this._TransferOption;
     let { mode } = this._TransferOption;
-    let inputStream;
     let targetFd;
     // Use mode first.
     // Then check perserveTargetMode and fallback to fallbackMode if fail to get mode of target
     if (mode === undefined && perserveTargetMode) {
       targetFd = await targetFs.open(target, 'w');
-      [inputStream, mode] = await Promise.all([
+      [this._handle, mode] = await Promise.all([
         srcFs.get(src),
         targetFs
           .fstat(targetFd)
@@ -109,19 +122,17 @@ export default class TransferTask implements Task {
           .catch(() => fallbackMode),
       ]);
     } else {
-      [inputStream, targetFd] = await Promise.all([srcFs.get(src), targetFs.open(target, 'w')]);
+      [this._handle, targetFd] = await Promise.all([srcFs.get(src), targetFs.open(target, 'w')]);
     }
 
     try {
-      await targetFs.put(inputStream, target, { mode, fd: targetFd, autoClose: false });
-    } finally {
+      await targetFs.put(this._handle, target, { mode, fd: targetFd, autoClose: false });
       if (atime && mtime) {
         try {
           await targetFs.futimes(targetFd, Math.floor(atime / 1000), Math.floor(mtime / 1000));
         } catch (error) {
           if (!hasWarnedUtimeError) {
             hasWarnedUtimeError = true;
-            // tslint:disable-next-line
             throw new Error(
               `Can't set modified time to the file because ${error.message}.` +
                 'This will cause "Sync" command to transfer unnecessary files.' +
@@ -130,6 +141,7 @@ export default class TransferTask implements Task {
           }
         }
       }
+    } finally {
       await targetFs.close(targetFd);
     }
   }

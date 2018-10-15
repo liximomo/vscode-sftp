@@ -1,9 +1,8 @@
 import { Uri } from 'vscode';
 import * as path from 'path';
 import app from '../../app';
-import { showErrorMessage } from '../../host';
 import logger from '../../logger';
-import { simplifyPath } from '../../helper';
+import { simplifyPath, reportError } from '../../helper';
 import { UResource, FileService } from '../../core';
 import { validateConfig } from '../config';
 import watcherService from '../fileWatcher';
@@ -54,13 +53,17 @@ export function createFileService(config: any, workspace: string) {
   });
   service.afterTransfer((error, task) => {
     const { localFsPath, transferType } = task;
-    if (error) {
-      const errorMsg = `${error.message} when ${transferType} ${localFsPath}`;
-      logger.error(error, errorMsg);
-      showErrorMessage(errorMsg);
+    const filename = path.basename(localFsPath);
+    const filepath = simplifyPath(localFsPath);
+    if (task.isCancelled()) {
+      logger.info(`cancel transfer ${localFsPath}`);
+      app.sftpBarItem.showMsg(`cancelled ${filename}`, filepath, 2000 * 2);
+    } else if (error) {
+      reportError(error, `when ${transferType} ${localFsPath}`);
+      app.sftpBarItem.showMsg(`failed ${filename}`, filepath, 2000 * 2);
     } else {
       logger.info(`${transferType} ${localFsPath}`);
-      app.sftpBarItem.showMsg('done', 2000 * 2);
+      app.sftpBarItem.showMsg(`done ${filename}`, filepath, 2000 * 2);
     }
   });
 

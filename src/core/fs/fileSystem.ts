@@ -1,6 +1,12 @@
 import { Readable } from 'stream';
 import * as fs from 'fs';
 
+interface FileSystemError extends Error {
+  code: string;
+}
+
+export const ERROR_MSG_STREAM_INTERRUPT = 'sftp.stream.interrupt';
+
 export type FileHandle = unknown;
 
 export enum FileType {
@@ -65,7 +71,7 @@ export default abstract class FileSystem {
    */
   abstract futimes(fd: FileHandle, atime: number, mtime: number): Promise<void>;
   abstract get(path: string, option?: FileOption): Promise<Readable>;
-  abstract put(input: Readable | Buffer, path, option?: FileOption): Promise<void>;
+  abstract put(input: Readable, path, option?: FileOption): Promise<void>;
   abstract mkdir(dir: string): Promise<void>;
   abstract ensureDir(dir: string): Promise<void>;
   abstract list(dir: string, option?): Promise<FileEntry[]>;
@@ -74,4 +80,17 @@ export default abstract class FileSystem {
   abstract symlink(targetPath: string, path: string): Promise<void>;
   abstract unlink(path: string): Promise<void>;
   abstract rmdir(path: string, recursive: boolean): Promise<void>;
+
+  static abortReadableStream(stream: Readable) {
+    const err = new Error('Transfer Aborted') as FileSystemError;
+    err.code = ERROR_MSG_STREAM_INTERRUPT;
+
+    // don't do `stream.destroy(err)`! `sftp.ReadaStream` do not support `err` parameter in `destory` method.
+    stream.emit('error', err);
+    stream.destroy();
+  }
+
+  static isAbortedError(err: FileSystemError) {
+    return err.code === ERROR_MSG_STREAM_INTERRUPT;
+  }
 }

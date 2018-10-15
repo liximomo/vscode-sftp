@@ -31,9 +31,9 @@
   version "10.11.6"
   resolved "http://registry.npm.taobao.org/@types/node/download/@types/node-10.11.6.tgz#ce5690df6cd917a9178439a1013e39a7e565c46e"
 
-"@types/node@^6.0.40":
-  version "6.0.73"
-  resolved "http://registry.npm.taobao.org/@types/node/download/@types/node-6.0.73.tgz#85dc4bb6f125377c75ddd2519a1eeb63f0a4ed70"
+"@types/node@^8.10.25":
+  version "8.10.36"
+  resolved "http://registry.npm.taobao.org/@types/node/download/@types/node-8.10.36.tgz#eac05d576fbcd0b4ea3c912dc58c20475c08d9e4"
 
 abab@^1.0.3:
   version "1.0.3"

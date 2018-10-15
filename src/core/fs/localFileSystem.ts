@@ -69,20 +69,14 @@ export default class LocalFileSystem extends FileSystem {
     });
   }
 
-  put(input: fs.ReadStream | Buffer, path, option?: FileOption): Promise<void> {
+  put(input: fs.ReadStream, path, option?: FileOption): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (option && option.fd && typeof option.fd !== 'number') {
         return reject(new Error('fd is not a number'));
       }
 
       const writer = fs.createWriteStream(path, option as any);
-      writer.once('error', reject);
-      writer.once('finish', resolve);
-
-      if (input instanceof Buffer) {
-        writer.end(input);
-        return;
-      }
+      writer.once('error', reject).once('finish', resolve); // transffered
 
       input.once('error', err => {
         reject(err);

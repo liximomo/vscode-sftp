@@ -74,6 +74,11 @@
         "category": "SFTP"
       },
       {
+        "command": "sftp.cancelAllTransfer",
+        "title": "Cancel All Transfers",
+        "category": "SFTP"
+      },
+      {
         "command": "sftp.upload.activeFile",
         "title": "Upload Active File",
         "category": "SFTP"
@@ -190,7 +195,8 @@
     "menus": {
       "commandPalette": [
         {
-          "command": "sftp.config"
+          "command": "sftp.cancelAllTransfer",
+          "when": "sftp.enabled"
         },
         {
           "command": "sftp.setProfile",
@@ -364,7 +370,7 @@
         },
         {
           "command": "sftp.revealInRemoteExplorer",
-          "when": "sftp.enabled",
+          "when": "sftp.enabled && resourceScheme == file",
           "group": "2_files"
         }
       ],
@@ -413,7 +419,7 @@
     "@types/fs-extra": "^5.0.4",
     "@types/jest": "^23.3.5",
     "@types/lru-cache": "^4.1.1",
-    "@types/node": "^6.0.40",
+    "@types/node": "^8.10.25",
     "jest": "^20.0.4",
     "mock-fs": "^4.7.0",
     "rimraf": "^2.6.2",

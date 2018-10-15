@@ -14,7 +14,11 @@ export default checkFileCommand({
     const fileEntry = await remotefs.lstat(ctx.target.remoteFsPath);
     if (fileEntry.type !== FileType.Directory) {
       await downloadFile(ctx, { ignore: null });
-      await showTextDocument(ctx.target.localUri);
+      try {
+        await showTextDocument(ctx.target.localUri);
+      } catch (error) {
+        // ignore
+      }
     } else {
       await downloadFolder(ctx, { ignore: null });
     }

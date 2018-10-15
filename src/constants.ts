@@ -11,12 +11,13 @@ export const CONGIF_FILENAME = 'sftp.json';
 export const CONFIG_PATH = path.join(VENDOR_FOLDER, CONGIF_FILENAME);
 
 // command not in package.json
-export const COMMAND_TOGGLE_OUTPUT = 'sftp.toggleOutput';
 export const COMMAND_SHOWRESOURCE = 'sftp.showResource';
+export const COMMAND_TOGGLE_OUTPUT = 'sftp.toggleOutput';
 
 // commands in package.json
 export const COMMAND_CONFIG = 'sftp.config';
 export const COMMAND_SET_PROFILE = 'sftp.setProfile';
+export const COMMAND_CANCEL_ALL_TRANSFER = 'sftp.cancelAllTransfer';
 
 export const COMMAND_FORCE_UPLOAD = 'sftp.forceUpload';
 export const COMMAND_UPLOAD = 'sftp.upload';

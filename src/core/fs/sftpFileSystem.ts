@@ -110,7 +110,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
     });
   }
 
-  put(input: Readable | Buffer, path, option?: FileOption): Promise<void> {
+  put(input: Readable, path, option?: FileOption): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       let writer: WriteStream;
       if (option && option.fd) {
@@ -120,13 +120,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
       } else {
         writer = this.sftp.createWriteStream(path, option);
       }
-      writer.once('error', reject);
-      writer.once('finish', resolve);
-
-      if (input instanceof Buffer) {
-        writer.end(input);
-        return;
-      }
+      writer.once('error', reject).once('finish', resolve); // transffered
 
       input.once('error', err => {
         reject(err);

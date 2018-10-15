@@ -64,6 +64,7 @@ export default class FileService {
   private _watcherConfig: WatcherConfig;
   private _profiles: string[];
   private _pendingTransferTasks: Set<TransferTask> = new Set();
+  private _schedulers: Scheduler[] = [];
   private _config: any;
   private _configValidator: ConfigValidator;
   private _watcherService: WatcherService = {
@@ -114,8 +115,23 @@ export default class FileService {
     return this._profiles || [];
   }
 
-  getPendingTransferTasks(): Readonly<TransferTask[]> {
+  getPendingTransferTasks(): TransferTask[] {
     return Array.from(this._pendingTransferTasks);
+  }
+
+  isTransferring() {
+    return this._schedulers.length > 0;
+  }
+
+  cancelTransferTasks() {
+    // keep th order so "onIdle" can be triggered.
+    // 1, remove tasks not start
+    this._schedulers.forEach(s => s.empty());
+    this._schedulers.length = 0;
+
+    // 2. cancel running task
+    this._pendingTransferTasks.forEach(t => t.cancel());
+    this._pendingTransferTasks.clear();
   }
 
   beforeTransfer(listener: (task: TransferTask) => void) {
@@ -127,10 +143,12 @@ export default class FileService {
   }
 
   createTransferScheduler(concurrency): TransferScheduler {
+    const self = this;
     const scheduler = new Scheduler({
       autoStart: false,
       concurrency,
     });
+    this._storeScheduler(scheduler);
 
     scheduler.onTaskStart(task => {
       this._pendingTransferTasks.add(task as TransferTask);
@@ -151,10 +169,14 @@ export default class FileService {
       run() {
         return new Promise(resolve => {
           if (scheduler.size <= 0) {
+            self._removeScheduler(scheduler);
             return resolve();
           }
 
-          scheduler.onIdle(resolve);
+          scheduler.onIdle(() => {
+            self._removeScheduler(scheduler);
+            resolve();
+          });
           scheduler.start();
         });
       },
@@ -215,6 +237,17 @@ export default class FileService {
   dispose() {
     this._disposeWatcher();
     this._disposeFileSystem();
+  }
+
+  private _storeScheduler(scheduler: Scheduler) {
+    this._schedulers.push(scheduler);
+  }
+
+  private _removeScheduler(scheduler: Scheduler) {
+    const index = this._schedulers.findIndex(s => s === scheduler);
+    if (index !== -1) {
+      this._schedulers.splice(index, 1);
+    }
   }
 
   private _createIgnoreFn(remoteContext: string): (fsPath: string) => boolean {
