@@ -3,6 +3,7 @@
   * New command [Upload Active Folder](https://github.com/liximomo/vscode-sftp/wiki/Commands#sftp-upload-active-folder).
   * New command [Download Active Folder](https://github.com/liximomo/vscode-sftp/wiki/Commands#sftp-download-active-folder).
   * New command [List Active Folder](https://github.com/liximomo/vscode-sftp/wiki/Commands#sftp-list-active-folder).
+  * New command [Cancel All Transfers](https://github.com/liximomo/vscode-sftp/wiki/Commands#cancel-all-transfers).
   * New config [remotetimeoffsetinhours](https://github.com/liximomo/vscode-sftp/wiki/Config#remotetimeoffsetinhours).
 
 ## 1.6.0 - 2018-10-12
