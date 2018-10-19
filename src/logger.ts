@@ -1,9 +1,8 @@
 import * as output from './ui/output';
-import { getUserSetting } from './host';
-import { EXTENSION_NAME } from './constants';
+import { getExtensionSetting } from './helper';
 
-const config = getUserSetting(EXTENSION_NAME);
-const printDebugLog = config.printDebugLog;
+const extSetting = getExtensionSetting();
+const debug = extSetting.debug || extSetting.printDebugLog;
 
 export interface Logger {
   trace(message: string, ...args: any[]): void;
@@ -16,13 +15,13 @@ export interface Logger {
 
 class VSCodeLogger implements Logger {
   trace(message: string, ...args: any[]) {
-    if (printDebugLog) {
+    if (debug) {
       output.print('[trace]', message, ...args);
     }
   }
 
   debug(message: string, ...args: any[]) {
-    if (printDebugLog) {
+    if (debug) {
       output.print('[debug]', message, ...args);
     }
   }

@@ -1,7 +1,10 @@
 import * as vscode from 'vscode';
 import { showTextDocument, registerCommand } from '../../host';
-import { COMMAND_REMOTEEXPLORER_REFRESH, COMMAND_SHOWRESOURCE } from '../../constants';
-import { UResource, Resource } from '../../core';
+import {
+  COMMAND_REMOTEEXPLORER_REFRESH,
+  COMMAND_REMOTEEXPLORER_VIEW_CONTENT,
+} from '../../constants';
+import { UResource } from '../../core';
 import { toRemotePath } from '../../helper';
 import { REMOTE_SCHEME } from '../../constants';
 import { getFileService } from '../serviceManager';
@@ -22,8 +25,8 @@ export default class RemoteExplorer {
     });
 
     registerCommand(context, COMMAND_REMOTEEXPLORER_REFRESH, () => this._refreshSelection());
-    registerCommand(context, COMMAND_SHOWRESOURCE, (resource: Resource) =>
-      this._openResource(resource)
+    registerCommand(context, COMMAND_REMOTEEXPLORER_VIEW_CONTENT, (item: ExplorerItem) =>
+      this._openResource(item.resource.uri)
     );
   }
 
@@ -66,7 +69,7 @@ export default class RemoteExplorer {
     }
   }
 
-  private _openResource(resource: Resource): void {
-    showTextDocument(resource.uri);
+  private _openResource(uri: vscode.Uri): void {
+    showTextDocument(uri);
   }
 }

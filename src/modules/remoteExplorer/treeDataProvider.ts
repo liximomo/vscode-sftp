@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import { upath, UResource, Resource, FileService, FileType } from '../../core';
-import { COMMAND_SHOWRESOURCE } from '../../constants';
+import { COMMAND_REMOTEEXPLORER_VIEW_CONTENT, COMMAND_REMOTEEXPLORER_EDITINLOCAL } from '../../constants';
 import { getAllFileService } from '../serviceManager';
+import { getExtensionSetting } from '../../helper';
 
 type Id = number;
 
@@ -82,8 +83,10 @@ export default class RemoteTreeData
       command: item.isDirectory
         ? undefined
         : {
-            command: COMMAND_SHOWRESOURCE,
-            arguments: [item.resource],
+            command: getExtensionSetting().downloadWhenOpenInRemoteExplorer
+              ? COMMAND_REMOTEEXPLORER_EDITINLOCAL
+              : COMMAND_REMOTEEXPLORER_VIEW_CONTENT,
+            arguments: [item],
             title: 'View Remote Resource',
           },
     };

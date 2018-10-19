@@ -202,7 +202,7 @@ _Note：_ You need manually refresh the parent folder after **delete** a file to
     - On Windows/Linux - `File > Preferences > Settings`
     - On macOS - `Code > Preferences > Settings`
 
-2.  Set `sftp.printDebugLog` to `true` and reload vscode.
+2.  Set `sftp.debug` to `true` and reload vscode.
 3.  View the logs in `View > Output > sftp`.
 
 ---

@@ -11,7 +11,6 @@ export const CONGIF_FILENAME = 'sftp.json';
 export const CONFIG_PATH = path.join(VENDOR_FOLDER, CONGIF_FILENAME);
 
 // command not in package.json
-export const COMMAND_SHOWRESOURCE = 'sftp.showResource';
 export const COMMAND_TOGGLE_OUTPUT = 'sftp.toggleOutput';
 
 // commands in package.json
@@ -49,3 +48,4 @@ export const COMMAND_REVEAL_IN_REMOTE_EXPLORER = 'sftp.revealInRemoteExplorer';
 
 export const COMMAND_REMOTEEXPLORER_REFRESH = 'sftp.remoteExplorer.refresh';
 export const COMMAND_REMOTEEXPLORER_EDITINLOCAL = 'sftp.remoteExplorer.editInLocal';
+export const COMMAND_REMOTEEXPLORER_VIEW_CONTENT = 'sftp.viewContent';

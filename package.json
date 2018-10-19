@@ -59,6 +59,16 @@
           "type": "boolean",
           "default": false,
           "description": "print debug log on sftp output channel.(reload vscode when change this)"
+        },
+        "sftp.debug": {
+          "type": "boolean",
+          "default": false,
+          "description": "print debug log on sftp output channel.(reload vscode when change this)"
+        },
+        "sftp.downloadWhenOpenInRemoteExplorer": {
+          "type": "boolean",
+          "default": false,
+          "description": "\"Download\" instead of \"View Content\" when open file in Remote Explorer"
         }
       }
     },
@@ -196,6 +206,11 @@
       {
         "command": "sftp.remoteExplorer.editInLocal",
         "title": "Edit in Local",
+        "category": "SFTP"
+      },
+      {
+        "command": "sftp.viewContent",
+        "title": "View Content",
         "category": "SFTP"
       },
       {
@@ -412,7 +427,12 @@
         {
           "command": "sftp.remoteExplorer.editInLocal",
           "group": "2_files",
-          "when": "view == remoteExplorer && viewItem == file"
+          "when": "view == remoteExplorer && viewItem == file && !config.sftp.downloadWhenOpenInRemoteExplorer"
+        },
+        {
+          "command": "sftp.viewContent",
+          "group": "2_files",
+          "when": "view == remoteExplorer && viewItem == file && config.sftp.downloadWhenOpenInRemoteExplorer"
         },
         {
           "command": "sftp.revealInExplorer",
