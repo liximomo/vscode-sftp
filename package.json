@@ -79,18 +79,23 @@
         "category": "SFTP"
       },
       {
-        "command": "sftp.upload.activeFile",
-        "title": "Upload Active File",
-        "category": "SFTP"
-      },
-      {
         "command": "sftp.upload.file",
         "title": "Upload",
         "category": "SFTP"
       },
       {
+        "command": "sftp.upload.activeFile",
+        "title": "Upload Active File",
+        "category": "SFTP"
+      },
+      {
         "command": "sftp.upload.folder",
         "title": "Upload Folder",
+        "category": "SFTP"
+      },
+      {
+        "command": "sftp.upload.activeFolder",
+        "title": "Upload Active Folder",
         "category": "SFTP"
       },
       {
@@ -104,18 +109,23 @@
         "category": "SFTP"
       },
       {
-        "command": "sftp.download.activeFile",
-        "title": "Download Active File",
-        "category": "SFTP"
-      },
-      {
         "command": "sftp.download.file",
         "title": "Download",
         "category": "SFTP"
       },
       {
+        "command": "sftp.download.activeFile",
+        "title": "Download Active File",
+        "category": "SFTP"
+      },
+      {
         "command": "sftp.download.folder",
         "title": "Download Folder",
+        "category": "SFTP"
+      },
+      {
+        "command": "sftp.download.activeFolder",
+        "title": "Download Active Folder",
         "category": "SFTP"
       },
       {
@@ -156,6 +166,11 @@
       {
         "command": "sftp.list",
         "title": "List",
+        "category": "SFTP"
+      },
+      {
+        "command": "sftp.listActiveFolder",
+        "title": "List Active Folder",
         "category": "SFTP"
       },
       {
@@ -207,11 +222,19 @@
           "when": "sftp.enabled"
         },
         {
+          "command": "sftp.upload.activeFolder",
+          "when": "sftp.enabled"
+        },
+        {
           "command": "sftp.upload.project",
           "when": "sftp.enabled"
         },
         {
           "command": "sftp.download.activeFile",
+          "when": "sftp.enabled"
+        },
+        {
+          "command": "sftp.download.activeFolder",
           "when": "sftp.enabled"
         },
         {
@@ -236,6 +259,10 @@
         },
         {
           "command": "sftp.list",
+          "when": "sftp.enabled"
+        },
+        {
+          "command": "sftp.listActiveFolder",
           "when": "sftp.enabled"
         },
         {

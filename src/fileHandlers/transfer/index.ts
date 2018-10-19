@@ -62,6 +62,7 @@ export const sync2Remote = createFileHandler<SyncOption>({
     const syncOption = config.syncOption || {};
     return {
       perserveTargetMode: config.protocol === 'sftp',
+      // remoteTimeOffsetInHours: config.remoteTimeOffsetInHours,
       ignore: config.ignore,
       delete: syncOption.delete,
       skipCreate: syncOption.skipCreate,
@@ -99,6 +100,7 @@ export const sync2Local = createFileHandler<SyncOption>({
     const syncOption = config.syncOption || {};
     return {
       perserveTargetMode: false,
+      // remoteTimeOffsetInHours: config.remoteTimeOffsetInHours,
       ignore: config.ignore,
       delete: syncOption.delete,
       skipCreate: syncOption.skipCreate,
@@ -114,8 +116,9 @@ export const upload = createFileHandler<TransferOption>({
   transformOption() {
     const config = this.config;
     return {
-      ignore: config.ignore,
       perserveTargetMode: config.protocol === 'sftp',
+      // remoteTimeOffsetInHours: config.remoteTimeOffsetInHours,
+      ignore: config.ignore,
     };
   },
   afterHandle() {
@@ -129,8 +132,9 @@ export const uploadFile = createFileHandler<TransferOption>({
   transformOption() {
     const config = this.config;
     return {
-      ignore: config.ignore,
       perserveTargetMode: config.protocol === 'sftp',
+      // remoteTimeOffsetInHours: config.remoteTimeOffsetInHours,
+      ignore: config.ignore,
     };
   },
   afterHandle() {
@@ -144,8 +148,9 @@ export const uploadFolder = createFileHandler<TransferOption>({
   transformOption() {
     const config = this.config;
     return {
-      ignore: config.ignore,
       perserveTargetMode: config.protocol === 'sftp',
+      // remoteTimeOffsetInHours: config.remoteTimeOffsetInHours,
+      ignore: config.ignore,
     };
   },
   afterHandle() {
@@ -159,8 +164,9 @@ export const download = createFileHandler<TransferOption>({
   transformOption() {
     const config = this.config;
     return {
-      ignore: config.ignore,
       perserveTargetMode: false,
+      // remoteTimeOffsetInHours: config.remoteTimeOffsetInHours,
+      ignore: config.ignore,
     };
   },
 });
@@ -171,8 +177,9 @@ export const downloadFile = createFileHandler<TransferOption>({
   transformOption() {
     const config = this.config;
     return {
-      ignore: config.ignore,
       perserveTargetMode: false,
+      // remoteTimeOffsetInHours: config.remoteTimeOffsetInHours,
+      ignore: config.ignore,
     };
   },
 });
@@ -183,8 +190,9 @@ export const downloadFolder = createFileHandler<TransferOption>({
   transformOption() {
     const config = this.config;
     return {
-      ignore: config.ignore,
       perserveTargetMode: false,
+      // remoteTimeOffsetInHours: config.remoteTimeOffsetInHours,
+      ignore: config.ignore,
     };
   },
 });

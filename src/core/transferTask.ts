@@ -2,8 +2,7 @@ import { Readable } from 'stream';
 import * as fileOperations from './fileBaseOperations';
 import { FileSystem, FileType } from './fs';
 import { Task } from './scheduler';
-
-let hasWarnedUtimeError = false;
+import logger from '../logger';
 
 export enum TransferDirection {
   LOCAL_TO_REMOTE = 'local -> remote',
@@ -107,7 +106,12 @@ export default class TransferTask implements Task {
     const target = this._targetFsPath;
     const srcFs = this._srcFs;
     const targetFs = this._targetFs;
-    const { perserveTargetMode, fallbackMode, atime, mtime } = this._TransferOption;
+    const {
+      perserveTargetMode,
+      fallbackMode,
+      atime,
+      mtime,
+    } = this._TransferOption;
     let { mode } = this._TransferOption;
     let targetFd;
     // Use mode first.
@@ -131,14 +135,7 @@ export default class TransferTask implements Task {
         try {
           await targetFs.futimes(targetFd, Math.floor(atime / 1000), Math.floor(mtime / 1000));
         } catch (error) {
-          if (!hasWarnedUtimeError) {
-            hasWarnedUtimeError = true;
-            throw new Error(
-              `Can't set modified time to the file because ${error.message}.` +
-                'This will cause "Sync" command to transfer unnecessary files.' +
-                '(this error will only show once)'
-            );
-          }
+          logger.warn(`Can't set modified time to the file because ${error.message}`);
         }
       }
     } finally {

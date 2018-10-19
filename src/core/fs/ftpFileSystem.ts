@@ -34,19 +34,9 @@ function toNumMode(rightObj) {
   return parseInt(modeStr, 8);
 }
 
-function toFileStat(stat): FileStats {
-  const mtime = stat.date.getTime();
-  return {
-    type: FTPFileSystem.getFileType(stat.type),
-    mode: toNumMode(stat.rights), // Caution: windows will always get 0o666
-    size: stat.size,
-    mtime,
-    atime: mtime,
-    target: stat.target,
-  };
-}
-
 export default class FTPFileSystem extends RemoteFileSystem {
+  private _supportMFMT: boolean = true;
+
   static getFileType(type) {
     if (type === 'd') {
       return FileType.Directory;
@@ -61,6 +51,26 @@ export default class FTPFileSystem extends RemoteFileSystem {
 
   get ftp() {
     return this.getClient().getFsClient();
+  }
+
+  toFileStat(stat): FileStats {
+    const mtime = this.toLocalTime(stat.date.getTime());
+    return {
+      type: FTPFileSystem.getFileType(stat.type),
+      mode: toNumMode(stat.rights), // Caution: windows will always get 0o666
+      size: stat.size,
+      mtime,
+      atime: mtime,
+      target: stat.target,
+    };
+  }
+
+  toFileEntry(fullPath, stat): FileEntry {
+    return {
+      fspath: fullPath,
+      name: stat.name,
+      ...this.toFileStat(stat),
+    };
   }
 
   _createClient(option) {
@@ -108,9 +118,13 @@ export default class FTPFileSystem extends RemoteFileSystem {
   }
 
   futimes(fd: FtpFileHandle, _atime: number, mtime: number): Promise<void> {
-    return this.atomicSetLastMod(fd.path, new Date(mtime * 1000)).catch(err => {
-      // swallow the err
-      logger.error(err, `fail to set modified time to ${fd.path}`);
+    if (!this._supportMFMT) return Promise.resolve();
+
+    return this.atomicSetLastMod(
+      fd.path,
+      new Date(this.toRemoteTimeInSecnonds(mtime) * 1000)
+    ).catch(_ => {
+      this._supportMFMT = false;
     });
   }
 
@@ -217,14 +231,6 @@ export default class FTPFileSystem extends RemoteFileSystem {
         }
         break;
     }
-  }
-
-  toFileEntry(fullPath, stat): FileEntry {
-    return {
-      fspath: fullPath,
-      name: stat.name,
-      ...toFileStat(stat),
-    };
   }
 
   async list(dir: string, { showHiddenFiles = true } = {}): Promise<FileEntry[]> {

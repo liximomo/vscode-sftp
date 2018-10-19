@@ -3,6 +3,13 @@ import FileSystem, { FileEntry, FileType, FileStats, FileOption } from './fileSy
 import RemoteFileSystem from './remoteFileSystem';
 import { SSHClient } from '../remote-client';
 
+type FileHandle = Buffer;
+
+interface SFTPFileDescriptor {
+  handle: FileHandle;
+  path: string;
+}
+
 interface WriteStream extends Writable {
   handle: Buffer;
   path: string;
@@ -16,19 +23,27 @@ function toSimpleFileMode(mode: number) {
   return mode & parseInt('777', 8); // tslint:disable-line:no-bitwise
 }
 
-function toFileStat(stat): FileStats {
-  return {
-    type: FileSystem.getFileTypecharacter(stat),
-    mode: toSimpleFileMode(stat.mode), // tslint:disable-line:no-bitwise
-    size: stat.size,
-    mtime: stat.mtime * 1000,
-    atime: stat.atime * 1000,
-  };
-}
-
 export default class SFTPFileSystem extends RemoteFileSystem {
   get sftp() {
     return this.getClient().getFsClient();
+  }
+
+  toFileStat(stat): FileStats {
+    return {
+      type: FileSystem.getFileTypecharacter(stat),
+      mode: toSimpleFileMode(stat.mode), // tslint:disable-line:no-bitwise
+      size: stat.size,
+      mtime: this.toLocalTime(stat.mtime * 1000),
+      atime: this.toLocalTime(stat.atime * 1000),
+    };
+  }
+
+  toFileEntry(fullPath, item): FileEntry {
+    return {
+      fspath: fullPath,
+      name: item.filename,
+      ...this.toFileStat(item.attrs),
+    };
   }
 
   _createClient(option) {
@@ -43,26 +58,29 @@ export default class SFTPFileSystem extends RemoteFileSystem {
           return;
         }
 
-        resolve(toFileStat(stat));
+        resolve(this.toFileStat(stat));
       });
     });
   }
 
-  open(path: string, flags: string, mode?: number): Promise<Buffer> {
+  open(path: string, flags: string, mode?: number): Promise<SFTPFileDescriptor> {
     return new Promise((resolve, reject) => {
       this.sftp.open(path, flags, mode, (err, handle) => {
         if (err) {
           return reject(err);
         }
 
-        resolve(handle);
+        resolve({
+          path,
+          handle,
+        });
       });
     });
   }
 
-  close(fd: number): Promise<void> {
+  close(fd: SFTPFileDescriptor): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.sftp.close(fd, err => {
+      this.sftp.close(fd.handle, err => {
         if (err) {
           reject(err);
           return;
@@ -73,24 +91,62 @@ export default class SFTPFileSystem extends RemoteFileSystem {
     });
   }
 
-  fstat(fd: Buffer): Promise<FileStats> {
+  fstat(fd: SFTPFileDescriptor): Promise<FileStats> {
     return new Promise((resolve, reject) => {
-      this.sftp.fstat(fd, (err, stat) => {
+      this.sftp.fstat(fd.handle, (err, stat) => {
         if (err) {
-          reject(err);
+          // Try stat() for sftp servers that may not support fstat() for
+          // whatever reason
+          // see WriteStream.prototype.open in ssh2-streams.
+          this.sftp.stat(fd.path, (_err, _stat) => {
+            if (_err) {
+              reject(err);
+              return;
+            }
+
+            resolve(this.toFileStat(_stat));
+          });
           return;
         }
 
-        resolve(toFileStat(stat));
+        resolve(this.toFileStat(stat));
       });
     });
   }
 
-  futimes(fd: Buffer, atime: number, mtime: number): Promise<void> {
+  futimes(fd: SFTPFileDescriptor, atime: number, mtime: number): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.sftp.futimes(fd, atime, mtime, err => {
+      this.sftp.futimes(
+        fd.handle,
+        this.toRemoteTimeInSecnonds(atime),
+        this.toRemoteTimeInSecnonds(mtime),
+        err => {
+          if (err) {
+            reject(err);
+            return;
+          }
+
+          resolve();
+        }
+      );
+    });
+  }
+
+  fchmod(fd: SFTPFileDescriptor, mode: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.sftp.fchmod(fd.handle, mode, err => {
         if (err) {
-          reject(err);
+          // Try chmod() for sftp servers that may not support fchmod() for
+          // whatever reason
+          // see WriteStream.prototype.open in ssh2-streams.
+          this.sftp.chmod(fd.path, mode, _err => {
+            if (_err) {
+              reject(err);
+              return;
+            }
+
+            resolve();
+          });
           return;
         }
 
@@ -110,16 +166,41 @@ export default class SFTPFileSystem extends RemoteFileSystem {
     });
   }
 
-  put(input: Readable, path, option?: FileOption): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      let writer: WriteStream;
-      if (option && option.fd) {
-        const opt = { ...option, handle: option.fd };
-        delete opt.fd;
-        writer = this.sftp.createWriteStream(path, opt);
-      } else {
-        writer = this.sftp.createWriteStream(path, option);
+  async put(input: Readable, path, option?: FileOption): Promise<void> {
+    if (option && option.fd) {
+      const fd = option.fd as SFTPFileDescriptor;
+      const opt = { ...option, handle: fd.handle };
+      delete opt.fd;
+
+      if (opt.mode) {
+        // mode will get ignored if handle passed in.
+        // call chmod manunally.
+        try {
+          await this.fchmod(fd, opt.mode);
+        } catch {
+          // ignore error
+        }
       }
+
+      return this._put(input, path, opt);
+    }
+
+    return this._put(input, path, option);
+  }
+
+  _put(
+    input: Readable,
+    path,
+    option?: {
+      flags?: string;
+      encoding?: string;
+      mode?: number;
+      autoClose?: boolean;
+      handle?: FileHandle;
+    }
+  ): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      const writer: WriteStream = this.sftp.createWriteStream(path, option);
       writer.once('error', reject).once('finish', resolve); // transffered
 
       input.once('error', err => {
@@ -205,14 +286,6 @@ export default class SFTPFileSystem extends RemoteFileSystem {
         }
         break;
     }
-  }
-
-  toFileEntry(fullPath, item): FileEntry {
-    return {
-      fspath: fullPath,
-      name: item.filename,
-      ...toFileStat(item.attrs),
-    };
   }
 
   list(dir: string, { showHiddenFiles = false } = {}): Promise<FileEntry[]> {

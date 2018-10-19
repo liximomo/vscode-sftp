@@ -30,6 +30,7 @@ const configScheme = {
   passphrase: nullable(Joi.string().allow(true)),
   interactiveAuth: Joi.boolean().optional(),
   algorithms: Joi.any(),
+  sshConfigPath: Joi.string().optional(),
 
   secure: Joi.any()
     .valid(true, false, 'control', 'implicit')
@@ -43,13 +44,6 @@ const configScheme = {
     .optional()
     .allow('confirm'),
 
-  syncOption: {
-    delete: Joi.boolean(),
-    skipCreate: Joi.boolean(),
-    ignoreExisting: Joi.boolean(),
-    update: Joi.boolean(),
-  },
-
   ignore: Joi.array()
     .min(0)
     .items(Joi.string()),
@@ -62,6 +56,16 @@ const configScheme = {
     autoDelete: Joi.boolean().optional(),
   },
   concurrency: Joi.number().integer(),
+
+  syncOption: {
+    delete: Joi.boolean(),
+    skipCreate: Joi.boolean(),
+    ignoreExisting: Joi.boolean(),
+    update: Joi.boolean(),
+  },
+  remoteTimeOffsetInHours: Joi.number()
+    .integer()
+    .optional(),
 };
 
 const defaultConfig = {
@@ -99,6 +103,7 @@ const defaultConfig = {
   secure: false,
   // secureOptions,
   passive: false,
+  remoteTimeOffsetInHours: 0,
 };
 
 function chooseDefaultPort(protocol) {

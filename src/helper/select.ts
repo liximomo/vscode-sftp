@@ -1,37 +1,38 @@
 import * as vscode from 'vscode';
-import { FileSystem, FileType } from '../core/fs';
+import { FileSystem, FileType } from '../core';
 import * as path from 'path';
 
 const ROOT = '@root';
 
-interface IFileLookUp {
-  [x: string]: IFilePickerItem[];
+interface IFileLookUp<T> {
+  [x: string]: T[];
 }
 
 interface IFilePickerOption {
   type?: FileType;
 }
 
-interface IFilePickerItem {
-  name: string;
-  fsPath: string;
+interface FileListChildItem extends FileListItem {
   parentFsPath: string;
-  type: FileType;
-  description: string;
-
-  getFs?: () => Promise<FileSystem>;
-  filter: (x: string) => boolean;
-
-  // config index
-  index: number;
 }
 
-async function showFiles(
-  fileLookUp: IFileLookUp,
-  parent: IFilePickerItem | null,
-  files: IFilePickerItem[],
+interface FileListItem {
+  name: string;
+  fsPath: string;
+  type: FileType;
+
+  description: string;
+
+  getFs?: (() => Promise<FileSystem>) | FileSystem;
+  filter?: (x: string) => boolean;
+}
+
+async function showFiles<T extends FileListChildItem>(
+  fileLookUp: IFileLookUp<T>,
+  parent: T | null,
+  files: T[],
   option: IFilePickerOption = {}
-) {
+): Promise<T> {
   let avalibleFiles = files;
   let filter;
   if (option.type === FileType.Directory) {
@@ -96,7 +97,8 @@ async function showFiles(
   const selectedValue = result.value;
   const selectedPath = selectedValue.fsPath;
   // fs will be nerver be null if current is root, so get fs from picker item
-  const fileSystem = await selectedValue.getFs();
+  const fileSystem =
+    typeof selectedValue.getFs === 'function' ? await selectedValue.getFs() : selectedValue.getFs;
 
   const nextItems = fileLookUp[selectedPath];
   if (nextItems !== undefined) {
@@ -104,39 +106,36 @@ async function showFiles(
   }
 
   return fileSystem.list(selectedPath).then(subFiles => {
-    const subItems = subFiles.map(file => ({
-      name: path.basename(file.fspath) + (file.type === FileType.Directory ? '/' : ''),
-      fsPath: file.fspath,
-      parentFsPath: selectedPath,
-      type: file.type,
-      description: '',
-      getFs: selectedValue.getFs,
-      filter: selectedValue.filter,
-      index: selectedValue.index,
-    }));
+    const subItems = subFiles.map(file =>
+      Object.assign({}, selectedValue, {
+        name: path.basename(file.fspath) + (file.type === FileType.Directory ? '/' : ''),
+        fsPath: file.fspath,
+        parentFsPath: selectedPath,
+        type: file.type,
+        description: '',
+      })
+    );
 
-    subItems.unshift({
-      name: '..',
-      fsPath: selectedValue.parentFsPath,
-      parentFsPath: '#will never reach here, cause the dir has alreay be cached#',
-      type: FileType.Directory,
-      description: 'go back',
-      getFs: selectedValue.getFs,
-      filter: selectedValue.filter,
-      index: selectedValue.index,
-    });
+    subItems.unshift(
+      Object.assign({}, selectedValue, {
+        name: '..',
+        fsPath: selectedValue.parentFsPath,
+        parentFsPath: '#will never reach here, cause the dir has alreay be cached#',
+        type: FileType.Directory,
+        description: 'go back',
+      })
+    );
 
     if (allowChooseFolder) {
-      subItems.unshift({
-        name: '.',
-        fsPath: selectedPath,
-        parentFsPath: selectedValue.parentFsPath,
-        type: FileType.Directory,
-        description: 'choose current folder',
-        getFs: selectedValue.getFs,
-        filter: selectedValue.filter,
-        index: selectedValue.index,
-      });
+      subItems.unshift(
+        Object.assign({}, selectedValue, {
+          name: '.',
+          fsPath: selectedPath,
+          parentFsPath: selectedValue.parentFsPath,
+          type: FileType.Directory,
+          description: 'choose current folder',
+        })
+      );
     }
 
     fileLookUp[selectedPath] = subItems;
@@ -144,23 +143,11 @@ async function showFiles(
   });
 }
 
-export function listFiles(
-  items: Array<{
-    name?: string;
-    description: string;
-    fsPath: string;
-    getFs: () => Promise<FileSystem>;
-    filter: (x: string) => boolean;
-    index: number;
-  }>,
+export function listFiles<T extends FileListItem>(
+  items: T[],
   option?: IFilePickerOption
-) {
-  const baseItems = items.map(item => ({
-    ...item,
-    name: item.name || item.fsPath,
-    parentFsPath: ROOT,
-    type: FileType.Directory,
-  }));
+): Promise<T & FileListChildItem> {
+  const baseItems = items.map(item => Object.assign({}, item, { parentFsPath: ROOT }));
   const fileLookUp = {
     [ROOT]: baseItems,
   };

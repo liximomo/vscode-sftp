@@ -1,4 +1,6 @@
+import * as path from 'path';
 import { Uri, window } from 'vscode';
+import { FileType } from '../core';
 import { getAllFileService } from '../modules/serviceManager';
 import { ExplorerItem } from '../modules/remoteExplorer';
 import { getActiveTextEditor } from '../host';
@@ -17,9 +19,10 @@ function createFileSelector({ filterCreator = null } = {}) {
     const remoteItems = getAllFileService().map((fileService, index) => {
       const config = fileService.getConfig();
       return {
-        name: config.name,
+        name: config.name || config.remotePath,
         description: config.host,
         fsPath: config.remotePath,
+        type: FileType.Directory,
         filter: filterCreator ? filterCreator(config) : undefined,
         getFs: () => fileService.getRemoteFileSystem(),
         index,
@@ -101,6 +104,15 @@ export function getActiveDocumentUri() {
   }
 
   return active.document.uri;
+}
+
+export function getActiveFolder() {
+  const uri = getActiveDocumentUri();
+  if (!uri) {
+    return null;
+  }
+
+  return Uri.file(path.dirname(uri.fsPath));
 }
 
 // selected file or activeTarget or configContext

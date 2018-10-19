@@ -69,6 +69,10 @@
             "default": true
           }
         }
+      },
+      "remoteTimeOffsetInHours": {
+        "type": "number",
+        "description": "The number of hours difference between the local machine and remote/server. (remote minus local)"
       }
     },
     "required": ["name"]

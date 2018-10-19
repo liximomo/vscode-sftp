@@ -1,19 +1,47 @@
 import FileSystem, { FileOption } from './fileSystem';
 import { RemoteClient, ConnectOption, RemoteClientConfig } from '../remote-client';
 
+interface RFSOption {
+  remoteTimeOffsetInHours?: number;
+  client?: RemoteClient;
+  clientOption?: ConnectOption;
+}
+
+const SECONDS_PER_HOUR = 60 * 60;
+const MILLISECONDS_PER_HOUR = SECONDS_PER_HOUR * 1000;
+
+const defaultOption: Partial<RFSOption> = {
+  remoteTimeOffsetInHours: 0,
+};
+
 export default abstract class RemoteFileSystem extends FileSystem {
   protected client: RemoteClient;
+  private _remoteTimeOffsetInMilliseconds: number = 0;
+  private _remoteTimeOffsetInSeconds: number = 0;
 
-  constructor(pathResolver, option: ConnectOption | RemoteClient) {
+  constructor(pathResolver, option: RFSOption) {
     super(pathResolver);
-    if (option instanceof RemoteClient) {
-      this.client = option;
+
+    const _option = {
+      ...defaultOption,
+      ...option,
+    };
+    const { client, clientOption, remoteTimeOffsetInHours } = _option;
+    if (client) {
+      this.client = client;
+    } else if (clientOption) {
+      this.client = this._createClient(clientOption);
     } else {
-      this.client = this._createClient(option);
+      throw new Error('No client or clientOption is provided');
     }
+
+    this.setRemoteTimeOffsetInHours(remoteTimeOffsetInHours);
   }
 
-  protected abstract _createClient(option: ConnectOption): any;
+  setRemoteTimeOffsetInHours(offset: number) {
+    this._remoteTimeOffsetInSeconds = offset * SECONDS_PER_HOUR;
+    this._remoteTimeOffsetInMilliseconds = offset * MILLISECONDS_PER_HOUR;
+  }
 
   getClient() {
     if (!this.client) {
@@ -35,6 +63,14 @@ export default abstract class RemoteFileSystem extends FileSystem {
 
   end() {
     this.client.end();
+  }
+
+  toLocalTime(remoteTimeMilliseconds: number): number {
+    return remoteTimeMilliseconds - this._remoteTimeOffsetInMilliseconds;
+  }
+
+  toRemoteTimeInSecnonds(localtime: number): number {
+    return localtime + this._remoteTimeOffsetInSeconds;
   }
 
   async readFile(path: string, option?: FileOption): Promise<string | Buffer> {
@@ -64,4 +100,6 @@ export default abstract class RemoteFileSystem extends FileSystem {
       stream.on('end', onEnd);
     });
   }
+
+  protected abstract _createClient(option: ConnectOption): any;
 }

@@ -34,7 +34,9 @@ export default class SSHClient extends RemoteClient {
         const preClient = this.hoppingClients[index - 1];
         if (preClient) {
           sock = await this._makeHopping(preClient, curOpt.host, curOpt.port);
-          fs = new SFTPFileSystem(upath, preClient);
+          fs = new SFTPFileSystem(upath, {
+            client: preClient,
+          });
         }
 
         if (curOpt.privateKeyPath) {

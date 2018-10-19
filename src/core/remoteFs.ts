@@ -31,9 +31,7 @@ class KeepAliveRemoteFs {
 
     const connectOption = Object.assign({}, option);
     // tslint:disable variable-name
-    let FsConstructor: {
-      new (path: any, option: any): RemoteFileSystem;
-    };
+    let FsConstructor: typeof SFTPFileSystem | typeof FTPFileSystem;
     if (option.protocol === 'sftp') {
       connectOption.debug = function debug(str) {
         const log = str.match(/^DEBUG(?:\[SFTP\])?: (.*?): (.*?)$/);
@@ -63,7 +61,9 @@ class KeepAliveRemoteFs {
       throw new Error(`unsupported protocol ${option.protocol}`);
     }
 
-    this.fs = new FsConstructor(upath, connectOption);
+    this.fs = new FsConstructor(upath, {
+      clientOption: connectOption,
+    });
     this.fs.onDisconnected(this.invalid.bind(this));
 
     app.sftpBarItem.showMsg('connecting...', connectOption.connectTimeout);

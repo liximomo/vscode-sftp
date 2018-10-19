@@ -37,11 +37,11 @@ function getHostInfo(config) {
     'remotePath',
     'uploadOnSave',
     'downloadOnOpen',
-    'syncMode',
     'ignore',
     'ignoreFile',
     'watcher',
     'concurrency',
+    'syncOption',
     'sshConfigPath',
   ];
 
