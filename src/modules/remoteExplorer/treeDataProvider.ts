@@ -20,7 +20,7 @@ export interface ExplorerRoot extends ExplorerChild {
 
 export type ExplorerItem = ExplorerRoot | ExplorerChild;
 
-function dirFisrtSort(fileA: ExplorerItem, fileB: ExplorerItem) {
+function dirFirstSort(fileA: ExplorerItem, fileB: ExplorerItem) {
   if (fileA.isDirectory === fileB.isDirectory) {
     return fileA.resource.fsPath.localeCompare(fileB.resource.fsPath);
   }
@@ -115,7 +115,7 @@ export default class RemoteTreeData
           isDirectory,
         };
       })
-      .sort(dirFisrtSort);
+      .sort(dirFirstSort);
   }
 
   getParent(item: ExplorerChild): ExplorerItem {
