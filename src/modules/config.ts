@@ -11,9 +11,9 @@ import logger from '../logger';
 
 const DEFAULT_SSHCONFIG_FILE = '~/.ssh/config';
 
-const nullable = schema => schema.optional().allow(null);
+const nullable = (schema: Joi.Schema) => schema.optional().allow(null);
 
-const configScheme = {
+const configScheme: Joi.SchemaLike = {
   name: Joi.string(),
 
   context: Joi.string(),
