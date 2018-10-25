@@ -4,7 +4,7 @@ about: Create a report to help us improve
 
 ---
 
-**I have read the FAQ?**
+**Do you read the FAQ?**
 - [ ] Yes.
 - [ ] [I am going to read now.](https://github.com/liximomo/vscode-sftp/blob/master/FAQ.md)
 
