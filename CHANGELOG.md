@@ -1,3 +1,7 @@
+## 1.7.1 - 2018-10-19
+  * New setting [downloadwhenopeninremoteexplorer](https://github.com/liximomo/vscode-sftp/wiki/Setting#downloadwhenopeninremoteexplorer).
+  * fix some bugs.
+
 ## 1.7.0 - 2018-10-19
 ### New Features
   * New command [Upload Active Folder](https://github.com/liximomo/vscode-sftp/wiki/Commands#sftp-upload-active-folder).
