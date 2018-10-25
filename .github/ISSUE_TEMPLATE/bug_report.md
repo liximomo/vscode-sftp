@@ -6,7 +6,7 @@ about: Create a report to help us improve
 
 **I have read the FAQ?**
 - [ ] Yes.
-- [ ] [I am going to read now.](https://github.com/liximomo/vscode-sftp/blob/master/CHANGELOG.md)
+- [ ] [I am going to read now.](https://github.com/liximomo/vscode-sftp/blob/master/FAQ.md)
 
 **Describe the bug**
 A clear and concise description of what the bug is.
