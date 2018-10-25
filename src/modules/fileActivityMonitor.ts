@@ -36,7 +36,6 @@ async function handleConfigSave(uri: vscode.Uri) {
 async function handleFileSave(uri: vscode.Uri) {
   const fileService = getFileService(uri);
   if (!fileService) {
-    logger.error(new Error(`FileService Not Found. (${uri.toString(true)}) `));
     return;
   }
 
@@ -55,8 +54,7 @@ async function handleFileSave(uri: vscode.Uri) {
 
 async function downloadOnOpen(uri: vscode.Uri) {
   const fileService = getFileService(uri);
-  if (!fileService && /* a new-created config */ !isConfigFile(uri)) {
-    logger.error(new Error(`FileService Not Found. (${uri.toString(true)}) `));
+  if (!fileService) {
     return;
   }
 
