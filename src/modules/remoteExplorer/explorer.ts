@@ -4,7 +4,7 @@ import {
   COMMAND_REMOTEEXPLORER_REFRESH,
   COMMAND_REMOTEEXPLORER_VIEW_CONTENT,
 } from '../../constants';
-import { UResource } from '../../core';
+import { UResource, upath } from '../../core';
 import { toRemotePath } from '../../helper';
 import { REMOTE_SCHEME } from '../../constants';
 import { getFileService } from '../serviceManager';
@@ -70,6 +70,13 @@ export default class RemoteExplorer {
   }
 
   private _openResource(uri: vscode.Uri): void {
-    showTextDocument(uri);
+    // There is no api to custom title.
+    // So we change url path for custom title.
+    // This is not break anything because we get fspth from uri.query.'
+    showTextDocument(
+      uri.with({
+        path: `/~ ${upath.basename(uri.path)}`,
+      })
+    );
   }
 }

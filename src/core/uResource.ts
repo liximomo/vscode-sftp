@@ -4,8 +4,8 @@ import { Uri } from 'vscode';
 import { toLocalPath, toRemotePath } from '../helper';
 import { REMOTE_SCHEME } from '../constants';
 
-function createUriString(authority: string, path: string, query: { [x: string]: any }) {
-  const normalizedPath = encodeURIComponent(path.replace(/^\/+/, ''));
+function createUriString(authority: string, filepath: string, query: { [x: string]: any }) {
+  const normalizedPath = encodeURIComponent(filepath.replace(/^\/+/, ''));
 
   // vscode.Uri will call decodeURIComponent for query, so we must encode it first.
   const queryStr = encodeURIComponent(querystring.stringify(query));
