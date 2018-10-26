@@ -4,8 +4,9 @@ about: Suggest an idea for this project
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+**Is this a similar or duplicate feature request?**
+- [ ] I don't know. I will go check it.
+- [ ] No.
 
 **Is your feature request related to a problem? Please describe.**
 A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
