@@ -84,6 +84,11 @@
         "category": "SFTP"
       },
       {
+        "command": "sftp.openConnectInTerminal",
+        "title": "Open SSH in Terminal",
+        "category": "SFTP"
+      },
+      {
         "command": "sftp.cancelAllTransfer",
         "title": "Cancel All Transfers",
         "category": "SFTP"
@@ -225,11 +230,15 @@
     "menus": {
       "commandPalette": [
         {
-          "command": "sftp.cancelAllTransfer",
+          "command": "sftp.setProfile",
           "when": "sftp.enabled"
         },
         {
-          "command": "sftp.setProfile",
+          "command": "sftp.openConnectInTerminal",
+          "when": "sftp.enabled"
+        },
+        {
+          "command": "sftp.cancelAllTransfer",
           "when": "sftp.enabled"
         },
         {
@@ -424,6 +433,11 @@
         }
       ],
       "view/item/context": [
+        {
+          "command": "sftp.openConnectInTerminal",
+          "group": "navigation",
+          "when": "view == remoteExplorer && viewItem == root"
+        },
         {
           "command": "sftp.remoteExplorer.editInLocal",
           "group": "2_files",
