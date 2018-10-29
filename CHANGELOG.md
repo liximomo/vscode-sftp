@@ -1,3 +1,6 @@
+## 1.7.2 - 2018-10-29
+  * New command [Open SSH in Terminal](https://github.com/liximomo/vscode-sftp/wiki/Commands#open-ssh-in-terminal).
+
 ## 1.7.1 - 2018-10-19
   * New setting [downloadwhenopeninremoteexplorer](https://github.com/liximomo/vscode-sftp/wiki/Setting#downloadwhenopeninremoteexplorer).
   * fix some bugs.
