@@ -64,7 +64,6 @@ const configScheme = {
     update: Joi.boolean(),
   },
   remoteTimeOffsetInHours: Joi.number()
-    .integer()
     .optional(),
 };
 
