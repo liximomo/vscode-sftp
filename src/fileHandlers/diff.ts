@@ -2,7 +2,7 @@ import * as path from 'path';
 import { diffFiles } from '../host';
 import { EXTENSION_NAME } from '../constants';
 import { fileOperations } from '../core';
-import { makeTmpFile, simplifyPath } from '../helper';
+import { makeTmpFile } from '../helper';
 import createFileHandler from './createFileHandler';
 
 export const diff = createFileHandler({
@@ -18,9 +18,9 @@ export const diff = createFileHandler({
 
     await fileOperations.transferFile(remoteFsPath, tmpPath, remoteFs, localFs);
     await diffFiles(
-      localFsPath,
       tmpPath,
-      `${simplifyPath(localFsPath)} (local ↔ ${this.fileService.name || 'remote'})`
+      localFsPath,
+      `${path.basename(localFsPath)} (${this.fileService.name || 'remote'} ↔ local)`
     );
   },
 });
