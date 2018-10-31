@@ -99,6 +99,15 @@
         "category": "SFTP"
       },
       {
+        "command": "sftp.upload.changedFile",
+        "title": "Upload File",
+        "category": "SFTP",
+        "icon": {
+          "light": "resources/light/upload.svg",
+          "dark": "resources/dark/upload.svg"
+        }
+      },
+      {
         "command": "sftp.upload.activeFile",
         "title": "Upload Active File",
         "category": "SFTP"
@@ -298,6 +307,10 @@
           "when": "false"
         },
         {
+          "command": "sftp.upload.changedFile",
+          "when": "false"
+        },
+        {
           "command": "sftp.upload.folder",
           "when": "false"
         },
@@ -457,6 +470,16 @@
           "command": "sftp.delete.remote",
           "group": "7_modification",
           "when": "view == remoteExplorer && viewItem != root"
+        }
+      ],
+      "scm/resourceState/context": [
+        {
+          "command": "sftp.upload.changedFile",
+          "group": "inline"
+        },
+        {
+          "command": "sftp.upload.changedFile",
+          "group": "sftp"
         }
       ]
     },
