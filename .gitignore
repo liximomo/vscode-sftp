@@ -7,3 +7,4 @@ _debug
 !.vscode/tasks.json
 !.vscode/launch.json
 /TODO.md
+/INSTALL_DEBUG.md
