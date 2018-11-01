@@ -20,6 +20,8 @@ Very powerful, with smart features. Very simple, requires just three lines of co
 1. `Ctrl+Shift+P` on Windows/Linux or `Cmd+Shift+P` on Mac open command palette, run `SFTP: config` command.
 2. Enjoy.
 
+For detailed usage. Please go to [wiki](https://github.com/liximomo/vscode-sftp/wiki).
+
 ## Example Configs
 
 You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/config).

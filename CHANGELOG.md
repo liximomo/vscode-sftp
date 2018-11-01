@@ -1,7 +1,11 @@
+## 1.7.3 - 2018-11-01
+  * New config [limitopenfilesonserver](https://github.com/liximomo/vscode-sftp/wiki/Config#limitopenfilesonserver).
+  * Show `upload file` context menu in SCM.
+
 ## 1.7.2 - 2018-10-29
   * New command [Open SSH in Terminal](https://github.com/liximomo/vscode-sftp/wiki/Commands#open-ssh-in-terminal).
 
-## 1.7.1 - 2018-10-19
+## 1.7.1 - 2018-10-25
   * New setting [downloadwhenopeninremoteexplorer](https://github.com/liximomo/vscode-sftp/wiki/Setting#downloadwhenopeninremoteexplorer).
   * fix some bugs.
 
