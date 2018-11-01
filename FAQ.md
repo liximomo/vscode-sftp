@@ -4,7 +4,7 @@ The failure error message comes from the remote side and is more or less the def
 
 ### Solution
 
-The most possible problem would be that your server runs out of file descriptors. You should try to increase the file descriptors limit. If you don't have the permission to do this, set [limitopenfilesonserver](https://github.com/liximomo/vscode-sftp/wiki/Config#limitopenfilesonserver) option in your config.
+The most possible problem would be that your server runs out of file descriptors. You should try to increase the file descriptors limit. If you don't have the permission to do this, set [limitOpenFilesOnServer](https://github.com/liximomo/vscode-sftp/wiki/Config#limitopenfilesonserver) option in your config.
 
 ## ENFILE: file table overflow ...
 
