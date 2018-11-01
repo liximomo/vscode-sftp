@@ -73,6 +73,11 @@
       "remoteTimeOffsetInHours": {
         "type": "number",
         "description": "The number of hours difference between the local machine and remote/server. (remote minus local)"
+      },
+      "limitOpenFilesOnRemote": {
+        "enum": ["number", true],
+        "description": "Limit the open file descriptors to the specific number in a remote server. Set to true for using default limit(222). Do not set this unless you have to.",
+        "default": true
       }
     },
     "required": ["name"]

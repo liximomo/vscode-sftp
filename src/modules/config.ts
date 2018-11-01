@@ -81,6 +81,7 @@ const defaultConfig = {
   //   autoDelete: false,
   // },
   concurrency: 4,
+  // limitOpenFilesOnRemote: false
 
   protocol: 'sftp',
 

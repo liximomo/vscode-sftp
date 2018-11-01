@@ -11,6 +11,7 @@ export interface ConnectOption {
   agent?: string; // ssh-only
   sock?: any; // ssh-only
   hop?: ConnectOption | ConnectOption[]; // ssh-only
+  limitOpenFilesOnRemote?: boolean | number; // ssh-only
 
   secure?: any; // ftp-only
   secureOptions?: object; // ftp-only
