@@ -1,4 +1,4 @@
-## 1.7.3 - 2018-11-01
+## 1.7.3 - 2018-11-03
   * New config [limitopenfilesonserver](https://github.com/liximomo/vscode-sftp/wiki/Config#limitopenfilesonserver).
   * Show `upload file` context menu in SCM.
 
