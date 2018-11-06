@@ -17,7 +17,7 @@ app.state = new AppState();
 app.sftpBarItem = new StatusBarItem(
   () => {
     if (app.state.profile) {
-      return `(${app.state.profile})SFTP`;
+      return `SFTP: ${app.state.profile}`;
     } else {
       return 'SFTP';
     }

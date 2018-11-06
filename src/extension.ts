@@ -44,8 +44,11 @@ export async function activate(context: vscode.ExtensionContext) {
   app.state.subscribe(_ => {
     const currentText = app.sftpBarItem.getText();
     // current is showing profile
-    if (currentText.endsWith('SFTP')) {
+    if (currentText.startsWith('SFTP')) {
       app.sftpBarItem.reset();
+    }
+    if (app.remoteExplorer) {
+      app.remoteExplorer.refresh();
     }
   });
   try {

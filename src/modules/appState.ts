@@ -7,6 +7,10 @@ class AppState {
   }
 
   set profile(newProfile: string) {
+    if (this._profile === newProfile) {
+      return;
+    }
+
     this._profile = newProfile;
     this._observer(this.getStateSnapshot());
   }
