@@ -28,7 +28,7 @@ interface FileHandlerOption<T> {
 export function handleCtxFromUri(uri: Uri): FileHandlerContext {
   const fileService = getFileService(uri);
   if (!fileService) {
-    throw new Error(`FileService Not Found. (${uri.toString(true)}) `);
+    throw new Error(`Config Not Found. (${uri.toString(true)}) `);
   }
   const config = fileService.getConfig();
   const target = UResource.from(uri, {
