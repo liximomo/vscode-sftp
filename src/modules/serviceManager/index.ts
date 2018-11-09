@@ -3,7 +3,7 @@ import * as path from 'path';
 import app from '../../app';
 import logger from '../../logger';
 import { simplifyPath, reportError } from '../../helper';
-import { UResource, FileService } from '../../core';
+import { UResource, FileService, TransferTask } from '../../core';
 import { validateConfig } from '../config';
 import watcherService from '../fileWatcher';
 import Trie from './trie';
@@ -103,4 +103,10 @@ export function getAllFileService(): FileService[] {
   }
 
   return serviceManager.getAllValues();
+}
+
+export function getRunningTransformTasks(): TransferTask[] {
+  return getAllFileService().reduce((acc, fileService) => {
+    return acc.concat(fileService.getPendingTransferTasks());
+  }, []);
 }

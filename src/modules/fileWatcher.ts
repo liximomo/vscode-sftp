@@ -3,9 +3,10 @@ import * as debounce from 'lodash.debounce';
 import logger from '../logger';
 import { isValidFile, fileDepth } from '../helper';
 import { upload, removeRemote } from '../fileHandlers';
-import { WatcherService } from '../core';
+import { WatcherService, TransferDirection } from '../core';
 import app from '../app';
 import StatusBarItem from '../ui/statusBarItem';
+import { getRunningTransformTasks } from './serviceManager';
 
 const watchers: {
   [x: string]: vscode.FileSystemWatcher;
@@ -20,7 +21,17 @@ const ACTION_INTEVAL = 550;
 function doUpload() {
   const files = Array.from(uploadQueue).sort((a, b) => fileDepth(b.fsPath) - fileDepth(a.fsPath));
   uploadQueue.clear();
+
+  const currentDownloadTasks = getRunningTransformTasks().filter(
+    task => task.transferType === TransferDirection.REMOTE_TO_LOCAL
+  );
+
   files.forEach(async uri => {
+    // current target is still in downloading, so don't upload it.
+    if (currentDownloadTasks.find(task => task.localFsPath === uri.fsPath)) {
+      return;
+    }
+
     const fspath = uri.fsPath;
     logger.info(`[watcher-update] ${fspath}`);
     try {
