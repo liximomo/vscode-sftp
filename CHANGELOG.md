@@ -1,3 +1,7 @@
+## 1.7.4 - 2018-11-09
+  * Fix [#362](https://github.com/liximomo/vscode-sftp/issues/362)
+  * Don't upload the file when it's in downloading. [#390](https://github.com/liximomo/vscode-sftp/issues/390)
+
 ## 1.7.3 - 2018-11-03
   * New config [limitopenfilesonserver](https://github.com/liximomo/vscode-sftp/wiki/Config#limitopenfilesonserver).
   * Show `upload file` context menu in SCM.
