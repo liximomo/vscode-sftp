@@ -1,6 +1,9 @@
 import * as vscode from 'vscode';
 import { upath, UResource, Resource, FileService, FileType } from '../../core';
-import { COMMAND_REMOTEEXPLORER_VIEW_CONTENT, COMMAND_REMOTEEXPLORER_EDITINLOCAL } from '../../constants';
+import {
+  COMMAND_REMOTEEXPLORER_VIEW_CONTENT,
+  COMMAND_REMOTEEXPLORER_EDITINLOCAL,
+} from '../../constants';
 import { getAllFileService } from '../serviceManager';
 import { getExtensionSetting } from '../../helper';
 
@@ -67,16 +70,12 @@ export default class RemoteTreeData
     let customLabel;
     if (isRoot) {
       customLabel = (item as ExplorerRoot).explorerContext.fileService.name;
-      if (!customLabel) {
-        customLabel = upath.basename(item.resource.fsPath);
-      }
+    }
+    if (!customLabel) {
+      customLabel = upath.basename(item.resource.fsPath);
     }
     return {
-      ...(customLabel
-        ? {
-            label: customLabel,
-          }
-        : {}),
+      label: customLabel,
       resourceUri: item.resource.uri,
       collapsibleState: item.isDirectory ? vscode.TreeItemCollapsibleState.Collapsed : undefined,
       contextValue: isRoot ? 'root' : item.isDirectory ? 'folder' : 'file',
