@@ -1,3 +1,6 @@
+## 1.7.5 - 2018-11-15
+  * Fix [#394](https://github.com/liximomo/vscode-sftp/issues/394)
+
 ## 1.7.4 - 2018-11-09
   * Fix [#362](https://github.com/liximomo/vscode-sftp/issues/362)
   * Don't upload the file when it's in downloading. [#390](https://github.com/liximomo/vscode-sftp/issues/390)
