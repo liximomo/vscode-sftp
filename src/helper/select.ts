@@ -48,6 +48,10 @@ async function showFiles<T extends FileListChildItem>(
     };
   }
   avalibleFiles = avalibleFiles.filter(file => {
+    if (file.parentFsPath === ROOT) {
+      return true;
+    }
+
     if (file.name === '.' || file.name === '..') {
       return true;
     }

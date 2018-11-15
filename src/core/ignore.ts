@@ -15,6 +15,10 @@ export default class Ignore {
   }
 
   ignores(pathname): boolean {
+    if (!GitIgnore.isPathValid(pathname)) {
+      return false;
+    }
+
     return this.ignore.ignores(pathname);
   }
 }
