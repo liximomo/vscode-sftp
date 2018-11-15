@@ -29,7 +29,7 @@ function setup(workspaceFolders: vscode.WorkspaceFolder[]) {
 // your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
   try {
-    await initCommands(context);
+    initCommands(context);
   } catch (error) {
     reportError(error, 'initCommands');
   }

@@ -8,23 +8,46 @@
 
 // A task runner that calls a custom npm script that compiles the extension.
 {
-    "version": "2.0.0",
+  "version": "2.0.0",
 
-    // we want to run npm
-    "command": "npm",
+  // we want to run npm
+  "command": "npm",
 
-    "type": "shell",
+  "type": "shell",
 
-    "presentation": {
-      "reveal": "silent",
-    },
+  "presentation": {
+    "reveal": "silent"
+  },
 
-    // we run the custom script "compile" as defined in package.json
-    "args": ["run", "compile", "--loglevel", "silent"],
+  // we run the custom script "dev" as defined in package.json
+  "args": ["run", "dev", "--", "--display", "minimal"],
 
-    // The tsc compiler is started in watching mode
-    "isBackground": true,
+  // The dev is started in watching mode
+  "isBackground": true,
 
-    // use the standard tsc in watch mode problem matcher to find compile problems in the output.
-    "problemMatcher": "$tsc-watch"
+  // use the standard tsc in watch mode problem matcher to find compile problems in the output.
+  "problemMatcher": {
+    "owner": "webpack",
+    "fileLocation": "relative",
+    "severity": "error",
+    "pattern": [
+      {
+        "regexp": "^(.*)\\s+in\\s+(.*)\\s(\\d+):(\\d+)-(\\d+)$",
+        "severity": 1,
+        "file": 2,
+        "line": 3,
+        "column": 4,
+        "endColumn": 5
+      },
+      {
+        "regexp": "^(?!Hash|Time|Version|Built at).+:\\s+(.*)$",
+        "message": 0
+      }
+    ],
+    "background": {
+      "activeOnStart": true,
+      "beginsPattern": "^$",
+      "endsPattern": "^$"
+    }
+  }
 }

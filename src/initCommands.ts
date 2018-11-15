@@ -1,15 +1,36 @@
-import * as path from 'path';
 import { ExtensionContext } from 'vscode';
-import * as fg from 'fast-glob';
 import logger from './logger';
 import { registerCommand } from './host';
 import Command from './commands/abstract/command';
 import { createCommand, createFileCommand } from './commands/abstract/createCommand';
 
-const COMMAND_FILENAME_PATTERN = `${__dirname}/commands/@(command|fileCommand)*.js`;
-
 export default function init(context: ExtensionContext) {
-  return loadCommands(COMMAND_FILENAME_PATTERN, /[Cc]ommand([^.]+)\.js$/, context);
+  loadCommands(
+    require.context(
+      // Look for files in the commands directory
+      './commands',
+      // Do not look in subdirectories
+      false,
+      // Only include "_base-" prefixed .vue files
+      /command.*.ts/
+    ),
+    /command(.*)/,
+    createCommand,
+    context
+  );
+  loadCommands(
+    require.context(
+      // Look for files in the current directory
+      './commands',
+      // Do not look in subdirectories
+      false,
+      // Only include "_base-" prefixed .vue files
+      /fileCommand.*.ts/
+    ),
+    /fileCommand(.*)/,
+    createFileCommand,
+    context
+  );
 }
 
 function nomalizeCommandName(rawName) {
@@ -17,35 +38,31 @@ function nomalizeCommandName(rawName) {
   return firstLetter + rawName.slice(1).replace(/[A-Z]/g, token => ` ${token[0]}`);
 }
 
-async function loadCommands(pattern, nameRegex, context: ExtensionContext) {
-  const entries = await fg<string>(pattern, {
-    deep: false,
-    onlyFiles: true,
-    transform: entry => (typeof entry === 'string' ? entry : entry.path),
-  });
-  entries.forEach(file => {
-    const basename = path.basename(file);
-    const match = nameRegex.exec(basename);
+async function loadCommands(requireContext, nameRegex, commandCreator, context: ExtensionContext) {
+  requireContext.keys().forEach(fileName => {
+    const clearName = fileName
+      // Remove the "./" from the beginning
+      .replace(/^\.\//, '')
+      // Remove the file extension from the end
+      .replace(/\.\w+$/, '');
+
+    const match = nameRegex.exec(clearName);
     if (!match || !match[1]) {
-      logger.warn(`Command name not found from ${file}`);
+      logger.warn(`Command name not found from ${fileName}`);
       return;
     }
 
-    const commandOption = require(file).default;
+    const commandOption = requireContext(fileName).default;
     commandOption.name = nomalizeCommandName(match[1]);
 
     try {
       // tslint:disable-next-line variable-name
-      let Cmd;
-      if (basename.startsWith('command')) {
-        Cmd = createCommand(commandOption);
-      } else {
-        Cmd = createFileCommand(commandOption);
-      }
+      const Cmd = commandCreator(commandOption);
       const cmdInstance: Command = new Cmd();
+      logger.debug(`register command "${commandOption.name}" from "${fileName}"`);
       registerCommand(context, commandOption.id, cmdInstance.run, cmdInstance);
     } catch (error) {
-      logger.error(error, `load command "${file}"`);
+      logger.error(error, `load command "${fileName}"`);
     }
   });
 }
