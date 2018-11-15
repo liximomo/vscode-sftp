@@ -8,7 +8,17 @@
         ],
         "sourceMap": true,
         "rootDir": ".",
-        "noUnusedLocals": true
+        "noUnusedLocals": true,
+        "plugins": [
+          {
+            "name": "typescript-tslint-plugin",
+            "alwaysShowRuleFailuresAsWarnings": false,
+            "ignoreDefinitionFiles": true,
+            "suppressWhileTypeErrorsPresent": false,
+            "mockTypeScriptVersion": false,
+            "configFile": "./tslint.json",
+          }
+        ]
     },
     "exclude": [
         "node_modules",
