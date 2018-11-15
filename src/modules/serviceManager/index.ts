@@ -15,13 +15,28 @@ const serviceManager = new Trie<FileService>(
   }
 );
 
+function maskConfig(config) {
+  const copy = {};
+  const privated = ['username', 'password', 'passphrase'];
+  Object.keys(config).forEach(key => {
+    const configValue = config[key];
+    // tslint:disable-next-line triple-equals
+    if (privated.indexOf(key) !== -1 && configValue != undefined) {
+      copy[key] = '******';
+    } else {
+      copy[key] = configValue;
+    }
+  });
+  return copy;
+}
+
 function normalizePathForTrie(pathname) {
   const isWindows = process.platform === 'win32';
   if (isWindows) {
     const device = pathname.substr(0, 2);
     if (device.charAt(1) === ':') {
       // lowercase drive letter
-      return pathname[0].toLowerCase() + pathname.substr(1);
+      pathname = pathname[0].toLowerCase() + pathname.substr(1);
     }
   }
 
@@ -29,8 +44,22 @@ function normalizePathForTrie(pathname) {
 }
 
 export function getBasePath(context: any, workspace: string) {
-  const baseDir = context ? context : workspace;
-  return normalizePathForTrie(path.resolve(workspace, baseDir));
+  let dirpath;
+  if (context) {
+    if (path.isAbsolute(context)) {
+      dirpath = context;
+    } else {
+      // Don't use path.resolve bacause it may change the root dir of workspace!
+      // Example: On window path.resove('\\a\\b\\c') will result to '<drive>:\\a\\b\\c'
+      // We know workspace must be a absolute path and context is a relative path to workspace,
+      // so path.join will suit our requirements.
+      dirpath = path.join(workspace, context);
+    }
+  } else {
+    dirpath = workspace;
+  }
+
+  return normalizePathForTrie(dirpath);
 }
 
 export function createFileService(config: any, workspace: string) {
@@ -40,6 +69,9 @@ export function createFileService(config: any, workspace: string) {
 
   const normalizedBasePath = getBasePath(config.context, workspace);
   const service = new FileService(normalizedBasePath, workspace, config);
+
+  logger.info(`config at ${normalizedBasePath}`, maskConfig(config));
+
   serviceManager.add(normalizedBasePath, service);
   service.name = config.name;
   service.setConfigValidator(validateConfig);

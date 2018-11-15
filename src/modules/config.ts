@@ -7,7 +7,6 @@ import { CONFIG_PATH, SETTING_KEY_REMOTE } from '../constants';
 import { reportError, replaceHomePath, resolvePath } from '../helper';
 import { upath } from '../core';
 import { showTextDocument, getUserSetting } from '../host';
-import logger from '../logger';
 
 const DEFAULT_SSHCONFIG_FILE = '~/.ssh/config';
 
@@ -183,21 +182,6 @@ async function extendConfig(config) {
   return copyed;
 }
 
-function maskConfig(config) {
-  const copy = {};
-  const privated = ['username', 'password', 'passphrase'];
-  Object.keys(config).forEach(key => {
-    const configValue = config[key];
-    // tslint:disable-next-line triple-equals
-    if (privated.indexOf(key) !== -1 && configValue != undefined) {
-      copy[key] = '******';
-    } else {
-      copy[key] = configValue;
-    }
-  });
-  return copy;
-}
-
 async function processConfig(config, workspace) {
   let extendedConfig = await extendConfig(config);
   extendedConfig = {
@@ -218,8 +202,6 @@ async function processConfig(config, workspace) {
   if (extendedConfig.ignoreFile) {
     extendedConfig.ignoreFile = resolvePath(workspace, extendedConfig.ignoreFile);
   }
-
-  logger.info(`config at ${workspace}`, maskConfig(extendedConfig));
 
   return extendedConfig;
 }
