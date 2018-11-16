@@ -7,6 +7,7 @@ import { CONFIG_PATH, SETTING_KEY_REMOTE } from '../constants';
 import { reportError, replaceHomePath, resolvePath } from '../helper';
 import { upath } from '../core';
 import { showTextDocument, getUserSetting } from '../host';
+import logger from '../logger';
 
 const DEFAULT_SSHCONFIG_FILE = '~/.ssh/config';
 
@@ -62,8 +63,7 @@ const configScheme = {
     ignoreExisting: Joi.boolean(),
     update: Joi.boolean(),
   },
-  remoteTimeOffsetInHours: Joi.number()
-    .optional(),
+  remoteTimeOffsetInHours: Joi.number().optional(),
 };
 
 const defaultConfig = {
@@ -146,7 +146,8 @@ async function extendConfig(config) {
   let content;
   try {
     content = await fse.readFile(sshConfigPath, 'utf8');
-  } catch {
+  } catch (error) {
+    logger.warn(error.message, `load ${sshConfigPath} failed`);
     return copyed;
   }
 
@@ -172,7 +173,12 @@ async function extendConfig(config) {
     const key = mapping.get(line.param);
 
     if (key !== undefined) {
-      setConfigValue(copyed, key, line.value);
+      // don't need consider config priority, always set to the resolve host.
+      if (key === 'host') {
+        copyed[key] = line.value;
+      } else {
+        setConfigValue(copyed, key, line.value);
+      }
     }
   });
 
