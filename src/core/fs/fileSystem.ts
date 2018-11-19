@@ -80,6 +80,7 @@ export default abstract class FileSystem {
   abstract symlink(targetPath: string, path: string): Promise<void>;
   abstract unlink(path: string): Promise<void>;
   abstract rmdir(path: string, recursive: boolean): Promise<void>;
+  abstract rename(srcPath: string, destPath: string): Promise<void>;
 
   static abortReadableStream(stream: Readable) {
     const err = new Error('Transfer Aborted') as FileSystemError;

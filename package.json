@@ -99,8 +99,8 @@
         "category": "SFTP"
       },
       {
-        "command": "sftp.upload.changedFile",
-        "title": "Upload File",
+        "command": "sftp.upload.changedFiles",
+        "title": "Upload Changed Files",
         "category": "SFTP",
         "icon": {
           "light": "resources/light/upload.svg",
@@ -307,7 +307,7 @@
           "when": "false"
         },
         {
-          "command": "sftp.upload.changedFile",
+          "command": "sftp.upload.changedFiles",
           "when": "false"
         },
         {
@@ -472,14 +472,33 @@
           "when": "view == remoteExplorer && viewItem != root"
         }
       ],
-      "scm/resourceState/context": [
+      "scm/title": [
         {
-          "command": "sftp.upload.changedFile",
-          "group": "inline"
+          "command": "sftp.upload.changedFiles",
+          "group": "sftp",
+          "when": "sftp.enabled && scmProvider == git && !gitFreshRepository"
+        }
+      ],
+      "scm/resourceGroup/context": [
+        {
+          "command": "sftp.upload.changedFiles",
+          "group": "inline",
+          "when": "sftp.enabled && scmProvider == git && scmResourceGroup == workingTree && !gitFreshRepository"
         },
         {
-          "command": "sftp.upload.changedFile",
-          "group": "sftp"
+          "command": "sftp.upload.changedFiles",
+          "group": "sftp",
+          "when": "sftp.enabled && scmProvider == git && scmResourceGroup == workingTree && !gitFreshRepository"
+        },
+        {
+          "command": "sftp.upload.changedFiles",
+          "group": "inline",
+          "when": "sftp.enabled && scmProvider == git && scmResourceGroup == index && !gitFreshRepository"
+        },
+        {
+          "command": "sftp.upload.changedFiles",
+          "group": "sftp",
+          "when": "sftp.enabled && scmProvider == git && scmResourceGroup == index && !gitFreshRepository"
         }
       ]
     },

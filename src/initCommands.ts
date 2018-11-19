@@ -12,7 +12,7 @@ export default function init(context: ExtensionContext) {
       // Do not look in subdirectories
       false,
       // Only include "_base-" prefixed .vue files
-      /command.*.ts/
+      /command.*.ts$/
     ),
     /command(.*)/,
     createCommand,
@@ -25,7 +25,7 @@ export default function init(context: ExtensionContext) {
       // Do not look in subdirectories
       false,
       // Only include "_base-" prefixed .vue files
-      /fileCommand.*.ts/
+      /fileCommand.*.ts$/
     ),
     /fileCommand(.*)/,
     createFileCommand,

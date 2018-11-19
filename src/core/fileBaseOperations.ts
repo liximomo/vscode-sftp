@@ -40,3 +40,7 @@ export function removeFile(path: string, fs: FileSystem, option): Promise<void> 
 export function removeDir(path: string, fs: FileSystem, option): Promise<void> {
   return fs.rmdir(path, true);
 }
+
+export function rename(srcPath: string, destPath: string, fs: FileSystem): Promise<void> {
+  return fs.rename(srcPath, destPath);
+}

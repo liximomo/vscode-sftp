@@ -35,6 +35,7 @@
         }
       }
     ],
-    "member-access": [true, "no-public"]
+    "member-access": [true, "no-public"],
+    "unified-signatures": false
   }
 }
