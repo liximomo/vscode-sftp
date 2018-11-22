@@ -1,3 +1,7 @@
+## 1.7.6 - 2018-11-22
+  * Reduce *80%* startup time.
+  * Fix [#396](https://github.com/liximomo/vscode-sftp/issues/396)
+
 ## 1.7.5 - 2018-11-15
   * Fix [#394](https://github.com/liximomo/vscode-sftp/issues/394)
 

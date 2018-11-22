@@ -2,7 +2,7 @@
   "name": "sftp",
   "displayName": "sftp",
   "description": "SFTP/FTP sync",
-  "version": "1.7.5",
+  "version": "1.7.6",
   "publisher": "liximomo",
   "author": "liximomo <liximomo@gmail.com> (https://liximomo.github.io/)",
   "engines": {
