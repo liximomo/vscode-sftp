@@ -18,6 +18,7 @@ const config = {
   devtool: 'source-map',
   externals: {
     vscode: 'commonjs vscode',
+    ssh2: 'commonjs ssh2',
   },
   resolve: {
     extensions: ['.ts', '.js'],
