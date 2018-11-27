@@ -166,6 +166,18 @@ export default class SFTPFileSystem extends RemoteFileSystem {
     });
   }
 
+  rename(srcPath: string, destPath: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.sftp.rename(srcPath, destPath, err => {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve();
+      });
+    });
+  }
+
   async put(input: Readable, path, option?: FileOption): Promise<void> {
     if (option && option.fd) {
       const fd = option.fd as SFTPFileDescriptor;
@@ -186,29 +198,6 @@ export default class SFTPFileSystem extends RemoteFileSystem {
     }
 
     return this._put(input, path, option);
-  }
-
-  _put(
-    input: Readable,
-    path,
-    option?: {
-      flags?: string;
-      encoding?: string;
-      mode?: number;
-      autoClose?: boolean;
-      handle?: FileHandle;
-    }
-  ): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      const writer: WriteStream = this.sftp.createWriteStream(path, option);
-      writer.once('error', reject).once('finish', resolve); // transffered
-
-      input.once('error', err => {
-        reject(err);
-        writer.end();
-      });
-      input.pipe(writer);
-    });
   }
 
   readlink(path: string): Promise<string> {
@@ -357,6 +346,29 @@ export default class SFTPFileSystem extends RemoteFileSystem {
           reject(err);
         }
       );
+    });
+  }
+
+  private _put(
+    input: Readable,
+    path,
+    option?: {
+      flags?: string;
+      encoding?: string;
+      mode?: number;
+      autoClose?: boolean;
+      handle?: FileHandle;
+    }
+  ): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      const writer: WriteStream = this.sftp.createWriteStream(path, option);
+      writer.once('error', reject).once('finish', resolve); // transffered
+
+      input.once('error', err => {
+        reject(err);
+        writer.end();
+      });
+      input.pipe(writer);
     });
   }
 }

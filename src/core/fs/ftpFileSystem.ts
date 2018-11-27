@@ -140,7 +140,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
 
   async chmod(path: string, mode: number): Promise<void> {
     const command = `CHMOD ${mode.toString(8)} ${path}`;
-    await this.atomicSite(command);
+    return await this.atomicSite(command);
   }
 
   async put(input: Readable, path, _option?: FileOption): Promise<void> {
@@ -171,11 +171,11 @@ export default class FTPFileSystem extends RemoteFileSystem {
   }
 
   async mkdir(dir: string): Promise<void> {
-    await this.atomicMakeDir(dir);
+    return await this.atomicMakeDir(dir);
   }
 
   async ensureDir(dir: string): Promise<void> {
-    await this._ensureDir(dir, true);
+    return await this._ensureDir(dir, true);
   }
 
   async _ensureDir(dir: string, checkExistFirst: boolean): Promise<void> {
@@ -246,11 +246,30 @@ export default class FTPFileSystem extends RemoteFileSystem {
   }
 
   async unlink(path: string): Promise<void> {
-    await this.atomicDeleteFile(path);
+    return await this.atomicDeleteFile(path);
   }
 
   async rmdir(path: string, recursive: boolean): Promise<void> {
-    await this.atomicRemoveDir(path, recursive);
+    return await this.atomicRemoveDir(path, recursive);
+  }
+
+  async rename(srcPath: string, destPath: string): Promise<void> {
+    return await this.atomicRenmae(srcPath, destPath);
+  }
+
+  private async atomicRenmae(srcPath: string, destPath: string): Promise<void> {
+    const task = () =>
+      new Promise<void>((resolve, reject) => {
+        this.ftp.rename(srcPath, destPath, err => {
+          if (err) {
+            return reject(err);
+          }
+
+          resolve();
+        });
+      });
+
+    return this.queue.add(task);
   }
 
   private async atomicList(path: string): Promise<any[]> {
