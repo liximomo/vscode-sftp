@@ -1,3 +1,5 @@
+import CustomError from '../customError';
+
 export interface ConnectOption {
   host: string;
   port: number;
@@ -20,8 +22,12 @@ export interface ConnectOption {
   debug(x: string): void;
 }
 
+export enum ErrorCode {
+  CONNECT_CANCELLED,
+}
+
 export interface Config {
-  askForPasswd(msg: string): Promise<string | undefined>;
+  askForPasswd(msg: string): Promise<string>;
 }
 
 export default abstract class RemoteClient {
@@ -48,7 +54,7 @@ export default abstract class RemoteClient {
 
     // cancel connect
     if (password === undefined) {
-      return;
+      throw new CustomError(ErrorCode.CONNECT_CANCELLED, 'cancelled');
     }
 
     return this._doConnect({ ...connectOption, password }, config);

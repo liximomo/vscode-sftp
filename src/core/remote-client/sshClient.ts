@@ -1,9 +1,10 @@
 import { Client } from 'ssh2';
 import upath from '../upath';
-import RemoteClient, { ConnectOption, Config } from './remoteClient';
+import RemoteClient, { ErrorCode, ConnectOption, Config } from './remoteClient';
 import localFs from '../localFs';
 import { FileSystem, RemoteFileSystem, SFTPFileSystem } from '../fs';
 import logger from '../../logger';
+import CustomError from '../customError';
 
 let MAX_OPEN_FD_NUM = 222;
 
@@ -174,7 +175,6 @@ export default class SSHClient extends RemoteClient {
           }
         });
         self._opendFdNum -= 1;
-        console.log('opendFdNum:', self._opendFdNum);
         cb.apply(this, arguments);
       }
       args.push(wrapped);
@@ -190,7 +190,6 @@ export default class SSHClient extends RemoteClient {
       const cb = arguments[last];
       function wrapped() {
         self._opendFdNum += 1;
-        console.log('opendFdNum:', self._opendFdNum);
         cb.apply(this, arguments);
       }
       args.push(wrapped);
@@ -220,6 +219,9 @@ export default class SSHClient extends RemoteClient {
     // explict compare to true, cause we want to distinct between string and true
     if (option.passphrase === true) {
       option.passphrase = await config.askForPasswd(`[${option.host}]: Enter your passphrase`);
+      if (option.passphrase === undefined) {
+        throw new CustomError(ErrorCode.CONNECT_CANCELLED, 'cancelled');
+      }
     }
 
     return new Promise<void>((resolve, reject) => {
@@ -237,6 +239,10 @@ export default class SSHClient extends RemoteClient {
             config
               .askForPasswd(`[${option.host}]: ${prompts[answers.length].prompt}`)
               .then(answer => {
+                if (answer === undefined) {
+                  return reject(new CustomError(ErrorCode.CONNECT_CANCELLED, 'cancelled'));
+                }
+
                 answers.push(answer);
                 redo(name, instructions, instructionsLang, prompts, finish, answers);
               });
