@@ -351,6 +351,10 @@
           "when": "false"
         },
         {
+          "command": "sftp.viewContent",
+          "when": "false"
+        },
+        {
           "command": "sftp.remoteExplorer.refresh",
           "when": "false"
         }
