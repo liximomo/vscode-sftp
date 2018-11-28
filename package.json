@@ -6,7 +6,7 @@
   "publisher": "liximomo",
   "author": "liximomo <liximomo@gmail.com> (https://liximomo.github.io/)",
   "engines": {
-    "vscode": "^1.24.0"
+    "vscode": "^1.25.0"
   },
   "bugs": {
     "url": "https://github.com/liximomo/vscode-sftp/issues",
