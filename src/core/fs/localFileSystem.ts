@@ -182,4 +182,8 @@ export default class LocalFileSystem extends FileSystem {
       });
     });
   }
+
+  rename(srcPath: string, destPath: string): Promise<void> {
+    return fse.rename(srcPath, destPath);
+  }
 }
