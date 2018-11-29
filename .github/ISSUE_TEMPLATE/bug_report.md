@@ -28,7 +28,7 @@ If applicable, add screenshots to help explain your problem.
  - VSCode Version [e.g. 1.27.0]
  - Extension Version [e.g. 1.7.0]
 
-**Extension Logs** - *required*
+**Extension Logs from Startup** - *required*
   1.  Open User Settings.
 
       * On Windows/Linux - File > Preferences > Settings
