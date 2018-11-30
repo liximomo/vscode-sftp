@@ -8,6 +8,9 @@ import { validateConfig } from '../config';
 import watcherService from '../fileWatcher';
 import Trie from './trie';
 
+const WIN_DRIVE_REGEX = /^([a-zA-Z]):/;
+const isWindows = process.platform === 'win32';
+
 const serviceManager = new Trie<FileService>(
   {},
   {
@@ -31,7 +34,6 @@ function maskConfig(config) {
 }
 
 function normalizePathForTrie(pathname) {
-  const isWindows = process.platform === 'win32';
   if (isWindows) {
     const device = pathname.substr(0, 2);
     if (device.charAt(1) === ':') {
@@ -43,11 +45,23 @@ function normalizePathForTrie(pathname) {
   return path.normalize(pathname);
 }
 
-export function getBasePath(context: any, workspace: string) {
+export function getBasePath(context: string, workspace: string) {
   let dirpath;
   if (context) {
     if (path.isAbsolute(context)) {
-      dirpath = context;
+      if (isWindows) {
+        const contextBeginWithDrive = context.match(WIN_DRIVE_REGEX);
+        // if a windows user omit drive, we complete it with a drive letter same with the workspace one
+        if (!contextBeginWithDrive) {
+          const workspaceDrive = workspace.match(WIN_DRIVE_REGEX);
+          if (workspaceDrive) {
+            const drive = workspaceDrive[1];
+            dirpath = path.join(`${drive}:`, context);
+          }
+        }
+      } else {
+        dirpath = context;
+      }
     } else {
       // Don't use path.resolve bacause it may change the root dir of workspace!
       // Example: On window path.resove('\\a\\b\\c') will result to '<drive>:\\a\\b\\c'
