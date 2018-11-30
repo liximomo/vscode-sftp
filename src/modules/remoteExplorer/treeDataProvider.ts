@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { showTextDocument } from '../../host';
 import { upath, UResource, Resource, FileService, FileType } from '../../core';
 import {
   COMMAND_REMOTEEXPLORER_VIEW_CONTENT,
@@ -8,6 +9,26 @@ import { getAllFileService } from '../serviceManager';
 import { getExtensionSetting } from '../../helper';
 
 type Id = number;
+
+const previewDocumentPathPrefix = '/~ ';
+
+/**
+ * covert the url path for a customed docuemnt title
+ *
+ *  There is no api to custom title.
+ *  So we change url path for custom title.
+ *  This is not break anything because we get fspth from uri.query.'
+ */
+export function makePreivewUrl(uri: vscode.Uri) {
+  // const query = querystring.parse(uri.query);
+  // query.originPath = uri.path;
+  // query.originQuery = uri.query;
+
+  return uri.with({
+    path: previewDocumentPathPrefix + upath.basename(uri.path),
+    // query: querystring.stringify(query),
+  });
+}
 
 interface ExplorerChild {
   resource: Resource;
@@ -59,9 +80,11 @@ export default class RemoteTreeData
 
       // refresh top level files as well
       const children = await this.getChildren(item);
-      children.filter(i => !i.isDirectory).forEach(i => this._onDidChangeFile.fire(i.resource.uri));
+      children
+        .filter(i => !i.isDirectory)
+        .forEach(i => this._onDidChangeFile.fire(makePreivewUrl(i.resource.uri)));
     } else {
-      this._onDidChangeFile.fire(item.resource.uri);
+      this._onDidChangeFile.fire(makePreivewUrl(item.resource.uri));
     }
   }
 
@@ -159,6 +182,14 @@ export default class RemoteTreeData
       UResource.makeResource(uri).fsPath || remotefs.pathResolver.normalize(uri.fsPath)
     );
     return buffer.toString();
+  }
+
+  showItem(item: ExplorerItem): void {
+    if (item.isDirectory) {
+      return;
+    }
+
+    showTextDocument(makePreivewUrl(item.resource.uri));
   }
 
   private _getRoots(): ExplorerRoot[] {

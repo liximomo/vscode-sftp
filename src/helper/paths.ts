@@ -7,10 +7,12 @@ export function simplifyPath(absolutePath: string) {
   return pathRelativeToWorkspace(absolutePath);
 }
 
+// FIXME: use fs.pathResolver instead of upath
 export function toRemotePath(localPath: string, localContext: string, remoteContext: string) {
   return upath.join(remoteContext, path.relative(localContext, localPath));
 }
 
+// FIXME: use fs.pathResolver instead of upath
 export function toLocalPath(remotePath: string, remoteContext: string, localContext: string) {
   return path.join(localContext, upath.relative(remoteContext, remotePath));
 }

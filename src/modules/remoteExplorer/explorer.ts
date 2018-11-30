@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
-import { showTextDocument, registerCommand } from '../../host';
+import { registerCommand } from '../../host';
 import {
   COMMAND_REMOTEEXPLORER_REFRESH,
   COMMAND_REMOTEEXPLORER_VIEW_CONTENT,
 } from '../../constants';
-import { UResource, upath } from '../../core';
+import { UResource } from '../../core';
 import { toRemotePath } from '../../helper';
 import { REMOTE_SCHEME } from '../../constants';
 import { getFileService } from '../serviceManager';
@@ -26,7 +26,7 @@ export default class RemoteExplorer {
 
     registerCommand(context, COMMAND_REMOTEEXPLORER_REFRESH, () => this._refreshSelection());
     registerCommand(context, COMMAND_REMOTEEXPLORER_VIEW_CONTENT, (item: ExplorerItem) =>
-      this._openResource(item.resource.uri)
+      this._treeDataProvider.showItem(item)
     );
   }
 
@@ -67,16 +67,5 @@ export default class RemoteExplorer {
     } else {
       this.refresh();
     }
-  }
-
-  private _openResource(uri: vscode.Uri): void {
-    // There is no api to custom title.
-    // So we change url path for custom title.
-    // This is not break anything because we get fspth from uri.query.'
-    showTextDocument(
-      uri.with({
-        path: `/~ ${upath.basename(uri.path)}`,
-      })
-    );
   }
 }
