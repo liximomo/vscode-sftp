@@ -72,7 +72,9 @@ export default checkCommand({
     if (shouldUseAgent(remoteConfig)) {
       terminal.sendText(getSshCommand(sshConfig));
     } else if (shouldUseKey(remoteConfig)) {
-      terminal.sendText(getSshCommand(sshConfig, `-i ${remoteConfig.privateKeyPath}`));
+      terminal.sendText(
+        getSshCommand(sshConfig, `-i "${remoteConfig.privateKeyPath.replace(/\\/g, '/')}"`)
+      );
     } else {
       terminal.sendText(getSshCommand(sshConfig));
     }
