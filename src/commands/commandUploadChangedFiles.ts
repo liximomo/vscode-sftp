@@ -70,7 +70,7 @@ async function handleCommand(hint: any) {
   const renames: Change[] = [];
   for (const change of changes) {
     if (!getFileService(change.uri)) {
-      return;
+      continue;
     }
 
     switch (change.status) {
@@ -93,23 +93,25 @@ async function handleCommand(hint: any) {
     renames.map(change => renameRemote(change.originalUri, { originPath: change.renameUri.fsPath }))
   );
 
-  logger.info('Upload Changed Files');
-  logger.info('\n');
-  outputGroup(creates, 'created:', c => simplifyPath(c.uri.fsPath));
-  logger.info('\n');
-  outputGroup(uploads, 'updated:', c => simplifyPath(c.uri.fsPath));
-  logger.info('\n');
+  logger.log('');
+  logger.log('------ Upload Changed Files Result ------');
+  outputGroup('create', creates, c => simplifyPath(c.uri.fsPath));
+  outputGroup('upload', uploads, c => simplifyPath(c.uri.fsPath));
   outputGroup(
+    'renamed',
     renames,
-    'renamed:',
     c => `${simplifyPath(c.originalUri.fsPath)} -> ${simplifyPath(c.renameUri.fsPath)}`
   );
 }
 
-function outputGroup<T>(items: T[], label, formatItem: (x: T) => string) {
-  logger.info(label);
-  logger.info('\n');
-  logger.info(items.map(formatItem).join('\t\n'));
+function outputGroup<T>(label: string, items: T[], formatItem: (x: T) => string) {
+  if (items.length <= 0) {
+    return;
+  }
+
+  logger.log(`${label.toUpperCase()}:`);
+  logger.log(items.map(i => formatItem(i)).join('\n'));
+  logger.log('');
 }
 
 async function getRepository(git: GitAPI): Promise<Repository> {

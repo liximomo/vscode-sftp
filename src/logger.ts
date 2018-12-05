@@ -14,6 +14,10 @@ export interface Logger {
 }
 
 class VSCodeLogger implements Logger {
+  log(message: string, ...args: any[]) {
+    output.print(message, ...args);
+  }
+
   trace(message: string, ...args: any[]) {
     if (debug) {
       output.print('[trace]', message, ...args);
