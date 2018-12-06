@@ -1,3 +1,7 @@
+## 1.8.0 - 2018-12-06
+  * New command [Upload Changed Files](https://github.com/liximomo/vscode-sftp/wiki/Commands#sftp-upload-changed-files).
+  * Fix bugs.
+
 ## 1.7.6 - 2018-11-22
   * Reduce *80%* startup time.
   * Fix [#396](https://github.com/liximomo/vscode-sftp/issues/396)
@@ -10,7 +14,7 @@
   * Don't upload the file when it's in downloading. [#390](https://github.com/liximomo/vscode-sftp/issues/390)
 
 ## 1.7.3 - 2018-11-03
-  * New config [limitopenfilesonserver](https://github.com/liximomo/vscode-sftp/wiki/Config#limitopenfilesonserver).
+  * New config [limitOpenFilesOnRemote](https://github.com/liximomo/vscode-sftp/wiki/Config#limitopenfilesonremote).
   * Show `upload file` context menu in SCM.
 
 ## 1.7.2 - 2018-10-29
