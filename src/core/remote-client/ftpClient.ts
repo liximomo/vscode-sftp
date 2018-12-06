@@ -1,4 +1,3 @@
-import { inspect } from 'util';
 import * as Client from 'ftp';
 import RemoteClient, { ConnectOption } from './remoteClient';
 
@@ -11,7 +10,7 @@ Client.prototype._send = function(cmd: string, cb: (err: Error) => void, promote
 
     if (cmd === 'ABOR') {
       if (this._pasvSocket) this._pasvSocket.aborting = true;
-      this._debug && this._debug('[connection] > ' + inspect(cmd));
+      this._debug && this._debug('[connection] > ' + cmd);
       this._socket.write(cmd + '\r\n');
       return;
     }
@@ -20,7 +19,7 @@ Client.prototype._send = function(cmd: string, cb: (err: Error) => void, promote
   if (!this._curReq && queueLen && this._socket && this._socket.readable) {
     this._curReq = this._queue.shift();
     if (this._curReq.cmd !== 'ABOR') {
-      this._debug && this._debug('[connection] > ' + inspect(this._curReq.cmd));
+      this._debug && this._debug('[connection] > ' + this._curReq.cmd);
       this._socket.write(this._curReq.cmd + '\r\n');
     }
   } else if (!this._curReq && !queueLen && this._ending) this._reset();
