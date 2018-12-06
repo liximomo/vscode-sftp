@@ -49,6 +49,7 @@ export function getBasePath(context: string, workspace: string) {
   let dirpath;
   if (context) {
     if (path.isAbsolute(context)) {
+      dirpath = context;
       if (isWindows) {
         const contextBeginWithDrive = context.match(WIN_DRIVE_REGEX);
         // if a windows user omit drive, we complete it with a drive letter same with the workspace one
@@ -59,8 +60,6 @@ export function getBasePath(context: string, workspace: string) {
             dirpath = path.join(`${drive}:`, context);
           }
         }
-      } else {
-        dirpath = context;
       }
     } else {
       // Don't use path.resolve bacause it may change the root dir of workspace!
