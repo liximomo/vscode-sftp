@@ -21,6 +21,7 @@ export default class RemoteExplorer {
     );
 
     this._explorerView = vscode.window.createTreeView('remoteExplorer', {
+      ...{ showCollapseAll: true }, // supress object literals error
       treeDataProvider: this._treeDataProvider,
     });
 
