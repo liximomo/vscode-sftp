@@ -1,3 +1,6 @@
+## 1.8.2 - 2018-12-13
+  * Add **Collapse All** action to RemoteExplorer.
+
 ## 1.8.0 - 2018-12-06
   * New command [Upload Changed Files](https://github.com/liximomo/vscode-sftp/wiki/Commands#sftp-upload-changed-files).
   * Fix bugs.
