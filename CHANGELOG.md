@@ -1,3 +1,6 @@
+## 1.8.3 - 2018-12-14
+  * Upgrade VSCode engine version.
+
 ## 1.8.2 - 2018-12-13
   * Add **Collapse All** action to RemoteExplorer.
 

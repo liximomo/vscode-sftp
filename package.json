@@ -2,11 +2,11 @@
   "name": "sftp",
   "displayName": "sftp",
   "description": "SFTP/FTP sync",
-  "version": "1.8.2",
+  "version": "1.8.3",
   "publisher": "liximomo",
   "author": "liximomo <liximomo@gmail.com> (https://liximomo.github.io/)",
   "engines": {
-    "vscode": "^1.25.0"
+    "vscode": "^1.30.0"
   },
   "bugs": {
     "url": "https://github.com/liximomo/vscode-sftp/issues",
