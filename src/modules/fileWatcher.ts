@@ -82,14 +82,14 @@ function createWatcher(
   watcherBase: string,
   watcherConfig: { files: false | string; autoUpload: boolean; autoDelete: boolean }
 ) {
-  if (!watcherConfig) {
-    return;
-  }
-
   let watcher = getWatcher(watcherBase);
   if (watcher) {
     // clear old watcher
     watcher.dispose();
+  }
+
+  if (!watcherConfig) {
+    return;
   }
 
   const shouldAddListenser = watcherConfig.autoUpload || watcherConfig.autoDelete;
