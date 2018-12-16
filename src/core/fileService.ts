@@ -9,6 +9,7 @@ import { filesIgnoredFromConfig } from '../helper';
 import { createRemoteIfNoneExist, removeRemote } from './remoteFs';
 import TransferTask from './transferTask';
 import localFs from './localFs';
+import logger from '../logger';
 
 interface WatcherConfig {
   files: false | string;
@@ -207,6 +208,7 @@ export default class FileService {
 
     const hasProfile = config.profiles && Object.keys(config.profiles).length > 0;
     if (hasProfile && app.state.profile) {
+      logger.info(`Using profile: ${app.state.profile}`);
       const profile = config.profiles[app.state.profile];
       if (!profile) {
         throw new Error(
@@ -230,7 +232,7 @@ export default class FileService {
     }
 
     // convert ingore config to ignore function
-    copied.ignore = this._createIgnoreFn(copied.remotePath);
+    copied.ignore = this._createIgnoreFn(copied);
     return copied;
   }
 
@@ -250,10 +252,11 @@ export default class FileService {
     }
   }
 
-  private _createIgnoreFn(remoteContext: string): (fsPath: string) => boolean {
+  private _createIgnoreFn(config: any): (fsPath: string) => boolean {
     const localContext = this.baseDir;
+    const remoteContext = config.remotePath;
 
-    const ignoreConfig = filesIgnoredFromConfig(this._config);
+    const ignoreConfig = filesIgnoredFromConfig(config);
     if (ignoreConfig.length <= 0) {
       return null;
     }
