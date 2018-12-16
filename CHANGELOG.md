@@ -1,3 +1,6 @@
+## 1.8.4 - 2018-12-16
+  * Fix ignore not work when use profile. [#428](https://github.com/liximomo/vscode-sftp/issues/428)
+
 ## 1.8.3 - 2018-12-14
   * Upgrade VSCode engine version.
 
