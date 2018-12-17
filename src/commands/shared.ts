@@ -8,14 +8,14 @@ import { listFiles, toLocalPath, simplifyPath } from '../helper';
 
 function configIngoreFilterCreator(config) {
   if (!config || !config.ignore) {
-    return null;
+    return;
   }
 
   return file => !config.ignore(file.fsPath);
 }
 
-function createFileSelector({ filterCreator = null } = {}) {
-  return async (): Promise<Uri> => {
+function createFileSelector(filterCreator?) {
+  return async (): Promise<Uri | undefined> => {
     const remoteItems = getAllFileService().map((fileService, index) => {
       const config = fileService.getConfig();
       return {
@@ -44,7 +44,7 @@ function createFileSelector({ filterCreator = null } = {}) {
   };
 }
 
-export function selectContext(): Promise<Uri> {
+export function selectContext(): Promise<Uri | undefined> {
   return new Promise((resolve, reject) => {
     const sercives = getAllFileService();
     const projectsList = sercives
@@ -70,7 +70,7 @@ export function selectContext(): Promise<Uri> {
         }
 
         // cancel selection
-        resolve(null);
+        resolve();
       }, reject);
   });
 }
@@ -89,9 +89,9 @@ export function applySelector<T>(...selectors: ((...args: any[]) => T | Promise<
   };
 }
 
-export function uriFromfspath(fileList: string[]): Uri[] {
+export function uriFromfspath(fileList: string[]): Uri[] | undefined {
   if (!Array.isArray(fileList) || typeof fileList[0] !== 'string') {
-    return null;
+    return;
   }
 
   return fileList.map(file => Uri.file(file));
@@ -100,7 +100,7 @@ export function uriFromfspath(fileList: string[]): Uri[] {
 export function getActiveDocumentUri() {
   const active = getActiveTextEditor();
   if (!active || !active.document) {
-    return null;
+    return;
   }
 
   return active.document.uri;
@@ -109,14 +109,14 @@ export function getActiveDocumentUri() {
 export function getActiveFolder() {
   const uri = getActiveDocumentUri();
   if (!uri) {
-    return null;
+    return;
   }
 
   return Uri.file(path.dirname(uri.fsPath));
 }
 
 // selected file or activeTarget or configContext
-export function uriFromExplorerContextOrEditorContext(item, items): Uri | Uri[] {
+export function uriFromExplorerContextOrEditorContext(item, items): undefined | Uri | Uri[] {
   // from explorer or editor context
   if (item instanceof Uri) {
     if (Array.isArray(items) && items[0] instanceof Uri) {
@@ -130,11 +130,11 @@ export function uriFromExplorerContextOrEditorContext(item, items): Uri | Uri[] 
     return item.resource.uri;
   }
 
-  return null;
+  return;
 }
 
 // selected folder or configContext
-export function selectFolderFallbackToConfigContext(item, items): Promise<Uri | Uri[]> {
+export function selectFolderFallbackToConfigContext(item, items): Promise<undefined | Uri | Uri[]> {
   // from explorer or editor context
   if (item) {
     if (item instanceof Uri) {
@@ -157,6 +157,4 @@ export function selectFolderFallbackToConfigContext(item, items): Promise<Uri | 
 export const selectFileFromAll = createFileSelector();
 
 // selected file from remote files expect ignored
-export const selectFile = createFileSelector({
-  filterCreator: configIngoreFilterCreator,
-});
+export const selectFile = createFileSelector(configIngoreFilterCreator);

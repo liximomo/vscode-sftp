@@ -1,5 +1,5 @@
 import * as output from './ui/output';
-import { getExtensionSetting } from './helper';
+import { getExtensionSetting } from './modules/ext';
 
 const extSetting = getExtensionSetting();
 const debug = extSetting.debug || extSetting.printDebugLog;

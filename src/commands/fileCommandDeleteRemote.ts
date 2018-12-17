@@ -10,6 +10,10 @@ export default checkFileCommand({
   async getFileTarget(item, items) {
     const targets = await uriFromExplorerContextOrEditorContext(item, items);
 
+    if (!targets) {
+      return;
+    }
+
     const filename = Array.isArray(targets)
       ? targets.map(t => upath.basename(t.fsPath)).join(',')
       : upath.basename(targets.fsPath);
@@ -19,7 +23,7 @@ export default checkFileCommand({
       'Cancel'
     );
 
-    return result ? targets : null;
+    return result ? targets : undefined;
   },
 
   handleFile: removeRemote,

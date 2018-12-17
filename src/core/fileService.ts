@@ -252,7 +252,7 @@ export default class FileService {
     }
   }
 
-  private _createIgnoreFn(config: any): (fsPath: string) => boolean {
+  private _createIgnoreFn(config: any): ((fsPath: string) => boolean) | null {
     const localContext = this.baseDir;
     const remoteContext = config.remotePath;
 

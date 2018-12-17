@@ -55,7 +55,7 @@ export default class FTPClient extends RemoteClient {
       this.connected = false;
     });
 
-    const { username, connectTimeout, ...option } = connectOption;
+    const { username, connectTimeout = 3 * 1000, ...option } = connectOption;
     return new Promise<void>((resolve, reject) => {
       setTimeout(() => {
         if (!this.connected) {

@@ -6,7 +6,7 @@ import {
   COMMAND_REMOTEEXPLORER_EDITINLOCAL,
 } from '../../constants';
 import { getAllFileService } from '../serviceManager';
-import { getExtensionSetting } from '../../helper';
+import { getExtensionSetting } from '../ext';
 
 type Id = number;
 
@@ -54,8 +54,8 @@ function dirFirstSort(fileA: ExplorerItem, fileB: ExplorerItem) {
 
 export default class RemoteTreeData
   implements vscode.TreeDataProvider<ExplorerItem>, vscode.TextDocumentContentProvider {
-  private _roots: ExplorerRoot[];
-  private _rootsMap: Map<Id, ExplorerRoot>;
+  private _roots: ExplorerRoot[] | null;
+  private _rootsMap: Map<Id, ExplorerRoot> | null;
   private _onDidChangeFolder: vscode.EventEmitter<ExplorerItem> = new vscode.EventEmitter<
     ExplorerItem
   >();
@@ -140,7 +140,7 @@ export default class RemoteTreeData
       .sort(dirFirstSort);
   }
 
-  getParent(item: ExplorerChild): ExplorerItem {
+  getParent(item: ExplorerChild): ExplorerItem | null {
     const resourceUri = item.resource.uri;
     const root = this.findRoot(resourceUri);
     if (!root) {
@@ -159,7 +159,7 @@ export default class RemoteTreeData
     };
   }
 
-  findRoot(uri: vscode.Uri): ExplorerRoot {
+  findRoot(uri: vscode.Uri): ExplorerRoot | null | undefined {
     if (!this._rootsMap) {
       return null;
     }
@@ -217,8 +217,8 @@ export default class RemoteTreeData
           id,
         },
       };
-      this._roots.push(item);
-      this._rootsMap.set(id, item);
+      this._roots!.push(item);
+      this._rootsMap!.set(id, item);
     });
     return this._roots;
   }

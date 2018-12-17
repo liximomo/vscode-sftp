@@ -14,6 +14,10 @@ export default checkCommand({
 
   async handleCommand() {
     const folderUri = getActiveFolder();
+    if (!folderUri) {
+      return;
+    }
+
     const ctx = handleCtxFromUri(folderUri);
     const config = ctx.config;
     const remotefs = await ctx.fileService.getRemoteFileSystem();
@@ -29,6 +33,10 @@ export default checkCommand({
       filter,
     }));
     const selected = await listFiles(listItems);
+    if (!selected) {
+      return;
+    }
+
     const localUri = Uri.file(
       toLocalPath(selected.fsPath, config.remotePath, ctx.fileService.baseDir)
     );

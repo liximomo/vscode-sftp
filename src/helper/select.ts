@@ -23,7 +23,7 @@ interface FileListItem {
 
   description: string;
 
-  getFs?: (() => Promise<FileSystem>) | FileSystem;
+  getFs: (() => Promise<FileSystem>) | FileSystem;
   filter?: (x: string) => boolean;
 }
 
@@ -32,7 +32,7 @@ async function showFiles<T extends FileListChildItem>(
   parent: T | null,
   files: T[],
   option: IFilePickerOption = {}
-): Promise<T> {
+): Promise<T | undefined> {
   let avalibleFiles = files;
   let filter;
   if (option.type === FileType.Directory) {
@@ -42,9 +42,10 @@ async function showFiles<T extends FileListChildItem>(
     filter = file => file.type !== FileType.SymbolicLink;
   }
   if (parent && parent.filter) {
+    const parentFilter = parent.filter;
     const oldFilter = filter;
     filter = file => {
-      return oldFilter(file) && parent.filter(file);
+      return oldFilter(file) && parentFilter(file);
     };
   }
   avalibleFiles = avalibleFiles.filter(file => {
@@ -100,7 +101,6 @@ async function showFiles<T extends FileListChildItem>(
 
   const selectedValue = result.value;
   const selectedPath = selectedValue.fsPath;
-  // fs will be nerver be null if current is root, so get fs from picker item
   const fileSystem =
     typeof selectedValue.getFs === 'function' ? await selectedValue.getFs() : selectedValue.getFs;
 
@@ -150,7 +150,7 @@ async function showFiles<T extends FileListChildItem>(
 export function listFiles<T extends FileListItem>(
   items: T[],
   option?: IFilePickerOption
-): Promise<T & FileListChildItem> {
+): Promise<T & FileListChildItem | undefined> {
   const baseItems = items.map(item => Object.assign({}, item, { parentFsPath: ROOT }));
   const fileLookUp = {
     [ROOT]: baseItems,

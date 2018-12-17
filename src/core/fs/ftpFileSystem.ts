@@ -8,7 +8,7 @@ import { FTPClient } from '../remote-client';
 interface FtpFileHandle {
   path: string;
   flags: string;
-  mode: number;
+  mode?: number;
 }
 
 const numMap = {
@@ -44,6 +44,8 @@ export default class FTPFileSystem extends RemoteFileSystem {
       return FileType.File;
     } else if (type === 'l') {
       return FileType.SymbolicLink;
+    } else {
+      return FileType.Unknown;
     }
   }
 
@@ -144,7 +146,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
   }
 
   async put(input: Readable, path, _option?: FileOption): Promise<void> {
-    let inputError: Error;
+    let inputError: Error | undefined;
     input.once('error', err => {
       inputError = err;
       this.ftp.abort(abortErr => {
@@ -162,7 +164,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
   }
 
   readlink(path: string): Promise<string> {
-    return this.lstat(path).then(stat => stat.target);
+    return this.lstat(path).then(stat => stat.target!);
   }
 
   symlink(_targetPath: string, _path: string): Promise<void> {

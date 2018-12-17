@@ -15,7 +15,7 @@ interface CommandOption extends BaseCommandOption {
 
 interface FileCommandOption extends BaseCommandOption {
   handleFile: (ctx: FileHandlerContext) => Promise<unknown>;
-  getFileTarget: (...args: any[]) => Uri | Uri[] | Promise<Uri | Uri[]>;
+  getFileTarget: (...args: any[]) => undefined | Uri | Uri[] | Promise<undefined | Uri | Uri[]>;
 }
 
 function checkType<T>() {
@@ -25,7 +25,7 @@ function checkType<T>() {
 export const checkCommand = checkType<CommandOption>();
 export const checkFileCommand = checkType<FileCommandOption>();
 
-export function createCommand(commandOption: CommandOption) {
+export function createCommand(commandOption: CommandOption & { name: string }) {
   return class NormalCommand extends Command {
     constructor() {
       super();
@@ -39,7 +39,7 @@ export function createCommand(commandOption: CommandOption) {
   };
 }
 
-export function createFileCommand(commandOption: FileCommandOption) {
+export function createFileCommand(commandOption: FileCommandOption & { name: string }) {
   return class FileCommand extends Command {
     constructor() {
       super();

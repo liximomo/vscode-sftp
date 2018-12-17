@@ -13,6 +13,7 @@ export enum FileType {
   Directory = 1,
   File,
   SymbolicLink,
+  Unknown,
 }
 
 export interface FileOption {
@@ -46,6 +47,8 @@ export default abstract class FileSystem {
       return FileType.File;
     } else if (stat.isSymbolicLink()) {
       return FileType.SymbolicLink;
+    } else {
+      return FileType.Unknown;
     }
   }
 

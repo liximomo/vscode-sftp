@@ -11,7 +11,7 @@ export interface CommandOption {
 
 export default abstract class Command {
   id: string;
-  name: string;
+  name!: string;
   private _commandDoneListeners: Array<(...args: any[]) => void>;
 
   constructor() {

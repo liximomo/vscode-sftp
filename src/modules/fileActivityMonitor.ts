@@ -17,6 +17,10 @@ let workspaceWatcher: vscode.Disposable;
 
 async function handleConfigSave(uri: vscode.Uri) {
   const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
+  if (!workspaceFolder) {
+    return;
+  }
+
   const workspacePath = workspaceFolder.uri.fsPath;
 
   // dispose old service

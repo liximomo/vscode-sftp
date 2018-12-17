@@ -1,12 +1,12 @@
 class AppState {
-  private _profile: string = null;
+  private _profile: string | null = null;
   private _observer: (x: any) => void;
 
-  get profile(): string {
+  get profile(): string | null {
     return this._profile;
   }
 
-  set profile(newProfile: string) {
+  set profile(newProfile: string | null) {
     if (this._profile === newProfile) {
       return;
     }

@@ -10,11 +10,11 @@ interface ITrieNodeChildren<T> {
 class TrieNode<T> {
   token: string;
 
-  private value: T;
+  private value: T | null;
   private children: ITrieNodeChildren<T>;
-  private parent: TrieNode<T>;
+  private parent: TrieNode<T> | null;
 
-  constructor(token: string, value: T = null) {
+  constructor(token: string, value: T | null = null) {
     this.token = token;
     this.value = value;
     this.children = {};
@@ -31,7 +31,7 @@ class TrieNode<T> {
     return this;
   }
 
-  getValue(): T {
+  getValue(): T | null {
     return this.value;
   }
 
@@ -40,7 +40,7 @@ class TrieNode<T> {
     return this;
   }
 
-  getParent(): TrieNode<T> {
+  getParent(): TrieNode<T> | null {
     return this.parent;
   }
 
@@ -125,16 +125,22 @@ export default class Trie<T> {
     return true;
   }
 
-  findPrefix(path: string | string[]): T {
+  findPrefix(path: string | string[]): T | null {
     const tokens = Array.isArray(path) ? path : this.splitPath(path);
     const node = this.findPrefixNode(this.root, tokens);
-    return node.getValue();
+    if (node) {
+      return node.getValue();
+    }
+
+    return null;
   }
 
-  clearPrefix(path: string | string[]): any {
+  clearPrefix(path: string | string[]) {
     const tokens = Array.isArray(path) ? path : this.splitPath(path);
     const node = this.findPrefixNode(this.root, tokens);
-    return node.clearValue();
+    if (node) {
+      node.clearValue();
+    }
   }
 
   findPrefixNode(parent: TrieNode<T>, tokens: string[]): TrieNode<T> | null {
@@ -144,7 +150,7 @@ export default class Trie<T> {
 
     let curentNode = this.root;
     do {
-      curentNode = curentNode.getChild(tokensQueue.pop());
+      curentNode = curentNode.getChild(tokensQueue.pop()!);
       if (curentNode === undefined) {
         break;
       }
@@ -172,12 +178,12 @@ export default class Trie<T> {
 
   getAllValues(): T[] {
     const nodeQueue = [this.root];
-    const result = [];
+    const result: T[] = [];
 
     do {
-      const curentNode = nodeQueue.shift();
+      const curentNode = nodeQueue.shift()!;
       if (curentNode.isLoaded()) {
-        result.push(curentNode.getValue());
+        result.push(curentNode.getValue()!);
       }
 
       const childrenNodes = curentNode.getChildren();
@@ -189,12 +195,12 @@ export default class Trie<T> {
 
   findValuesWithShortestBranch(): T[] {
     const nodeQueue = [this.root];
-    const result = [];
+    const result: T[] = [];
 
     do {
-      const curentNode = nodeQueue.shift();
+      const curentNode = nodeQueue.shift()!;
       if (curentNode.isLoaded()) {
-        result.push(curentNode.getValue());
+        result.push(curentNode.getValue()!);
       } else {
         const childrenNodes = curentNode.getChildren();
         nodeQueue.push(...childrenNodes);

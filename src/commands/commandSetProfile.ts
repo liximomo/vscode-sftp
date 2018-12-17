@@ -10,7 +10,9 @@ export default checkCommand({
   id: COMMAND_SET_PROFILE,
 
   async handleCommand(definedProfile) {
-    const profiles: Array<vscode.QuickPickItem & { value: string }> = getAllFileService().reduce(
+    const profiles = getAllFileService().reduce<
+      Array<vscode.QuickPickItem & { value: string | null }>
+    >(
       (acc, service) => {
         if (service.getAvaliableProfiles().length <= 0) {
           return acc;

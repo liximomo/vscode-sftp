@@ -55,7 +55,7 @@ export default class RemoteExplorer {
   }
 
   reveal(item: ExplorerItem): Thenable<void> {
-    return item ? this._explorerView.reveal(item) : null;
+    return item ? this._explorerView.reveal(item) : Promise.resolve();
   }
 
   findRoot(remoteUri: vscode.Uri) {

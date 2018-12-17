@@ -1,25 +1,28 @@
 import CustomError from '../customError';
 
 export interface ConnectOption {
+  // common
   host: string;
   port: number;
   username?: string;
   password?: string;
   connectTimeout?: number;
-  privateKeyPath?: string; // ssh-only
-  privateKey?: string; // ssh-only
-  passphrase?: string | boolean; // ssh-only
-  interactiveAuth?: boolean; // ssh-only
-  agent?: string; // ssh-only
-  sock?: any; // ssh-only
-  hop?: ConnectOption | ConnectOption[]; // ssh-only
-  limitOpenFilesOnRemote?: boolean | number; // ssh-only
-
-  secure?: any; // ftp-only
-  secureOptions?: object; // ftp-only
-  passive?: boolean; // ftp-only
-
   debug(x: string): void;
+
+  // ssh-only
+  privateKeyPath?: string;
+  privateKey?: string;
+  passphrase?: string | boolean;
+  interactiveAuth?: boolean;
+  agent?: string;
+  sock?: any;
+  hop?: ConnectOption | ConnectOption[];
+  limitOpenFilesOnRemote?: boolean | number;
+
+  // ftp-only
+  secure?: any;
+  secureOptions?: object;
+  passive?: boolean;
 }
 
 export enum ErrorCode {

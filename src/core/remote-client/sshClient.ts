@@ -170,7 +170,7 @@ export default class SSHClient extends RemoteClient {
         // 队列到下一周期执行, 确保 cb 先执行.
         Promise.resolve().then(() => {
           if (self._queuedFdRequireCall.length > 0) {
-            const queuedCall = self._queuedFdRequireCall.pop();
+            const queuedCall = self._queuedFdRequireCall.pop()!;
             queuedCall();
           }
         });
@@ -260,7 +260,7 @@ export default class SSHClient extends RemoteClient {
         .connect({
           keepaliveInterval: 1000 * 30,
           keepaliveCountMax: 2,
-          readyTimeout: interactiveAuth ? Math.max(60 * 1000, connectTimeout) : connectTimeout,
+          readyTimeout: interactiveAuth ? Math.max(60 * 1000, connectTimeout || 0) : connectTimeout,
           ...option,
           tryKeyboard: interactiveAuth,
         });

@@ -151,7 +151,7 @@ export function getAllFileService(): FileService[] {
 }
 
 export function getRunningTransformTasks(): TransferTask[] {
-  return getAllFileService().reduce((acc, fileService) => {
+  return getAllFileService().reduce<TransferTask[]>((acc, fileService) => {
     return acc.concat(fileService.getPendingTransferTasks());
   }, []);
 }

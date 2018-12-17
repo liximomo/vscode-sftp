@@ -9,6 +9,7 @@
         "sourceMap": true,
         "rootDir": ".",
         "noUnusedLocals": true,
+        "strictNullChecks": true,
         "plugins": [
           {
             "name": "typescript-tslint-plugin",
@@ -16,7 +17,7 @@
             "ignoreDefinitionFiles": true,
             "suppressWhileTypeErrorsPresent": false,
             "mockTypeScriptVersion": false,
-            "configFile": "./tslint.json",
+            "configFile": "./tslint.json"
           }
         ]
     },

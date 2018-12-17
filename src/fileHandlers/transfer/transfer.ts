@@ -10,7 +10,7 @@ import {
 import { flatten } from '../../utils';
 
 interface InternalTransferOption extends TransferTaskTransferOption {
-  ignore?: (filepath: string) => boolean;
+  ignore?: ((filepath: string) => boolean) | null;
 }
 
 interface BaseTransferHandleConfig {

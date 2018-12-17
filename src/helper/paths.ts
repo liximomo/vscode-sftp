@@ -30,5 +30,8 @@ export function resolvePath(from: string, to: string) {
 }
 
 export function isInWorksapce(filepath: string) {
-  return getWorkspaceFolders().some(folder => filepath.indexOf(folder.uri.fsPath) === 0);
+  const workspaceFolders = getWorkspaceFolders();
+  return (
+    workspaceFolders && workspaceFolders.some(folder => filepath.indexOf(folder.uri.fsPath) === 0)
+  );
 }

@@ -39,7 +39,7 @@ function isSourceControlResourceGroup(object: any): object is vscode.SourceContr
 }
 
 async function handleCommand(hint: any) {
-  let repository: Repository;
+  let repository: Repository | undefined;
   let filterGroupId;
   const git = getGitService();
 
@@ -90,7 +90,7 @@ async function handleCommand(hint: any) {
 
   await Promise.all(creates.concat(uploads).map(change => uploadFile(change.uri)));
   await Promise.all(
-    renames.map(change => renameRemote(change.originalUri, { originPath: change.renameUri.fsPath }))
+    renames.map(change => renameRemote(change.originalUri, { originPath: change.renameUri!.fsPath }))
   );
 
   logger.log('');
@@ -100,7 +100,7 @@ async function handleCommand(hint: any) {
   outputGroup(
     'renamed',
     renames,
-    c => `${simplifyPath(c.originalUri.fsPath)} -> ${simplifyPath(c.renameUri.fsPath)}`
+    c => `${simplifyPath(c.originalUri.fsPath)} -> ${simplifyPath(c.renameUri!.fsPath)}`
   );
 }
 
@@ -114,7 +114,7 @@ function outputGroup<T>(label: string, items: T[], formatItem: (x: T) => string)
   logger.log('');
 }
 
-async function getRepository(git: GitAPI): Promise<Repository> {
+async function getRepository(git: GitAPI): Promise<Repository | undefined> {
   if (git.repositories.length === 1) {
     return git.repositories[0];
   }

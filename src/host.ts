@@ -5,7 +5,7 @@ export function getUserSetting(section: string) {
   return vscode.workspace.getConfiguration(section);
 }
 
-export function executeCommand(command: string, ...rest: any[]): Thenable<{}> {
+export function executeCommand(command: string, ...rest: any[]): Thenable<any> {
   return vscode.commands.executeCommand(command, ...rest);
 }
 

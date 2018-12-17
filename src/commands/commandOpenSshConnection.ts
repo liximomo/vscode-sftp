@@ -38,7 +38,9 @@ export default checkCommand({
         return;
       }
     } else {
-      const remoteItems = getAllFileService().reduce((result, fileService) => {
+      const remoteItems = getAllFileService().reduce<
+        { label: string; description: string; config: any }[]
+      >((result, fileService) => {
         const config = fileService.getConfig();
         if (config.protocol === 'sftp') {
           result.push({
