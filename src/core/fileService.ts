@@ -1,20 +1,70 @@
 import { EventEmitter } from 'events';
+import * as fs from 'fs';
 import * as path from 'path';
 import app from '../app';
 import upath from './upath';
 import Ignore from './ignore';
 import { FileSystem } from './fs';
 import Scheduler from './scheduler';
-import { filesIgnoredFromConfig } from '../helper';
 import { createRemoteIfNoneExist, removeRemote } from './remoteFs';
 import TransferTask from './transferTask';
 import localFs from './localFs';
 import logger from '../logger';
 
+interface Host {
+  host: string;
+  port: number;
+  connectTimeout: number;
+  username: string;
+  password: string;
+
+  passphrase: string | true;
+  interactiveAuth: boolean;
+  algorithms: any;
+
+  secure: boolean | 'control' | 'implicit';
+  secureOptions: any;
+}
+
 interface WatcherConfig {
   files: false | string;
   autoUpload: boolean;
   autoDelete: boolean;
+}
+
+interface ServiceOption {
+  name: string;
+  protocol: string;
+  context: string;
+  remotePath: string;
+  uploadOnSave: boolean;
+  downloadOnOpen: boolean | 'confirm';
+  concurrency: number;
+
+  watcher: WatcherConfig;
+  syncOption: {
+    delete: boolean;
+    skipCreate: boolean;
+    ignoreExisting: boolean;
+    update: boolean;
+  };
+  remoteTimeOffsetInHours: number;
+}
+
+export interface FileServiceConfig extends Host, ServiceOption {
+  agent?: string;
+  privateKeyPath?: string;
+  sshConfigPath: string;
+  ignore: string[];
+  ignoreFile: string;
+
+  profiles?: {
+    [x: string]: FileServiceConfig;
+  };
+}
+
+export interface ServiceConfig extends Host, ServiceOption {
+  ignore?: ((fsPath: string) => boolean) | null;
 }
 
 export interface WatcherService {
@@ -30,7 +80,30 @@ interface TransferScheduler {
 
 type ConfigValidator = (x: any) => { message: string };
 
-let id = 0;
+function filesIgnoredFromConfig(config: FileServiceConfig): string[] {
+  const cache = app.ignoreFileCache;
+  const ignore: string[] = config.ignore && config.ignore.length ? config.ignore : [];
+
+  const ignoreFile = config.ignoreFile;
+  if (!ignoreFile) {
+    return ignore;
+  }
+
+  let ignoreFromFile;
+  if (cache.has(ignoreFile)) {
+    ignoreFromFile = cache.get(ignoreFile);
+  } else if (fs.existsSync(ignoreFile)) {
+    ignoreFromFile = fs
+      .readFileSync(ignoreFile)
+      .toString()
+      .split(/\r?\n/g);
+    cache.set(ignoreFile, ignoreFromFile);
+  } else {
+    throw new Error(`File ${ignoreFile} not found. Check your config of "ignoreFile"`);
+  }
+
+  return ignore.concat(ignoreFromFile);
+}
 
 function getHostInfo(config) {
   const ignoreOptions = [
@@ -59,6 +132,8 @@ enum Event {
   AFTER_TRANSFER = 'AFTER_TRANSFER',
 }
 
+let id = 0;
+
 export default class FileService {
   private _eventEmitter: EventEmitter = new EventEmitter();
   private _name: string;
@@ -66,7 +141,7 @@ export default class FileService {
   private _profiles: string[];
   private _pendingTransferTasks: Set<TransferTask> = new Set();
   private _schedulers: Scheduler[] = [];
-  private _config: any;
+  private _config: FileServiceConfig;
   private _configValidator: ConfigValidator;
   private _watcherService: WatcherService = {
     create() {
@@ -80,7 +155,7 @@ export default class FileService {
   baseDir: string;
   workspace: string;
 
-  constructor(baseDir: string, workspace: string, config: any) {
+  constructor(baseDir: string, workspace: string, config: FileServiceConfig) {
     this.id = ++id;
     this.workspace = workspace;
     this.baseDir = baseDir;
@@ -192,9 +267,9 @@ export default class FileService {
     return createRemoteIfNoneExist(getHostInfo(this.getConfig()));
   }
 
-  getConfig(): any {
+  getConfig(): ServiceConfig {
     const config = this._config;
-    const copied = Object.assign({}, config);
+    const copied = Object.assign({}, config) as any;
     delete copied.profiles;
 
     if (config.agent && config.agent.startsWith('$')) {
@@ -209,7 +284,7 @@ export default class FileService {
     const hasProfile = config.profiles && Object.keys(config.profiles).length > 0;
     if (hasProfile && app.state.profile) {
       logger.info(`Using profile: ${app.state.profile}`);
-      const profile = config.profiles[app.state.profile];
+      const profile = config.profiles![app.state.profile];
       if (!profile) {
         throw new Error(
           `Unkown Profile "${app.state.profile}".` +
@@ -252,7 +327,7 @@ export default class FileService {
     }
   }
 
-  private _createIgnoreFn(config: any): ((fsPath: string) => boolean) | null {
+  private _createIgnoreFn(config: FileServiceConfig): ServiceConfig['ignore'] {
     const localContext = this.baseDir;
     const remoteContext = config.remotePath;
 
