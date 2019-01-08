@@ -64,6 +64,12 @@ const configScheme = {
     update: Joi.boolean(),
   },
   remoteTimeOffsetInHours: Joi.number().optional(),
+
+  remoteExplorer: {
+    filesExclude: Joi.array()
+      .min(0)
+      .items(Joi.string()),
+  },
 };
 
 const defaultConfig = {

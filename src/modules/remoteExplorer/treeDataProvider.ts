@@ -1,6 +1,15 @@
 import * as vscode from 'vscode';
 import { showTextDocument } from '../../host';
-import { upath, UResource, Resource, FileService, FileType } from '../../core';
+import {
+  upath,
+  UResource,
+  Resource,
+  FileService,
+  FileType,
+  FileEntry,
+  Ignore,
+  ServiceConfig,
+} from '../../core';
 import {
   COMMAND_REMOTEEXPLORER_VIEW_CONTENT,
   COMMAND_REMOTEEXPLORER_EDITINLOCAL,
@@ -12,6 +21,7 @@ type Id = number;
 
 const previewDocumentPathPrefix = '/~ ';
 
+const DEFAULT_FILES_EXCLUDE = ['.git', '.svn', '.hg', 'CVS', '.DS_Store'];
 /**
  * covert the url path for a customed docuemnt title
  *
@@ -38,6 +48,7 @@ interface ExplorerChild {
 export interface ExplorerRoot extends ExplorerChild {
   explorerContext: {
     fileService: FileService;
+    config: ServiceConfig;
     id: Id;
   };
 }
@@ -123,10 +134,23 @@ export default class RemoteTreeData
     if (!root) {
       throw new Error(`Can't find config for remote resource ${item.resource.uri}.`);
     }
-    const remotefs = await root.explorerContext.fileService.getRemoteFileSystem();
+    const config = root.explorerContext.config;
+    const remotefs = await root.explorerContext.fileService.getRemoteFileSystem(config);
     const fileEntries = await remotefs.list(item.resource.fsPath);
 
+    const filesExcludeList: string[] =
+      config.remoteExplorer && config.remoteExplorer.filesExclude
+        ? config.remoteExplorer.filesExclude.concat(DEFAULT_FILES_EXCLUDE)
+        : DEFAULT_FILES_EXCLUDE;
+
+    const ignore = new Ignore(filesExcludeList);
+    function filterFile(file: FileEntry) {
+      const relativePath = upath.relative(config.remotePath, file.fspath);
+      return !ignore.ignores(relativePath);
+    }
+
     return fileEntries
+      .filter(filterFile)
       .map(file => {
         const isDirectory = file.type === FileType.Directory;
 
@@ -177,7 +201,8 @@ export default class RemoteTreeData
       throw new Error(`Can't find remote for resource ${uri}.`);
     }
 
-    const remotefs = await root.explorerContext.fileService.getRemoteFileSystem();
+    const config = root.explorerContext.config;
+    const remotefs = await root.explorerContext.fileService.getRemoteFileSystem(config);
     const buffer = await remotefs.readFile(
       UResource.makeResource(uri).fsPath || remotefs.pathResolver.normalize(uri.fsPath)
     );
@@ -214,6 +239,7 @@ export default class RemoteTreeData
         isDirectory: true,
         explorerContext: {
           fileService,
+          config,
           id,
         },
       };

@@ -113,6 +113,21 @@
         "type": "string",
         "description": "Absolute path to the ignore file or Relative path relative to the workspace root folder.",
         "default": ".gitignore"
+      },
+      "remoteExplorer": {
+        "type": "object",
+        "description": "Remote Explorer Setting.",
+        "properties": {
+          "filesExclude": {
+            "type": "array",
+            "description": "Configure patterns for excluding files and folders. The Remote Explorer decides which files and folders to show or hide based on this setting.",
+            "items": {
+              "type": "string",
+              "description": "Exclude pattern."
+            },
+            "default": []
+          }
+        }
       }
     }
   },

@@ -1,6 +1,6 @@
 import { Uri } from 'vscode';
 import app from '../app';
-import { UResource, FileService } from '../core';
+import { UResource, FileService, ServiceConfig } from '../core';
 import logger from '../logger';
 import { getFileService } from '../modules/serviceManager';
 
@@ -11,7 +11,7 @@ interface FileHandlerConfig {
 export interface FileHandlerContext {
   target: UResource;
   fileService: FileService;
-  config: any;
+  config: ServiceConfig;
 }
 
 type FileHandlerContextMethod<R = void> = (this: FileHandlerContext) => R;

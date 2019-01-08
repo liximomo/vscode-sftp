@@ -4,7 +4,7 @@ import createFileHandler from './createFileHandler';
 export const removeRemote = createFileHandler<{ skipDir?: boolean }>({
   name: 'removeRemote',
   async handle(option) {
-    const remoteFs = await this.fileService.getRemoteFileSystem();
+    const remoteFs = await this.fileService.getRemoteFileSystem(this.config);
     const { remoteFsPath } = this.target;
     const stat = await remoteFs.lstat(remoteFsPath);
     let promise;

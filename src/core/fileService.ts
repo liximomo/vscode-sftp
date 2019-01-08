@@ -49,6 +49,9 @@ interface ServiceOption {
     update: boolean;
   };
   remoteTimeOffsetInHours: number;
+  remoteExplorer?: {
+    filesExclude?: string[];
+  };
 }
 
 export interface FileServiceConfig extends Host, ServiceOption {
@@ -263,8 +266,8 @@ export default class FileService {
     return localFs;
   }
 
-  getRemoteFileSystem(): Promise<FileSystem> {
-    return createRemoteIfNoneExist(getHostInfo(this.getConfig()));
+  getRemoteFileSystem(config: ServiceConfig): Promise<FileSystem> {
+    return createRemoteIfNoneExist(getHostInfo(config));
   }
 
   getConfig(): ServiceConfig {
@@ -364,6 +367,7 @@ export default class FileService {
     this._watcherService.dispose(this.baseDir);
   }
 
+  // fixme: remote all profiles
   private _disposeFileSystem() {
     return removeRemote(getHostInfo(this.getConfig()));
   }

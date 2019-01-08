@@ -30,7 +30,7 @@ export enum ErrorCode {
 }
 
 export interface Config {
-  askForPasswd(msg: string): Promise<string>;
+  askForPasswd(msg: string): Promise<string | undefined>;
 }
 
 export default abstract class RemoteClient {

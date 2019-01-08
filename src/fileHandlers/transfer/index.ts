@@ -4,7 +4,7 @@ import { transfer, sync, TransferOption, SyncOption, TransferDirection } from '.
 
 function createTransferHandle(direction: TransferDirection) {
   return async function handle(this: FileHandlerContext, option) {
-    const remoteFs = await this.fileService.getRemoteFileSystem();
+    const remoteFs = await this.fileService.getRemoteFileSystem(this.config);
     const localFs = this.fileService.getLocalFileSystem();
     const { localFsPath, remoteFsPath } = this.target;
     const scheduler = this.fileService.createTransferScheduler(this.config.concurrency);
@@ -40,7 +40,7 @@ const downloadHandle = createTransferHandle(TransferDirection.REMOTE_TO_LOCAL);
 export const sync2Remote = createFileHandler<SyncOption>({
   name: 'sync',
   async handle(option) {
-    const remoteFs = await this.fileService.getRemoteFileSystem();
+    const remoteFs = await this.fileService.getRemoteFileSystem(this.config);
     const localFs = this.fileService.getLocalFileSystem();
     const { localFsPath, remoteFsPath } = this.target;
     const scheduler = this.fileService.createTransferScheduler(this.config.concurrency);
@@ -78,7 +78,7 @@ export const sync2Remote = createFileHandler<SyncOption>({
 export const sync2Local = createFileHandler<SyncOption>({
   name: 'sync',
   async handle(option) {
-    const remoteFs = await this.fileService.getRemoteFileSystem();
+    const remoteFs = await this.fileService.getRemoteFileSystem(this.config);
     const localFs = this.fileService.getLocalFileSystem();
     const { localFsPath, remoteFsPath } = this.target;
     const scheduler = this.fileService.createTransferScheduler(this.config.concurrency);

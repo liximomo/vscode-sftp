@@ -8,7 +8,7 @@ import createFileHandler from './createFileHandler';
 export const diff = createFileHandler({
   name: 'diff',
   async handle() {
-    const remoteFs = await this.fileService.getRemoteFileSystem();
+    const remoteFs = await this.fileService.getRemoteFileSystem(this.config);
     const localFs = this.fileService.getLocalFileSystem();
     const { localFsPath, remoteFsPath } = this.target;
     const tmpPath = await makeTmpFile({

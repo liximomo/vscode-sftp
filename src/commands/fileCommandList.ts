@@ -10,7 +10,7 @@ export default checkFileCommand({
   getFileTarget: selectFile,
 
   async handleFile(ctx) {
-    const remotefs = await ctx.fileService.getRemoteFileSystem();
+    const remotefs = await ctx.fileService.getRemoteFileSystem(ctx.config);
     const fileEntry = await remotefs.lstat(ctx.target.remoteFsPath);
     if (fileEntry.type !== FileType.Directory) {
       await downloadFile(ctx);

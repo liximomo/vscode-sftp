@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import { EXTENSION_NAME } from './constants';
 
-export function getUserSetting(section: string) {
-  return vscode.workspace.getConfiguration(section);
+export function getUserSetting(section: string, resource?: vscode.Uri | null | undefined) {
+  return vscode.workspace.getConfiguration(section, resource);
 }
 
 export function executeCommand(command: string, ...rest: any[]): Thenable<any> {
@@ -55,12 +55,12 @@ export function diffFiles(leftFsPath, rightFsPath, title, option?) {
   return executeCommand('vscode.diff', leftUri, rightUri, title, option);
 }
 
-export function promptForPassword(prompt: string): Promise<string | null> {
+export function promptForPassword(prompt: string): Promise<string | undefined> {
   return vscode.window.showInputBox({
     ignoreFocusOut: true,
     password: true,
     prompt,
-  }) as Promise<string | null>;
+  }) as Promise<string | undefined>;
 }
 
 export function setContextValue(key: string, value: any) {

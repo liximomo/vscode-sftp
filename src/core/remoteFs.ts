@@ -15,7 +15,7 @@ function hashOption(opiton) {
 class KeepAliveRemoteFs {
   private isValid: boolean = false;
 
-  private pendingPromise: Promise<RemoteFileSystem>;
+  private pendingPromise: Promise<RemoteFileSystem> | null;
 
   private fs: RemoteFileSystem;
 

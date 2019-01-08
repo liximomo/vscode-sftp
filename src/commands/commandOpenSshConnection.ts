@@ -33,7 +33,7 @@ export default checkCommand({
   async handleCommand(exploreItem?: ExplorerRoot) {
     let remoteConfig;
     if (exploreItem && exploreItem.explorerContext) {
-      remoteConfig = exploreItem.explorerContext.fileService.getConfig();
+      remoteConfig = exploreItem.explorerContext.config;
       if (remoteConfig.protocol !== 'sftp') {
         return;
       }

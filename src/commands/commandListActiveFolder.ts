@@ -20,9 +20,9 @@ export default checkCommand({
 
     const ctx = handleCtxFromUri(folderUri);
     const config = ctx.config;
-    const remotefs = await ctx.fileService.getRemoteFileSystem();
+    const remotefs = await ctx.fileService.getRemoteFileSystem(config);
     const fileEntry = await remotefs.list(ctx.target.remoteFsPath);
-    const filter = config.ignore ? file => !config.ignore(file.fsPath) : undefined;
+    const filter = config.ignore ? file => !config.ignore!(file.fsPath) : undefined;
 
     const listItems = fileEntry.map(file => ({
       name: path.basename(file.fspath) + (file.type === FileType.Directory ? '/' : ''),

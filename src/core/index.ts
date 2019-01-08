@@ -4,6 +4,7 @@ import FileService, { WatcherService, FileServiceConfig, ServiceConfig } from '.
 import UResource, { Resource } from './uResource';
 import Scheduler from './scheduler';
 import TransferTask from './transferTask';
+import Ignore from './ignore';
 export * from './transferTask';
 export * from './fs';
 
@@ -18,4 +19,5 @@ export {
   UResource,
   Resource,
   Scheduler,
+  Ignore,
 };
