@@ -1,3 +1,8 @@
+## 1.9.0 - 2019-01-08
+  * Control files and folders to show or hide in Remote Explorer by `remoteExplorer.filesExclude`. [#410](https://github.com/liximomo/vscode-sftp/issues/410)
+  * Suport new OpenSSH key format. [#391](https://github.com/liximomo/vscode-sftp/issues/391)
+  * Improve performance.
+
 ## 1.8.4 - 2018-12-16
   * Fix ignore not work when use profile. [#428](https://github.com/liximomo/vscode-sftp/issues/428)
 
