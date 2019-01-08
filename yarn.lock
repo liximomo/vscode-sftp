@@ -614,6 +614,13 @@ bcrypt-pbkdf@^1.0.0:
   dependencies:
     tweetnacl "^0.14.3"
 
+bcrypt-pbkdf@^1.0.2:
+  version "1.0.2"
+  resolved "http://registry.npm.taobao.org/bcrypt-pbkdf/download/bcrypt-pbkdf-1.0.2.tgz#a4301d389b6a43f9b67ff3ca11a3f6637e360e9e"
+  integrity sha1-pDAdOJtqQ/m2f/PKEaP2Y342Dp4=
+  dependencies:
+    tweetnacl "^0.14.3"
+
 beeper@^1.0.0:
   version "1.1.1"
   resolved "http://registry.npm.taobao.org/beeper/download/beeper-1.1.1.tgz#e6d5ea8c5dad001304a70b22638447f69cb2f809"
@@ -4201,7 +4208,7 @@ schema-utils@^0.4.4, schema-utils@^0.4.5:
     ajv "^6.1.0"
     ajv-keywords "^3.1.0"
 
-"semver@2 || 3 || 4 || 5", semver@^5.1.0, semver@^5.3.0:
+"semver@2 || 3 || 4 || 5", semver@^5.3.0:
   version "5.3.0"
   resolved "http://registry.npm.taobao.org/semver/download/semver-5.3.0.tgz#9b2ce5d3de02d17c6012ad326aa6b4d0cf54f94f"
 
@@ -4399,19 +4406,21 @@ ssh-config@^1.1.3:
   version "1.1.3"
   resolved "http://registry.npm.taobao.org/ssh-config/download/ssh-config-1.1.3.tgz#2b19630af85b1666688b9d68f6e4218900f81f8c"
 
-ssh2-streams@~0.2.0:
-  version "0.2.1"
-  resolved "http://registry.npm.taobao.org/ssh2-streams/download/ssh2-streams-0.2.1.tgz#9c9c9964be60e9644575af328677f64b1e5cbd79"
+ssh2-streams@~0.3.0:
+  version "0.3.0"
+  resolved "http://registry.npm.taobao.org/ssh2-streams/download/ssh2-streams-0.3.0.tgz#63ebd0975149059f10bc5ed1323dff925d630dfc"
+  integrity sha1-Y+vQl1FJBZ8QvF7RMj3/kl1jDfw=
   dependencies:
     asn1 "~0.2.0"
-    semver "^5.1.0"
+    bcrypt-pbkdf "^1.0.2"
     streamsearch "~0.1.2"
 
-ssh2@^0.6.1:
-  version "0.6.1"
-  resolved "http://registry.npm.taobao.org/ssh2/download/ssh2-0.6.1.tgz#5dde1a7394bb978b1f9c2f014affee2f5493bd40"
+ssh2@^0.7.0:
+  version "0.7.0"
+  resolved "http://registry.npm.taobao.org/ssh2/download/ssh2-0.7.0.tgz#f91bf702bce8d48d82e4ea81eb3269498c98501c"
+  integrity sha1-+Rv3Arzo1I2C5OqB6zJpSYyYUBw=
   dependencies:
-    ssh2-streams "~0.2.0"
+    ssh2-streams "~0.3.0"
 
 sshpk@^1.7.0:
   version "1.13.0"
