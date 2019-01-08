@@ -59,7 +59,7 @@ class PriorityQueue<T> implements Queue<T> {
   }
 
   dequeue(): T {
-    return this._queue.shift().item;
+    return this._queue.shift()!.item;
   }
 
   clear() {

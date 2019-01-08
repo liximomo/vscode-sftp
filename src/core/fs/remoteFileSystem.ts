@@ -1,16 +1,19 @@
 import FileSystem, { FileOption } from './fileSystem';
 import { RemoteClient, ConnectOption, RemoteClientConfig } from '../remote-client';
 
-interface RFSOption {
-  remoteTimeOffsetInHours?: number;
+interface RFSOptionDefaults {
+  remoteTimeOffsetInHours: number;
+}
+
+type RFSOption = Partial<RFSOptionDefaults> & {
   client?: RemoteClient;
   clientOption?: ConnectOption;
-}
+};
 
 const SECONDS_PER_HOUR = 60 * 60;
 const MILLISECONDS_PER_HOUR = SECONDS_PER_HOUR * 1000;
 
-const defaultOption: Partial<RFSOption> = {
+const defaultOption: RFSOptionDefaults = {
   remoteTimeOffsetInHours: 0,
 };
 
@@ -82,7 +85,7 @@ export default abstract class RemoteFileSystem extends FileSystem {
         return reject(error);
       }
 
-      const arr = [];
+      const arr: Buffer[] = [];
       const onData = chunk => {
         arr.push(chunk);
       };
