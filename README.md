@@ -1,5 +1,7 @@
 # sftp sync extension for VS Code
 
+[![Paypal Donations](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=KEJA775QBTZSC&source=url)
+
 Very powerful, with smart features. Very simple, requires just three lines of config! Very fast, finished in a blink.
 
 - Features
@@ -223,4 +225,4 @@ If this project help you reduce time to develop, you can give me a cup of coffee
 
 ### PayPal
 
-[![PayPal](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/liximomo)
+[![PayPal](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=KEJA775QBTZSC&source=url)
