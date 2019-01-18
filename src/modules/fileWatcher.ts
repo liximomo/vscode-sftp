@@ -33,7 +33,7 @@ function doUpload() {
     }
 
     const fspath = uri.fsPath;
-    logger.info(`[watcher-update] ${fspath}`);
+    logger.info(`[watcher/updated] ${fspath}`);
     try {
       await upload(uri);
     } catch (error) {
@@ -48,7 +48,7 @@ function doDelete() {
   deleteQueue.clear();
   files.forEach(async uri => {
     const fspath = uri.fsPath;
-    logger.info(`[watcher-update] ${fspath}`);
+    logger.info(`[watcher/removed] ${fspath}`);
     try {
       await removeRemote(uri);
     } catch (error) {

@@ -7,19 +7,10 @@ import {
   TransferDirection,
   fileOperations,
 } from '../../core';
+import { FileHandleOption } from '../option';
 import { flatten } from '../../utils';
 
-interface InternalTransferOption extends TransferTaskTransferOption {
-  ignore?: ((filepath: string) => boolean) | null;
-}
-
-interface BaseTransferHandleConfig {
-  srcFsPath: string;
-  targetFsPath: string;
-  srcFs: FileSystem;
-  targetFs: FileSystem;
-  transferDirection: TransferDirection;
-}
+interface InternalTransferOption extends FileHandleOption, TransferTaskTransferOption {}
 
 type ExternalTransferOption<T extends InternalTransferOption> = Pick<
   T,
@@ -42,6 +33,14 @@ interface SyncOption extends TransferOption {
 
   // make newest file to be present in both locations.
   bothDiretions?: boolean;
+}
+
+interface BaseTransferHandleConfig {
+  srcFsPath: string;
+  targetFsPath: string;
+  srcFs: FileSystem;
+  targetFs: FileSystem;
+  transferDirection: TransferDirection;
 }
 
 interface TransferHandleConfig<T> extends BaseTransferHandleConfig {
@@ -290,7 +289,6 @@ async function _sync(
     // files exist only on target
     if (transferOption.bothDiretions) {
       if (transferOption.skipCreate !== true) {
-        // todo change transferDirection
         Object.keys(desFileTable).forEach(id => {
           const file = desFileTable[id];
           const fspath = srcFs.pathResolver.join(srcFsPath, file.name);

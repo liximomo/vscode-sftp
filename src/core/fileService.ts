@@ -6,7 +6,7 @@ import upath from './upath';
 import Ignore from './ignore';
 import { FileSystem } from './fs';
 import Scheduler from './scheduler';
-import { createRemoteIfNoneExist, removeRemote } from './remoteFs';
+import { createRemoteIfNoneExist, removeRemoteFs } from './remoteFs';
 import TransferTask from './transferTask';
 import localFs from './localFs';
 import logger from '../logger';
@@ -311,6 +311,8 @@ export default class FileService {
 
     // convert ingore config to ignore function
     copied.ignore = this._createIgnoreFn(copied);
+
+    // todo: do processConfig here
     return copied;
   }
 
@@ -369,6 +371,6 @@ export default class FileService {
 
   // fixme: remote all profiles
   private _disposeFileSystem() {
-    return removeRemote(getHostInfo(this.getConfig()));
+    return removeRemoteFs(getHostInfo(this.getConfig()));
   }
 }

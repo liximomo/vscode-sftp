@@ -1,7 +1,8 @@
 import { fileOperations, FileType } from '../core';
 import createFileHandler from './createFileHandler';
+import { FileHandleOption } from './option';
 
-export const removeRemote = createFileHandler<{ skipDir?: boolean }>({
+export const removeRemote = createFileHandler<FileHandleOption & { skipDir?: boolean }>({
   name: 'removeRemote',
   async handle(option) {
     const remoteFs = await this.fileService.getRemoteFileSystem(this.config);
@@ -24,5 +25,11 @@ export const removeRemote = createFileHandler<{ skipDir?: boolean }>({
         throw new Error(`Unsupported file type (type = ${stat.type})`);
     }
     await promise;
+  },
+  transformOption() {
+    const config = this.config;
+    return {
+      ignore: config.ignore,
+    };
   },
 });

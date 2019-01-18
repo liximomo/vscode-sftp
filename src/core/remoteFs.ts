@@ -125,7 +125,7 @@ export function createRemoteIfNoneExist(option): Promise<FileSystem> {
   return fsInstance.getFs(option);
 }
 
-export function removeRemote(option) {
+export function removeRemoteFs(option) {
   const identity = hashOption(option);
   const fs = fsTable[identity];
   if (fs !== undefined) {
