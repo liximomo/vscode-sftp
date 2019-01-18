@@ -28,7 +28,7 @@ async function handleConfigSave(uri: vscode.Uri) {
 
   // create new service
   try {
-    const configs = await readConfigsFromFile(uri.fsPath, workspacePath);
+    const configs = await readConfigsFromFile(uri.fsPath);
     configs.forEach(config => createFileService(config, workspacePath));
   } catch (error) {
     reportError(error);

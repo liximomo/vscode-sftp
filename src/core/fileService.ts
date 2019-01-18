@@ -1,7 +1,12 @@
 import { EventEmitter } from 'events';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as sshConfig from 'ssh-config';
 import app from '../app';
+import logger from '../logger';
+import { getUserSetting } from '../host';
+import { replaceHomePath, resolvePath } from '../helper';
+import { SETTING_KEY_REMOTE } from '../constants';
 import upath from './upath';
 import Ignore from './ignore';
 import { FileSystem } from './fs';
@@ -9,7 +14,8 @@ import Scheduler from './scheduler';
 import { createRemoteIfNoneExist, removeRemoteFs } from './remoteFs';
 import TransferTask from './transferTask';
 import localFs from './localFs';
-import logger from '../logger';
+
+const DEFAULT_SSHCONFIG_FILE = '~/.ssh/config';
 
 interface Host {
   host: string;
@@ -18,6 +24,9 @@ interface Host {
   username: string;
   password: string;
 
+  agent?: string;
+
+  privateKeyPath?: string;
   passphrase: string | true;
   interactiveAuth: boolean;
   algorithms: any;
@@ -55,15 +64,15 @@ interface ServiceOption {
 }
 
 export interface FileServiceConfig extends Host, ServiceOption {
-  agent?: string;
-  privateKeyPath?: string;
-  sshConfigPath: string;
-  ignore: string[];
-  ignoreFile: string;
-
   profiles?: {
     [x: string]: FileServiceConfig;
   };
+
+  remote?: string;
+  sshConfigPath?: string;
+
+  ignore: string[];
+  ignoreFile: string;
 }
 
 export interface ServiceConfig extends Host, ServiceOption {
@@ -128,6 +137,96 @@ function getHostInfo(config) {
     }
     return obj;
   }, {});
+}
+
+function chooseDefaultPort(protocol) {
+  return protocol === 'ftp' ? 21 : 22;
+}
+
+function setConfigValue(config, key, value) {
+  if (config[key] === undefined) {
+    if (key === 'port') {
+      config[key] = parseInt(value, 10);
+    } else {
+      config[key] = value;
+    }
+  }
+}
+
+function mergeConfigWithExternalRefer(config: FileServiceConfig): FileServiceConfig {
+  const copyed = Object.assign({}, config);
+
+  if (config.remote) {
+    const remoteMap = getUserSetting(SETTING_KEY_REMOTE);
+    const remote = remoteMap.get(config.remote);
+    if (!remote) {
+      throw new Error(`Can\'t not find remote "${config.remote}"`);
+    }
+    const remoteKeyMapping = new Map([['scheme', 'protocol']]);
+
+    const remoteKeyIgnored = new Map([['rootPath', 1]]);
+
+    Object.keys(remote).forEach(key => {
+      if (remoteKeyIgnored.has(key)) {
+        return;
+      }
+
+      const targetKey = remoteKeyMapping.has(key) ? remoteKeyMapping.get(key) : key;
+      setConfigValue(copyed, targetKey, remote[key]);
+    });
+  }
+
+  if (config.protocol !== 'sftp') {
+    return copyed;
+  }
+
+  const sshConfigPath = replaceHomePath(config.sshConfigPath || DEFAULT_SSHCONFIG_FILE);
+  let content;
+  try {
+    content = fs.readFileSync(sshConfigPath, 'utf8');
+  } catch (error) {
+    logger.warn(error.message, `load ${sshConfigPath} failed`);
+    return copyed;
+  }
+
+  const parsedSSHConfig = sshConfig.parse(content);
+  const section = parsedSSHConfig.find({
+    Host: copyed.host,
+  });
+
+  if (section === null) {
+    return copyed;
+  }
+
+  const mapping = new Map([
+    ['HostName', 'host'],
+    ['Port', 'port'],
+    ['User', 'user'],
+    ['IdentityFile', 'privatekey'],
+    ['ServerAliveInterval', 'keepalive'],
+    ['ConnectTimeout', 'connTimeout'],
+  ]);
+
+  section.config.forEach(line => {
+    const key = mapping.get(line.param);
+
+    if (key !== undefined) {
+      // don't need consider config priority, always set to the resolve host.
+      if (key === 'host') {
+        copyed[key] = line.value;
+      } else {
+        setConfigValue(copyed, key, line.value);
+      }
+    }
+  });
+
+  return copyed;
+}
+
+function getCompleteConfig(config: FileServiceConfig, workspace: string): FileServiceConfig {
+  const mergedConfig = mergeConfigWithExternalRefer(config);
+
+  return mergedConfig;
 }
 
 enum Event {
@@ -272,17 +371,8 @@ export default class FileService {
 
   getConfig(): ServiceConfig {
     const config = this._config;
-    const copied = Object.assign({}, config) as any;
-    delete copied.profiles;
-
-    if (config.agent && config.agent.startsWith('$')) {
-      const evnVarName = config.agent.slice(1);
-      const val = process.env[evnVarName];
-      if (!val) {
-        throw new Error(`Environment variable "${evnVarName}" not found`);
-      }
-      copied.agent = val;
-    }
+    const afterApplyProfile = Object.assign({}, config) as any;
+    delete afterApplyProfile.profiles;
 
     const hasProfile = config.profiles && Object.keys(config.profiles).length > 0;
     if (hasProfile && app.state.profile) {
@@ -295,11 +385,11 @@ export default class FileService {
             ' You can set a profile by running command `SFTP: Set Profile`.'
         );
       }
-      Object.assign(copied, profile);
+      Object.assign(afterApplyProfile, profile);
     }
 
     // validate config
-    const error = this._configValidator && this._configValidator(copied);
+    const error = this._configValidator && this._configValidator(afterApplyProfile);
     if (error) {
       let errorMsg = `Config validation fail: ${error.message}.`;
       // tslint:disable-next-line triple-equals
@@ -309,16 +399,48 @@ export default class FileService {
       throw new Error(errorMsg);
     }
 
-    // convert ingore config to ignore function
-    copied.ignore = this._createIgnoreFn(copied);
-
-    // todo: do processConfig here
-    return copied;
+    return this._resolveServiceConfig(getCompleteConfig(afterApplyProfile, this.workspace));
   }
 
   dispose() {
     this._disposeWatcher();
     this._disposeFileSystem();
+  }
+
+  private _resolveServiceConfig(fileServiceConfig: FileServiceConfig): ServiceConfig {
+    const workspace = this.workspace;
+    const serviceConfig: ServiceConfig = fileServiceConfig as any;
+
+    if (serviceConfig.port === undefined) {
+      serviceConfig.port = chooseDefaultPort(serviceConfig.protocol);
+    }
+
+    if (serviceConfig.protocol === 'ftp') {
+      serviceConfig.concurrency = 1;
+    }
+
+    // remove the './' part from a relative path
+    serviceConfig.remotePath = upath.normalize(serviceConfig.remotePath);
+    if (serviceConfig.privateKeyPath) {
+      serviceConfig.privateKeyPath = resolvePath(workspace, serviceConfig.privateKeyPath);
+    }
+
+    if (fileServiceConfig.ignoreFile) {
+      fileServiceConfig.ignoreFile = resolvePath(workspace, fileServiceConfig.ignoreFile);
+      serviceConfig.ignore = this._createIgnoreFn(fileServiceConfig);
+    }
+
+    // convert ingore config to ignore function
+    if (serviceConfig.agent && serviceConfig.agent.startsWith('$')) {
+      const evnVarName = serviceConfig.agent.slice(1);
+      const val = process.env[evnVarName];
+      if (!val) {
+        throw new Error(`Environment variable "${evnVarName}" not found`);
+      }
+      serviceConfig.agent = val;
+    }
+
+    return serviceConfig;
   }
 
   private _storeScheduler(scheduler: Scheduler) {

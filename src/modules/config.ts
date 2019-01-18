@@ -2,14 +2,9 @@ import * as vscode from 'vscode';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as Joi from 'joi';
-import * as sshConfig from 'ssh-config';
-import { CONFIG_PATH, SETTING_KEY_REMOTE } from '../constants';
-import { reportError, replaceHomePath, resolvePath } from '../helper';
-import { upath } from '../core';
-import { showTextDocument, getUserSetting } from '../host';
-import logger from '../logger';
-
-const DEFAULT_SSHCONFIG_FILE = '~/.ssh/config';
+import { CONFIG_PATH } from '../constants';
+import { reportError } from '../helper';
+import { showTextDocument } from '../host';
 
 const nullable = schema => schema.optional().allow(null);
 
@@ -92,7 +87,7 @@ const defaultConfig = {
 
   // server common
   // host,
-  // port: 22,
+  // port,
   // username,
   // password,
   connectTimeout: 10 * 1000,
@@ -107,115 +102,15 @@ const defaultConfig = {
   // ftp
   secure: false,
   // secureOptions,
-  passive: false,
+  // passive: false,
   remoteTimeOffsetInHours: 0,
 };
 
-function chooseDefaultPort(protocol) {
-  return protocol === 'ftp' ? 21 : 22;
-}
-
-function setConfigValue(config, key, value) {
-  if (config[key] === undefined) {
-    config[key] = value;
-  }
-}
-
-async function extendConfig(config) {
-  const copyed = Object.assign({}, config);
-
-  if (config.remote) {
-    const remoteMap = getUserSetting(SETTING_KEY_REMOTE);
-    const remote = remoteMap.get(config.remote);
-    if (!remote) {
-      throw new Error(`Can\'t not find remote "${config.remote}"`);
-    }
-    const remoteKeyMapping = new Map([['scheme', 'protocol']]);
-
-    const remoteKeyIgnored = new Map([['rootPath', 1]]);
-
-    Object.keys(remote).forEach(key => {
-      if (remoteKeyIgnored.has(key)) {
-        return;
-      }
-
-      const targetKey = remoteKeyMapping.has(key) ? remoteKeyMapping.get(key) : key;
-      setConfigValue(copyed, targetKey, remote[key]);
-    });
-  }
-
-  if (config.protocol !== 'sftp') {
-    return copyed;
-  }
-
-  const sshConfigPath = replaceHomePath(copyed.sshConfigPath || DEFAULT_SSHCONFIG_FILE);
-  let content;
-  try {
-    content = await fse.readFile(sshConfigPath, 'utf8');
-  } catch (error) {
-    logger.warn(error.message, `load ${sshConfigPath} failed`);
-    return copyed;
-  }
-
-  const parsedSSHConfig = sshConfig.parse(content);
-  const section = parsedSSHConfig.find({
-    Host: copyed.host,
-  });
-
-  if (section === null) {
-    return copyed;
-  }
-
-  const mapping = new Map([
-    ['HostName', 'host'],
-    ['Port', 'port'],
-    ['User', 'user'],
-    ['IdentityFile', 'privatekey'],
-    ['ServerAliveInterval', 'keepalive'],
-    ['ConnectTimeout', 'connTimeout'],
-  ]);
-
-  section.config.forEach(line => {
-    const key = mapping.get(line.param);
-
-    if (key !== undefined) {
-      // don't need consider config priority, always set to the resolve host.
-      if (key === 'host') {
-        copyed[key] = line.value;
-      } else {
-        setConfigValue(copyed, key, line.value);
-      }
-    }
-  });
-
-  // convert to integer
-  copyed.port = parseInt(copyed.port, 10);
-
-  return copyed;
-}
-
-async function processConfig(config, workspace) {
-  let extendedConfig = await extendConfig(config);
-  extendedConfig = {
+function mergedDefault(config) {
+  return {
     ...defaultConfig,
-    port: chooseDefaultPort(extendedConfig.protocol), // override default port by protocol
-    ...extendedConfig,
+    ...config,
   };
-
-  if (extendedConfig.protocol === 'ftp') {
-    extendedConfig.concurrency = 1;
-  }
-
-  // remove the './' part from a relative path
-  extendedConfig.remotePath = upath.normalize(extendedConfig.remotePath);
-  if (extendedConfig.privateKeyPath) {
-    extendedConfig.privateKeyPath = resolvePath(workspace, extendedConfig.privateKeyPath);
-  }
-  if (extendedConfig.ignoreFile) {
-    extendedConfig.ignoreFile = resolvePath(workspace, extendedConfig.ignoreFile);
-  }
-
-  return extendedConfig;
 }
 
 function getConfigPath(basePath) {
@@ -235,10 +130,10 @@ export function validateConfig(config) {
   return error;
 }
 
-export function readConfigsFromFile(configPath, workspace): Promise<any[]> {
+export function readConfigsFromFile(configPath): Promise<any[]> {
   return fse.readJson(configPath).then(config => {
     const configs = Array.isArray(config) ? config : [config];
-    return Promise.all(configs.map(c => processConfig(c, workspace)));
+    return configs.map(mergedDefault);
   });
 }
 
@@ -247,7 +142,7 @@ export function tryLoadConfigs(workspace): Promise<any[]> {
   return fse.pathExists(configPath).then(
     exist => {
       if (exist) {
-        return readConfigsFromFile(configPath, workspace);
+        return readConfigsFromFile(configPath);
       }
       return [];
     },
@@ -278,9 +173,9 @@ export function newConfig(basePath) {
         .outputJson(
           configPath,
           {
-            protocol: defaultConfig.protocol,
             host: 'localhost',
-            port: chooseDefaultPort(defaultConfig.protocol),
+            protocol: 'sftp',
+            port: '22',
             username: 'username',
             remotePath: '/',
           },
