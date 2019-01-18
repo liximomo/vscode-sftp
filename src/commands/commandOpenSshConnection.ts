@@ -2,7 +2,10 @@ import * as vscode from 'vscode';
 import { COMMAND_OPEN_CONNECTION_IN_TERMINAL } from '../constants';
 import { getAllFileService } from '../modules/serviceManager';
 import { ExplorerRoot } from '../modules/remoteExplorer';
+import { getUserSetting } from '../host';
 import { checkCommand } from './abstract/createCommand';
+
+const isWindows = process.platform === 'win32';
 
 function shouldUseAgent(config) {
   return typeof config.agent === 'string' && config.agent.length > 0;
@@ -10,6 +13,24 @@ function shouldUseAgent(config) {
 
 function shouldUseKey(config) {
   return typeof config.privateKeyPath === 'string' && config.privateKeyPath.length > 0;
+}
+
+function adaptPath(filepath) {
+  // convert to unix style
+  const safeUnixPath = filepath.replace(/\\\\/g, '/').replace(/\\/g, '/');
+  if (!isWindows) {
+    return safeUnixPath;
+  }
+
+  const setting = getUserSetting('terminal.integrated.shell');
+  const shell = setting.get('windows', '');
+
+  if (!shell.endsWith('wsl.exe')) {
+    return safeUnixPath;
+  }
+
+  // append with /mnt and convert c: to c
+  return '/mnt/' + safeUnixPath.replace(/^([a-zA-Z]):/, '$1');
 }
 
 // function shouldUsePass(config) {
@@ -74,9 +95,7 @@ export default checkCommand({
     if (shouldUseAgent(remoteConfig)) {
       terminal.sendText(getSshCommand(sshConfig));
     } else if (shouldUseKey(remoteConfig)) {
-      terminal.sendText(
-        getSshCommand(sshConfig, `-i "${remoteConfig.privateKeyPath.replace(/\\/g, '/')}"`)
-      );
+      terminal.sendText(getSshCommand(sshConfig, `-i "${adaptPath(remoteConfig.privateKeyPath)}"`));
     } else {
       terminal.sendText(getSshCommand(sshConfig));
     }
