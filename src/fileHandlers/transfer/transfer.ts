@@ -9,6 +9,7 @@ import {
 } from '../../core';
 import { FileHandleOption } from '../option';
 import { flatten } from '../../utils';
+import logger from '../../logger';
 
 interface InternalTransferOption extends FileHandleOption, TransferTaskTransferOption {}
 
@@ -149,7 +150,7 @@ async function transferWithType(
       transferFile(config, fileType, collect);
       break;
     default:
-      throw new Error(`Unsupported file type (type = ${fileType})`);
+      logger.warn(`Unsupported file type (type = ${fileType}). File ${config.srcFsPath}`);
   }
 }
 

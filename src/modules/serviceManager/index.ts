@@ -104,7 +104,9 @@ export function createFileService(config: any, workspace: string) {
       logger.info(`cancel transfer ${localFsPath}`);
       app.sftpBarItem.showMsg(`cancelled ${filename}`, filepath, 2000 * 2);
     } else if (error) {
+      // if ((error as any).reported !== true) {
       reportError(error, `when ${transferType} ${localFsPath}`);
+      // }
       app.sftpBarItem.showMsg(`failed ${filename}`, filepath, 2000 * 2);
     } else {
       logger.info(`${transferType} ${localFsPath}`);

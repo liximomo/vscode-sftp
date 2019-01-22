@@ -93,7 +93,7 @@ interface TransferScheduler {
 type ConfigValidator = (x: any) => { message: string };
 
 function filesIgnoredFromConfig(config: FileServiceConfig): string[] {
-  const cache = app.ignoreFileCache;
+  const cache = app.fsCache;
   const ignore: string[] = config.ignore && config.ignore.length ? config.ignore : [];
 
   const ignoreFile = config.ignoreFile;
@@ -105,16 +105,13 @@ function filesIgnoredFromConfig(config: FileServiceConfig): string[] {
   if (cache.has(ignoreFile)) {
     ignoreFromFile = cache.get(ignoreFile);
   } else if (fs.existsSync(ignoreFile)) {
-    ignoreFromFile = fs
-      .readFileSync(ignoreFile)
-      .toString()
-      .split(/\r?\n/g);
+    ignoreFromFile = fs.readFileSync(ignoreFile).toString();
     cache.set(ignoreFile, ignoreFromFile);
   } else {
     throw new Error(`File ${ignoreFile} not found. Check your config of "ignoreFile"`);
   }
 
-  return ignore.concat(ignoreFromFile);
+  return ignore.concat(ignoreFromFile.split(/\r?\n/g));
 }
 
 function getHostInfo(config) {
@@ -181,15 +178,26 @@ function mergeConfigWithExternalRefer(config: FileServiceConfig): FileServiceCon
   }
 
   const sshConfigPath = replaceHomePath(config.sshConfigPath || DEFAULT_SSHCONFIG_FILE);
-  let content;
-  try {
-    content = fs.readFileSync(sshConfigPath, 'utf8');
-  } catch (error) {
-    logger.warn(error.message, `load ${sshConfigPath} failed`);
+
+  const cache = app.fsCache;
+  let sshConfigContent;
+  if (cache.has(sshConfigPath)) {
+    sshConfigContent = cache.get(sshConfigPath);
+  } else {
+    try {
+      sshConfigContent = fs.readFileSync(sshConfigPath, 'utf8');
+    } catch (error) {
+      logger.warn(error.message, `load ${sshConfigPath} failed`);
+      sshConfigContent = '';
+    }
+    cache.set(sshConfigPath, sshConfigContent);
+  }
+
+  if (!sshConfigContent) {
     return copyed;
   }
 
-  const parsedSSHConfig = sshConfig.parse(content);
+  const parsedSSHConfig = sshConfig.parse(sshConfigContent);
   const section = parsedSSHConfig.find({
     Host: copyed.host,
   });
@@ -225,6 +233,26 @@ function mergeConfigWithExternalRefer(config: FileServiceConfig): FileServiceCon
 
 function getCompleteConfig(config: FileServiceConfig, workspace: string): FileServiceConfig {
   const mergedConfig = mergeConfigWithExternalRefer(config);
+
+  // remove the './' part from a relative path
+  mergedConfig.remotePath = upath.normalize(mergedConfig.remotePath);
+  if (mergedConfig.privateKeyPath) {
+    mergedConfig.privateKeyPath = resolvePath(workspace, mergedConfig.privateKeyPath);
+  }
+
+  if (mergedConfig.ignoreFile) {
+    mergedConfig.ignoreFile = resolvePath(workspace, mergedConfig.ignoreFile);
+  }
+
+  // convert ingore config to ignore function
+  if (mergedConfig.agent && mergedConfig.agent.startsWith('$')) {
+    const evnVarName = mergedConfig.agent.slice(1);
+    const val = process.env[evnVarName];
+    if (!val) {
+      throw new Error(`Environment variable "${evnVarName}" not found`);
+    }
+    mergedConfig.agent = val;
+  }
 
   return mergedConfig;
 }
@@ -373,7 +401,6 @@ export default class FileService {
     const config = this._config;
     const afterApplyProfile = Object.assign({}, config) as any;
     delete afterApplyProfile.profiles;
-
     const hasProfile = config.profiles && Object.keys(config.profiles).length > 0;
     if (hasProfile && app.state.profile) {
       logger.info(`Using profile: ${app.state.profile}`);
@@ -388,8 +415,8 @@ export default class FileService {
       Object.assign(afterApplyProfile, profile);
     }
 
-    // validate config
-    const error = this._configValidator && this._configValidator(afterApplyProfile);
+    const completeConfig = getCompleteConfig(afterApplyProfile, this.workspace);
+    const error = this._configValidator && this._configValidator(completeConfig);
     if (error) {
       let errorMsg = `Config validation fail: ${error.message}.`;
       // tslint:disable-next-line triple-equals
@@ -399,7 +426,7 @@ export default class FileService {
       throw new Error(errorMsg);
     }
 
-    return this._resolveServiceConfig(getCompleteConfig(afterApplyProfile, this.workspace));
+    return this._resolveServiceConfig(completeConfig);
   }
 
   dispose() {
@@ -408,37 +435,15 @@ export default class FileService {
   }
 
   private _resolveServiceConfig(fileServiceConfig: FileServiceConfig): ServiceConfig {
-    const workspace = this.workspace;
     const serviceConfig: ServiceConfig = fileServiceConfig as any;
 
     if (serviceConfig.port === undefined) {
       serviceConfig.port = chooseDefaultPort(serviceConfig.protocol);
     }
-
     if (serviceConfig.protocol === 'ftp') {
       serviceConfig.concurrency = 1;
     }
-
-    // remove the './' part from a relative path
-    serviceConfig.remotePath = upath.normalize(serviceConfig.remotePath);
-    if (serviceConfig.privateKeyPath) {
-      serviceConfig.privateKeyPath = resolvePath(workspace, serviceConfig.privateKeyPath);
-    }
-
-    if (fileServiceConfig.ignoreFile) {
-      fileServiceConfig.ignoreFile = resolvePath(workspace, fileServiceConfig.ignoreFile);
-      serviceConfig.ignore = this._createIgnoreFn(fileServiceConfig);
-    }
-
-    // convert ingore config to ignore function
-    if (serviceConfig.agent && serviceConfig.agent.startsWith('$')) {
-      const evnVarName = serviceConfig.agent.slice(1);
-      const val = process.env[evnVarName];
-      if (!val) {
-        throw new Error(`Environment variable "${evnVarName}" not found`);
-      }
-      serviceConfig.agent = val;
-    }
+    serviceConfig.ignore = this._createIgnoreFn(fileServiceConfig);
 
     return serviceConfig;
   }

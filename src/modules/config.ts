@@ -23,32 +23,27 @@ const configScheme = {
   agent: nullable(Joi.string()),
   privateKeyPath: nullable(Joi.string()),
   passphrase: nullable(Joi.string().allow(true)),
-  interactiveAuth: Joi.boolean().optional(),
+  interactiveAuth: Joi.boolean(),
   algorithms: Joi.any(),
-  sshConfigPath: Joi.string().optional(),
+  sshConfigPath: Joi.string(),
 
-  secure: Joi.any()
-    .valid(true, false, 'control', 'implicit')
-    .optional(),
+  secure: Joi.any().valid(true, false, 'control', 'implicit'),
   secureOptions: nullable(Joi.object()),
-  passive: Joi.boolean().optional(),
+  passive: Joi.boolean(),
 
   remotePath: Joi.string().required(),
-  uploadOnSave: Joi.boolean().optional(),
+  uploadOnSave: Joi.boolean(),
   downloadOnOpen: Joi.boolean()
-    .optional()
-    .allow('confirm'),
+  .allow('confirm'),
 
   ignore: Joi.array()
     .min(0)
     .items(Joi.string()),
-  ignoreFile: Joi.string().optional(),
+  ignoreFile: Joi.string(),
   watcher: {
-    files: Joi.string()
-      .allow(false, null)
-      .optional(),
-    autoUpload: Joi.boolean().optional(),
-    autoDelete: Joi.boolean().optional(),
+    files: Joi.string().allow(false, null),
+    autoUpload: Joi.boolean(),
+    autoDelete: Joi.boolean(),
   },
   concurrency: Joi.number().integer(),
 
@@ -58,7 +53,7 @@ const configScheme = {
     ignoreExisting: Joi.boolean(),
     update: Joi.boolean(),
   },
-  remoteTimeOffsetInHours: Joi.number().optional(),
+  remoteTimeOffsetInHours: Joi.number(),
 
   remoteExplorer: {
     filesExclude: Joi.array()

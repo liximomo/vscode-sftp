@@ -5,7 +5,7 @@ import AppState from './modules/appState';
 import RemoteExplorer from './modules/remoteExplorer';
 
 interface App {
-  ignoreFileCache: LRU.Cache<string, string[]>;
+  fsCache: LRU.Cache<string, string>;
   state: AppState;
   sftpBarItem: StatusBarItem;
   remoteExplorer: RemoteExplorer;
@@ -25,6 +25,6 @@ app.sftpBarItem = new StatusBarItem(
   'SFTP@liximomo',
   COMMAND_TOGGLE_OUTPUT
 );
-app.ignoreFileCache = LRU<string, string[]>({ max: 6 });
+app.fsCache = LRU<string, string>({ max: 6 });
 
 export default app;

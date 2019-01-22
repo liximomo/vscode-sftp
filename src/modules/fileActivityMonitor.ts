@@ -98,8 +98,8 @@ function watchWorkspace({
     }
 
     // remove staled cache
-    if (app.ignoreFileCache.has(uri.fsPath)) {
-      app.ignoreFileCache.del(uri.fsPath);
+    if (app.fsCache.has(uri.fsPath)) {
+      app.fsCache.del(uri.fsPath);
     }
 
     if (isConfigFile(uri)) {
