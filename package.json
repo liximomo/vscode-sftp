@@ -2,7 +2,7 @@
   "name": "sftp",
   "displayName": "sftp",
   "description": "SFTP/FTP sync",
-  "version": "1.9.1",
+  "version": "1.9.2",
   "publisher": "liximomo",
   "author": "liximomo <liximomo@gmail.com> (https://liximomo.github.io/)",
   "engines": {
@@ -362,13 +362,13 @@
       "explorer/context": [
         {
           "command": "sftp.revealInRemoteExplorer",
-          "group": "navigation",
-          "when": "sftp.enabled"
+          "group": "navigation@20",
+          "when": "sftp.enabled && !explorerResourceIsRoot"
         },
         {
           "command": "sftp.diff",
           "group": "3_compare",
-          "when": "sftp.enabled && !explorerResourceIsFolder"
+          "when": "sftp.enabled && !explorerResourceIsRoot && !explorerResourceIsFolder"
         },
         {
           "command": "sftp.sync.localToRemote",
@@ -388,7 +388,7 @@
         {
           "command": "sftp.upload.file",
           "group": "sftp.trans@1",
-          "when": "sftp.enabled && !explorerResourceIsFolder"
+          "when": "sftp.enabled && !explorerResourceIsRoot && !explorerResourceIsFolder"
         },
         {
           "command": "sftp.upload.folder",
@@ -399,7 +399,7 @@
         {
           "command": "sftp.download.file",
           "group": "sftp.trans@2",
-          "when": "sftp.enabled && !explorerResourceIsFolder"
+          "when": "sftp.enabled && !explorerResourceIsRoot && !explorerResourceIsFolder"
         },
         {
           "command": "sftp.download.folder",
