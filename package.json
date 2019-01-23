@@ -37,7 +37,7 @@
       "activitybar": [
         {
           "id": "sftp",
-          "title": "SFTP",
+          "title": "Remote Explorer",
           "icon": "resources/remote-explorer.svg"
         }
       ]
