@@ -168,11 +168,13 @@ export function newConfig(basePath) {
         .outputJson(
           configPath,
           {
+            name: 'My Server',
             host: 'localhost',
             protocol: 'sftp',
-            port: '22',
+            port: 22,
             username: 'username',
             remotePath: '/',
+            uploadOnSave: true,
           },
           { spaces: 4 }
         )
