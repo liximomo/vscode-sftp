@@ -77,6 +77,8 @@ Use `SFTP: Set Profile` to swtich profile.
 
 ### Multiple Context
 
+The context must **not be same**.
+
 ```json
 [
   {
