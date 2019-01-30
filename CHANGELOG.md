@@ -1,3 +1,7 @@
+## 1.9.3 - 2019-01-30
+  * New icon for RemoteExplorer. Thanks [niccolomineo](https://github.com/niccolomineo) and [jonbp](https://github.com/jonbp).
+  * Change `port` to number in the generated config.
+   
 ## 1.9.2 - 2019-01-22
   * Fix [#388](https://github.com/liximomo/vscode-sftp/issues/388)
   * Fix [#456](https://github.com/liximomo/vscode-sftp/issues/456)
