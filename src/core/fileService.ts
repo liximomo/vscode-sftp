@@ -207,16 +207,16 @@ function mergeConfigWithExternalRefer(config: FileServiceConfig): FileServiceCon
   }
 
   const mapping = new Map([
-    ['HostName', 'host'],
-    ['Port', 'port'],
-    ['User', 'user'],
-    ['IdentityFile', 'privatekey'],
-    ['ServerAliveInterval', 'keepalive'],
-    ['ConnectTimeout', 'connTimeout'],
+    ['hostname', 'host'],
+    ['port', 'port'],
+    ['user', 'username'],
+    ['identityfile', 'privatekey'],
+    ['serveraliveinterval', 'keepalive'],
+    ['connecttimeout', 'connTimeout'],
   ]);
 
   section.config.forEach(line => {
-    const key = mapping.get(line.param);
+    const key = mapping.get(line.param.toLocaleLowerCase());
 
     if (key !== undefined) {
       // don't need consider config priority, always set to the resolve host.
