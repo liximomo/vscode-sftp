@@ -38,13 +38,14 @@ function adaptPath(filepath) {
 // }
 
 function getSshCommand(
-  config: { host: string; port: number; username: string },
+  config: { host: string; port: number; username: string; workingDir: string },
   extraOpiton?: string
 ) {
-  let sshStr = `ssh ${config.username}@${config.host} -p ${config.port}`;
+  let sshStr = `ssh -t ${config.username}@${config.host} -p ${config.port}`;
   if (extraOpiton) {
     sshStr += ` ${extraOpiton}`;
   }
+  sshStr += ` "cd \"${config.workingDir}\"; exec \\$SHELL -l"`
   return sshStr;
 }
 
@@ -90,6 +91,7 @@ export default checkCommand({
       host: remoteConfig.host,
       port: remoteConfig.port,
       username: remoteConfig.username,
+      workingDir: remoteConfig.remotePath,
     };
     const terminal = vscode.window.createTerminal(remoteConfig.name);
     if (shouldUseAgent(remoteConfig)) {
