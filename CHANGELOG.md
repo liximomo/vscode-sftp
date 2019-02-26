@@ -1,3 +1,7 @@
+## 1.9.4 - 2019-02-26
+  * Fix sshConfig file not work.
+  * Open SSH in Terminal can enter to remote path.
+
 ## 1.9.3 - 2019-01-30
   * New icon for RemoteExplorer. Thanks [niccolomineo](https://github.com/niccolomineo) and [jonbp](https://github.com/jonbp).
   * Change `port` to number in the generated config.
