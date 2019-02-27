@@ -45,7 +45,7 @@ function getSshCommand(
   if (extraOpiton) {
     sshStr += ` ${extraOpiton}`;
   }
-  sshStr += ` "cd \"${config.workingDir}\"; exec \\$SHELL -l"`
+  sshStr += ` "cd \\"${config.workingDir}\\"; exec \\$SHELL -l"`;
   return sshStr;
 }
 

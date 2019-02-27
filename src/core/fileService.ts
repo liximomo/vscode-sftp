@@ -216,6 +216,10 @@ function mergeConfigWithExternalRefer(config: FileServiceConfig): FileServiceCon
   ]);
 
   section.config.forEach(line => {
+    if (!line.param) {
+      return;
+    }
+
     const key = mapping.get(line.param.toLocaleLowerCase());
 
     if (key !== undefined) {
