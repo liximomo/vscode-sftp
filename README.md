@@ -71,9 +71,9 @@ You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/
 }
 ```
 
-_Note：_ `context` and `watcher` are only avaliable at root level.
+_Note：_ `context` and `watcher` are only available at root level.
 
-Use `SFTP: Set Profile` to swtich profile.
+Use `SFTP: Set Profile` to switch profile.
 
 ### Multiple Context
 
@@ -104,7 +104,7 @@ _Note：_ `name` is required in this mode.
 
 ### Connection Hopping.
 
-You can connection to a target server through a proxy with ssh protocol.
+You can connect to a target server through a proxy with ssh protocol.
 
 _Note：_ **Variable substitution is not working in a hop config.**
 
@@ -192,14 +192,14 @@ In sftp.json:
 
 ![remote-explorer-preview](https://raw.githubusercontent.com/liximomo/vscode-sftp/master/assets/showcase/remote-explorer.png)
 
-Remote Explorer let you explore files in remote. You can open Remote Explorer by:
+Remote Explorer lets you explore files in remote. You can open Remote Explorer by:
 
 1. Run Command `View: Show SFTP`.
 2. Click SFTP view in Activity Bar.
 
-You can only view files content with Remote Explorer. Run command `SFTP: Edit in Local` to edit it in local.
+You can only view a files content with Remote Explorer. Run command `SFTP: Edit in Local` to edit it in local.
 
-_Note：_ You need manually refresh the parent folder after **delete** a file to make the explorer updated.
+_Note：_ You need to manually refresh the parent folder after you **delete** a file to make the explorer updated.
 
 ## Debug
 
@@ -215,7 +215,7 @@ _Note：_ You need manually refresh the parent folder after **delete** a file to
 
 ## Donation
 
-If this project help you reduce time to develop, you can give me a cup of coffee :)
+If this project helped you reduce development time, you can give me a cup of coffee :)
 
 ### Alipay
 
