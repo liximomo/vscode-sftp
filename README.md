@@ -28,13 +28,15 @@ For detailed usage. Please go to [wiki](https://github.com/liximomo/vscode-sftp/
 
 You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/config).
 
-- [Simple](#password-free)
+- [Simple](#simple)
 - [Profiles](#profiles)
 - [Multiple Context](#multiple-context)
 - [Connection Hopping](#connection-hopping)
+  - [Single Hop](#single-hop)
+  - [Multiple Hop](#multiple-hop)
 - [Config in User Setting](#config-in-user-setting)
 
-### Password Free
+### Simple
 
 ```json
 {
@@ -102,7 +104,7 @@ The context must **not be same**.
 
 _Note：_ `name` is required in this mode.
 
-### Connection Hopping.
+### Connection Hopping
 
 You can connect to a target server through a proxy with ssh protocol.
 
@@ -117,37 +119,37 @@ local -> hop -> target
   "name": "target",
   "host": "targetHost",
   "username": "targetUsername",
-  "privateKeyPath": "~/.ssh/id_rsa",
+  "privateKeyPath": "/Users/hopUser/.ssh/id_rsa", // The key file is assumed on the hop.
   "remotePath": "/path/in/target",
   "hop": {
     "host": "hopHost",
     "username": "hopUsername",
-    "privateKeyPath": "/Users/hopUsername/.ssh/id_rsa" // The key file is assumed on the hop.
+    "privateKeyPath": "/Users/localUser/.ssh/id_rsa" // The key file is assumed on the local.
   }
 }
 ```
 
 #### Multiple Hop
 
-local -> hopA -> hopB -> target
+local -> hopa -> hopb -> target
 
 ```json
 {
   "name": "target",
   "host": "targetHost",
   "username": "targetUsername",
-  "privateKeyPath": "~/.ssh/id_rsa",
+   "privateKeyPath": "/Users/hopbUser/.ssh/id_rsa", // The key file is assumed on the hopb.
   "remotePath": "/path/in/target",
   "hop": [
     {
       "host": "hopAHost",
       "username": "hopAUsername",
-      "privateKeyPath": "/Users/hopAUsername/.ssh/id_rsa"
+      "privateKeyPath": "/Users/hopAUsername/.ssh/id_rsa" // The key file is assumed on the local.
     },
     {
       "host": "hopBHost",
       "username": "hopBUsername",
-      "privateKeyPath": "/Users/hopBUsername/.ssh/id_rsa"
+      "privateKeyPath": "/Users/hopaUser/.ssh/id_rsa" // The key file is assumed on the hopa.
     }
   ]
 }
