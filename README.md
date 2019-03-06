@@ -117,14 +117,18 @@ local -> hop -> target
 ```json
 {
   "name": "target",
-  "host": "targetHost",
-  "username": "targetUsername",
-  "privateKeyPath": "/Users/hopUser/.ssh/id_rsa", // The key file is assumed on the hop.
   "remotePath": "/path/in/target",
+  
+  // hop
+  "host": "hopHost",
+  "username": "hopUsername",
+  "privateKeyPath": "/Users/localUser/.ssh/id_rsa", // The key file is assumed on the local.
+
   "hop": {
-    "host": "hopHost",
-    "username": "hopUsername",
-    "privateKeyPath": "/Users/localUser/.ssh/id_rsa" // The key file is assumed on the local.
+    // target
+    "host": "targetHost",
+    "username": "targetUsername",
+    "privateKeyPath": "/Users/hopUser/.ssh/id_rsa", // The key file is assumed on the hop.
   }
 }
 ```
@@ -136,20 +140,26 @@ local -> hopa -> hopb -> target
 ```json
 {
   "name": "target",
-  "host": "targetHost",
-  "username": "targetUsername",
-   "privateKeyPath": "/Users/hopbUser/.ssh/id_rsa", // The key file is assumed on the hopb.
   "remotePath": "/path/in/target",
+
+  // hopa
+  "host": "hopAHost",
+  "username": "hopAUsername",
+  "privateKeyPath": "/Users/hopAUsername/.ssh/id_rsa" // The key file is assumed on the local.
+
   "hop": [
-    {
-      "host": "hopAHost",
-      "username": "hopAUsername",
-      "privateKeyPath": "/Users/hopAUsername/.ssh/id_rsa" // The key file is assumed on the local.
-    },
+    // hopb
     {
       "host": "hopBHost",
       "username": "hopBUsername",
       "privateKeyPath": "/Users/hopaUser/.ssh/id_rsa" // The key file is assumed on the hopa.
+    },
+
+    // target
+    {
+      "host": "targetHost",
+      "username": "targetUsername",
+      "privateKeyPath": "/Users/hopbUser/.ssh/id_rsa", // The key file is assumed on the hopb.
     }
   ]
 }

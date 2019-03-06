@@ -26,11 +26,14 @@ export default class SSHClient extends RemoteClient {
   async _doConnect(connectOption: ConnectOption, config: Config): Promise<void> {
     const { hop, ...option } = connectOption;
 
+    let lastOption: ConnectOption = option;
     let fs: FileSystem | RemoteFileSystem = localFs;
     let sock;
     if ((Array.isArray(hop) && hop.length > 0) || (hop && Object.keys(hop).length > 0)) {
       this.hoppingClients = [];
-      const connectOptions = Array.isArray(hop) ? hop.slice() : [hop];
+      const connectOptions = Array.isArray(hop) ? [option].concat(hop) : [option, hop];
+      lastOption = connectOptions.pop()!;
+
       for (let index = 0; index < connectOptions.length; index++) {
         const curOpt = connectOptions[index];
         if (curOpt.port === undefined) {
@@ -51,29 +54,27 @@ export default class SSHClient extends RemoteClient {
 
         const client = new SSHClient(curOpt);
         this.hoppingClients.push(client);
-        await client.connect(
-          { ...curOpt, sock },
-          config
-        );
+        await client.connect({ ...curOpt, sock }, config);
       }
-      sock = await this._makeHopping(
-        this.hoppingClients[this.hoppingClients.length - 1],
-        option.host,
-        option.port
-      );
+
+      const lastClient = this.hoppingClients[this.hoppingClients.length - 1];
+      sock = await this._makeHopping(lastClient, lastOption.host, lastOption.port);
+      fs = new SFTPFileSystem(upath, {
+        client: lastClient,
+      });
     }
 
-    if (option.privateKeyPath) {
-      const buffer = await fs.readFile(option.privateKeyPath);
-      option.privateKey = buffer.toString();
+    if (lastOption.privateKeyPath) {
+      const buffer = await fs.readFile(lastOption.privateKeyPath);
+      lastOption.privateKey = buffer.toString();
     }
 
-    await this._connectSSHClient(this._client, { ...option, sock }, config);
+    await this._connectSSHClient(this._client, { ...lastOption, sock }, config);
     this.sftp = await this._getSftp(this._client);
 
-    if (option.limitOpenFilesOnRemote) {
-      if (typeof option.limitOpenFilesOnRemote !== 'boolean') {
-        MAX_OPEN_FD_NUM = Math.max(127, option.limitOpenFilesOnRemote);
+    if (lastOption.limitOpenFilesOnRemote) {
+      if (typeof lastOption.limitOpenFilesOnRemote !== 'boolean') {
+        MAX_OPEN_FD_NUM = Math.max(127, lastOption.limitOpenFilesOnRemote);
       }
       this._limitSftpFileDescriptor();
     }
