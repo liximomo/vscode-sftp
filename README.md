@@ -219,13 +219,13 @@ _Note：_ You need to manually refresh the parent folder after you **delete** a 
 
 If this project helped you reduce development time, you can give me a cup of coffee :)
 
-### Alipay
-
-![Alipay](https://raw.githubusercontent.com/liximomo/vscode-sftp/master/assets/alipay.png)
-
 ### Wechat
 
-![Wechat](https://raw.githubusercontent.com/liximomo/vscode-sftp/master/assets/wechat.png)
+<img width="140" alt="Wechat" src="https://raw.githubusercontent.com/liximomo/vscode-sftp/master/assets/wechat.png"/>
+
+### Alipay
+
+<img width="140" alt="Alipay" src="https://raw.githubusercontent.com/liximomo/vscode-sftp/master/assets/alipay.png"/>
 
 ### PayPal
 
