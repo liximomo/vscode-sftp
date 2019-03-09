@@ -1,6 +1,6 @@
 # sftp sync extension for VS Code
 
-[![Paypal Donations](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=KEJA775QBTZSC&source=url)
+[![Paypal Donations](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=BY89QD47D7MPS&source=url) [![PayPal Me](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/liximomo)
 
 Very powerful, with smart features. Very simple, requires just three lines of config! Very fast, finished in a blink.
 
@@ -238,5 +238,4 @@ If this project helped you reduce development time, you can give me a cup of cof
 <img width="140" alt="Alipay" src="https://raw.githubusercontent.com/liximomo/vscode-sftp/master/assets/alipay.png"/>
 
 ### PayPal
-
-[![PayPal](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=KEJA775QBTZSC&source=url)
+[![PayPal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=BY89QD47D7MPS&source=url) [![PayPal Me](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/liximomo) 
