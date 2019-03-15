@@ -38,7 +38,7 @@ const uploadHandle = createTransferHandle(TransferDirection.LOCAL_TO_REMOTE);
 const downloadHandle = createTransferHandle(TransferDirection.REMOTE_TO_LOCAL);
 
 export const sync2Remote = createFileHandler<SyncOption>({
-  name: 'sync',
+  name: 'sync local -> remote',
   async handle(option) {
     const remoteFs = await this.fileService.getRemoteFileSystem(this.config);
     const localFs = this.fileService.getLocalFileSystem();
@@ -76,7 +76,7 @@ export const sync2Remote = createFileHandler<SyncOption>({
 });
 
 export const sync2Local = createFileHandler<SyncOption>({
-  name: 'sync',
+  name: 'sync remote -> local',
   async handle(option) {
     const remoteFs = await this.fileService.getRemoteFileSystem(this.config);
     const localFs = this.fileService.getLocalFileSystem();

@@ -10,6 +10,7 @@ import {
 import { FileHandleOption } from '../option';
 import { flatten } from '../../utils';
 import logger from '../../logger';
+import { getOpenTextDocuments } from '../../host';
 
 interface InternalTransferOption extends FileHandleOption, TransferTaskTransferOption {}
 
@@ -102,13 +103,22 @@ async function transferFolder(
   );
 }
 
-function transferFile(
+async function transferFile(
   config: TransferHandleConfig<InternalTransferOption>,
   fileType: FileType,
   collect: (t: TransferTask) => void
 ) {
   if (config.transferOption.ignore && config.transferOption.ignore(config.srcFsPath)) {
     return;
+  }
+
+  // save before upload
+  if (config.transferDirection === TransferDirection.LOCAL_TO_REMOTE) {
+    const textDocuments = getOpenTextDocuments();
+    const document = textDocuments.find(doc => doc.fileName === config.srcFsPath);
+    if (document && !document.isClosed && document.isDirty) {
+      await document.save();
+    }
   }
 
   collect(
