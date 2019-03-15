@@ -1,3 +1,7 @@
+## 1.11.0 - 2019-03-15
+  * Save before upload.
+  * Fix [#490](https://github.com/liximomo/vscode-sftp/issues/490).
+
 ## 1.9.4 - 2019-02-26
   * Fix sshConfig file not work.
   * Open SSH in Terminal can enter to remote path.
