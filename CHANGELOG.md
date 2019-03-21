@@ -1,3 +1,6 @@
+## 1.12.0 - 2019-03-21
+  * new option [sshCustomParams](https://github.com/liximomo/vscode-sftp/wiki/SFTP-only-Config#sshcustomparams).
+
 ## 1.11.0 - 2019-03-15
   * Save before upload.
   * Fix [#490](https://github.com/liximomo/vscode-sftp/issues/490).
