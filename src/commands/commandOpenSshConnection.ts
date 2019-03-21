@@ -3,6 +3,7 @@ import { COMMAND_OPEN_CONNECTION_IN_TERMINAL } from '../constants';
 import { getAllFileService } from '../modules/serviceManager';
 import { ExplorerRoot } from '../modules/remoteExplorer';
 import { getUserSetting } from '../host';
+import { interpolate } from '../utils';
 import { checkCommand } from './abstract/createCommand';
 
 const isWindows = process.platform === 'win32';
@@ -38,14 +39,14 @@ function adaptPath(filepath) {
 // }
 
 function getSshCommand(
-  config: { host: string; port: number; username: string; workingDir: string },
+  config: { host: string; port: number; username: string },
   extraOpiton?: string
 ) {
   let sshStr = `ssh -t ${config.username}@${config.host} -p ${config.port}`;
   if (extraOpiton) {
     sshStr += ` ${extraOpiton}`;
   }
-  sshStr += ` "cd \\"${config.workingDir}\\"; exec $SHELL -l"`;
+  // sshStr += ` "cd \\"${config.workingDir}\\"; exec \\$SHELL -l"`;
   return sshStr;
 }
 
@@ -91,16 +92,27 @@ export default checkCommand({
       host: remoteConfig.host,
       port: remoteConfig.port,
       username: remoteConfig.username,
-      workingDir: remoteConfig.remotePath,
     };
     const terminal = vscode.window.createTerminal(remoteConfig.name);
+    let sshCommand;
     if (shouldUseAgent(remoteConfig)) {
-      terminal.sendText(getSshCommand(sshConfig));
+      sshCommand = getSshCommand(sshConfig);
     } else if (shouldUseKey(remoteConfig)) {
-      terminal.sendText(getSshCommand(sshConfig, `-i "${adaptPath(remoteConfig.privateKeyPath)}"`));
+      sshCommand = getSshCommand(sshConfig, `-i "${adaptPath(remoteConfig.privateKeyPath)}"`);
     } else {
-      terminal.sendText(getSshCommand(sshConfig));
+      sshCommand = getSshCommand(sshConfig);
     }
+
+    if (remoteConfig.sshCustomParams) {
+      sshCommand =
+        sshCommand +
+        ' ' +
+        interpolate(remoteConfig.sshCustomParams, {
+          remotePath: remoteConfig.remotePath,
+        });
+    }
+
+    terminal.sendText(sshCommand);
     terminal.show();
   },
 });

@@ -15,24 +15,42 @@ import { createRemoteIfNoneExist, removeRemoteFs } from './remoteFs';
 import TransferTask from './transferTask';
 import localFs from './localFs';
 
-const DEFAULT_SSHCONFIG_FILE = '~/.ssh/config';
+type Omit<T, U> = Pick<T, Exclude<keyof T, U>>;
+
+interface Root {
+  name: string;
+  context: string;
+  watcher: WatcherConfig;
+  defaultProfile: string;
+}
 
 interface Host {
   host: string;
   port: number;
-  connectTimeout: number;
   username: string;
   password: string;
+  remotePath: string;
+  connectTimeout: number;
+}
 
-  agent?: string;
-
-  privateKeyPath?: string;
-  passphrase: string | true;
-  interactiveAuth: boolean;
-  algorithms: any;
-
-  secure: boolean | 'control' | 'implicit';
-  secureOptions: any;
+interface ServiceOption {
+  protocol: string;
+  remote?: string;
+  uploadOnSave: boolean;
+  downloadOnOpen: boolean | 'confirm';
+  syncOption: {
+    delete: boolean;
+    skipCreate: boolean;
+    ignoreExisting: boolean;
+    update: boolean;
+  };
+  ignore: string[];
+  ignoreFile: string;
+  remoteExplorer?: {
+    filesExclude?: string[];
+  };
+  remoteTimeOffsetInHours: number;
+  limitOpenFilesOnRemote: number | true;
 }
 
 interface WatcherConfig {
@@ -41,41 +59,36 @@ interface WatcherConfig {
   autoDelete: boolean;
 }
 
-interface ServiceOption {
-  name: string;
-  protocol: string;
-  context: string;
-  remotePath: string;
-  uploadOnSave: boolean;
-  downloadOnOpen: boolean | 'confirm';
+interface SftpOption {
+  // sftp
+  agent?: string;
+  privateKeyPath?: string;
+  passphrase: string | true;
+  interactiveAuth: boolean;
+  algorithms: any;
+  sshConfigPath?: string;
   concurrency: number;
-
-  watcher: WatcherConfig;
-  syncOption: {
-    delete: boolean;
-    skipCreate: boolean;
-    ignoreExisting: boolean;
-    update: boolean;
-  };
-  remoteTimeOffsetInHours: number;
-  remoteExplorer?: {
-    filesExclude?: string[];
-  };
+  sshCustomParams?: string;
+  hop: (Host & SftpOption)[] | (Host & SftpOption);
 }
 
-export interface FileServiceConfig extends Host, ServiceOption {
+interface FtpOption {
+  secure: boolean | 'control' | 'implicit';
+  secureOptions: any;
+}
+
+export interface FileServiceConfig extends Root, Host, ServiceOption, SftpOption, FtpOption {
   profiles?: {
     [x: string]: FileServiceConfig;
   };
-
-  remote?: string;
-  sshConfigPath?: string;
-
-  ignore: string[];
-  ignoreFile: string;
 }
 
-export interface ServiceConfig extends Host, ServiceOption {
+export interface ServiceConfig
+  extends Root,
+    Host,
+    Omit<ServiceOption, 'ignore'>,
+    SftpOption,
+    FtpOption {
   ignore?: ((fsPath: string) => boolean) | null;
 }
 
@@ -91,6 +104,8 @@ interface TransferScheduler {
 }
 
 type ConfigValidator = (x: any) => { message: string };
+
+const DEFAULT_SSHCONFIG_FILE = '~/.ssh/config';
 
 function filesIgnoredFromConfig(config: FileServiceConfig): string[] {
   const cache = app.fsCache;

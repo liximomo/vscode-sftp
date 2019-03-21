@@ -5,10 +5,6 @@
         "type": "string",
         "description": "A string to identify your config."
       },
-      "remote": {
-        "type": "string",
-        "description": "Name of remote which configs with `remoteFs.remote` in User Setting. Config will get merged to this remote."
-      },
       "context": {
         "type": "string",
         "description": "Relative path relative to the workspace root folder."
@@ -43,6 +39,26 @@
       "defaultProfile": {
         "type": "string",
         "description": "Profile name you want to set as default."
+      }
+    },
+    "required": ["name"]
+  },
+  "option": {
+    "type": "object",
+    "properties": {
+      "remote": {
+        "type": "string",
+        "description": "Name of remote which configs with `remoteFs.remote` in User Setting. Config will get merged to this remote."
+      },
+      "uploadOnSave": {
+        "type": "boolean",
+        "description": "True to upload on every save operation of VS Code.",
+        "default": true
+      },
+      "downloadOnOpen": {
+        "enum": ["confirm", true, false],
+        "description": "True to download when a file opens.",
+        "default": "confirm"
       },
       "syncOption": {
         "type": "object",
@@ -69,36 +85,6 @@
             "default": true
           }
         }
-      },
-      "remoteTimeOffsetInHours": {
-        "type": "number",
-        "description": "The number of hours difference between the local machine and remote/server. (remote minus local)"
-      },
-      "limitOpenFilesOnRemote": {
-        "enum": ["number", true],
-        "description": "Limit the open file descriptors to the specific number in a remote server. Set to true for using default limit(222). Do not set this unless you have to.",
-        "default": true
-      }
-    },
-    "required": ["name"]
-  },
-  "option": {
-    "type": "object",
-    "properties": {
-      "uploadOnSave": {
-        "type": "boolean",
-        "description": "True to upload on every save operation of VS Code.",
-        "default": true
-      },
-      "downloadOnOpen": {
-        "enum": ["confirm", true, false],
-        "description": "True to download when a file opens.",
-        "default": "confirm"
-      },
-      "syncMode": {
-        "enum": ["update", "full"],
-        "description": "The Strategy `sync` command to use.",
-        "default": "update"
       },
       "ignore": {
         "type": "array",
@@ -128,6 +114,15 @@
             "default": []
           }
         }
+      },
+      "remoteTimeOffsetInHours": {
+        "type": "number",
+        "description": "The number of hours difference between the local machine and remote/server. (remote minus local)"
+      },
+      "limitOpenFilesOnRemote": {
+        "enum": ["number", true],
+        "description": "Limit the open file descriptors to the specific number in a remote server. Set to true for using default limit(222). Do not set this unless you have to.",
+        "default": true
       }
     }
   },
@@ -152,6 +147,11 @@
         "type": "string",
         "description": "Password for password-based user authentication.",
         "default": ""
+      },
+      "remotePath": {
+        "type": "string",
+        "description": "The absolute path on remote.",
+        "default": "/"
       },
       "connectTimeout": {
         "type": "number",
@@ -265,6 +265,15 @@
       "sshConfigPath": {
         "type": "string",
         "description": "Absolute path to your SSH config file (eg. ~/.ssh/config)"
+      },
+      "concurrency": {
+        "type": "number",
+        "description": "Concurrency number."
+      },
+      "sshCustomParams": {
+        "type": "string",
+        "description": "Extra parameters append to SSH command using by \"Open SSH in Terminal\"",
+        "default": "\"cd \"${remotePath}\"; exec \\$SHELL -l\""
       }
     }
   },

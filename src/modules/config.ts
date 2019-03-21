@@ -26,6 +26,7 @@ const configScheme = {
   interactiveAuth: Joi.boolean(),
   algorithms: Joi.any(),
   sshConfigPath: Joi.string(),
+  sshCustomParams: Joi.string(),
 
   secure: Joi.any().valid(true, false, 'control', 'implicit'),
   secureOptions: nullable(Joi.object()),
@@ -33,8 +34,7 @@ const configScheme = {
 
   remotePath: Joi.string().required(),
   uploadOnSave: Joi.boolean(),
-  downloadOnOpen: Joi.boolean()
-  .allow('confirm'),
+  downloadOnOpen: Joi.boolean().allow('confirm'),
 
   ignore: Joi.array()
     .min(0)

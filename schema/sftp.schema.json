@@ -19,11 +19,6 @@
           "enum": ["sftp"],
           "description": "sftp connection protocol."
         },
-        "remotePath": {
-          "type": "string",
-          "description": "The absolute path on remote.",
-          "default": "/"
-        },
         "hop": {
           "oneOf": [
             {
