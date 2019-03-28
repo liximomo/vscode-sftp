@@ -32,6 +32,10 @@ export function resolvePath(from: string, to: string) {
 export function isInWorksapce(filepath: string) {
   const workspaceFolders = getWorkspaceFolders();
   return (
-    workspaceFolders && workspaceFolders.some(folder => filepath.indexOf(folder.uri.fsPath) === 0)
+    workspaceFolders &&
+    workspaceFolders.some(
+      // vscode can't keep filepath's stable, covert them to toLowerCase before check
+      folder => filepath.toLowerCase().indexOf(folder.uri.fsPath.toLowerCase()) === 0
+    )
   );
 }

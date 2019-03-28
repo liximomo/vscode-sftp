@@ -1,3 +1,6 @@
+## 1.12.1 - 2019-03-28
+  * Fix [#510](https://github.com/liximomo/vscode-sftp/issues/510).
+
 ## 1.12.0 - 2019-03-21
   * new option [sshCustomParams](https://github.com/liximomo/vscode-sftp/wiki/SFTP-only-Config#sshcustomparams).
 
