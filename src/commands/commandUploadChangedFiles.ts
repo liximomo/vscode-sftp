@@ -100,7 +100,7 @@ async function handleCommand(hint: any) {
   outputGroup(
     'renamed',
     renames,
-    c => `${simplifyPath(c.originalUri.fsPath)} -> ${simplifyPath(c.renameUri!.fsPath)}`
+    c => `${simplifyPath(c.originalUri.fsPath)} ➞ ${simplifyPath(c.renameUri!.fsPath)}`
   );
 }
 

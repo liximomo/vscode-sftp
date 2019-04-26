@@ -5,8 +5,8 @@ import { Task } from './scheduler';
 import logger from '../logger';
 
 export enum TransferDirection {
-  LOCAL_TO_REMOTE = 'local -> remote',
-  REMOTE_TO_LOCAL = 'remote -> local',
+  LOCAL_TO_REMOTE = 'local ➞ remote',
+  REMOTE_TO_LOCAL = 'remote ➞ local',
 }
 
 interface FileHandle {
