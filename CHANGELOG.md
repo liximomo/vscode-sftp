@@ -1,3 +1,7 @@
+## 1.12.3 - 2019-04-27
+  * Minor improvements.
+  * Bug fix.
+
 ## 1.12.1 - 2019-03-28
   * Fix [#510](https://github.com/liximomo/vscode-sftp/issues/510).
 
