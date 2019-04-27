@@ -29,6 +29,7 @@ function createTransferHandle(direction: TransferDirection) {
         transferDirection: TransferDirection.LOCAL_TO_REMOTE,
       };
     }
+    // todo: abort at here. we should stop collect task
     await transfer(transferConfig, t => scheduler.add(t));
     await scheduler.run();
   };

@@ -98,9 +98,11 @@ export interface WatcherService {
 }
 
 interface TransferScheduler {
+  // readonly _scheduler: Scheduler;
   size: number;
   add(x: TransferTask): void;
   run(): Promise<void>;
+  stop(): void;
 }
 
 type ConfigValidator = (x: any) => { message: string };
@@ -289,7 +291,7 @@ export default class FileService {
   private _watcherConfig: WatcherConfig;
   private _profiles: string[];
   private _pendingTransferTasks: Set<TransferTask> = new Set();
-  private _schedulers: Scheduler[] = [];
+  private _transferSchedulers: TransferScheduler[] = [];
   private _config: FileServiceConfig;
   private _configValidator: ConfigValidator;
   private _watcherService: WatcherService = {
@@ -345,14 +347,14 @@ export default class FileService {
   }
 
   isTransferring() {
-    return this._schedulers.length > 0;
+    return this._transferSchedulers.length > 0;
   }
 
   cancelTransferTasks() {
-    // keep th order so "onIdle" can be triggered.
+    // keep the order
     // 1, remove tasks not start
-    this._schedulers.forEach(s => s.empty());
-    this._schedulers.length = 0;
+    this._transferSchedulers.forEach(transfer => transfer.stop());
+    this._transferSchedulers.length = 0;
 
     // 2. cancel running task
     this._pendingTransferTasks.forEach(t => t.cancel());
@@ -368,13 +370,11 @@ export default class FileService {
   }
 
   createTransferScheduler(concurrency): TransferScheduler {
-    const self = this;
+    const fileService = this;
     const scheduler = new Scheduler({
       autoStart: false,
       concurrency,
     });
-    this._storeScheduler(scheduler);
-
     scheduler.onTaskStart(task => {
       this._pendingTransferTasks.add(task as TransferTask);
       this._eventEmitter.emit(Event.BEFORE_TRANSFER, task);
@@ -384,28 +384,49 @@ export default class FileService {
       this._eventEmitter.emit(Event.AFTER_TRANSFER, err, task);
     });
 
-    return {
+    let runningPromise: Promise<void> | null = null;
+    let isStopped: boolean = false;
+    const transferScheduler: TransferScheduler = {
       get size() {
         return scheduler.size;
       },
+      stop() {
+        isStopped = true;
+        scheduler.empty();
+      },
       add(task: TransferTask) {
+        if (isStopped) {
+          return;
+        }
+
         scheduler.add(task);
       },
       run() {
-        return new Promise(resolve => {
-          if (scheduler.size <= 0) {
-            self._removeScheduler(scheduler);
-            return resolve();
-          }
+        if (isStopped) {
+          return Promise.resolve();
+        }
 
-          scheduler.onIdle(() => {
-            self._removeScheduler(scheduler);
-            resolve();
+        if (scheduler.size <= 0) {
+          fileService._removeScheduler(transferScheduler);
+          return Promise.resolve();
+        }
+
+        if (!runningPromise) {
+          runningPromise = new Promise(resolve => {
+            scheduler.onIdle(() => {
+              runningPromise = null;
+              fileService._removeScheduler(transferScheduler);
+              resolve();
+            });
+            scheduler.start();
           });
-          scheduler.start();
-        });
+        }
+        return runningPromise;
       },
     };
+    fileService._storeScheduler(transferScheduler);
+
+    return transferScheduler;
   }
 
   getLocalFileSystem(): FileSystem {
@@ -467,14 +488,14 @@ export default class FileService {
     return serviceConfig;
   }
 
-  private _storeScheduler(scheduler: Scheduler) {
-    this._schedulers.push(scheduler);
+  private _storeScheduler(scheduler: TransferScheduler) {
+    this._transferSchedulers.push(scheduler);
   }
 
-  private _removeScheduler(scheduler: Scheduler) {
-    const index = this._schedulers.findIndex(s => s === scheduler);
+  private _removeScheduler(scheduler: TransferScheduler) {
+    const index = this._transferSchedulers.findIndex(s => s === scheduler);
     if (index !== -1) {
-      this._schedulers.splice(index, 1);
+      this._transferSchedulers.splice(index, 1);
     }
   }
 
