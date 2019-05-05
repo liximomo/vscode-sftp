@@ -4,6 +4,8 @@ import { FileSystem, FileType } from './fs';
 import { Task } from './scheduler';
 import logger from '../logger';
 
+let hasWarnedModifedTimePermission = false;
+
 export enum TransferDirection {
   LOCAL_TO_REMOTE = 'local ➞ remote',
   REMOTE_TO_LOCAL = 'remote ➞ local',
@@ -106,12 +108,7 @@ export default class TransferTask implements Task {
     const target = this._targetFsPath;
     const srcFs = this._srcFs;
     const targetFs = this._targetFs;
-    const {
-      perserveTargetMode,
-      fallbackMode,
-      atime,
-      mtime,
-    } = this._TransferOption;
+    const { perserveTargetMode, fallbackMode, atime, mtime } = this._TransferOption;
     let { mode } = this._TransferOption;
     let targetFd;
     // Use mode first.
@@ -135,7 +132,10 @@ export default class TransferTask implements Task {
         try {
           await targetFs.futimes(targetFd, Math.floor(atime / 1000), Math.floor(mtime / 1000));
         } catch (error) {
-          logger.warn(`Can't set modified time to the file because ${error.message}`);
+          if (!hasWarnedModifedTimePermission) {
+            hasWarnedModifedTimePermission = true;
+            logger.warn(`Can't set modified time to the file because ${error.message}`);
+          }
         }
       }
     } finally {
