@@ -29,7 +29,7 @@ const DEFAULT_FILES_EXCLUDE = ['.git', '.svn', '.hg', 'CVS', '.DS_Store'];
  *  So we change url path for custom title.
  *  This is not break anything because we get fspth from uri.query.'
  */
-export function makePreivewUrl(uri: vscode.Uri) {
+function makePreivewUrl(uri: vscode.Uri) {
   // const query = querystring.parse(uri.query);
   // query.originPath = uri.path;
   // query.originQuery = uri.query;
@@ -203,9 +203,7 @@ export default class RemoteTreeData
 
     const config = root.explorerContext.config;
     const remotefs = await root.explorerContext.fileService.getRemoteFileSystem(config);
-    const buffer = await remotefs.readFile(
-      UResource.makeResource(uri).fsPath || remotefs.pathResolver.normalize(uri.fsPath)
-    );
+    const buffer = await remotefs.readFile(UResource.makeResource(uri).fsPath);
     return buffer.toString();
   }
 

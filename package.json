@@ -1,6 +1,6 @@
 {
   "name": "sftp",
-  "displayName": "sftp",
+  "displayName": "SFTP",
   "description": "SFTP/FTP sync",
   "version": "1.12.3",
   "publisher": "liximomo",
@@ -37,7 +37,7 @@
       "activitybar": [
         {
           "id": "sftp",
-          "title": "Remote Explorer",
+          "title": "SFTP",
           "icon": "resources/remote-explorer.svg"
         }
       ]
@@ -46,7 +46,7 @@
       "sftp": [
         {
           "id": "remoteExplorer",
-          "name": "Remote Explorer",
+          "name": "Explorer",
           "when": "sftp.enabled"
         }
       ]
@@ -510,6 +510,15 @@
       {
         "fileMatch": ".vscode/sftp.json",
         "url": "./schema/config.schema.json"
+      }
+    ],
+    "resourceLabelFormatters": [
+      {
+        "scheme": "remote",
+        "formatting": {
+          "label": "${path}",
+          "separator": "/"
+        }
       }
     ]
   },
