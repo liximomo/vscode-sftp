@@ -235,8 +235,9 @@ export default class FTPFileSystem extends RemoteFileSystem {
     }
   }
 
-  async list(dir: string, { showHiddenFiles = true } = {}): Promise<FileEntry[]> {
-    const stats = await this.atomicList(showHiddenFiles ? `-al ${dir}` : dir);
+  async list(dir: string, { showHiddenFiles = false } = {}): Promise<FileEntry[]> {
+    // -al flag only get partially support
+    const stats = await this.atomicList(dir);
 
     return (
       stats
