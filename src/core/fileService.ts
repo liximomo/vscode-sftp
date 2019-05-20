@@ -227,7 +227,7 @@ function mergeConfigWithExternalRefer(config: FileServiceConfig): FileServiceCon
     ['hostname', 'host'],
     ['port', 'port'],
     ['user', 'username'],
-    ['identityfile', 'privatekey'],
+    ['identityfile', 'privateKeyPath'],
     ['serveraliveinterval', 'keepalive'],
     ['connecttimeout', 'connTimeout'],
   ]);
@@ -237,7 +237,7 @@ function mergeConfigWithExternalRefer(config: FileServiceConfig): FileServiceCon
       return;
     }
 
-    const key = mapping.get(line.param.toLocaleLowerCase());
+    const key = mapping.get(line.param.toLowerCase());
 
     if (key !== undefined) {
       // don't need consider config priority, always set to the resolve host.
