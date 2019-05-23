@@ -181,7 +181,8 @@ export default class FTPFileSystem extends RemoteFileSystem {
   }
 
   async _ensureDir(dir: string, checkExistFirst: boolean): Promise<void> {
-    // check if exist first
+    // check if exist first.
+    // `ls` command can't make sure to return dotfiles, so this not work for dotfiles,
     // cause ftp don't return distinct error code for dir not exists and dir exists
     if (checkExistFirst) {
       let stat;
@@ -211,10 +212,19 @@ export default class FTPFileSystem extends RemoteFileSystem {
     }
 
     switch (err.code) {
-      // because check if exist first, so here must be dir not exists
       case 550:
+        // Hooray, exists!
+        if (err.message.toLowerCase().indexOf('file exists') >= 0) {
+          return;
+        }
+
         const parentPath = this.pathResolver.dirname(dir);
-        if (parentPath === dir) throw err;
+        // We are trying to create the root dir, something must go wrong.
+        if (parentPath === dir) {
+          throw err;
+        }
+
+        // If goes here, we can assume the file doesn't exist
         await this._ensureDir(parentPath, false);
         await this.mkdir(dir);
         break;
