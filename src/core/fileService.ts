@@ -172,7 +172,7 @@ function mergeConfigWithExternalRefer(config: FileServiceConfig): FileServiceCon
 
   if (config.remote) {
     const remoteMap = getUserSetting(SETTING_KEY_REMOTE);
-    const remote = remoteMap.get(config.remote);
+    const remote = remoteMap.get<Record<string, any>>(config.remote);
     if (!remote) {
       throw new Error(`Can\'t not find remote "${config.remote}"`);
     }
