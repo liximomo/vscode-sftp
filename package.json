@@ -206,6 +206,10 @@
         "command": "sftp.delete.remote",
         "title": "Delete",
         "category": "SFTP"
+      },{
+        "command": "sftp.create.folder",
+        "title": "Create Folder",
+        "category": "SFTP"
       },
       {
         "command": "sftp.revealInExplorer",
@@ -336,6 +340,9 @@
         },
         {
           "command": "sftp.delete.remote",
+          "when": "false"
+        },{
+          "command": "sftp.create.folder",
           "when": "false"
         },
         {
@@ -472,6 +479,10 @@
         },
         {
           "command": "sftp.delete.remote",
+          "group": "7_modification",
+          "when": "view == remoteExplorer && viewItem != root"
+        },{
+          "command": "sftp.create.folder",
           "group": "7_modification",
           "when": "view == remoteExplorer && viewItem != root"
         }

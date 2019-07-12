@@ -44,3 +44,7 @@ export function removeDir(path: string, fs: FileSystem, option): Promise<void> {
 export function rename(srcPath: string, destPath: string, fs: FileSystem): Promise<void> {
   return fs.rename(srcPath, destPath);
 }
+
+export function createDir(path: string, fs: FileSystem, option): Promise<void> {
+  return fs.mkdir(path);
+}
