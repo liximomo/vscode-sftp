@@ -1,13 +1,13 @@
-import { COMMAND_CREATE_FOLDER } from '../constants';
+import { COMMAND_CREATE_FILE } from '../constants';
 import { upath } from '../core';
-import { createRemoteFolder } from '../fileHandlers';
+import { createRemoteFile } from '../fileHandlers';
 // import { showConfirmMessage } from '../host';
 import { checkFileCommand } from './abstract/createCommand';
 import { uriFromExplorerContextOrEditorContext } from './shared';
 import { window, Uri } from 'vscode';
 
 export default checkFileCommand({
-  id: COMMAND_CREATE_FOLDER,
+  id: COMMAND_CREATE_FILE,
   async getFileTarget(item, items) {
     const targets = await uriFromExplorerContextOrEditorContext(item, items);
 
@@ -20,12 +20,12 @@ export default checkFileCommand({
 
     const result = await window.showInputBox({
         value: '',
-        prompt: 'Please input folder name',
+        prompt: 'Please input file name',
     });
 
 
     if (result !== undefined) {
-     //   window.showInformationMessage(targets.toString() + '%252F' + result);
+        // window.showInformationMessage(targets.toString() + '%252F' + result);
 
         return Uri.parse(targets.toString() + '/' + result);
     }
@@ -46,5 +46,5 @@ export default checkFileCommand({
     return result ? targets : undefined;*/
   },
 
-  handleFile: createRemoteFolder,
+  handleFile: createRemoteFile,
 });
