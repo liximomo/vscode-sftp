@@ -1,5 +1,4 @@
 import { COMMAND_CREATE_FILE } from '../constants';
-import { upath } from '../core';
 import { createRemoteFile } from '../fileHandlers';
 // import { showConfirmMessage } from '../host';
 import { checkFileCommand } from './abstract/createCommand';
@@ -14,10 +13,10 @@ export default checkFileCommand({
     if (!targets) {
       return;
     }
-    const filename = Array.isArray(targets)
+   /* const filename = Array.isArray(targets)
     ? targets.map(t => upath.basename(t.fsPath)).join(',')
     : upath.basename(targets.fsPath);
-
+*/
     const result = await window.showInputBox({
         value: '',
         prompt: 'Please input file name',
