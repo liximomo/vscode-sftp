@@ -2,19 +2,19 @@ import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import FileSystem, { FileEntry, FileStats, FileOption } from './fileSystem';
 
-function toFileStat(stat: fs.Stats): FileStats {
-  return {
-    type: FileSystem.getFileTypecharacter(stat),
-    size: stat.size,
-    mode: stat.mode & parseInt('777', 8), // tslint:disable-line:no-bitwise
-    mtime: stat.mtime.getTime(),
-    atime: stat.atime.getTime(),
-  };
-}
-
 export default class LocalFileSystem extends FileSystem {
   constructor(pathResolver: any) {
     super(pathResolver);
+  }
+
+  toFileStat(stat: fs.Stats): FileStats {
+    return {
+      type: FileSystem.getFileTypecharacter(stat),
+      size: stat.size,
+      mode: stat.mode & parseInt('777', 8), // tslint:disable-line:no-bitwise
+      mtime: stat.mtime.getTime(),
+      atime: stat.atime.getTime(),
+    };
   }
 
   lstat(path: string): Promise<FileStats> {
@@ -25,7 +25,7 @@ export default class LocalFileSystem extends FileSystem {
           return;
         }
 
-        resolve(toFileStat(stat));
+        resolve(this.toFileStat(stat));
       });
     });
   }
@@ -51,7 +51,7 @@ export default class LocalFileSystem extends FileSystem {
   }
 
   fstat(fd: number): Promise<FileStats> {
-    return fse.fstat(fd).then(stat => toFileStat(stat));
+    return fse.fstat(fd).then(stat => this.toFileStat(stat));
   }
 
   futimes(fd: number, atime: number, mtime: number): Promise<void> {
@@ -62,6 +62,7 @@ export default class LocalFileSystem extends FileSystem {
     return new Promise((resolve, reject) => {
       try {
         const stream = fs.createReadStream(path, option);
+        stream.once('error', reject);
         resolve(stream);
       } catch (err) {
         reject(err);
@@ -127,7 +128,7 @@ export default class LocalFileSystem extends FileSystem {
     return fse.ensureDir(dir);
   }
 
-  toFileEntry(fullPath, stat): FileEntry {
+  toFileEntry(fullPath: string, stat: FileStats): FileEntry {
     return {
       fspath: fullPath,
       name: this.pathResolver.basename(fullPath),
@@ -145,7 +146,9 @@ export default class LocalFileSystem extends FileSystem {
 
         const fileStatus = files.map(file => {
           const fspath = this.pathResolver.join(dir, file);
-          return this.lstat(fspath).then(stat => this.toFileEntry(fspath, stat));
+          return this.lstat(fspath).then(stat =>
+            this.toFileEntry(fspath, stat)
+          );
         });
 
         resolve(Promise.all(fileStatus));

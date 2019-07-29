@@ -225,7 +225,6 @@ async function _sync(
         let from: FileEntry = srcFile;
         let to: FileEntry = desFile;
         let direction: TransferDirection = transferDirection;
-
         switch (from.type) {
           case FileType.Directory:
             dir2sync.push([from.fspath, to.fspath]);

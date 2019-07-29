@@ -79,13 +79,18 @@ export default class TransferTask implements Task {
     const target = this._targetFsPath;
     const srcFs = this._srcFs;
     const targetFs = this._targetFs;
-
     switch (this.fileType) {
       case FileType.File:
         await this._transferFile();
         break;
       case FileType.SymbolicLink:
-        await fileOperations.transferSymlink(src, target, srcFs, targetFs, this._TransferOption);
+        await fileOperations.transferSymlink(
+          src,
+          target,
+          srcFs,
+          targetFs,
+          this._TransferOption
+        );
         break;
       default:
         throw new Error(`Unsupported file type (type = ${this.fileType})`);
@@ -108,7 +113,12 @@ export default class TransferTask implements Task {
     const target = this._targetFsPath;
     const srcFs = this._srcFs;
     const targetFs = this._targetFs;
-    const { perserveTargetMode, fallbackMode, atime, mtime } = this._TransferOption;
+    const {
+      perserveTargetMode,
+      fallbackMode,
+      atime,
+      mtime,
+    } = this._TransferOption;
     let { mode } = this._TransferOption;
     let targetFd;
     // Use mode first.
@@ -123,18 +133,31 @@ export default class TransferTask implements Task {
           .catch(() => fallbackMode),
       ]);
     } else {
-      [this._handle, targetFd] = await Promise.all([srcFs.get(src), targetFs.open(target, 'w')]);
+      [this._handle, targetFd] = await Promise.all([
+        srcFs.get(src),
+        targetFs.open(target, 'w'),
+      ]);
     }
 
     try {
-      await targetFs.put(this._handle, target, { mode, fd: targetFd, autoClose: false });
+      await targetFs.put(this._handle, target, {
+        mode,
+        fd: targetFd,
+        autoClose: false,
+      });
       if (atime && mtime) {
         try {
-          await targetFs.futimes(targetFd, Math.floor(atime / 1000), Math.floor(mtime / 1000));
+          await targetFs.futimes(
+            targetFd,
+            Math.floor(atime / 1000),
+            Math.floor(mtime / 1000)
+          );
         } catch (error) {
           if (!hasWarnedModifedTimePermission) {
             hasWarnedModifedTimePermission = true;
-            logger.warn(`Can't set modified time to the file because ${error.message}`);
+            logger.warn(
+              `Can't set modified time to the file because ${error.message}`
+            );
           }
         }
       }
