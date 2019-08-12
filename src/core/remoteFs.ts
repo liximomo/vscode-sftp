@@ -3,7 +3,12 @@ import { promptForPassword } from '../host';
 import logger from '../logger';
 import app from '../app';
 import { ConnectOption } from './remote-client/remoteClient';
-import { FileSystem, RemoteFileSystem, SFTPFileSystem, FTPFileSystem } from './fs';
+import {
+  FileSystem,
+  RemoteFileSystem,
+  SFTPFileSystem,
+  FTPFileSystem,
+} from './fs';
 import localFs from './localFs';
 
 function hashOption(opiton) {
@@ -19,7 +24,12 @@ class KeepAliveRemoteFs {
 
   private fs: RemoteFileSystem;
 
-  async getFs(option: ConnectOption & { protocol: string }): Promise<RemoteFileSystem> {
+  async getFs(
+    option: ConnectOption & {
+      protocol: string;
+      remoteTimeOffsetInHours: number;
+    }
+  ): Promise<RemoteFileSystem> {
     if (this.isValid) {
       this.pendingPromise = null;
       return Promise.resolve(this.fs);
@@ -63,17 +73,15 @@ class KeepAliveRemoteFs {
 
     this.fs = new FsConstructor(upath, {
       clientOption: connectOption,
+      remoteTimeOffsetInHours: option.remoteTimeOffsetInHours,
     });
     this.fs.onDisconnected(this.invalid.bind(this));
 
     app.sftpBarItem.showMsg('connecting...', connectOption.connectTimeout);
     this.pendingPromise = this.fs
-      .connect(
-        connectOption,
-        {
-          askForPasswd: promptForPassword,
-        }
-      )
+      .connect(connectOption, {
+        askForPasswd: promptForPassword,
+      })
       .then(
         () => {
           app.sftpBarItem.reset();

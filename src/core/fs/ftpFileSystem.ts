@@ -122,10 +122,8 @@ export default class FTPFileSystem extends RemoteFileSystem {
   futimes(fd: FtpFileHandle, _atime: number, mtime: number): Promise<void> {
     if (!this._supportMFMT) return Promise.resolve();
 
-    return this.atomicSetLastMod(
-      fd.path,
-      new Date(this.toRemoteTimeInSecnonds(mtime) * 1000)
-    ).catch(_ => {
+    return this.atomicSetLastMod(fd.path, new Date(mtime * 1000)).catch(_ => {
+      logger.info('Don\'t Support MFMT');
       this._supportMFMT = false;
     });
   }
@@ -245,7 +243,10 @@ export default class FTPFileSystem extends RemoteFileSystem {
     }
   }
 
-  async list(dir: string, { showHiddenFiles = false } = {}): Promise<FileEntry[]> {
+  async list(
+    dir: string,
+    { showHiddenFiles = false } = {}
+  ): Promise<FileEntry[]> {
     // -al flag only get partially support
     const stats = await this.atomicList(dir);
 
@@ -254,7 +255,9 @@ export default class FTPFileSystem extends RemoteFileSystem {
         // item will be a string if ftp fail to parse it (https://github.com/liximomo/vscode-sftp/issues/308)
         // we simply ignore it by check whether it has a name property
         .filter(item => item.name && item.name !== '.' && item.name !== '..')
-        .map(item => this.toFileEntry(this.pathResolver.join(dir, item.name), item))
+        .map(item =>
+          this.toFileEntry(this.pathResolver.join(dir, item.name), item)
+        )
     );
   }
 
@@ -360,7 +363,10 @@ export default class FTPFileSystem extends RemoteFileSystem {
     return this.queue.add(task);
   }
 
-  private async atomicRemoveDir(path: string, recursive: boolean): Promise<void> {
+  private async atomicRemoveDir(
+    path: string,
+    recursive: boolean
+  ): Promise<void> {
     const task = () =>
       new Promise<void>((resolve, reject) => {
         this.ftp.rmdir(path, recursive, err => {
