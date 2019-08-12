@@ -1784,6 +1784,11 @@ ftp@^0.3.10:
     readable-stream "1.1.x"
     xregexp "2.0.0"
 
+function-bind@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/function-bind/-/function-bind-1.1.1.tgz#a56899d3ea3c9bab874bb9773b7c5ede92f4895d"
+  integrity sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A==
+
 gauge@~2.7.3:
   version "2.7.4"
   resolved "http://registry.npm.taobao.org/gauge/download/gauge-2.7.4.tgz#2c03405c7538c39d7eb37b317022e325fb018bf7"
@@ -2095,6 +2100,13 @@ has-values@^1.0.0:
   dependencies:
     is-number "^3.0.0"
     kind-of "^4.0.0"
+
+has@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/has/-/has-1.0.3.tgz#722d7cbfc1f6aa8241f16dd814e011e1f41e8796"
+  integrity sha512-f2dvO0VU6Oej7RkWJGrehjbzMAjFp5/VKPp5tTpWIV4JHHZK1/BxbFRtf/siA2SWTe09caDmVtYYzWEIbBS4zw==
+  dependencies:
+    function-bind "^1.1.1"
 
 hash-base@^3.0.0:
   version "3.0.4"
@@ -2443,9 +2455,10 @@ is-windows@^1.0.2:
   version "1.0.2"
   resolved "http://registry.npm.taobao.org/is-windows/download/is-windows-1.0.2.tgz#d1850eb9791ecd18e6182ce12a30f396634bb19d"
 
-is@^3.1.0:
-  version "3.2.1"
-  resolved "http://registry.npm.taobao.org/is/download/is-3.2.1.tgz#d0ac2ad55eb7b0bec926a5266f6c662aaa83dca5"
+is@^3.2.1:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/is/-/is-3.3.0.tgz#61cff6dd3c4193db94a3d62582072b44e5645d79"
+  integrity sha512-nW24QBoPcFGGHJGUwnfpI7Yc5CdqWNdsyHQszVE/z2pKHXzh7FZ5GWhJqSyaQ9wMkQnsTx+kAI8bHlCX4tKdbg==
 
 isarray@0.0.1:
   version "0.0.1"
@@ -3422,10 +3435,12 @@ node-pre-gyp@^0.10.0:
     tar "^4"
 
 node.extend@^1.1.2:
-  version "1.1.6"
-  resolved "http://registry.npm.taobao.org/node.extend/download/node.extend-1.1.6.tgz#a7b882c82d6c93a4863a5504bd5de8ec86258b96"
+  version "1.1.8"
+  resolved "https://registry.yarnpkg.com/node.extend/-/node.extend-1.1.8.tgz#0aab3e63789f4e6d68b42bc00073ad1881243cf0"
+  integrity sha512-L/dvEBwyg3UowwqOUTyDsGBU6kjBQOpOhshio9V3i3BMPv5YUb9+mWNN8MK0IbWqT0AqaTSONZf0aTuMMahWgA==
   dependencies:
-    is "^3.1.0"
+    has "^1.0.3"
+    is "^3.2.1"
 
 nopt@^4.0.1:
   version "4.0.1"
