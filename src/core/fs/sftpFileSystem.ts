@@ -1,5 +1,10 @@
 import { Readable, Writable } from 'stream';
-import FileSystem, { FileEntry, FileType, FileStats, FileOption } from './fileSystem';
+import FileSystem, {
+  FileEntry,
+  FileType,
+  FileStats,
+  FileOption,
+} from './fileSystem';
 import RemoteFileSystem from './remoteFileSystem';
 import { SSHClient } from '../remote-client';
 
@@ -63,7 +68,11 @@ export default class SFTPFileSystem extends RemoteFileSystem {
     });
   }
 
-  open(path: string, flags: string, mode?: number): Promise<SFTPFileDescriptor> {
+  open(
+    path: string,
+    flags: string,
+    mode?: number
+  ): Promise<SFTPFileDescriptor> {
     return new Promise((resolve, reject) => {
       this.sftp.open(path, flags, mode, (err, handle) => {
         if (err) {
