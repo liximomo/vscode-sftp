@@ -20,7 +20,7 @@ export default class SSHClient extends RemoteClient {
 
   _hasProvideAuth(connectOption: ConnectOption) {
     // tslint:disable-next-line triple-equals
-    return ['password', 'agent', 'privateKeyPath'].some(key => connectOption[key] != undefined);
+    return ['password', 'agent', 'privateKeyPath', 'interactiveAuth'].some(key => connectOption[key] != undefined);
   }
 
   async _doConnect(connectOption: ConnectOption, config: Config): Promise<void> {
