@@ -4420,21 +4420,21 @@ ssh-config@^1.1.3:
   version "1.1.3"
   resolved "http://registry.npm.taobao.org/ssh-config/download/ssh-config-1.1.3.tgz#2b19630af85b1666688b9d68f6e4218900f81f8c"
 
-ssh2-streams@~0.4.2:
-  version "0.4.2"
-  resolved "http://registry.npm.taobao.org/ssh2-streams/download/ssh2-streams-0.4.2.tgz#bac0d18727396d16049f5f0c8517a46516b45719"
-  integrity sha1-usDRhyc5bRYEn18MhRekZRa0Vxk=
+ssh2-streams@~0.4.4:
+  version "0.4.5"
+  resolved "https://registry.npm.taobao.org/ssh2-streams/download/ssh2-streams-0.4.5.tgz#420f7666f3930c836688091e09c2283c088a931f"
+  integrity sha1-Qg92ZvOTDINmiAkeCcIoPAiKkx8=
   dependencies:
     asn1 "~0.2.0"
     bcrypt-pbkdf "^1.0.2"
     streamsearch "~0.1.2"
 
-ssh2@^0.8.2:
-  version "0.8.2"
-  resolved "http://registry.npm.taobao.org/ssh2/download/ssh2-0.8.2.tgz#f7a172458d3a7a13d520438264f90de8a3ee72af"
-  integrity sha1-96FyRY06ehPVIEOCZPkN6KPucq8=
+ssh2@^0.8.5:
+  version "0.8.5"
+  resolved "https://registry.npm.taobao.org/ssh2/download/ssh2-0.8.5.tgz#9144cdd6c104aa81b2b16ce647c109f4bd138b57"
+  integrity sha1-kUTN1sEEqoGysWzmR8EJ9L0Ti1c=
   dependencies:
-    ssh2-streams "~0.4.2"
+    ssh2-streams "~0.4.4"
 
 sshpk@^1.7.0:
   version "1.13.0"
