@@ -19,19 +19,32 @@ export default class SSHClient extends RemoteClient {
   }
 
   _hasProvideAuth(connectOption: ConnectOption) {
-    // tslint:disable-next-line triple-equals
-    return interactiveAuth === true || ['password', 'agent', 'privateKeyPath'].some(key => connectOption[key] != undefined);
+    return (
+      connectOption.interactiveAuth === true ||
+      ['password', 'agent', 'privateKeyPath'].some(
+        // tslint:disable-next-line triple-equals
+        key => connectOption[key] != undefined
+      )
+    );
   }
 
-  async _doConnect(connectOption: ConnectOption, config: Config): Promise<void> {
+  async _doConnect(
+    connectOption: ConnectOption,
+    config: Config
+  ): Promise<void> {
     const { hop, ...option } = connectOption;
 
     let lastOption: ConnectOption = option;
     let fs: FileSystem | RemoteFileSystem = localFs;
     let sock;
-    if ((Array.isArray(hop) && hop.length > 0) || (hop && Object.keys(hop).length > 0)) {
+    if (
+      (Array.isArray(hop) && hop.length > 0) ||
+      (hop && Object.keys(hop).length > 0)
+    ) {
       this.hoppingClients = [];
-      const connectOptions = Array.isArray(hop) ? [option].concat(hop) : [option, hop];
+      const connectOptions = Array.isArray(hop)
+        ? [option].concat(hop)
+        : [option, hop];
       lastOption = connectOptions.pop()!;
 
       for (let index = 0; index < connectOptions.length; index++) {
@@ -58,7 +71,11 @@ export default class SSHClient extends RemoteClient {
       }
 
       const lastClient = this.hoppingClients[this.hoppingClients.length - 1];
-      sock = await this._makeHopping(lastClient, lastOption.host, lastOption.port);
+      sock = await this._makeHopping(
+        lastClient,
+        lastOption.host,
+        lastOption.port
+      );
       fs = new SFTPFileSystem(upath, {
         client: lastClient,
       });
@@ -156,9 +173,15 @@ export default class SSHClient extends RemoteClient {
     }
 
     const sftp = this.sftp;
-    sftp._stream.open = this._hookCallForRequestFileDescriptor(sftp._stream.open);
-    sftp._stream.opendir = this._hookCallForRequestFileDescriptor(sftp._stream.opendir);
-    sftp._stream.close = this._hookCallForReleaseFileDescriptor(sftp._stream.close);
+    sftp._stream.open = this._hookCallForRequestFileDescriptor(
+      sftp._stream.open
+    );
+    sftp._stream.opendir = this._hookCallForRequestFileDescriptor(
+      sftp._stream.opendir
+    );
+    sftp._stream.close = this._hookCallForReleaseFileDescriptor(
+      sftp._stream.close
+    );
   }
 
   private _hookCallForReleaseFileDescriptor(fn) {
@@ -219,7 +242,9 @@ export default class SSHClient extends RemoteClient {
 
     // explict compare to true, cause we want to distinct between string and true
     if (option.passphrase === true) {
-      option.passphrase = await config.askForPasswd(`[${option.host}]: Enter your passphrase`);
+      option.passphrase = await config.askForPasswd(
+        `[${option.host}]: Enter your passphrase`
+      );
       if (option.passphrase === undefined) {
         throw new CustomError(ErrorCode.CONNECT_CANCELLED, 'cancelled');
       }
@@ -238,14 +263,25 @@ export default class SSHClient extends RemoteClient {
           const answers = stackedAnswers || [];
           if (answers.length < prompts.length) {
             config
-              .askForPasswd(`[${option.host}]: ${prompts[answers.length].prompt}`)
+              .askForPasswd(
+                `[${option.host}]: ${prompts[answers.length].prompt}`
+              )
               .then(answer => {
                 if (answer === undefined) {
-                  return reject(new CustomError(ErrorCode.CONNECT_CANCELLED, 'cancelled'));
+                  return reject(
+                    new CustomError(ErrorCode.CONNECT_CANCELLED, 'cancelled')
+                  );
                 }
 
                 answers.push(answer);
-                redo(name, instructions, instructionsLang, prompts, finish, answers);
+                redo(
+                  name,
+                  instructions,
+                  instructionsLang,
+                  prompts,
+                  finish,
+                  answers
+                );
               });
           } else {
             finish(answers);
@@ -261,7 +297,9 @@ export default class SSHClient extends RemoteClient {
         .connect({
           keepaliveInterval: 1000 * 30,
           keepaliveCountMax: 2,
-          readyTimeout: interactiveAuth ? Math.max(60 * 1000, connectTimeout || 0) : connectTimeout,
+          readyTimeout: interactiveAuth
+            ? Math.max(60 * 1000, connectTimeout || 0)
+            : connectTimeout,
           ...option,
           tryKeyboard: interactiveAuth,
         });
