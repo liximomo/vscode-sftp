@@ -305,6 +305,25 @@ function getCompleteConfig(
   return mergedConfig;
 }
 
+function mergeProfile(
+  target: FileServiceConfig,
+  source: FileServiceConfig
+): FileServiceConfig {
+  const res = Object.assign({}, target);
+  delete res.profiles;
+
+  const keys = Object.keys(source);
+  for (const key of keys) {
+    if (key === 'ignore') {
+      res.ignore = res.ignore.concat(source.ignore);
+    } else {
+      res[key] = source[key];
+    }
+  }
+
+  return res;
+}
+
 enum Event {
   BEFORE_TRANSFER = 'BEFORE_TRANSFER',
   AFTER_TRANSFER = 'AFTER_TRANSFER',
@@ -465,9 +484,7 @@ export default class FileService {
   }
 
   getConfig(): ServiceConfig {
-    const config = this._config;
-    const afterApplyProfile = Object.assign({}, config) as any;
-    delete afterApplyProfile.profiles;
+    let config = this._config;
     const hasProfile =
       config.profiles && Object.keys(config.profiles).length > 0;
     if (hasProfile && app.state.profile) {
@@ -480,10 +497,10 @@ export default class FileService {
             ' You can set a profile by running command `SFTP: Set Profile`.'
         );
       }
-      Object.assign(afterApplyProfile, profile);
+      config = mergeProfile(config, profile);
     }
 
-    const completeConfig = getCompleteConfig(afterApplyProfile, this.workspace);
+    const completeConfig = getCompleteConfig(config, this.workspace);
     const error =
       this._configValidator && this._configValidator(completeConfig);
     if (error) {
