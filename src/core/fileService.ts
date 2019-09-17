@@ -490,7 +490,7 @@ export default class FileService {
       let errorMsg = `Config validation fail: ${error.message}.`;
       // tslint:disable-next-line triple-equals
       if (hasProfile && app.state.profile == null) {
-        errorMsg += ' Maybe you should set a profile first.';
+        errorMsg += ' You might want to set a profile first.';
       }
       throw new Error(errorMsg);
     }
