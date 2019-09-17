@@ -528,14 +528,14 @@
     "dev": "webpack --mode development --watch",
     "test": "jest",
     "package": "vsce package",
-    "pub:debug": "rm -rf _debug && mkdir _debug && vsce package --out _debug/sftp-debug.vsix && cd _debug && git init && git commit --allow-empty -m 'update debug package' && git checkout -b debug-pacakge && cp ../INSTALL_DEBUG.md README.md  && git add . && git commit -am 'update debug package' && git push git@github.com:liximomo/vscode-sftp.git debug-pacakge --force",
-    "postinstall": "node ./node_modules/vscode/bin/install"
+    "pub:debug": "rm -rf _debug && mkdir _debug && vsce package --out _debug/sftp-debug.vsix && cd _debug && git init && git commit --allow-empty -m 'update debug package' && git checkout -b debug-pacakge && cp ../INSTALL_DEBUG.md README.md  && git add . && git commit -am 'update debug package' && git push git@github.com:liximomo/vscode-sftp.git debug-pacakge --force"
   },
   "devDependencies": {
     "@types/fs-extra": "^5.0.4",
     "@types/jest": "^23.3.5",
     "@types/lru-cache": "^4.1.1",
     "@types/node": "^8.10.25",
+    "@types/vscode": "1.30",
     "@types/webpack-env": "^1.13.6",
     "jest": "^20.0.4",
     "memfs": "^2.15.5",
@@ -544,7 +544,6 @@
     "tslint": "^5.11.0",
     "typescript": "3.1.6",
     "typescript-tslint-plugin": "^0.0.6",
-    "vscode": "^1.1.17",
     "webpack": "^4.25.1",
     "webpack-cli": "^3.1.2"
   },
