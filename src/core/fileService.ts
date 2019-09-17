@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as sshConfig from 'ssh-config';
 import app from '../app';
 import logger from '../logger';
-import { getUserSetting, showWarningMessage } from '../host';
+import { getUserSetting } from '../host';
 import { replaceHomePath, resolvePath } from '../helper';
 import { SETTING_KEY_REMOTE } from '../constants';
 import upath from './upath';
