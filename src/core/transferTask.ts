@@ -93,7 +93,7 @@ export default class TransferTask implements Task {
         );
         break;
       default:
-        throw new Error(`Unsupported file type (type = ${this.fileType})`);
+        logger.warn(`Unsupported file type (type = ${this.fileType}). File ${src}`);
     }
   }
 

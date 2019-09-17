@@ -1,6 +1,7 @@
 import { fileOperations, FileType } from '../core';
 import createFileHandler from './createFileHandler';
 import { FileHandleOption } from './option';
+import logger from '../logger';
 
 export const removeRemote = createFileHandler<FileHandleOption & { skipDir?: boolean }>({
   name: 'removeRemote',
@@ -22,7 +23,7 @@ export const removeRemote = createFileHandler<FileHandleOption & { skipDir?: boo
         promise = fileOperations.removeFile(remoteFsPath, remoteFs, {});
         break;
       default:
-        throw new Error(`Unsupported file type (type = ${stat.type})`);
+        logger.warn(`Unsupported file type (type = ${stat.type}). File ${remoteFsPath}`);
     }
     await promise;
   },
