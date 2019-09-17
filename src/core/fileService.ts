@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as sshConfig from 'ssh-config';
 import app from '../app';
 import logger from '../logger';
-import { getUserSetting } from '../host';
+import { getUserSetting, showWarningMessage } from '../host';
 import { replaceHomePath, resolvePath } from '../helper';
 import { SETTING_KEY_REMOTE } from '../constants';
 import upath from './upath';
@@ -77,7 +77,12 @@ interface FtpOption {
   secureOptions: any;
 }
 
-export interface FileServiceConfig extends Root, Host, ServiceOption, SftpOption, FtpOption {
+export interface FileServiceConfig
+  extends Root,
+    Host,
+    ServiceOption,
+    SftpOption,
+    FtpOption {
   profiles?: {
     [x: string]: FileServiceConfig;
   };
@@ -111,7 +116,8 @@ const DEFAULT_SSHCONFIG_FILE = '~/.ssh/config';
 
 function filesIgnoredFromConfig(config: FileServiceConfig): string[] {
   const cache = app.fsCache;
-  const ignore: string[] = config.ignore && config.ignore.length ? config.ignore : [];
+  const ignore: string[] =
+    config.ignore && config.ignore.length ? config.ignore : [];
 
   const ignoreFile = config.ignoreFile;
   if (!ignoreFile) {
@@ -125,7 +131,9 @@ function filesIgnoredFromConfig(config: FileServiceConfig): string[] {
     ignoreFromFile = fs.readFileSync(ignoreFile).toString();
     cache.set(ignoreFile, ignoreFromFile);
   } else {
-    throw new Error(`File ${ignoreFile} not found. Check your config of "ignoreFile"`);
+    throw new Error(
+      `File ${ignoreFile} not found. Check your config of "ignoreFile"`
+    );
   }
 
   return ignore.concat(ignoreFromFile.split(/\r?\n/g));
@@ -167,7 +175,9 @@ function setConfigValue(config, key, value) {
   }
 }
 
-function mergeConfigWithExternalRefer(config: FileServiceConfig): FileServiceConfig {
+function mergeConfigWithExternalRefer(
+  config: FileServiceConfig
+): FileServiceConfig {
   const copyed = Object.assign({}, config);
 
   if (config.remote) {
@@ -185,7 +195,9 @@ function mergeConfigWithExternalRefer(config: FileServiceConfig): FileServiceCon
         return;
       }
 
-      const targetKey = remoteKeyMapping.has(key) ? remoteKeyMapping.get(key) : key;
+      const targetKey = remoteKeyMapping.has(key)
+        ? remoteKeyMapping.get(key)
+        : key;
       setConfigValue(copyed, targetKey, remote[key]);
     });
   }
@@ -194,7 +206,9 @@ function mergeConfigWithExternalRefer(config: FileServiceConfig): FileServiceCon
     return copyed;
   }
 
-  const sshConfigPath = replaceHomePath(config.sshConfigPath || DEFAULT_SSHCONFIG_FILE);
+  const sshConfigPath = replaceHomePath(
+    config.sshConfigPath || DEFAULT_SSHCONFIG_FILE
+  );
 
   const cache = app.fsCache;
   let sshConfigContent;
@@ -252,13 +266,26 @@ function mergeConfigWithExternalRefer(config: FileServiceConfig): FileServiceCon
   return copyed;
 }
 
-function getCompleteConfig(config: FileServiceConfig, workspace: string): FileServiceConfig {
+function getCompleteConfig(
+  config: FileServiceConfig,
+  workspace: string
+): FileServiceConfig {
   const mergedConfig = mergeConfigWithExternalRefer(config);
+
+  if (mergedConfig.agent && mergedConfig.privateKeyPath) {
+    logger.warn(
+      'Config Option Conflicted. You are specifing "agent" and "privateKey" at the same time, ' +
+        'the later will be ignored.'
+    );
+  }
 
   // remove the './' part from a relative path
   mergedConfig.remotePath = upath.normalize(mergedConfig.remotePath);
   if (mergedConfig.privateKeyPath) {
-    mergedConfig.privateKeyPath = resolvePath(workspace, mergedConfig.privateKeyPath);
+    mergedConfig.privateKeyPath = resolvePath(
+      workspace,
+      mergedConfig.privateKeyPath
+    );
   }
 
   if (mergedConfig.ignoreFile) {
@@ -441,7 +468,8 @@ export default class FileService {
     const config = this._config;
     const afterApplyProfile = Object.assign({}, config) as any;
     delete afterApplyProfile.profiles;
-    const hasProfile = config.profiles && Object.keys(config.profiles).length > 0;
+    const hasProfile =
+      config.profiles && Object.keys(config.profiles).length > 0;
     if (hasProfile && app.state.profile) {
       logger.info(`Using profile: ${app.state.profile}`);
       const profile = config.profiles![app.state.profile];
@@ -456,7 +484,8 @@ export default class FileService {
     }
 
     const completeConfig = getCompleteConfig(afterApplyProfile, this.workspace);
-    const error = this._configValidator && this._configValidator(completeConfig);
+    const error =
+      this._configValidator && this._configValidator(completeConfig);
     if (error) {
       let errorMsg = `Config validation fail: ${error.message}.`;
       // tslint:disable-next-line triple-equals
@@ -474,7 +503,9 @@ export default class FileService {
     this._disposeFileSystem();
   }
 
-  private _resolveServiceConfig(fileServiceConfig: FileServiceConfig): ServiceConfig {
+  private _resolveServiceConfig(
+    fileServiceConfig: FileServiceConfig
+  ): ServiceConfig {
     const serviceConfig: ServiceConfig = fileServiceConfig as any;
 
     if (serviceConfig.port === undefined) {
