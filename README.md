@@ -85,7 +85,7 @@ The context must **not be same**.
 [
   {
     "name": "server1",
-    "context": "/project/build",
+    "context": "project/build",
     "host": "host",
     "username": "username",
     "password": "password",
@@ -93,7 +93,7 @@ The context must **not be same**.
   },
   {
     "name": "server2",
-    "context": "/project/src",
+    "context": "project/src",
     "host": "host",
     "username": "username",
     "password": "password",
