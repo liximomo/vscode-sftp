@@ -2,6 +2,9 @@
 
 [![Paypal Donations](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=BY89QD47D7MPS&source=url) [![PayPal Me](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/liximomo)
 
+
+Syncs your local directory with a remote server directory. Allows you to optionally edit upload a file to the remote directory after it saves locally.  This allows you to edit more or less directly on the server similar to WinScp or other similar programs.
+
 Very powerful, with smart features. Very simple, requires just three lines of config! Very fast, finished in a blink.
 
 - Features
@@ -18,9 +21,40 @@ Very powerful, with smart features. Very simple, requires just three lines of co
 - [Support SFTP Project](#Donation)
 
 ## Usage
+ If your latest files are on the server, you can start with an empty local folder, then download your project, and from that point sync.  
 
-1. `Ctrl+Shift+P` on Windows/Linux or `Cmd+Shift+P` on Mac open command palette, run `SFTP: config` command.
-2. Enjoy.
+
+1. In `VS Code`, open a local directory you wish to sync to the remote server (or create an empty directory that you wish to first download the contents of a remote server folder in order to edit locally). 
+2. `Ctrl+Shift+P` on Windows/Linux or `Cmd+Shift+P` on Mac open command palette, run `SFTP: config` command.
+3. A basic configuration file will appear named `sftp.json` under the `.vscode` directory.  Edit the parameters to match your setup.
+
+For instance: 
+
+```json
+
+{
+    "name": "Profile Name",
+    "host": "name_of_remote_host",
+    "protocol": "ftp",
+    "port": 21,
+    "secure": true,
+    "username": "username",
+    "remotePath": "/public_html/project",  <---- This is the path which will be downloaded if you "Download Project"
+    "password": "password",  
+    "uploadOnSave": true
+}
+
+```
+The password parameter is optional but if you don't add it, you will be constantly prompted for a password.  Note that you must escape any backslashes and other special characters with a backslash.
+
+There are other Example Configs below.
+
+3.  Save and close the `sftp.json` file. 
+4.  `Ctrl+Shift+P` on Windows/Linux or `Cmd+Shift+P` on Mac open command palette.
+5. Type "sftp" and you'll now see a number of other comands.  
+6. A good one to start with if you want to start with a remote folder is `SFTP: Download Project`.  This will download the directory shown in the `remotePath` setting in `sftp.json` to your local open directory. 
+7. Done  - you can now edit locally and after each save it will upload to your remote file. 
+8. Enjoy !
 
 For detailed usage. Please go to [wiki](https://github.com/liximomo/vscode-sftp/wiki).
 
