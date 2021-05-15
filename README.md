@@ -5,14 +5,12 @@
 New modded version by [Natizyskunk](https://github.com/Natizyskunk/) that just work 😀 <br>
 https://github.com/Natizyskunk/vscode-sftp/releases/tag/v1.12.10
 
-To install it just follow thoses steps : <br>
-1. from within VSCode. Follow the steps to install manually:
-2. Select Extensions (Ctrl + Shift + X)
-3. Open “More Action” menu(ellipsis on the top) and click “Install from VSIX…”
-4. Locate VSIX file and select
-5. Reload VSCode
-6. Voilà !
-
+To install it just follow thoses steps from within VSCode : <br>
+1. Select Extensions (Ctrl + Shift + X).
+2.  Open “More Action” menu(ellipsis on the top) and click “Install from VSIX…”.
+3. Locate VSIX file and select.
+4. Reload VSCode.
+5. Voilà !
 
 Syncs your local directory with a remote server directory. Allows you to optionally edit upload a file to the remote directory after it saves locally.  This allows you to edit more or less directly on the server similar to WinScp or other similar programs.
 
