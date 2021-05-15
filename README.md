@@ -7,10 +7,11 @@ https://github.com/Natizyskunk/vscode-sftp/releases/tag/v1.12.10
 
 To install it just follow thoses steps from within VSCode : <br>
 1. Select Extensions (Ctrl + Shift + X).
-2.  Open “More Action” menu(ellipsis on the top) and click “Install from VSIX…”.
-3. Locate VSIX file and select.
-4. Reload VSCode.
-5. Voilà !
+2. Uninstall current sftp extension from [liximomo](https://github.com/liximomo/)
+3. Open "More Action” menu(ellipsis on the top) and click “Install from VSIX…”.
+4. Locate VSIX file and select.
+5. Reload VSCode.
+6. Voilà !
 
 Syncs your local directory with a remote server directory. Allows you to optionally edit upload a file to the remote directory after it saves locally.  This allows you to edit more or less directly on the server similar to WinScp or other similar programs.
 
