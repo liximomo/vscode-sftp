@@ -3,8 +3,9 @@
   "displayName": "SFTP",
   "description": "SFTP/FTP sync",
   "version": "1.12.10",
-  "publisher": "liximomo",
+  "publisher": "Natizyskunk",
   "author": "liximomo <liximomo@gmail.com> (https://liximomo.github.io/)",
+  "modder": "Natizyskunk (https://github.com/Natizyskunk)",
   "engines": {
     "vscode": "^1.30.0"
   },
