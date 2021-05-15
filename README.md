@@ -2,6 +2,17 @@
 
 [![Paypal Donations](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=BY89QD47D7MPS&source=url) [![PayPal Me](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/liximomo)
 
+New modded version by [Natizyskunk](https://github.com/Natizyskunk/) that just work 😀 <br>
+https://github.com/Natizyskunk/vscode-sftp/releases/tag/v1.12.10
+
+To install it just follow thoses steps : <br>
+1. from within VSCode. Follow the steps to install manually:
+2. Select Extensions (Ctrl + Shift + X)
+3. Open “More Action” menu(ellipsis on the top) and click “Install from VSIX…”
+4. Locate VSIX file and select
+5. Reload VSCode
+6. Voilà !
+
 
 Syncs your local directory with a remote server directory. Allows you to optionally edit upload a file to the remote directory after it saves locally.  This allows you to edit more or less directly on the server similar to WinScp or other similar programs.
 
@@ -62,13 +73,22 @@ For detailed usage. Please go to [wiki](https://github.com/liximomo/vscode-sftp/
 
 You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/config).
 
-- [Simple](#simple)
-- [Profiles](#profiles)
-- [Multiple Context](#multiple-context)
-- [Connection Hopping](#connection-hopping)
-  - [Single Hop](#single-hop)
-  - [Multiple Hop](#multiple-hop)
-- [Config in User Setting](#config-in-user-setting)
+- [sftp sync extension for VS Code](#sftp-sync-extension-for-vs-code)
+  - [Usage](#usage)
+  - [Example Configs](#example-configs)
+    - [Simple](#simple)
+    - [Profiles](#profiles)
+    - [Multiple Context](#multiple-context)
+    - [Connection Hopping](#connection-hopping)
+      - [Single Hop](#single-hop)
+      - [Multiple Hop](#multiple-hop)
+    - [Config in User Setting](#config-in-user-setting)
+  - [Remote Explorer](#remote-explorer)
+  - [Debug](#debug)
+  - [Donation](#donation)
+    - [Wechat](#wechat)
+    - [Alipay](#alipay)
+    - [PayPal](#paypal)
 
 ### Simple
 
