@@ -112,15 +112,6 @@ async function transferFile(
     return;
   }
 
-  // save before upload
-  if (config.transferDirection === TransferDirection.LOCAL_TO_REMOTE) {
-    const textDocuments = getOpenTextDocuments();
-    const document = textDocuments.find(doc => doc.fileName === config.srcFsPath);
-    if (document && !document.isClosed && document.isDirty) {
-      await document.save();
-    }
-  }
-
   collect(
     new TransferTask(
       {
@@ -156,6 +147,15 @@ async function transferWithType(
       if (config.ensureDirExist) {
         const { targetFs, targetFsPath } = config;
         await targetFs.ensureDir(targetFs.pathResolver.dirname(targetFsPath));
+      }
+      // save before upload
+      if (config.transferDirection === TransferDirection.LOCAL_TO_REMOTE) {
+        const textDocuments = getOpenTextDocuments();
+        const document = textDocuments.find(doc => doc.fileName === config.srcFsPath);
+        if (document && !document.isClosed && document.isDirty) {
+          await document.save();
+          logger.info('save before upload');
+        }
       }
       transferFile(config, fileType, collect);
       break;
