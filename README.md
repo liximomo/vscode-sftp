@@ -2,12 +2,12 @@
 
 [![Paypal Donations](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=BY89QD47D7MPS&source=url) [![PayPal Me](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/liximomo)
 
-New modded version by [Natizyskunk](https://github.com/Natizyskunk/) that just work 😀 <br>
-https://github.com/Natizyskunk/vscode-sftp/releases/tag/v1.12.10
+New modded version by [@Natizyskunk](https://github.com/Natizyskunk/) that just work 😀 <br>
+https://github.com/Natizyskunk/vscode-sftp/releases/
 
 To install it just follow thoses steps from within VSCode : <br>
 1. Select Extensions (Ctrl + Shift + X).
-2. Uninstall current sftp extension from [liximomo](https://github.com/liximomo/)
+2. Uninstall current sftp extension from [@liximomo](https://github.com/liximomo/)
 3. Open "More Action” menu(ellipsis on the top) and click “Install from VSIX…”.
 4. Locate VSIX file and select.
 5. Reload VSCode.
