@@ -2,6 +2,8 @@
   * Add braces >=2.3.1 to package.json.
   * Add node-notifier >=8.0.1 to package.json.
   * Add yargs-parser ^20.2.4 to package.json.
+  * Fixed error "No such file" on VSCode 1.56.
+  * Fixed issue with uploading of file which has unsaved changes.
 
 ## 1.13.0 - 2021-07-06
   * Upgrade `ssh2` version to official v1.1.0 by @mscdex.
