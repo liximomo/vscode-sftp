@@ -1,16 +1,22 @@
 # sftp sync extension for VS Code
 
-New modded version by [@Natizyskunk](https://github.com/Natizyskunk/) that just work 😀 <br>
+New version by [@Natizyskunk](https://github.com/Natizyskunk/) that just work 😀 <br>
 https://github.com/Natizyskunk/vscode-sftp/releases/
 
-To install it just follow thoses steps from within VSCode : <br>
+## Installation
+
+### Method 1
 1. Select Extensions (Ctrl + Shift + X).
-2. Uninstall current sftp extension from [@Natizyskunk](https://github.com/Natizyskunk/)
+2. Uninstall current sftp extension from @liximomo
+3. Install new extension directly from VS Code Marketplace : https://marketplace.visualstudio.com/items?itemName=Natizyskunk.sftp
+
+### Method 2
+To install it just follow thoses steps from within VSCode :
+1. Select Extensions (Ctrl + Shift + X).
+2. Uninstall current sftp extension from @liximomo
 3. Open "More Action” menu(ellipsis on the top) and click “Install from VSIX…”.
 4. Locate VSIX file and select.
 5. Reload VSCode.
-6. Voilà !
-
 Syncs your local directory with a remote server directory. Allows you to optionally edit upload a file to the remote directory after it saves locally.  This allows you to edit more or less directly on the server similar to WinScp or other similar programs.
 
 Very powerful, with smart features. Very simple, requires just three lines of config! Very fast, finished in a blink.
@@ -31,15 +37,12 @@ Very powerful, with smart features. Very simple, requires just three lines of co
 ## Usage
  If your latest files are on the server, you can start with an empty local folder, then download your project, and from that point sync.  
 
-
 1. In `VS Code`, open a local directory you wish to sync to the remote server (or create an empty directory that you wish to first download the contents of a remote server folder in order to edit locally). 
 2. `Ctrl+Shift+P` on Windows/Linux or `Cmd+Shift+P` on Mac open command palette, run `SFTP: config` command.
 3. A basic configuration file will appear named `sftp.json` under the `.vscode` directory.  Edit the parameters to match your setup.
 
 For instance: 
-
 ```json
-
 {
     "name": "Profile Name",
     "host": "name_of_remote_host",
@@ -51,7 +54,6 @@ For instance:
     "password": "password",  
     "uploadOnSave": true
 }
-
 ```
 The password parameter is optional but if you don't add it, you will be constantly prompted for a password.  Note that you must escape any backslashes and other special characters with a backslash.
 
