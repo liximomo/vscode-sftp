@@ -1,7 +1,9 @@
 # sftp sync extension for VS Code
 
-New version by [@Natizyskunk](https://github.com/Natizyskunk/) that just work 😀 <br>
-https://github.com/Natizyskunk/vscode-sftp/releases/
+New version by [@Natizyskunk](https://github.com/Natizyskunk/) that just work 😀
+
+- VS Code marketplace : https://marketplace.visualstudio.com/items?itemName=Natizyskunk.sftp <br>
+- VSIX release : https://github.com/Natizyskunk/vscode-sftp/releases/
 
 ## Installation
 
