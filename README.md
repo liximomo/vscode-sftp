@@ -34,7 +34,6 @@ Very powerful, with smart features. Very simple, requires just three lines of co
   - Switchable profiles
 - [Commands](https://github.com/Natizyskunk/vscode-sftp/wiki/Command)
 - [Debug](#debug)
-- [Support SFTP Project](#Donation)
 
 ## Usage
  If your latest files are on the server, you can start with an empty local folder, then download your project, and from that point sync.  
@@ -75,6 +74,9 @@ For detailed usage. Please go to [wiki](https://github.com/Natizyskunk/vscode-sf
 You can see the full config [here](https://github.com/Natizyskunk/vscode-sftp/wiki/config).
 
 - [sftp sync extension for VS Code](#sftp-sync-extension-for-vs-code)
+  - [Installation](#installation)
+    - [Method 1](#method-1)
+    - [Method 2](#method-2)
   - [Usage](#usage)
   - [Example Configs](#example-configs)
     - [Simple](#simple)

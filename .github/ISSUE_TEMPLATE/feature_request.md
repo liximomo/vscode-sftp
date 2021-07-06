@@ -19,4 +19,3 @@ A clear and concise description of any alternative solutions or features you've 
 
 **Does this project help you?**
 - [x] Yes. SFTP IS AWESOME!
-- [ ] Yes. [I want to support you.](https://github.com/Natizyskunk/vscode-sftp#donation)
