@@ -5,20 +5,8 @@ New version by [@Natizyskunk](https://github.com/Natizyskunk/) that just work �
 - VS Code marketplace : https://marketplace.visualstudio.com/items?itemName=Natizyskunk.sftp <br>
 - VSIX release : https://github.com/Natizyskunk/vscode-sftp/releases/
 
-## Installation
+---
 
-### Method 1
-1. Select Extensions (Ctrl + Shift + X).
-2. Uninstall current sftp extension from @liximomo
-3. Install new extension directly from VS Code Marketplace : https://marketplace.visualstudio.com/items?itemName=Natizyskunk.sftp
-
-### Method 2
-To install it just follow thoses steps from within VSCode :
-1. Select Extensions (Ctrl + Shift + X).
-2. Uninstall current sftp extension from @liximomo
-3. Open "More Action” menu(ellipsis on the top) and click “Install from VSIX…”.
-4. Locate VSIX file and select.
-5. Reload VSCode.
 Syncs your local directory with a remote server directory. Allows you to optionally edit upload a file to the remote directory after it saves locally.  This allows you to edit more or less directly on the server similar to WinScp or other similar programs.
 
 Very powerful, with smart features. Very simple, requires just three lines of config! Very fast, finished in a blink.
@@ -34,6 +22,23 @@ Very powerful, with smart features. Very simple, requires just three lines of co
   - Switchable profiles
 - [Commands](https://github.com/Natizyskunk/vscode-sftp/wiki/Command)
 - [Debug](#debug)
+
+## Installation
+
+### Method 1 (Recommended : Auto update)
+1. Select Extensions (Ctrl + Shift + X).
+2. Uninstall current sftp extension from @liximomo
+3. Install new extension directly from VS Code Marketplace : https://marketplace.visualstudio.com/items?itemName=Natizyskunk.sftp
+4. Voilà !
+
+### Method 2 (Manual update)
+To install it just follow thoses steps from within VSCode :
+1. Select Extensions (Ctrl + Shift + X).
+2. Uninstall current sftp extension from @liximomo
+3. Open "More Action” menu(ellipsis on the top) and click “Install from VSIX…”.
+4. Locate VSIX file and select.
+5. Reload VSCode.
+6. Voilà !
 
 ## Usage
  If your latest files are on the server, you can start with an empty local folder, then download your project, and from that point sync.  
@@ -75,8 +80,8 @@ You can see the full config [here](https://github.com/Natizyskunk/vscode-sftp/wi
 
 - [sftp sync extension for VS Code](#sftp-sync-extension-for-vs-code)
   - [Installation](#installation)
-    - [Method 1](#method-1)
-    - [Method 2](#method-2)
+    - [Method 1 (Recommended : Auto update)](#method-1-recommended--auto-update)
+    - [Method 2 (Manual update)](#method-2-manual-update)
   - [Usage](#usage)
   - [Example Configs](#example-configs)
     - [Simple](#simple)
