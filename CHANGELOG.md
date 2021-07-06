@@ -1,6 +1,9 @@
+## 1.13.0 - 2021-07-06
+  * Upgrade `ssh2` version to official v1.1.0 by @mscdex.
+
 ## 1.12.10 - 2021-05-15
-* Improve sftp reliability.
-* Upgrade `ssh2` version to modded v0.8.10 by @Natizyskunk.
+  * Improve sftp reliability.
+  * Upgrade `ssh2` version to modded v0.8.10 by @Natizyskunk.
 
 ## 1.12.3 - 2019-04-27
   * Minor improvements.
