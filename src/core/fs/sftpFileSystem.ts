@@ -166,9 +166,8 @@ export default class SFTPFileSystem extends RemoteFileSystem {
 
   get(path, option?: FileOption): Promise<Readable> {
     return new Promise((resolve, reject) => {
-      const opt = { ...option, autoDestroy: false };
       try {
-        const stream = this.sftp.createReadStream(path, opt);
+        const stream = this.sftp.createReadStream(path, option);
         resolve(stream);
       } catch (err) {
         reject(err);
@@ -191,7 +190,7 @@ export default class SFTPFileSystem extends RemoteFileSystem {
   async put(input: Readable, path, option?: FileOption): Promise<void> {
     if (option && option.fd) {
       const fd = option.fd as SFTPFileDescriptor;
-      const opt = { ...option, handle: fd.handle, autoDestroy: false };
+      const opt = { ...option, handle: fd.handle };
       delete opt.fd;
 
       if (opt.mode) {
