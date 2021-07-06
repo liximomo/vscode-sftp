@@ -1,3 +1,8 @@
+## 1.13.1 - 2021-07-06
+  * Add braces >=2.3.1 to package.json.
+  * Add node-notifier >=8.0.1 to package.json.
+  * Add yargs-parser ^20.2.4 to package.json.
+
 ## 1.13.0 - 2021-07-06
   * Upgrade `ssh2` version to official v1.1.0 by @mscdex.
 
