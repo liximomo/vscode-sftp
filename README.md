@@ -1,13 +1,11 @@
 # sftp sync extension for VS Code
 
-[![Paypal Donations](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=BY89QD47D7MPS&source=url) [![PayPal Me](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/liximomo)
-
 New modded version by [@Natizyskunk](https://github.com/Natizyskunk/) that just work 😀 <br>
 https://github.com/Natizyskunk/vscode-sftp/releases/
 
 To install it just follow thoses steps from within VSCode : <br>
 1. Select Extensions (Ctrl + Shift + X).
-2. Uninstall current sftp extension from [@liximomo](https://github.com/liximomo/)
+2. Uninstall current sftp extension from [@Natizyskunk](https://github.com/Natizyskunk/)
 3. Open "More Action” menu(ellipsis on the top) and click “Install from VSIX…”.
 4. Locate VSIX file and select.
 5. Reload VSCode.
@@ -26,7 +24,7 @@ Very powerful, with smart features. Very simple, requires just three lines of co
   - File Watcher
   - Multiple configs
   - Switchable profiles
-- [Commands](https://github.com/liximomo/vscode-sftp/wiki/Command)
+- [Commands](https://github.com/Natizyskunk/vscode-sftp/wiki/Command)
 - [Debug](#debug)
 - [Support SFTP Project](#Donation)
 
@@ -66,11 +64,11 @@ There are other Example Configs below.
 7. Done  - you can now edit locally and after each save it will upload to your remote file. 
 8. Enjoy !
 
-For detailed usage. Please go to [wiki](https://github.com/liximomo/vscode-sftp/wiki).
+For detailed usage. Please go to [wiki](https://github.com/Natizyskunk/vscode-sftp/wiki).
 
 ## Example Configs
 
-You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/config).
+You can see the full config [here](https://github.com/Natizyskunk/vscode-sftp/wiki/config).
 
 - [sftp sync extension for VS Code](#sftp-sync-extension-for-vs-code)
   - [Usage](#usage)
@@ -84,10 +82,6 @@ You can see the full config [here](https://github.com/liximomo/vscode-sftp/wiki/
     - [Config in User Setting](#config-in-user-setting)
   - [Remote Explorer](#remote-explorer)
   - [Debug](#debug)
-  - [Donation](#donation)
-    - [Wechat](#wechat)
-    - [Alipay](#alipay)
-    - [PayPal](#paypal)
 
 ### Simple
 
@@ -255,7 +249,7 @@ In sftp.json:
 
 ## Remote Explorer
 
-![remote-explorer-preview](https://raw.githubusercontent.com/liximomo/vscode-sftp/master/assets/showcase/remote-explorer.png)
+![remote-explorer-preview](https://raw.githubusercontent.com/Natizyskunk/vscode-sftp/master/assets/showcase/remote-explorer.png)
 
 Remote Explorer lets you explore files in remote. You can open Remote Explorer by:
 
@@ -275,20 +269,3 @@ _Note：_ You need to manually refresh the parent folder after you **delete** a 
 
 2.  Set `sftp.debug` to `true` and reload vscode.
 3.  View the logs in `View > Output > sftp`.
-
----
-
-## Donation
-
-If this project helped you reduce development time, you can give me a cup of coffee :)
-
-### Wechat
-
-<img width="140" alt="Wechat" src="https://raw.githubusercontent.com/liximomo/vscode-sftp/master/assets/wechat.png"/>
-
-### Alipay
-
-<img width="140" alt="Alipay" src="https://raw.githubusercontent.com/liximomo/vscode-sftp/master/assets/alipay.png"/>
-
-### PayPal
-[![PayPal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=BY89QD47D7MPS&source=url) [![PayPal Me](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/liximomo) 

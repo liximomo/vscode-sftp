@@ -6,7 +6,7 @@ The failure error message comes from the remote side and is more or less the def
 Change `remotePath` to the actual path if it's a symlink.
 
 ### Solution Two
-The problem would be that your server runs out of file descriptors. You should try to increase the file descriptors limit. If you don't have the permission to do this, set [limitOpenFilesOnRemote](https://github.com/liximomo/vscode-sftp/wiki/Config#limitopenfilesonremote) option in your config.
+The problem would be that your server runs out of file descriptors. You should try to increase the file descriptors limit. If you don't have the permission to do this, set [limitOpenFilesOnRemote](https://github.com/Natizyskunk/vscode-sftp/wiki/Config#limitopenfilesonremote) option in your config.
 
 ## ENFILE: file table overflow ...
 

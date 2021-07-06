@@ -31,4 +31,4 @@ requestInfoOn:
 # *OPTIONAL* Add a list of people whose Issues/PRs will not be commented on
 # keys must be GitHub usernames
 requestInfoUserstoExclude:
-  - liximomo
+  - Natizyskunk
