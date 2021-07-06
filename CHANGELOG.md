@@ -2,6 +2,7 @@
   * Add braces >=2.3.1 to package.json.
   * Add node-notifier >=8.0.1 to package.json.
   * Add yargs-parser ^20.2.4 to package.json.
+  * Changing publisher and repo links.
   * Fixed error "No such file" on VSCode 1.56.
   * Fixed issue with uploading of file which has unsaved changes.
 
