@@ -1,12 +1,38 @@
+### Default ###
 .DS_Store
 out
 dist
-node_modules
-*.log
 test/test.js
 _debug
+TODO.md
+INSTALL_DEBUG.md
+
+### Extensions ###
+sftp-*.vsix
+
+### VS Code ###
 .vscode/**
 !.vscode/tasks.json
 !.vscode/launch.json
-/TODO.md
-/INSTALL_DEBUG.md
+
+### Node ###
+logs
+*.log
+package-lock.json
+node_modules/
+build/Release
+.npm
+
+### Yarn ###
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+!.yarn/cache
+
+### Bower ###
+bower_components
+.bower-cache
+.bower-registry
+.bower-tmp
