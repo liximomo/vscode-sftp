@@ -20,7 +20,7 @@ Very powerful, with smart features. Very simple, requires just three lines of co
   - File Watcher
   - Multiple configs
   - Switchable profiles
-- [Commands](https://github.com/Natizyskunk/vscode-sftp/wiki/Command)
+- [Commands](https://github.com/Natizyskunk/vscode-sftp/wiki/Commands)
 - [Debug](#debug)
 
 ## Installation
