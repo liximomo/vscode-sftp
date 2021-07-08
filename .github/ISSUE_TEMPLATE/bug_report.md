@@ -25,7 +25,7 @@ If applicable, add screenshots to help explain your problem.
 
 **Desktop (please complete the following information):**
  - OS: [e.g. Mac, Win, Linux]
- - VSCode Version [e.g. 1.27.0]
+ - VSCode Version [e.g. 1.51.0]
  - Extension Version [e.g. 1.7.0]
 
 **Extension Logs from Startup** - *required*
