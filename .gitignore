@@ -18,7 +18,7 @@ sftp-*.vsix
 ### Node ###
 logs
 *.log
-node_modules/
+node_modules
 build/Release
 .npm
 
