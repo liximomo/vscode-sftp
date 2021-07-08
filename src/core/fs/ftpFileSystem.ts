@@ -252,7 +252,7 @@ export default class FTPFileSystem extends RemoteFileSystem {
 
     return (
       stats
-        // item will be a string if ftp fail to parse it (https://github.com/Natizyskunk/vscode-sftp/issues/308)
+        // item will be a string if ftp fail to parse it (https://github.com/liximomo/vscode-sftp/issues/308)
         // we simply ignore it by check whether it has a name property
         .filter(item => item.name && item.name !== '.' && item.name !== '..')
         .map(item =>
