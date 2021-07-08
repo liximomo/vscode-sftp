@@ -8,6 +8,16 @@ import localFs from '../../../core/localFs';
 import TransferTask from '../../../core/transferTask';
 import RemoteFs from '../../../../test/helper/localRemoteFs';
 
+declare global {
+  interface Array<T> {
+    formatSep(): Array<T>;
+  }
+}
+
+Array.prototype.formatSep = function() {
+  return this.map(str => str.replace(/\//g, path.sep))
+}
+
 function createRemoteFs({ remoteTimeOffsetInHours = 0 } = {}) {
   return new RemoteFs(path, {
     clientOption: {} as any,
@@ -120,13 +130,13 @@ describe('transfer algorithm', () => {
       expect(deleted.length).toEqual(0);
       expect(mapList(task, 'targetFsPath').sort()).toEqual(
         [
-          '/remote/a',
-          '/remote/b',
-          '/remote/c/c-a',
-          '/remote/c/c-b',
-          '/remote/c/d/d-a',
-          '/remote/c/d/d-b',
-        ].sort()
+          `/remote/a`,
+          `/remote/b`,
+          `/remote/c/c-a`,
+          `/remote/c/c-b`,
+          `/remote/c/d/d-a`,
+          `/remote/c/d/d-b`,
+        ].formatSep().sort()
       );
     });
 
@@ -177,7 +187,7 @@ describe('transfer algorithm', () => {
       expect(task.length).toEqual(6);
       expect(deleted.length).toEqual(3);
       expect(mapList(deleted, 'fspath').sort()).toEqual(
-        ['/remote/$da', '/remote/$db', '/remote/c/$dc'].sort()
+        ['/remote/$da', '/remote/$db', '/remote/c/$dc'].formatSep().sort()
       );
       expect(mapList(task, 'targetFsPath').sort()).toEqual(
         [
@@ -187,7 +197,7 @@ describe('transfer algorithm', () => {
           '/remote/c/c-b',
           '/remote/c/d/d-a',
           '/remote/c/d/d-b',
-        ].sort()
+        ].formatSep().sort()
       );
     });
 
@@ -238,7 +248,7 @@ describe('transfer algorithm', () => {
       expect(task.length).toEqual(6);
       expect(deleted.length).toEqual(3);
       expect(mapList(deleted, 'fspath').sort()).toEqual(
-        ['/remote/$da', '/remote/$db', '/remote/c/$dc'].sort()
+        ['/remote/$da', '/remote/$db', '/remote/c/$dc'].formatSep().sort()
       );
       expect(mapList(task, 'targetFsPath').sort()).toEqual(
         [
@@ -248,7 +258,7 @@ describe('transfer algorithm', () => {
           '/remote/c/c-b',
           '/remote/c/d/d-a',
           '/remote/c/d/d-b',
-        ].sort()
+        ].formatSep().sort()
       );
     });
 
@@ -287,7 +297,7 @@ describe('transfer algorithm', () => {
       expect(task.length).toEqual(1);
       expect(deleted.length).toEqual(0);
       expect(mapList(task, 'targetFsPath').sort()).toEqual(
-        ['/remote/a'].sort()
+        ['/remote/a'].formatSep().sort()
       );
       task.length = 0;
       deleted.length = 0;
@@ -340,7 +350,7 @@ describe('transfer algorithm', () => {
       expect(task.length).toEqual(3);
       expect(deleted.length).toEqual(0);
       expect(mapList(task, 'targetFsPath').sort()).toEqual(
-        ['/remote/a', '/remote/c/c-a', '/remote/c/d/d-a'].sort()
+        ['/remote/a', '/remote/c/c-a', '/remote/c/d/d-a'].formatSep().sort()
       );
     });
 
@@ -393,7 +403,7 @@ describe('transfer algorithm', () => {
           '/remote/c/c-b',
           '/remote/c/d/d-a',
           '/remote/c/d/d-b',
-        ].sort()
+        ].formatSep().sort()
       );
     });
 
@@ -455,7 +465,7 @@ describe('transfer algorithm', () => {
           '/remote/c/d/d-a',
           '/local/c/d/d-b',
           '/local/c/d/d-c',
-        ].sort()
+        ].formatSep().sort()
       );
     });
 
@@ -516,7 +526,7 @@ describe('transfer algorithm', () => {
           '/local/c/c-b',
           '/remote/c/d/d-a',
           '/local/c/d/d-b',
-        ].sort()
+        ].formatSep().sort()
       );
     });
   });
