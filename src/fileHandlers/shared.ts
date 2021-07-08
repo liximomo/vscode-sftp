@@ -2,7 +2,7 @@ import { UResource, FileService, FileType } from '../core';
 import app from '../app';
 
 // NEED_VSCODE_UPDATE: detect explorer view visible
-// refresh will open explorer view which cause a problem https://github.com/Natizyskunk/vscode-sftp/issues/286
+// refresh will open explorer view which cause a problem https://github.com/liximomo/vscode-sftp/issues/286
 // export function refreshLocalExplorer(localUri: Uri) {
 //   // do nothing
 // }
