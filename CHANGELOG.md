@@ -3,8 +3,8 @@
   * re-add yargs-parser ^20.2.4 to package.json.
   * Remove `yarn.lock`.
   * Add `package-lock.json`.
-  * Fix Writing CHANNEL_DATA (0) / Writing FSETSTAT (Merge pull request [#12](https://github.com/Natizyskunk/vscode-sftp/pull/12) from zarausto/patch-1).
-  * Fix transfer-test in window platform (Merge pull request [#11](https://github.com/Natizyskunk/vscode-sftp/pull/11) from alex1504/fix-transfer-test).
+  * Fix Writing CHANNEL_DATA (0) / Writing FSETSTAT (Merged pull request [#12](https://github.com/Natizyskunk/vscode-sftp/pull/12) from zarausto/patch-1).
+  * Fix transfer-test for Windows platform (Merged pull request [#11](https://github.com/Natizyskunk/vscode-sftp/pull/11) from alex1504/fix-transfer-test).
 
 ## 1.13.2 - 2021-07-07
   * remove braces >=2.3.1 to package.json.
