@@ -1,22 +1,18 @@
 # SFTP Configuration
 
 ## agent
-
 *string*: Path to ssh-agent's UNXI socket for ssh-agent-based user authentication.  Windows users must
 set to 'pageant' for authenticating with Pagenat or (actual) path to a Cygwin "UNIX socket".Id gets
 more stability because some clients/servers have some sort of configured/hard coded limit.
 
 ## privateKeyPath
-
 *string*: Absolute path to user's private key.
 
 ## passphrase
-
 *mixed*: For an encrypted private key, this is the passphrase string used to decrypt it.  Set to true
 for enabling passphrase dialog.  This will prevent from using cleartext passphrase in this config.
 
 ## interactiveAuth
-
 *boolean*: Set to true to enable `verifyCode` dialog.  Keyboard interation mechanism.  For example, using
 Google Authentication (multi-factor).
 
@@ -25,11 +21,9 @@ Note: *Requires the server to have keyboard-interactive authentication enabled.*
 **Default**: false
 
 ## algorithms
-
 Explicit overrides for the default transport layer algorithms used for the connection.
 
 **Default**:
-
 ```json
 algorithms: {
   "kex": [
@@ -63,11 +57,9 @@ algorithms: {
 ```
 
 ## sshConfigPath
-
 Absolute path to your SSH configuration file.
 
 **Default**: ~/.ssh/config
 
 ## sshCustomParams
-
 Extra parameters appended to the SSH command used by "Open SSH in Terminal".
