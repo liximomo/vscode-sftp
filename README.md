@@ -283,4 +283,4 @@ _Note：_ You need to manually refresh the parent folder after you **delete** a 
 3. View the logs in `View > Output > sftp`.
 
 ## FAQ
-You can see all the Frequently Asked Questions [here](./FAQ.md)
+You can see all the Frequently Asked Questions [here](./FAQ.md).
