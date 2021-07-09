@@ -1,7 +1,15 @@
+## 1.13.3 - 2021-07-09
+  * re-add braces >=2.3.1 to package.json.
+  * re-add yargs-parser ^20.2.4 to package.json.
+  * Remove `yarn.lock`.
+  * Add `package-lock.json`.
+  * Fix Writing CHANNEL_DATA (0) / Writing FSETSTAT (Merge pull request [#12](https://github.com/Natizyskunk/vscode-sftp/pull/12) from zarausto/patch-1).
+  * Fix transfer-test in window platform (Merge pull request [#11](https://github.com/Natizyskunk/vscode-sftp/pull/11) from alex1504/fix-transfer-test).
+
 ## 1.13.2 - 2021-07-07
   * remove braces >=2.3.1 to package.json.
   * remove yargs-parser ^20.2.4 to package.json.
-  * Removing the fix for the "No such file" error on VSCode 1.56 since it's been implementend in the new ssh2 v1.1.0 npm package. commit taht fix it : https://github.com/mscdex/ssh2/commit/c0de05d186065ad4081b98d2f7aa0fe22161ec09
+  * Remove the fix for the "No such file" error on VSCode 1.56 since it's been implementend in the new ssh2 v1.1.0 npm package. commit taht fix it : https://github.com/mscdex/ssh2/commit/c0de05d186065ad4081b98d2f7aa0fe22161ec09
 
 ## 1.13.1 - 2021-07-06
   * Add braces >=2.3.1 to package.json.
@@ -16,7 +24,6 @@
 
 ## 1.12.10 - 2021-05-15
   * Improve sftp reliability.
-  * Upgrade `ssh2` version to modded v0.8.10 by @Natizyskunk.
 
 ## 1.12.3 - 2019-04-27
   * Minor improvements.
