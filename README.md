@@ -23,9 +23,9 @@ Very powerful, with smart features. Very simple, requires just three lines of co
   - File Watcher
   - Multiple configs
   - Switchable profiles
-- [Commands](/wiki/Commands)
+- [Commands](https://github.com/Natizyskunk/vscode-sftp/wiki/Commands)
 - [Debug](#debug)
-- [FAQ](./FAQ.md)
+- [FAQ](#FAQ)
 
 ## Installation
 
@@ -45,12 +45,12 @@ To install it just follow thoses steps from within VSCode :
 6. Voilà !
 
 ## Documentation
-- [Home](/wiki)
-- [Settings](/wiki/Setting)
-- [Common configuration](/wiki/Common-Config)
-- [SFTP configuration](/wiki/SFTP-only-Config)
-- [FTP confriguration](/wiki/FTP(s)-only-Config)
-- [Commands](/wiki/Commands)
+- [Home](https://github.com/Natizyskunk/vscode-sftp/wiki)
+- [Settings](https://github.com/Natizyskunk/vscode-sftp/wiki/Setting)
+- [Common configuration](https://github.com/Natizyskunk/vscode-sftp/wiki/Common-Config)
+- [SFTP configuration](https://github.com/Natizyskunk/vscode-sftp/wiki/SFTP-only-Config)
+- [FTP confriguration](https://github.com/Natizyskunk/vscode-sftp/wiki/FTP(s)-only-Config)
+- [Commands](https://github.com/Natizyskunk/vscode-sftp/wiki/Commands)
 
 ## Usage
 If your latest files are on the server, you can start with an empty local folder,
@@ -283,4 +283,4 @@ _Note：_ You need to manually refresh the parent folder after you **delete** a 
 3. View the logs in `View > Output > sftp`.
 
 ## FAQ
-[Frequently Asked Questions](./FAQ.md)
+You can see all the Frequently Asked Questions [here](./FAQ.md)
