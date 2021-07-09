@@ -23,8 +23,9 @@ Very powerful, with smart features. Very simple, requires just three lines of co
   - File Watcher
   - Multiple configs
   - Switchable profiles
-- [Commands](https://github.com/Natizyskunk/vscode-sftp/wiki/Commands)
+- [Commands](/wiki/Commands)
 - [Debug](#debug)
+- [FAQ](./FAQ.md)
 
 ## Installation
 
@@ -43,14 +44,13 @@ To install it just follow thoses steps from within VSCode :
 5. Reload VSCode.
 6. Voilà !
 
-
 ## Documentation
-- [Commands](./docs/commands.md)
-- [Alt commands](./docs/alt_commands.md)
-- [Common configuration](./docs/common_config.md)
-- [SFTP configuration](./docs/sftp_config.md)
-- [FTP confriguration](./docs/ftp_config.md)
-- [Settings](./docs/settings.md)
+- [Home](/wiki)
+- [Settings](/wiki/Setting)
+- [Common configuration](/wiki/Common-Config)
+- [SFTP configuration](/wiki/SFTP-only-Config)
+- [FTP confriguration](/wiki/FTP(s)-only-Config)
+- [Commands](/wiki/Commands)
 
 ## Usage
 If your latest files are on the server, you can start with an empty local folder,
@@ -91,10 +91,9 @@ There are other Example Configs below.
 For detailed usage. Please go to [wiki](https://github.com/Natizyskunk/vscode-sftp/wiki).
 
 ## Example Configs
-
 You can see the full config [here](https://github.com/Natizyskunk/vscode-sftp/wiki/config).
 
-- [SFTP sync extension for VS Code](#sftp-sync-extension-for-vs-code)
+- [sftp sync extension for VS Code](#sftp-sync-extension-for-vs-code)
   - [Installation](#installation)
     - [Method 1 (Recommended : Auto update)](#method-1-recommended--auto-update)
     - [Method 2 (Manual update)](#method-2-manual-update)
@@ -110,9 +109,9 @@ You can see the full config [here](https://github.com/Natizyskunk/vscode-sftp/wi
     - [Config in User Setting](#config-in-user-setting)
   - [Remote Explorer](#remote-explorer)
   - [Debug](#debug)
+  - [FAQ](#faq)
 
 ### Simple
-
 ```json
 {
   "host": "host",
@@ -122,7 +121,6 @@ You can see the full config [here](https://github.com/Natizyskunk/vscode-sftp/wi
 ```
 
 ### Profiles
-
 ```json
 {
   "username": "username",
@@ -153,9 +151,7 @@ _Note：_ `context` and `watcher` are only available at root level.
 Use `SFTP: Set Profile` to switch profile.
 
 ### Multiple Context
-
 The context must **not be same**.
-
 ```json
 [
   {
@@ -180,15 +176,12 @@ The context must **not be same**.
 _Note：_ `name` is required in this mode.
 
 ### Connection Hopping
-
 You can connect to a target server through a proxy with ssh protocol.
 
 _Note：_ **Variable substitution is not working in a hop config.**
 
 #### Single Hop
-
 local -> hop -> target
-
 ```json
 {
   "name": "target",
@@ -209,9 +202,7 @@ local -> hop -> target
 ```
 
 #### Multiple Hop
-
 local -> hopa -> hopb -> target
-
 ```json
 {
   "name": "target",
@@ -241,11 +232,9 @@ local -> hopa -> hopb -> target
 ```
 
 ### Config in User Setting
-
 You can use `remote` to tell sftp to get the config from [remote-fs](https://github.com/liximomo/vscode-remote-fs).
 
 In User Setting:
-
 ```json
 "remotefs.remote": {
   "dev": {
@@ -265,7 +254,6 @@ In User Setting:
 ```
 
 In sftp.json:
-
 ```json
 {
   "remote": "dev",
@@ -276,7 +264,6 @@ In sftp.json:
 ```
 
 ## Remote Explorer
-
 ![remote-explorer-preview](https://raw.githubusercontent.com/Natizyskunk/vscode-sftp/master/assets/showcase/remote-explorer.png)
 
 Remote Explorer lets you explore files in remote. You can open Remote Explorer by:
@@ -289,9 +276,11 @@ You can only view a files content with Remote Explorer. Run command `SFTP: Edit 
 _Note：_ You need to manually refresh the parent folder after you **delete** a file to make the explorer updated.
 
 ## Debug
-
 1. Open User Settings.
   - On Windows/Linux - `File > Preferences > Settings`
   - On macOS - `Code > Preferences > Settings`
 2. Set `sftp.debug` to `true` and reload vscode.
 3. View the logs in `View > Output > sftp`.
+
+## FAQ
+[Frequently Asked Questions](./FAQ.md)
