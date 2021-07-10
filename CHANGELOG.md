@@ -1,3 +1,7 @@
+## 1.13.4 - 2021-07-10
+  * Fix "Error with the transfer direction."
+  * Add loggers for transfer informations.
+
 ## 1.13.3 - 2021-07-09
   * re-add braces >=2.3.1 to package.json.
   * re-add yargs-parser ^20.2.4 to package.json.
