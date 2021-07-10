@@ -102,7 +102,7 @@ async function transferFolder(
     )
   );
   
-  logger.info('folder saved.');
+  logger.info('folder transfered.');
 }
 
 async function transferFile(
@@ -132,7 +132,7 @@ async function transferFile(
     )
   );
 
-  logger.info('file saved.');
+  logger.info('file transfered.');
 }
 
 async function transferWithType(
@@ -142,32 +142,30 @@ async function transferWithType(
   fileType: FileType,
   collect: (t: TransferTask) => void
 ) {
-  if (config.transferDirection === TransferDirection.LOCAL_TO_REMOTE) {
-    switch (fileType) {
-      case FileType.Directory:
-        await transferFolder(config, collect);
-        break;
-      case FileType.File:
-      case FileType.SymbolicLink:
-        if (config.ensureDirExist) {
-          const { targetFs, targetFsPath } = config;
-          await targetFs.ensureDir(targetFs.pathResolver.dirname(targetFsPath));
-        }
-        // <<< save before upload: start
+  switch (fileType) {
+    case FileType.Directory:
+      await transferFolder(config, collect);
+      break;
+    case FileType.File:
+    case FileType.SymbolicLink:
+      if (config.ensureDirExist) {
+        const { targetFs, targetFsPath } = config;
+        await targetFs.ensureDir(targetFs.pathResolver.dirname(targetFsPath));
+      }
+      // <<< save before upload: start
+      if (config.transferDirection === TransferDirection.LOCAL_TO_REMOTE) {
         const textDocuments = getOpenTextDocuments();
         const document = textDocuments.find(doc => doc.fileName === config.srcFsPath);
         if (document && !document.isClosed && document.isDirty) {
           await document.save();
-          logger.info('save before upload');
+          logger.info('save before upload.');
         }
-        // save before upload: end >>>
-        transferFile(config, fileType, collect);
-        break;
-      default:
-        logger.warn(`Unsupported file type (type = ${fileType}). File ${config.srcFsPath}`);
-    }
-  } else {
-    logger.info('Error with the transfer direction. Direction seems not to be local to remote.');
+      }
+      // save before upload: end >>>
+      transferFile(config, fileType, collect);
+      break;
+    default:
+      logger.warn(`Unsupported file type (type = ${fileType}). File ${config.srcFsPath}`);
   }
 }
 
@@ -179,10 +177,12 @@ async function removeFile(file: string, fs: FileSystem, fileType: FileType, opti
   switch (fileType) {
     case FileType.Directory:
       await fileOperations.removeDir(file, fs, option);
+      logger.info('folder removed.');
       break;
     case FileType.File:
     case FileType.SymbolicLink:
       await fileOperations.removeFile(file, fs, option);
+      logger.info('file removed.');
       break;
     default:
       break;
