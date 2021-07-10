@@ -79,6 +79,7 @@ export default class FTPClient extends RemoteClient {
         .connect({
           keepalive: 1000 * 10, // 10 secs, original
           // keepalive: 1000 * 600, // 10 mins
+          // keepalive: 1000 * 1800, // 30 mins
           pasvTimeout: connectTimeout,
           ...option,
           connTimeout: connectTimeout,

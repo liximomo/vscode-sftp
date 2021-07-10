@@ -296,15 +296,15 @@ export default class SSHClient extends RemoteClient {
         })
         .connect({
           keepaliveInterval: 1000 * 30, // 30 secs, original
-          // keepaliveInterval: 1000 * 1800, // 30 mins
           // keepaliveInterval: 1000 * 600, // 10 mins
+          // keepaliveInterval: 1000 * 1800, // 30 mins
           keepaliveCountMax: 2, // x2 original
-          // keepaliveCountMax: 6, // x6
           // keepaliveCountMax: 3, // x3 
+          // keepaliveCountMax: 6, // x6
           readyTimeout: interactiveAuth
             ? Math.max(60 * 1000, connectTimeout || 0) // 60 secs, original
-            // ? Math.max(10800 * 1000, connectTimeout || 0) // 180 mins
             // ? Math.max(1800 * 1000, connectTimeout || 0) // 30 mins
+            // ? Math.max(10800 * 1000, connectTimeout || 0) // 180 mins
             : connectTimeout,
           ...option,
           tryKeyboard: interactiveAuth,
