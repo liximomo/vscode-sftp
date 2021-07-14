@@ -130,12 +130,12 @@ describe('transfer algorithm', () => {
       expect(deleted.length).toEqual(0);
       expect(mapList(task, 'targetFsPath').sort()).toEqual(
         [
-          `/remote/a`,
-          `/remote/b`,
-          `/remote/c/c-a`,
-          `/remote/c/c-b`,
-          `/remote/c/d/d-a`,
-          `/remote/c/d/d-b`,
+          '/remote/a',
+          '/remote/b',
+          '/remote/c/c-a',
+          '/remote/c/c-b',
+          '/remote/c/d/d-a',
+          '/remote/c/d/d-b',
         ].formatSep().sort()
       );
     });
