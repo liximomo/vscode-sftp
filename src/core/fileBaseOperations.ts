@@ -1,4 +1,7 @@
 import { FileSystem } from './fs';
+import { window } from 'vscode';
+import { Readable } from 'stream';
+import logger from '../logger';
 
 interface FileOption {
   mode?: number;
@@ -43,4 +46,25 @@ export function removeDir(path: string, fs: FileSystem, option): Promise<void> {
 
 export function rename(srcPath: string, destPath: string, fs: FileSystem): Promise<void> {
   return fs.rename(srcPath, destPath);
+}
+
+export function createDir(path: string, fs: FileSystem, option): Promise<void> {
+  return fs.mkdir(path);
+}
+
+export async function createFile(path: string, fs: FileSystem, option): Promise<void> {
+  try {
+    await fs.lstat(path);
+    logger.warn(`Can't create file becase file already exist`);
+    window.showErrorMessage(`Can't create file becase file already exist`);
+    return;
+  } catch (error) {
+
+  }
+
+  const targetFd = await fs.open(path, 'w');
+  const s = new Readable();
+  s._read = () => { };
+  s.push(null);
+  return fs.put(s, path, { fd: targetFd });
 }
