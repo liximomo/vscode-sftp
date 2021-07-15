@@ -496,7 +496,7 @@
         {
           "command": "sftp.create.folder",
           "group": "7_modification",
-          "when": "view == remoteExplorer && viewItem != file"
+          "when": "view == remoteExplorer && viewItem != folder"
         },
         {
           "command": "sftp.create.file",
