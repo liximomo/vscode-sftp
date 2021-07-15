@@ -1,3 +1,6 @@
+## 1.13.6 - 2021-07-15
+  * Fix syntax in `src\fileHandlers\transfer\__tests__\transfer-test.ts`.
+
 ## 1.13.5 - 2021-07-10
   * Reorder test parameters for `keepalive`.
   * Add v1.13.5-beta. Only use beta version if you still encounter the "REQUEST_FAILURE" error like described in those two issues : [Buffering on save file after 15 minute](https://github.com/Natizyskunk/vscode-sftp/issues/7) & [Infinite spinner on file save after server rest connection with client](https://github.com/Natizyskunk/vscode-sftp/issues/8).
