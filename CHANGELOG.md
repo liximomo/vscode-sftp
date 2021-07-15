@@ -1,3 +1,6 @@
+## 1.14.0-beta - 2021-07-15
+  * Add `create remote file` and `create remote folder` commands.
+
 ## 1.13.6 - 2021-07-15
   * Fix syntax in `src\fileHandlers\transfer\__tests__\transfer-test.ts`.
 
