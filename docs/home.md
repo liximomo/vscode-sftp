@@ -6,3 +6,4 @@
     - [SFTP](./sftp_config.md)
     - [FTP(s)](./ftp_config.md)
 3. [Commands](./commands.md)
+4. [FAQ](./../FAQ.md)

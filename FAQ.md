@@ -1,11 +1,12 @@
-- [vscode-sftp Frequently Asked Questions](#vscode-sftp-frequently-asked-questions)
-  - [Error: Failure](#error-failure)
-    - [Error: Failure - Solution One](#error-failure---solution-one)
-    - [Error: Failure - Solution Two](#error-failure---solution-two)
-  - [ENFILE: file table overflow](#enfile-file-table-overflow)
-  - [How do I upload content inside a folder, but not the folder itself?](#how-do-i-upload-content-inside-a-folder-but-not-the-folder-itself)
-  - [Clicking Upload Changed Files does not work](#clicking-upload-changed-files-does-not-work)
-  - [How can I upload files as root?](#how-can-i-upload-files-as-root)
+- [Error: Failure](#error-failure)
+  - [Error: Failure - Solution One](#error-failure---solution-one)
+  - [Error: Failure - Solution Two](#error-failure---solution-two)
+  - [Error: Failure - Solution Three](#error-failure---solution-three)
+- [ENFILE: file table overflow ...](#enfile-file-table-overflow-)
+  - [ENFILE: file table overflow ... - Solution for MacOS harsh limit](#enfile-file-table-overflow----solution-for-macos-harsh-limit)
+- [How do I upload content inside a folder, but not the folder itself?](#how-do-i-upload-content-inside-a-folder-but-not-the-folder-itself)
+- [Clicking Upload Changed Files does not work](#clicking-upload-changed-files-does-not-work)
+- [How can I upload files as root?](#how-can-i-upload-files-as-root)
 
 ## Error: Failure
 
@@ -23,6 +24,46 @@ Change `remotePath` to the actual path if it's a symlink.
 The problem would be that your server runs out of file descriptors.
 You should try to increase the file descriptors limit.
 If you don't have the permission to do this, set [limitOpenFilesOnRemote](https://github.com/Natizyskunk/vscode-sftp/wiki/Config#limitopenfilesonremote) option in your config.
+
+### Error: Failure - Solution Three
+
+The problem would be that the SFTP extension keeps closing for those who use more legacy/old systems.
+You'll have to Explicitly override the default transport layer algorithms used for the connection to remove the new `"diffie-hellman-group-exchange-sha256"` algorithm that cause the problem from the `kex` section. Just add this in your `sftp.json` config file, which should make it work.
+```json
+{
+	...
+	"host": "exemple.com",
+	...
+	"algorithms": {
+		"kex": [
+			"ecdh-sha2-nistp256", 
+			"ecdh-sha2-nistp384", 
+			"ecdh-sha2-nistp521", 
+			"diffie-hellman-group14-sha1"
+		],
+		"cipher": [
+			"aes128-ctr", 
+			"aes192-ctr", 
+			"aes256-ctr", 
+			"aes128-gcm", 
+			"aes128-gcm@openssh.com", 
+			"aes256-gcm", 
+			"aes256-gcm@openssh.com"
+		],
+		"serverHostKey": [
+			"ssh-rsa", 
+			"ecdsa-sha2-nistp256", 
+			"ecdsa-sha2-nistp384", 
+			"ecdsa-sha2-nistp521"
+		],
+		"hmac": [
+			"hmac-sha2-256", 
+			"hmac-sha2-512", 
+			"hmac-sha1"
+		]
+	}
+}
+```
 
 ## ENFILE: file table overflow ...
 
@@ -49,19 +90,19 @@ will work."
 Example config (where all JS and HTML files in `./build` will be copied to `/folder1/folder2/folder3`):
 ```json
 {
-    "name": "My Server",
-    "host": "10.19.5.33",
-    "protocol": "sftp",
-    "port": 22,
-    "username": "user1",
-    "remotePath": "/folder1/folder2/folder3",
-    "context": "./build",
-    "uploadOnSave": false,
-    "watcher": {
-        "files": "*.{js,html}",
-        "autoUpload": true,
-        "autoDelete": false
-    }
+  "name": "My Server",
+  "host": "10.19.5.33",
+  "protocol": "sftp",
+  "port": 22,
+  "username": "user1",
+  "remotePath": "/folder1/folder2/folder3",
+  "context": "./build",
+  "uploadOnSave": false,
+  "watcher": {
+    "files": "*.{js,html}",
+    "autoUpload": true,
+    "autoDelete": false
+  }
 }
 ```
 
