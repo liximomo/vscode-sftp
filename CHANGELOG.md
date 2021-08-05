@@ -1,3 +1,6 @@
+## 1.14.0-beta - 2021-08-06
+  * Update of the FAQ to add support for old/legacy systems.
+
 ## 1.14.0-beta - 2021-07-15
   * Add `create remote file` and `create remote folder` commands.
 
