@@ -34,6 +34,7 @@ const configScheme = {
 
   remotePath: Joi.string().required(),
   uploadOnSave: Joi.boolean(),
+  useTempFile: Joi.boolean(),
   downloadOnOpen: Joi.boolean().allow('confirm'),
 
   ignore: Joi.array()
@@ -67,6 +68,7 @@ const defaultConfig = {
   // name: undefined,
   remotePath: './',
   uploadOnSave: false,
+  useTempFile: true,
   downloadOnOpen: false,
   ignore: [],
   // ignoreFile: undefined,
@@ -175,6 +177,7 @@ export function newConfig(basePath) {
             username: 'username',
             remotePath: '/',
             uploadOnSave: true,
+            useTempFile: true,
           },
           { spaces: 4 }
         )
