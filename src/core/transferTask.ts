@@ -171,7 +171,11 @@ export default class TransferTask implements Task {
 
       if(useTempFile) {
         logger.info("moving to: " + target);
-        await targetFs.unlink(target);
+        try {
+          await targetFs.unlink(target);
+        } catch(error) {
+          // Just ignore
+        }
         await targetFs.rename(uploadTarget, target);
       }
 
