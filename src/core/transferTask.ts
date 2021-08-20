@@ -122,20 +122,34 @@ export default class TransferTask implements Task {
       mtime,
     } = this._TransferOption;
     let { mode } = this._TransferOption;
-    let targetFd;
+    let targetFd, uploadFd;
     const uploadTarget = target + (useTempFile ? ".new" : "");
 
     // Use mode first.
     // Then check perserveTargetMode and fallback to fallbackMode if fail to get mode of target
     if (mode === undefined && perserveTargetMode) {
-      targetFd = await targetFs.open(uploadTarget, 'w');
+      if(useTempFile) {
+        [targetFd, uploadFd] = await Promise.all([
+          targetFs.open(target, 'r')  // Get handle for reading the target mode
+            .catch(() => null), // Return null if target file doesn't exist
+          targetFs.open(uploadTarget, 'w')  // Get handle for the file upload
+        ]);
+      } else {
+        targetFd = uploadFd = await targetFs.open(uploadTarget, 'w');
+      }
+
       [this._handle, mode] = await Promise.all([
         srcFs.get(src),
-        targetFs
+        targetFd && targetFs  // If target exists => get target mode
           .fstat(targetFd)
           .then(stat => stat.mode)
           .catch(() => fallbackMode),
       ]);
+
+      if(useTempFile) {
+        targetFs.close(targetFd);
+      }
+
     } else {
       [this._handle, targetFd] = await Promise.all([
         srcFs.get(src),
@@ -149,13 +163,13 @@ export default class TransferTask implements Task {
       }
       await targetFs.put(this._handle, uploadTarget, {
         mode,
-        fd: targetFd,
+        fd: uploadFd,
         autoClose: false,
       });
       if (atime && mtime) {
         try {
           await targetFs.futimes(
-            targetFd,
+            uploadFd,
             Math.floor(atime / 1000),
             Math.floor(mtime / 1000)
           );
@@ -180,7 +194,7 @@ export default class TransferTask implements Task {
       }
 
     } finally {
-      await targetFs.close(targetFd);
+      await targetFs.close(uploadFd);
     }
   }
 }
