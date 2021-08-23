@@ -22,6 +22,7 @@ export interface TransferOption {
   mode?: number;
   fallbackMode?: number;
   perserveTargetMode: boolean;
+  useTempFile?: boolean;
 }
 
 export default class TransferTask implements Task {
@@ -115,40 +116,60 @@ export default class TransferTask implements Task {
     const targetFs = this._targetFs;
     const {
       perserveTargetMode,
+      useTempFile,
       fallbackMode,
       atime,
       mtime,
     } = this._TransferOption;
     let { mode } = this._TransferOption;
-    let targetFd;
+    let targetFd, uploadFd;
+    const uploadTarget = target + (useTempFile ? ".new" : "");
+
     // Use mode first.
     // Then check perserveTargetMode and fallback to fallbackMode if fail to get mode of target
     if (mode === undefined && perserveTargetMode) {
-      targetFd = await targetFs.open(target, 'w');
+      if(useTempFile) {
+        [targetFd, uploadFd] = await Promise.all([
+          targetFs.open(target, 'r')  // Get handle for reading the target mode
+            .catch(() => null), // Return null if target file doesn't exist
+          targetFs.open(uploadTarget, 'w')  // Get handle for the file upload
+        ]);
+      } else {
+        targetFd = uploadFd = await targetFs.open(uploadTarget, 'w');
+      }
+
       [this._handle, mode] = await Promise.all([
         srcFs.get(src),
-        targetFs
+        targetFd && targetFs  // If target exists => get target mode
           .fstat(targetFd)
           .then(stat => stat.mode)
           .catch(() => fallbackMode),
       ]);
+
+      if(useTempFile) {
+        targetFs.close(targetFd);
+      }
+
     } else {
       [this._handle, targetFd] = await Promise.all([
         srcFs.get(src),
-        targetFs.open(target, 'w'),
+        targetFs.open(uploadTarget, 'w'),
       ]);
     }
 
     try {
-      await targetFs.put(this._handle, target, {
+      if(useTempFile) {
+        logger.info("uploading temp file: " + uploadTarget);
+      }
+      await targetFs.put(this._handle, uploadTarget, {
         mode,
-        fd: targetFd,
+        fd: uploadFd,
         autoClose: false,
       });
       if (atime && mtime) {
         try {
           await targetFs.futimes(
-            targetFd,
+            uploadFd,
             Math.floor(atime / 1000),
             Math.floor(mtime / 1000)
           );
@@ -161,8 +182,19 @@ export default class TransferTask implements Task {
           }
         }
       }
+
+      if(useTempFile) {
+        logger.info("moving to: " + target);
+        try {
+          await targetFs.unlink(target);
+        } catch(error) {
+          // Just ignore
+        }
+        await targetFs.rename(uploadTarget, target);
+      }
+
     } finally {
-      await targetFs.close(targetFd);
+      await targetFs.close(uploadFd);
     }
   }
 }

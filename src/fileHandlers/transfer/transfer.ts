@@ -131,8 +131,6 @@ async function transferFile(
       }
     )
   );
-
-  logger.info('file transfered.');
 }
 
 async function transferWithType(

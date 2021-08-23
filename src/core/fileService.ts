@@ -37,6 +37,7 @@ interface ServiceOption {
   protocol: string;
   remote?: string;
   uploadOnSave: boolean;
+  useTempFile: boolean;
   downloadOnOpen: boolean | 'confirm';
   syncOption: {
     delete: boolean;
@@ -144,6 +145,7 @@ function getHostInfo(config) {
     'name',
     'remotePath',
     'uploadOnSave',
+    'useTempFile',
     'downloadOnOpen',
     'ignore',
     'ignoreFile',
