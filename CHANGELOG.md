@@ -1,3 +1,7 @@
+## 1.15.0 - 2021-08-23
+  * New option [useTempFile](https://github.com/Natizyskunk/vscode-sftp/wiki/Common-Config#usetempfile).
+  * Update of the wiki to add support for useTempFile option.
+
 ## 1.14.0 - 2021-08-06
   * Update of the FAQ to add support for old/legacy systems.
   * switching from beta to stable.
