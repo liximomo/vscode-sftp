@@ -131,7 +131,7 @@ export default class TransferTask implements Task {
     // Use mode first.
     // Then check perserveTargetMode and fallback to fallbackMode if fail to get mode of target
     if (mode === undefined && perserveTargetMode) {
-      if(useTempFile) {
+      if (useTempFile) {
         [targetFd, uploadFd] = await Promise.all([
           targetFs.open(target, 'r')  // Get handle for reading the target mode
             .catch(() => null), // Return null if target file doesn't exist
@@ -141,7 +141,7 @@ export default class TransferTask implements Task {
         targetFd = uploadFd = await targetFs.open(uploadTarget, 'w');
       }
 
-      if(targetFd) {
+      if (targetFd) {
         [this._handle, mode] = await Promise.all([
           srcFs.get(src),
           targetFs
@@ -150,7 +150,7 @@ export default class TransferTask implements Task {
             .catch(() => fallbackMode),
         ]);
 
-        if(useTempFile) {
+        if (useTempFile) {
           targetFs.close(targetFd);
         }
 
@@ -167,7 +167,7 @@ export default class TransferTask implements Task {
     }
 
     try {
-      if(useTempFile) {
+      if (useTempFile) {
         logger.info("uploading temp file: " + uploadTarget);
       }
       await targetFs.put(this._handle, uploadTarget, {
@@ -192,8 +192,8 @@ export default class TransferTask implements Task {
         }
       }
 
-      if(useTempFile) {
-        logger.info("moving to: " + target);
+      if (useTempFile) {
+        logger.info("moving from: " + target + ".new" + "to: " + target);
         if(openSsh) {
           await targetFs.renameAtomic(uploadTarget, target);
         } else {
@@ -204,6 +204,8 @@ export default class TransferTask implements Task {
           }
           await targetFs.rename(uploadTarget, target);
         }
+      } else {
+        logger.info("moving to: " + target);
       }
 
     } finally {
