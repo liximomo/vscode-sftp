@@ -122,7 +122,8 @@ export default class TransferTask implements Task {
       mtime,
     } = this._TransferOption;
     let { mode } = this._TransferOption;
-    let targetFd, uploadFd;
+    let targetFd; // Destination file
+    let uploadFd; // Temp file or destination file when no temp file is used
     const uploadTarget = target + (useTempFile ? ".new" : "");
 
     // Use mode first.
@@ -138,20 +139,26 @@ export default class TransferTask implements Task {
         targetFd = uploadFd = await targetFs.open(uploadTarget, 'w');
       }
 
-      [this._handle, mode] = await Promise.all([
-        srcFs.get(src),
-        targetFd && targetFs  // If target exists => get target mode
-          .fstat(targetFd)
-          .then(stat => stat.mode)
-          .catch(() => fallbackMode),
-      ]);
+      if(targetFd) {
+        [this._handle, mode] = await Promise.all([
+          srcFs.get(src),
+          targetFs
+            .fstat(targetFd)
+            .then(stat => stat.mode)
+            .catch(() => fallbackMode),
+        ]);
 
-      if(useTempFile) {
-        targetFs.close(targetFd);
+        if(useTempFile) {
+          targetFs.close(targetFd);
+        }
+
+      } else {
+        this._handle = await srcFs.get(src);
+        mode = fallbackMode;
       }
 
     } else {
-      [this._handle, targetFd] = await Promise.all([
+      [this._handle, uploadFd] = await Promise.all([
         srcFs.get(src),
         targetFs.open(uploadTarget, 'w'),
       ]);
