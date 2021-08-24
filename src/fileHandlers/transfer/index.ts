@@ -64,6 +64,7 @@ export const sync2Remote = createFileHandler<SyncOption>({
     return {
       perserveTargetMode: config.protocol === 'sftp',
       useTempFile: config.useTempFile,
+      openSsh: config.openSsh,
       // remoteTimeOffsetInHours: config.remoteTimeOffsetInHours,
       ignore: config.ignore,
       delete: syncOption.delete,
@@ -120,6 +121,7 @@ export const upload = createFileHandler<TransferOption>({
     return {
       perserveTargetMode: config.protocol === 'sftp',
       useTempFile: config.useTempFile,
+      openSsh: config.openSsh,
       // remoteTimeOffsetInHours: config.remoteTimeOffsetInHours,
       ignore: config.ignore,
     };
@@ -137,6 +139,7 @@ export const uploadFile = createFileHandler<TransferOption>({
     return {
       perserveTargetMode: config.protocol === 'sftp',
       useTempFile: config.useTempFile,
+      openSsh: config.openSsh,
       // remoteTimeOffsetInHours: config.remoteTimeOffsetInHours,
       ignore: config.ignore,
     };
@@ -154,6 +157,7 @@ export const uploadFolder = createFileHandler<TransferOption>({
     return {
       perserveTargetMode: config.protocol === 'sftp',
       useTempFile: config.useTempFile,
+      openSsh: config.openSsh,
       // remoteTimeOffsetInHours: config.remoteTimeOffsetInHours,
       ignore: config.ignore,
     };

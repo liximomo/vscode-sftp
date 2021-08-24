@@ -270,10 +270,10 @@ export default class FTPFileSystem extends RemoteFileSystem {
   }
 
   async rename(srcPath: string, destPath: string): Promise<void> {
-    return await this.atomicRenmae(srcPath, destPath);
+    return await this.renameAtomic(srcPath, destPath);
   }
 
-  private async atomicRenmae(srcPath: string, destPath: string): Promise<void> {
+  async renameAtomic(srcPath: string, destPath: string): Promise<void> {
     const task = () =>
       new Promise<void>((resolve, reject) => {
         this.ftp.rename(srcPath, destPath, err => {

@@ -23,6 +23,7 @@ export interface TransferOption {
   fallbackMode?: number;
   perserveTargetMode: boolean;
   useTempFile?: boolean;
+  openSsh?: boolean;
 }
 
 export default class TransferTask implements Task {
@@ -117,6 +118,7 @@ export default class TransferTask implements Task {
     const {
       perserveTargetMode,
       useTempFile,
+      openSsh,
       fallbackMode,
       atime,
       mtime,
@@ -129,7 +131,7 @@ export default class TransferTask implements Task {
     // Use mode first.
     // Then check perserveTargetMode and fallback to fallbackMode if fail to get mode of target
     if (mode === undefined && perserveTargetMode) {
-      if(useTempFile) {
+      if (useTempFile) {
         [targetFd, uploadFd] = await Promise.all([
           targetFs.open(target, 'r')  // Get handle for reading the target mode
             .catch(() => null), // Return null if target file doesn't exist
@@ -139,7 +141,7 @@ export default class TransferTask implements Task {
         targetFd = uploadFd = await targetFs.open(uploadTarget, 'w');
       }
 
-      if(targetFd) {
+      if (targetFd) {
         [this._handle, mode] = await Promise.all([
           srcFs.get(src),
           targetFs
@@ -148,7 +150,7 @@ export default class TransferTask implements Task {
             .catch(() => fallbackMode),
         ]);
 
-        if(useTempFile) {
+        if (useTempFile) {
           targetFs.close(targetFd);
         }
 
@@ -165,7 +167,7 @@ export default class TransferTask implements Task {
     }
 
     try {
-      if(useTempFile) {
+      if (useTempFile) {
         logger.info("uploading temp file: " + uploadTarget);
       }
       await targetFs.put(this._handle, uploadTarget, {
@@ -190,14 +192,20 @@ export default class TransferTask implements Task {
         }
       }
 
-      if(useTempFile) {
-        logger.info("moving to: " + target);
-        try {
-          await targetFs.unlink(target);
-        } catch(error) {
-          // Just ignore
+      if (useTempFile) {
+        logger.info("moving from: " + target + ".new" + "to: " + target);
+        if(openSsh) {
+          await targetFs.renameAtomic(uploadTarget, target);
+        } else {
+          try {
+            await targetFs.unlink(target);
+          } catch(error) {
+            // Just ignore
+          }
+          await targetFs.rename(uploadTarget, target);
         }
-        await targetFs.rename(uploadTarget, target);
+      } else {
+        logger.info("moving to: " + target);
       }
 
     } finally {

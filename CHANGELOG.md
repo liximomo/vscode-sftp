@@ -1,3 +1,12 @@
+## 1.15.2 - 2021-08-24
+  * Fix the `useTempFile` bug.
+  * Change `useTempFile` default value from true to false.
+  * Fix the "Cannot read property 'handle' of undefined" bug (related to `useTempFile` bug).
+  * Fix the "fd argument must be of type number. Received undefined" bug (related to `useTempFile` bug).
+  * Fix the "Permission denied" bug when uploading.
+  * New option [openSsh](https://github.com/Natizyskunk/vscode-sftp/wiki/Common-Config#openssh).
+  * Update of the wiki to add support for openSsh option.
+
 ## 1.15.1 - 2021-08-24
   * Add the `useTempFile` option to the test config spec.
   * Fix get target mode error && add more precise logger-infos for tranfer tasks.

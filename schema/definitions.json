@@ -60,6 +60,11 @@
         "description": "True to upload temp file on every save operation of VS Code to avoid breaking a webpage when a user acceses it while the file is still being uploaded (is incomplete).",
         "default": false
       },
+      "openSsh": {
+        "type": "boolean",
+        "description": "True to enable atomic file uploads (only supported by openSSH servers). if true, `useTempFile` must also be set to true.",
+        "default": false
+      },
       "downloadOnOpen": {
         "enum": ["confirm", true, false],
         "description": "True to download when a file opens.",
