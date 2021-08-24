@@ -129,7 +129,7 @@ export default class TransferTask implements Task {
     // Use mode first.
     // Then check perserveTargetMode and fallback to fallbackMode if fail to get mode of target
     if (mode === undefined && perserveTargetMode) {
-      if(useTempFile) {
+      if (useTempFile) {
         [targetFd, uploadFd] = await Promise.all([
           targetFs.open(target, 'r')  // Get handle for reading the target mode
             .catch(() => null), // Return null if target file doesn't exist
@@ -139,7 +139,17 @@ export default class TransferTask implements Task {
         targetFd = uploadFd = await targetFs.open(uploadTarget, 'w');
       }
 
-      if(targetFd) {
+      if (useTempFile) {
+        [this._handle, mode] = await Promise.all([
+          srcFs.get(src),
+          targetFd && targetFs  // If target exists => get target mode
+            .fstat(targetFd)
+            .then(stat => stat.mode)
+            .catch(() => fallbackMode),
+        ]);
+
+        targetFs.close(targetFd);
+      } else {
         [this._handle, mode] = await Promise.all([
           srcFs.get(src),
           targetFs
@@ -147,14 +157,6 @@ export default class TransferTask implements Task {
             .then(stat => stat.mode)
             .catch(() => fallbackMode),
         ]);
-
-        if(useTempFile) {
-          targetFs.close(targetFd);
-        }
-
-      } else {
-        this._handle = await srcFs.get(src);
-        mode = fallbackMode;
       }
 
     } else {
@@ -165,7 +167,7 @@ export default class TransferTask implements Task {
     }
 
     try {
-      if(useTempFile) {
+      if (useTempFile) {
         logger.info("uploading temp file: " + uploadTarget);
       }
       await targetFs.put(this._handle, uploadTarget, {
@@ -190,14 +192,13 @@ export default class TransferTask implements Task {
         }
       }
 
-      if(useTempFile) {
-        logger.info("moving to: " + target);
-        try {
-          await targetFs.unlink(target);
-        } catch(error) {
-          // Just ignore
-        }
+      if (useTempFile) {
+        // logger.info("moving from: " + target + ".new" + " to: " + target);
+        logger.info("moving from: " + uploadTarget + " to: " + target);
+        await targetFs.unlink(target);
         await targetFs.rename(uploadTarget, target);
+      } else {
+        logger.info("moving to: " + target);
       }
 
     } finally {

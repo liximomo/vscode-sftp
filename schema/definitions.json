@@ -55,6 +55,11 @@
         "description": "True to upload on every save operation of VS Code.",
         "default": true
       },
+      "useTempFile": {
+        "type": "boolean",
+        "description": "True to upload temp file on every save operation of VS Code to avoid breaking a webpage when a user acceses it while the file is still being uploaded (is incomplete).",
+        "default": true
+      },
       "downloadOnOpen": {
         "enum": ["confirm", true, false],
         "description": "True to download when a file opens.",
