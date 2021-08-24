@@ -52,7 +52,7 @@ describe("validation config", () => {
       remotePath: '/',
       uploadOnSave: false,
       
-      useTempFile: true,
+      useTempFile: false,
     
       syncMode: 'update',
     
@@ -120,7 +120,7 @@ describe("validation config", () => {
         remotePath: '/',
         uploadOnSave: false,
       
-        useTempFile: true,
+        useTempFile: false,
       
         syncMode: 'update',
       
@@ -155,7 +155,7 @@ describe("validation config", () => {
         remotePath: '/',
         uploadOnSave: false,
       
-        useTempFile: true,
+        useTempFile: false,
       
         syncMode: 'update',
       
@@ -214,7 +214,7 @@ describe("validation config", () => {
         remotePath: '/',
         uploadOnSave: false,
       
-        useTempFile: true,
+        useTempFile: false,
       
         syncMode: 'update',
       
@@ -256,7 +256,7 @@ describe("validation config", () => {
         remotePath: '/',
         uploadOnSave: false,
       
-        useTempFile: true,
+        useTempFile: false,
       
         syncMode: 'update',
       
