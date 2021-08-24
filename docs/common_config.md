@@ -42,7 +42,7 @@ to the `remotePath`.
 *boolean*: Upload temp file on every save operation of VSCode to avoid breaking a webpage when a user acceses it 
 while the file is still being uploaded (is incomplete).
 
-**Default**: true
+**Default**: false
 
 ## downloadOnOpen
 *boolean*: Download the file from the remote server whenever it is opened.

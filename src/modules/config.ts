@@ -68,7 +68,7 @@ const defaultConfig = {
   // name: undefined,
   remotePath: './',
   uploadOnSave: false,
-  useTempFile: true,
+  useTempFile: false,
   downloadOnOpen: false,
   ignore: [],
   // ignoreFile: undefined,
@@ -177,7 +177,7 @@ export function newConfig(basePath) {
             username: 'username',
             remotePath: '/',
             uploadOnSave: true,
-            useTempFile: true,
+            useTempFile: false,
           },
           { spaces: 4 }
         )
