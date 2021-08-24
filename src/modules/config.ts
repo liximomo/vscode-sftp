@@ -69,7 +69,7 @@ const defaultConfig = {
   // name: undefined,
   remotePath: './',
   uploadOnSave: false,
-  useTempFile: true,
+  useTempFile: false,
   openSsh: false,
   downloadOnOpen: false,
   ignore: [],
@@ -180,6 +180,8 @@ export function newConfig(basePath) {
             remotePath: '/',
             uploadOnSave: true,
             useTempFile: true,
+            openSsh: false,
+            useTempFile: false,
             openSsh: false,
           },
           { spaces: 4 }

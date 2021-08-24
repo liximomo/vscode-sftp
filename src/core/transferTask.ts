@@ -124,13 +124,14 @@ export default class TransferTask implements Task {
       mtime,
     } = this._TransferOption;
     let { mode } = this._TransferOption;
-    let targetFd, uploadFd;
+    let targetFd; // Destination file
+    let uploadFd; // Temp file or destination file when no temp file is used
     const uploadTarget = target + (useTempFile ? ".new" : "");
 
     // Use mode first.
     // Then check perserveTargetMode and fallback to fallbackMode if fail to get mode of target
     if (mode === undefined && perserveTargetMode) {
-      if (useTempFile) {
+      if(useTempFile) {
         [targetFd, uploadFd] = await Promise.all([
           targetFs.open(target, 'r')  // Get handle for reading the target mode
             .catch(() => null), // Return null if target file doesn't exist
@@ -140,17 +141,7 @@ export default class TransferTask implements Task {
         targetFd = uploadFd = await targetFs.open(uploadTarget, 'w');
       }
 
-      if (useTempFile) {
-        [this._handle, mode] = await Promise.all([
-          srcFs.get(src),
-          targetFd && targetFs  // If target exists => get target mode
-            .fstat(targetFd)
-            .then(stat => stat.mode)
-            .catch(() => fallbackMode),
-        ]);
-
-        targetFs.close(targetFd);
-      } else {
+      if(targetFd) {
         [this._handle, mode] = await Promise.all([
           srcFs.get(src),
           targetFs
@@ -158,17 +149,25 @@ export default class TransferTask implements Task {
             .then(stat => stat.mode)
             .catch(() => fallbackMode),
         ]);
+
+        if(useTempFile) {
+          targetFs.close(targetFd);
+        }
+
+      } else {
+        this._handle = await srcFs.get(src);
+        mode = fallbackMode;
       }
 
     } else {
-      [this._handle, targetFd] = await Promise.all([
+      [this._handle, uploadFd] = await Promise.all([
         srcFs.get(src),
         targetFs.open(uploadTarget, 'w'),
       ]);
     }
 
     try {
-      if (useTempFile) {
+      if(useTempFile) {
         logger.info("uploading temp file: " + uploadTarget);
       }
       await targetFs.put(this._handle, uploadTarget, {

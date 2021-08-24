@@ -58,7 +58,7 @@
       "useTempFile": {
         "type": "boolean",
         "description": "True to upload temp file on every save operation of VS Code to avoid breaking a webpage when a user acceses it while the file is still being uploaded (is incomplete).",
-        "default": true
+        "default": false
       },
       "openSsh": {
         "type": "boolean",
