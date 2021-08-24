@@ -193,7 +193,7 @@ export default class TransferTask implements Task {
       }
 
       if (useTempFile) {
-        logger.info("moving from: " + target + ".new" + "to: " + target);
+        logger.info("moving from: " + target + ".new" + " to: " + target);
         if(openSsh) {
           await targetFs.renameAtomic(uploadTarget, target);
         } else {
@@ -204,8 +204,6 @@ export default class TransferTask implements Task {
           }
           await targetFs.rename(uploadTarget, target);
         }
-      } else {
-        logger.info("moving to: " + target);
       }
 
     } finally {
