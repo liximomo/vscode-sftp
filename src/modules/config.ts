@@ -35,6 +35,7 @@ const configScheme = {
   remotePath: Joi.string().required(),
   uploadOnSave: Joi.boolean(),
   useTempFile: Joi.boolean(),
+  openSsh: Joi.boolean(),
   downloadOnOpen: Joi.boolean().allow('confirm'),
 
   ignore: Joi.array()
@@ -69,6 +70,7 @@ const defaultConfig = {
   remotePath: './',
   uploadOnSave: false,
   useTempFile: true,
+  openSsh: false,
   downloadOnOpen: false,
   ignore: [],
   // ignoreFile: undefined,
@@ -178,6 +180,7 @@ export function newConfig(basePath) {
             remotePath: '/',
             uploadOnSave: true,
             useTempFile: true,
+            openSsh: false,
           },
           { spaces: 4 }
         )

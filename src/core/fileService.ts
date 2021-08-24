@@ -38,6 +38,7 @@ interface ServiceOption {
   remote?: string;
   uploadOnSave: boolean;
   useTempFile: boolean;
+  openSsh: boolean;
   downloadOnOpen: boolean | 'confirm';
   syncOption: {
     delete: boolean;

@@ -23,6 +23,7 @@ export interface TransferOption {
   fallbackMode?: number;
   perserveTargetMode: boolean;
   useTempFile?: boolean;
+  openSsh?: boolean;
 }
 
 export default class TransferTask implements Task {
@@ -117,6 +118,7 @@ export default class TransferTask implements Task {
     const {
       perserveTargetMode,
       useTempFile,
+      openSsh,
       fallbackMode,
       atime,
       mtime,
@@ -191,13 +193,18 @@ export default class TransferTask implements Task {
         }
       }
 
-      if (useTempFile) {
-        // logger.info("moving from: " + target + ".new" + " to: " + target);
-        logger.info("moving from: " + uploadTarget + " to: " + target);
-        await targetFs.unlink(target);
-        await targetFs.rename(uploadTarget, target);
-      } else {
+      if(useTempFile) {
         logger.info("moving to: " + target);
+        if(openSsh) {
+          await targetFs.renameAtomic(uploadTarget, target);
+        } else {
+          try {
+            await targetFs.unlink(target);
+          } catch(error) {
+            // Just ignore
+          }
+          await targetFs.rename(uploadTarget, target);
+        }
       }
 
     } finally {

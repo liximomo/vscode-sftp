@@ -189,6 +189,19 @@ export default class SFTPFileSystem extends RemoteFileSystem {
     });
   }
 
+  // See: https://github.com/mscdex/ssh2/issues/1054
+  renameAtomic(srcPath: string, destPath: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.sftp.ext_openssh_rename(srcPath, destPath, err => {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve();
+      });
+    });
+  }
+
   async put(input: Readable, path, option?: FileOption): Promise<void> {
     if (option && option.fd) {
       const fd = option.fd as SFTPFileDescriptor;
