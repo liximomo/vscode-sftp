@@ -147,6 +147,7 @@ function getHostInfo(config) {
     'remotePath',
     'uploadOnSave',
     'useTempFile',
+    'openSsh',
     'downloadOnOpen',
     'ignore',
     'ignoreFile',
