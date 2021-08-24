@@ -23,6 +23,7 @@ const configScheme = {
   remotePath: Joi.string().required(),
   uploadOnSave: Joi.boolean().optional(),
   useTempFile: Joi.boolean().optional(),
+  openSsh: Joi.boolean().optional(),
   syncMode: Joi.any().valid('update', 'full'),
   ignore: Joi.array()
     .min(0)
@@ -53,6 +54,7 @@ describe("validation config", () => {
       uploadOnSave: false,
       
       useTempFile: false,
+      openSsh: false,
     
       syncMode: 'update',
     
@@ -121,6 +123,7 @@ describe("validation config", () => {
         uploadOnSave: false,
       
         useTempFile: false,
+        openSsh: false,
       
         syncMode: 'update',
       
@@ -156,6 +159,7 @@ describe("validation config", () => {
         uploadOnSave: false,
       
         useTempFile: false,
+        openSsh: false,
       
         syncMode: 'update',
       
@@ -215,6 +219,7 @@ describe("validation config", () => {
         uploadOnSave: false,
       
         useTempFile: false,
+        openSsh: false,
       
         syncMode: 'update',
       
@@ -257,6 +262,7 @@ describe("validation config", () => {
         uploadOnSave: false,
       
         useTempFile: false,
+        openSsh: false,
       
         syncMode: 'update',
       
