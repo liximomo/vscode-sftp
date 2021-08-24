@@ -2,7 +2,7 @@
   "name": "sftp",
   "displayName": "SFTP",
   "description": "SFTP/FTP sync",
-  "version": "1.15.0",
+  "version": "1.15.1",
   "publisher": "Natizyskunk",
   "author": "Natizyskunk <natan.fourie@hotmail.fr> (https://github.com/Natizyskunk)",
   "engines": {

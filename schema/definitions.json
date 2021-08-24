@@ -50,14 +50,14 @@
         "type": "string",
         "description": "Name of remote which configs with `remoteFs.remote` in User Setting. Config will get merged to this remote."
       },
-      "useTempFile": {
-        "type": "boolean",
-        "description": "True to upload temp file on every save operation of VS Code to avoid breaking a webpage when a user acceses it while the file is still being uploaded (is incomplete).",
-        "default": true
-      },
       "uploadOnSave": {
         "type": "boolean",
         "description": "True to upload on every save operation of VS Code.",
+        "default": true
+      },
+      "useTempFile": {
+        "type": "boolean",
+        "description": "True to upload temp file on every save operation of VS Code to avoid breaking a webpage when a user acceses it while the file is still being uploaded (is incomplete).",
         "default": true
       },
       "downloadOnOpen": {
