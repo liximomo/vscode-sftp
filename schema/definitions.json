@@ -62,7 +62,7 @@
       },
       "openSsh": {
         "type": "boolean",
-        "description": "True to enable atomic file uploads (only supported by openSSH servers). Must be used together with 'useTempFile' = true.",
+        "description": "True to enable atomic file uploads (only supported by openSSH servers). if true, `useTempFile` must also be set to true.",
         "default": false
       },
       "downloadOnOpen": {
