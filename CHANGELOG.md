@@ -1,3 +1,7 @@
+## 1.15.1 - 2021-08-24
+  * Add the `useTempFile` option to the test config spec.
+  * Fix get target mode error && add more precise logger-infos for tranfer tasks.
+
 ## 1.15.0 - 2021-08-23
   * New option [useTempFile](https://github.com/Natizyskunk/vscode-sftp/wiki/Common-Config#usetempfile).
   * Update of the wiki to add support for useTempFile option.
