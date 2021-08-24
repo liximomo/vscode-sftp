@@ -179,8 +179,6 @@ export function newConfig(basePath) {
             username: 'username',
             remotePath: '/',
             uploadOnSave: true,
-            useTempFile: true,
-            openSsh: false,
             useTempFile: false,
             openSsh: false,
           },
