@@ -17,6 +17,7 @@
     "type": "git",
     "url": "https://github.com/Natizyskunk/vscode-sftp.git"
   },
+  "license" : "MIT",
   "categories": [
     "Other"
   ],
