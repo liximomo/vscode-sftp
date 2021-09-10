@@ -1,3 +1,6 @@
+## 1.15.3 - 2021-09-10
+  * Upgrade `ssh2` version to official v1.4.0 by @mscdex.
+
 ## 1.15.2 - 2021-08-24
   * Fix the `useTempFile` bug.
   * Change `useTempFile` default value from true to false.
