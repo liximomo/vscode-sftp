@@ -97,7 +97,7 @@ Set `uploadOnSave` to false when you watch everything.
 
 **Default**: 0
 
-## remtoeExplorer
+## remoteExplorer
 *object*.
 
 ## remoteExplorer.fileExclude
