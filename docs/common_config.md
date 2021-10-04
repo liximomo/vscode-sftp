@@ -45,7 +45,7 @@ while the file is still being uploaded (is incomplete).
 **Default**: false
 
 ### openSsh
-boolean: Enable atomic file uploads (only supported by openSSH servers). if set to true, the `useTempFile` option must also be set to true.
+*boolean*: Enable atomic file uploads (only supported by openSSH servers). if set to true, the `useTempFile` option must also be set to true.
 
 **Default**: false
 
@@ -97,7 +97,7 @@ Set `uploadOnSave` to false when you watch everything.
 
 **Default**: 0
 
-## remtoeExplorer
+## remoteExplorer
 *object*.
 
 ## remoteExplorer.fileExclude
