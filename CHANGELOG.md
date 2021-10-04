@@ -1,5 +1,5 @@
 ## 1.15.4 - 2021-10-04
-  * Remove error message when using calling sftp.sftp.sync.remoteToLocal command in vscode tasks.json.
+  * Remove error message when calling sftp.sftp.sync.remoteToLocal command in vscode tasks.json.
 
 ## 1.15.3 - 2021-09-10
   * Upgrade `ssh2` version to official v1.4.0 by @mscdex.
