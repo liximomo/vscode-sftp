@@ -28,7 +28,11 @@ interface FileHandlerOption<T> {
 export function handleCtxFromUri(uri: Uri): FileHandlerContext {
   const fileService = getFileService(uri);
   if (!fileService) {
-    throw new Error(`Config Not Found. (${uri.toString(true)}) `);
+    if (uri.toString(true) == "file:///${command:sftp.sync.remoteToLocal}") {
+      throw '';
+    } else {
+      throw new Error(`Config Not Found. (${uri.toString(true)})`);
+    }
   }
   const config = fileService.getConfig();
   const target = UResource.from(uri, {
