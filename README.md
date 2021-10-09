@@ -285,3 +285,17 @@ _Note：_ You need to manually refresh the parent folder after you **delete** a 
 
 ## FAQ
 You can see all the Frequently Asked Questions [here](./FAQ.md).
+
+---
+
+## Donation
+
+If this project helped you reduce development time, you can give me a cup of coffee :)
+
+### Buy Me a Coffee
+[![Buy Me A Coffee](https://bmc-cdn.nyc3.digitaloceanspaces.com/BMC-button-images/custom_images/orange_img.png)](https://www.buymeacoffee.com/Natizyskunk)
+
+### PayPal
+<!-- [![PayPal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=BY89QD47D7MPS&source=url) -->
+[![PayPal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/donate?business=DELD7APHHM3BC&no_recurring=0&currency_code=EUR)
+[![PayPal Me](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/natanfourie)
