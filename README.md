@@ -286,10 +286,7 @@ _Note：_ You need to manually refresh the parent folder after you **delete** a 
 ## FAQ
 You can see all the Frequently Asked Questions [here](./FAQ.md).
 
----
-
 ## Donation
-
 If this project helped you reduce development time, you can give me a cup of coffee :)
 
 ### Buy Me a Coffee
