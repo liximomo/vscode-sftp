@@ -156,6 +156,9 @@ async function transferWithType(
         const document = textDocuments.find(doc => doc.fileName === config.srcFsPath);
         if (document && !document.isClosed && document.isDirty) {
           await document.save();
+          // Update mtime after file was saved
+          const stat = await config.srcFs.lstat(config.srcFsPath);
+          config.transferOption.mtime = stat.mtime;
           logger.info('save before upload.');
         }
       }
