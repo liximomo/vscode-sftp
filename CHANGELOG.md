@@ -13,7 +13,7 @@
 ## 1.15.2 - 2021-08-24
   * Fix the `useTempFile` bug (Merged pull request [#41](https://github.com/Natizyskunk/vscode-sftp/pull/41) from kripper/master).
   * Change `useTempFile` default value from true to false.
-    * Fix the "Cannot read property 'handle' of undefined" bug (related to `useTempFile` bug) [TypeError: Cannot read property 'handle' of undefined](https://github.com/Natizyskunk/vscode-sftp/issues/43).
+  * Fix the "Cannot read property 'handle' of undefined" bug (related to `useTempFile` bug) [TypeError: Cannot read property 'handle' of undefined](https://github.com/Natizyskunk/vscode-sftp/issues/43).
   * Fix the "fd argument must be of type number. Received undefined" bug (related to `useTempFile` bug) [TypeError since last update (The "fd" argument must be of type number.)](https://github.com/Natizyskunk/vscode-sftp/issues/34).
   * Fix the "Permission denied" bug when uploading.
   * New option [openSsh](https://github.com/Natizyskunk/vscode-sftp/wiki/Common-Config#openssh) (Pull request [#42](https://github.com/Natizyskunk/vscode-sftp/pull/42) from kripper/atomic-rename merged inside [#45](https://github.com/Natizyskunk/vscode-sftp/pull/45)).
