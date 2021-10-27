@@ -1,3 +1,9 @@
+## 1.15.5 - 2021-10-27
+  * Update mtime after file was saved before upload. (Merged pull request [#75](https://github.com/Natizyskunk/vscode-sftp/pull/75) from viperet/save_before_upload_mtime).
+  * Add pull request issue template.
+  * Add funding/sponsors page.
+  * Add code scanning alert.
+
 ## 1.15.4 - 2021-10-04
   * Remove error message when calling sftp.sftp.sync.remoteToLocal command in vscode tasks.json.
 
@@ -5,20 +11,20 @@
   * Upgrade `ssh2` version to official v1.4.0 by @mscdex.
 
 ## 1.15.2 - 2021-08-24
-  * Fix the `useTempFile` bug.
+  * Fix the `useTempFile` bug (Merged pull request [#41](https://github.com/Natizyskunk/vscode-sftp/pull/41) from kripper/master).
   * Change `useTempFile` default value from true to false.
-  * Fix the "Cannot read property 'handle' of undefined" bug (related to `useTempFile` bug).
-  * Fix the "fd argument must be of type number. Received undefined" bug (related to `useTempFile` bug).
+  * Fix the "Cannot read property 'handle' of undefined" bug (related to `useTempFile` bug) [TypeError: Cannot read property 'handle' of undefined](https://github.com/Natizyskunk/vscode-sftp/issues/43).
+  * Fix the "fd argument must be of type number. Received undefined" bug (related to `useTempFile` bug) [TypeError since last update (The "fd" argument must be of type number.)](https://github.com/Natizyskunk/vscode-sftp/issues/34).
   * Fix the "Permission denied" bug when uploading.
-  * New option [openSsh](https://github.com/Natizyskunk/vscode-sftp/wiki/Common-Config#openssh).
+  * New option [openSsh](https://github.com/Natizyskunk/vscode-sftp/wiki/Common-Config#openssh) (Pull request [#42](https://github.com/Natizyskunk/vscode-sftp/pull/42) from kripper/atomic-rename merged inside [#45](https://github.com/Natizyskunk/vscode-sftp/pull/45)).
   * Update of the wiki to add support for openSsh option.
 
 ## 1.15.1 - 2021-08-24
   * Add the `useTempFile` option to the test config spec.
-  * Fix get target mode error && add more precise logger-infos for tranfer tasks.
+  * Fix get target mode error && add more precise logger-infos for tranfer tasks  (Merged pull request [#29](https://github.com/Natizyskunk/vscode-sftp/pull/29) from kripper/master).
 
 ## 1.15.0 - 2021-08-23
-  * New option [useTempFile](https://github.com/Natizyskunk/vscode-sftp/wiki/Common-Config#usetempfile).
+  * New option [useTempFile](https://github.com/Natizyskunk/vscode-sftp/wiki/Common-Config#usetempfile) (Merged pull request [#29](https://github.com/Natizyskunk/vscode-sftp/pull/29) from kripper/master).
   * Update of the wiki to add support for useTempFile option.
 
 ## 1.14.0 - 2021-08-06
@@ -26,7 +32,7 @@
   * switching from beta to stable.
 
 ## 1.14.0-beta - 2021-07-15
-  * Add `create remote file` and `create remote folder` commands.
+  * Add `create remote file` and `create remote folder` commands (Merged pull request [#18](https://github.com/Natizyskunk/vscode-sftp/pull/18) from mathsgod/master).
 
 ## 1.13.6 - 2021-07-15
   * Fix syntax in `src\fileHandlers\transfer\__tests__\transfer-test.ts`.
