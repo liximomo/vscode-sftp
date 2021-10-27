@@ -577,7 +577,10 @@
     "typescript-tslint-plugin": "^0.0.6",
     "webpack": "^4.39.2",
     "webpack-cli": "^3.3.7",
-    "yargs-parser": "^20.2.4"
+    "yargs-parser": "^20.2.4",
+    "set-value": "^4.0.1",
+    "glob-parent": ">=5.1.2",
+    "merge": ">=2.1.1"
   },
   "dependencies": {
     "async": "^2.6.3",
