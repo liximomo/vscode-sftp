@@ -1,5 +1,8 @@
+## 1.15.6 - 2021-10-27
+  * Fix ssh config resolution (Merged pull request [#69](https://github.com/Natizyskunk/vscode-sftp/pull/69) from clemyan/fix-ssh-config).
+
 ## 1.15.5 - 2021-10-27
-  * Update mtime after file was saved before upload. (Merged pull request [#75](https://github.com/Natizyskunk/vscode-sftp/pull/75) from viperet/save_before_upload_mtime).
+  * Update mtime after file was saved before upload (Merged pull request [#75](https://github.com/Natizyskunk/vscode-sftp/pull/75) from viperet/save_before_upload_mtime).
   * Add pull request issue template.
   * Add funding/sponsors page.
   * Add code scanning alert.
@@ -199,7 +202,7 @@
   * [Config in User Setting](https://github.com/liximomo/vscode-sftp#config-in-user-setting) config your remote in User Setting
 
 ### Fix
-  * fix sshConfig file not overwriting default config. ([#305](https://github.com/liximomo/vscode-sftp/issues/305))
+  * fix sshConfig file not overwriting default config ([#305](https://github.com/liximomo/vscode-sftp/issues/305))
 
 ## 1.4.0 - 2018-08-27
 ### Feature
@@ -247,7 +250,7 @@
 
 ## 1.1.8 - 2018-05-15
 * Some UX improvements.
-    * Only show `sftp` menu when extension get activated. (Thanks [@mikolino](https://github.com/mikolino))
+    * Only show `sftp` menu when extension get activated (Thanks [@mikolino](https://github.com/mikolino))
     * Remove some unnecessary warning.
 * Improve ftp reliability.
 * Upgrade `ssh2` version.
@@ -336,7 +339,7 @@
 ## 0.8.9 - 2017-11-17
 * Preserve file permissions.
 * Better README thanks [kataklys](https://github.com/kataklys).
-* Fix Empty (0kb) files when download and uplaod. Thanks for [kataklys](https://github.com/kataklys)'s help. ([#33](https://github.com/liximomo/vscode-sftp/issues/33))
+* Fix Empty (0kb) files when download and uplaod. Thanks for [kataklys](https://github.com/kataklys)'s help ([#33](https://github.com/liximomo/vscode-sftp/issues/33))
 * Show a waring for existing none-worksapce-root config files. Previously you can create multiple config files anywhere under workspace. So you won't need to open multiple vscode instances to make `sftp` working in different folders. Sincle vscode support [Multi-root Workspaces](https://code.visualstudio.com/docs/editor/multi-root-workspaces). There is no necessary to support multiple config now. This will make `sftp` both simple and a bettern starup performace.
 
 ## 0.8.8 - 2017-11-11
