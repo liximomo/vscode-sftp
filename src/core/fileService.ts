@@ -233,36 +233,30 @@ function mergeConfigWithExternalRefer(
   }
 
   const parsedSSHConfig = sshConfig.parse(sshConfigContent);
-  const section = parsedSSHConfig.find({
-    Host: copyed.host,
-  });
-
-  if (section === null) {
-    return copyed;
-  }
+  const computed = parsedSSHConfig.compute(copyed.host);
 
   const mapping = new Map([
     ['hostname', 'host'],
     ['port', 'port'],
     ['user', 'username'],
-    ['identityfile', 'privateKeyPath'],
     ['serveraliveinterval', 'keepalive'],
     ['connecttimeout', 'connTimeout'],
   ]);
 
-  section.config.forEach(line => {
-    if (!line.param) {
+  Object.entries<any>(computed).forEach(([param, value]) => {
+    if (param.toLowerCase() === 'identityfile') {
+      setConfigValue(copyed, 'privateKeyPath', value[0]);
       return;
     }
 
-    const key = mapping.get(line.param.toLowerCase());
+    const key = mapping.get(param.toLowerCase());
 
     if (key !== undefined) {
       // don't need consider config priority, always set to the resolve host.
       if (key === 'host') {
-        copyed[key] = line.value;
+        copyed[key] = value;
       } else {
-        setConfigValue(copyed, key, line.value);
+        setConfigValue(copyed, key, value);
       }
     }
   });
