@@ -1,3 +1,6 @@
+## 1.15.7 - 2021-11-12
+  * Upgrade `ssh2` version to official v1.5.0 by @mscdex.
+
 ## 1.15.6 - 2021-10-27
   * Fix ssh config resolution (Merged pull request [#69](https://github.com/Natizyskunk/vscode-sftp/pull/69) from clemyan/fix-ssh-config).
 
