@@ -3,7 +3,7 @@
 ## SFTP: Config
 Create a new config file for a project.
 
-## Set Profile
+## SFTP: Set Profile
 Set the current profile.
            
 ### KeyBindings Args
@@ -14,6 +14,7 @@ Upload the current file.
 
 ## SFTP: Upload Changed Files
 Upload all files changed or created since the last commit to your Git.
+Can be called by default keyboard shortcut `Ctrl+Alt+U`.
 
 ## SFTP: Upload Active Folder
 Upload the entire folder the current file is located in.
@@ -53,10 +54,10 @@ Download file or folders.
 ### KeyBindings Args
 func(fspaths: string[])
 
-## Cancel All Transfers
+## SFTP: Cancel All Transfers
 Stop the current transfers (upload and download).
 
-## Open SSH in Terminal
+## SFTP: Open SSH in Terminal
 Open a terminal in VSCode and auto login to a specific server.
 
 ***

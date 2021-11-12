@@ -110,7 +110,8 @@ Example config (where all JS and HTML files in `./build` will be copied to `/fol
 
 See [vscode-sftp issue #854](https://github.com/liximomo/vscode-sftp/issues/854).
 
-**danieleiobbi** has a workaround to create a keyboard shortcut.
+**@PaPa31** added a fix to make the 'Upload Changed Files' command visible and added a default keyboard shortcut to call it.
+<!-- **danieleiobbi** has a workaround to create a keyboard shortcut. -->
 
 ![upload changed files keyboard shortcut](assets/faq/upload_changed_files_shortcut.png)
 
