@@ -1,11 +1,17 @@
+## 1.15.8 - 2021-11-12
+  * Fix 'Upload Changed Files' & 'No Such File' bugs (Commit [fix upload changed files](https://github.com/wandway/vscode-sftp/commit/775016788e4c59db901dc68a20c1f61ebcca7bc7#diff-20516d8841b4891f1926f1e40e447e99e0575a5e36ba6814f6b85b45db1b8fbb) from @wandway vscode-sftp:master).
+  * Make the 'Upload Changed Files' command visible and add Add a default keyboard shortcut (Ctrl+Alt+U) to call it (Merged pull request [#84](https://github.com/Natizyskunk/vscode-sftp/pull/84) from @PaPa31 vscode-sftp:master). See [FAQ](https://github.com/Natizyskunk/vscode-sftp/blob/master/FAQ.md#clicking-upload-changed-files-does-not-work)).
+  * Update Webpack from 4.39.2 to 5.0.0.
+  * Update Webpack-cli from 3.3.7 to 4.7.0.
+
 ## 1.15.7 - 2021-11-12
   * Upgrade `ssh2` version to official v1.5.0 by @mscdex.
 
 ## 1.15.6 - 2021-10-27
-  * Fix ssh config resolution (Merged pull request [#69](https://github.com/Natizyskunk/vscode-sftp/pull/69) from clemyan/fix-ssh-config).
+  * Fix ssh config resolution (Merged pull request [#69](https://github.com/Natizyskunk/vscode-sftp/pull/69) from @clemyan vscode-sftp:fix-ssh-config).
 
 ## 1.15.5 - 2021-10-27
-  * Update mtime after file was saved before upload (Merged pull request [#75](https://github.com/Natizyskunk/vscode-sftp/pull/75) from viperet/save_before_upload_mtime).
+  * Update mtime after file was saved before upload (Merged pull request [#75](https://github.com/Natizyskunk/vscode-sftp/pull/75) from @viperet vscode-sftp:save_before_upload_mtime).
   * Add pull request issue template.
   * Add funding/sponsors page.
   * Add code scanning alert.
@@ -14,23 +20,23 @@
   * Remove error message when calling sftp.sftp.sync.remoteToLocal command in vscode tasks.json.
 
 ## 1.15.3 - 2021-09-10
-  * Upgrade `ssh2` version to official v1.4.0 by @mscdex.
+  * Upgrade `ssh2` version to official v1.4.0 bcy @mscdex.
 
 ## 1.15.2 - 2021-08-24
-  * Fix the `useTempFile` bug (Merged pull request [#41](https://github.com/Natizyskunk/vscode-sftp/pull/41) from kripper/master).
+  * Fix the `useTempFile` bug (Merged pull request [#41](https://github.com/Natizyskunk/vscode-sftp/pull/41) from @kripper vscode-sftp:master).
   * Change `useTempFile` default value from true to false.
   * Fix the "Cannot read property 'handle' of undefined" bug (related to `useTempFile` bug) [TypeError: Cannot read property 'handle' of undefined](https://github.com/Natizyskunk/vscode-sftp/issues/43).
   * Fix the "fd argument must be of type number. Received undefined" bug (related to `useTempFile` bug) [TypeError since last update (The "fd" argument must be of type number.)](https://github.com/Natizyskunk/vscode-sftp/issues/34).
   * Fix the "Permission denied" bug when uploading.
-  * New option [openSsh](https://github.com/Natizyskunk/vscode-sftp/wiki/Common-Config#openssh) (Pull request [#42](https://github.com/Natizyskunk/vscode-sftp/pull/42) from kripper/atomic-rename merged inside [#45](https://github.com/Natizyskunk/vscode-sftp/pull/45)).
+  * New option [openSsh](https://github.com/Natizyskunk/vscode-sftp/wiki/Common-Config#openssh) (Pull request [#42](https://github.com/Natizyskunk/vscode-sftp/pull/42) from @kripper vscode-sftp:atomic-rename merged inside [#45](https://github.com/Natizyskunk/vscode-sftp/pull/45)).
   * Update of the wiki to add support for openSsh option.
 
 ## 1.15.1 - 2021-08-24
   * Add the `useTempFile` option to the test config spec.
-  * Fix get target mode error && add more precise logger-infos for tranfer tasks  (Merged pull request [#29](https://github.com/Natizyskunk/vscode-sftp/pull/29) from kripper/master).
+  * Fix get target mode error && add more precise logger-infos for tranfer tasks  (Merged pull request [#29](https://github.com/Natizyskunk/vscode-sftp/pull/29) from @kripper vscode-sftp:master).
 
 ## 1.15.0 - 2021-08-23
-  * New option [useTempFile](https://github.com/Natizyskunk/vscode-sftp/wiki/Common-Config#usetempfile) (Merged pull request [#29](https://github.com/Natizyskunk/vscode-sftp/pull/29) from kripper/master).
+  * New option [useTempFile](https://github.com/Natizyskunk/vscode-sftp/wiki/Common-Config#usetempfile) (Merged pull request [#29](https://github.com/Natizyskunk/vscode-sftp/pull/29) from @kripper vscode-sftp:master).
   * Update of the wiki to add support for useTempFile option.
 
 ## 1.14.0 - 2021-08-06
@@ -38,7 +44,7 @@
   * switching from beta to stable.
 
 ## 1.14.0-beta - 2021-07-15
-  * Add `create remote file` and `create remote folder` commands (Merged pull request [#18](https://github.com/Natizyskunk/vscode-sftp/pull/18) from mathsgod/master).
+  * Add `create remote file` and `create remote folder` commands (Merged pull request [#18](https://github.com/Natizyskunk/vscode-sftp/pull/18) from @mathsgod vscode-sftp:master).
 
 ## 1.13.6 - 2021-07-15
   * Fix syntax in `src\fileHandlers\transfer\__tests__\transfer-test.ts`.
@@ -56,13 +62,13 @@
   * re-add yargs-parser ^20.2.4 to package.json.
   * Remove `yarn.lock`.
   * Add `package-lock.json`.
-  * Fix Writing CHANNEL_DATA (0) / Writing FSETSTAT (Merged pull request [#12](https://github.com/Natizyskunk/vscode-sftp/pull/12) from zarausto/patch-1).
-  * Fix transfer-test for Windows platform (Merged pull request [#11](https://github.com/Natizyskunk/vscode-sftp/pull/11) from alex1504/fix-transfer-test).
+  * Fix Writing CHANNEL_DATA (0) / Writing FSETSTAT (Merged pull request [#12](https://github.com/Natizyskunk/vscode-sftp/pull/12) from @zarausto vscode-sftp:patch-1).
+  * Fix transfer-test for Windows platform (Merged pull request [#11](https://github.com/Natizyskunk/vscode-sftp/pull/11) from @alex1504 vscode-sftp:fix-transfer-test).
 
 ## 1.13.2 - 2021-07-07
   * remove braces >=2.3.1 to package.json.
   * remove yargs-parser ^20.2.4 to package.json.
-  * Remove the fix for the "No such file" error on VSCode 1.56 since it's been implementend in the new ssh2 v1.1.0 npm package. commit taht fix it : https://github.com/mscdex/ssh2/commit/c0de05d186065ad4081b98d2f7aa0fe22161ec09
+  * Remove the fix for the "No such file" error on VSCode 1.56 since it's been implementend in the new ssh2 v1.1.0 npm package (Commit [SFTP: explicitly set autoClose option for node 14+](https://github.com/mscdex/ssh2/commit/c0de05d186065ad4081b98d2f7aa0fe22161ec09) from @mscdex ssh2:master).
 
 ## 1.13.1 - 2021-07-06
   * Add braces >=2.3.1 to package.json.
