@@ -233,6 +233,41 @@ function mergeConfigWithExternalRefer(
   }
 
   const parsedSSHConfig = sshConfig.parse(sshConfigContent);
+  const section = parsedSSHConfig.find({
+    Host: copyed.host,
+  });
+
+  if (section === null) {
+    return copyed;
+  }
+
+  const mapping = new Map([
+    ['hostname', 'host'],
+    ['port', 'port'],
+    ['user', 'username'],
+    ['identityfile', 'privateKeyPath'],
+    ['serveraliveinterval', 'keepalive'],
+    ['connecttimeout', 'connTimeout'],
+  ]);
+
+  section.config.forEach(line => {
+    if (!line.param) {
+      return;
+    }
+
+    const key = mapping.get(line.param.toLowerCase());
+
+    if (key !== undefined) {
+      if (key === 'host') {
+        copyed[key] = line.value;
+      } else {
+        setConfigValue(copyed, key, line.value);
+      }
+    }
+  });
+  
+  // Bug introduced in pull request #69 : Fix ssh config resolution
+  /* const parsedSSHConfig = sshConfig.parse(sshConfigContent);
   const computed = parsedSSHConfig.compute(copyed.host);
 
   const mapping = new Map([
@@ -259,7 +294,7 @@ function mergeConfigWithExternalRefer(
         setConfigValue(copyed, key, value);
       }
     }
-  });
+  }); */
 
   return copyed;
 }
