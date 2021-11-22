@@ -23,7 +23,11 @@ const configScheme = {
   agent: nullable(Joi.string()),
   privateKeyPath: nullable(Joi.string()),
   passphrase: nullable(Joi.string().allow(true)),
-  interactiveAuth: Joi.boolean(),
+  interactiveAuth: Joi.alternatives([
+    Joi.boolean(),
+    Joi.array()
+      .items(Joi.string()),
+  ]).optional(),
   algorithms: Joi.any(),
   sshConfigPath: Joi.string(),
   sshCustomParams: Joi.string(),

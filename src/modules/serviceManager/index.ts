@@ -20,14 +20,24 @@ const serviceManager = new Trie<FileService>(
 
 function maskConfig(config) {
   const copy = {};
-  const privated = ['username', 'password', 'passphrase'];
+  const MASK = '******';
   Object.keys(config).forEach(key => {
     const configValue = config[key];
-    // tslint:disable-next-line triple-equals
-    if (privated.indexOf(key) !== -1 && configValue != undefined) {
-      copy[key] = '******';
-    } else {
-      copy[key] = configValue;
+    switch (key) {
+      case 'username':
+      case 'password':
+      case 'passphrase':
+        copy[key] = MASK;
+        break;
+      case 'interactiveAuth':
+        if (Array.isArray(configValue)) {
+          copy[key] = configValue.map(phrase => MASK);
+        } else {
+          copy[key] = configValue;
+        }
+        break;
+      default:
+        copy[key] = configValue;
     }
   });
   return copy;

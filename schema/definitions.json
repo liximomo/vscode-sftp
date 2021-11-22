@@ -193,9 +193,21 @@
         "description": "For an encrypted private key, this is the passphrase string used to decrypt it. Set to true for enable passphrase dialog. This will prevent from using cleartext passphrase in this config."
       },
       "interactiveAuth": {
-        "type": "boolean",
-        "description": "True to enable verifyCode dialog. Keyboard interaction authentication mechanism. For example using Google Authentication.",
-        "default": true
+        "oneOf": [
+          {
+            "type": "boolean",
+            "description": "True to enable verifyCode dialog.",
+            "default": false
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array of predefined phrases to automatically pass them without user prompting."
+          }
+        ],
+        "description": "Keyboard interaction authentication mechanism. For example using Google Authentication."
       },
       "algorithms": {
         "type": "object",
