@@ -1,5 +1,5 @@
 ## 1.15.10 - 2021-11-22
-* Update npm `json-schema` depedency to v0.4.0.
+* Update npm `json-schema` devDepedency to v0.2.3.
 
 ## 1.15.9 - 2021-11-21
 * Remove ssh config bug introduced in pull request [#69](https://github.com/Natizyskunk/vscode-sftp/pull/69) from @clemyan while we can find another solution.
