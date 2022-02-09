@@ -20,7 +20,11 @@ export default class SSHClient extends RemoteClient {
 
   _hasProvideAuth(connectOption: ConnectOption) {
     return (
+      // interactiveAuth : boolean
       connectOption.interactiveAuth === true ||
+      // or interactiveAuth : array of phrases
+      (Array.isArray(connectOption.interactiveAuth) && !!connectOption.interactiveAuth.length) ||
+      // or key defined
       ['password', 'agent', 'privateKeyPath'].some(
         // tslint:disable-next-line triple-equals
         key => connectOption[key] != undefined
@@ -260,7 +264,10 @@ export default class SSHClient extends RemoteClient {
           finish,
           stackedAnswers
         ) {
-          const answers = stackedAnswers || [];
+          const answers = stackedAnswers ||
+            // load predefined answeres if any
+            (Array.isArray(interactiveAuth) ? interactiveAuth : undefined) ||
+            [];
           if (answers.length < prompts.length) {
             config
               .askForPasswd(
@@ -299,7 +306,7 @@ export default class SSHClient extends RemoteClient {
           // keepaliveInterval: 1000 * 600, // 10 mins
           // keepaliveInterval: 1000 * 1800, // 30 mins
           keepaliveCountMax: 2, // x2 original
-          // keepaliveCountMax: 3, // x3 
+          // keepaliveCountMax: 3, // x3
           // keepaliveCountMax: 6, // x6
           readyTimeout: interactiveAuth
             ? Math.max(60 * 1000, connectTimeout || 0) // 60 secs, original
@@ -307,7 +314,7 @@ export default class SSHClient extends RemoteClient {
             // ? Math.max(10800 * 1000, connectTimeout || 0) // 180 mins
             : connectTimeout,
           ...option,
-          tryKeyboard: interactiveAuth,
+          tryKeyboard: !!interactiveAuth,
         });
     });
   }

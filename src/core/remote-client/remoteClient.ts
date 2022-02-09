@@ -13,7 +13,7 @@ export interface ConnectOption {
   privateKeyPath?: string;
   privateKey?: string;
   passphrase?: string | boolean;
-  interactiveAuth?: boolean;
+  interactiveAuth?: boolean | string[];
   agent?: string;
   sock?: any;
   hop?: ConnectOption | ConnectOption[];
