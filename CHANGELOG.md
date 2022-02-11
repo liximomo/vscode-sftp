@@ -1,4 +1,4 @@
-## 1.15.12 - 2021-02-11
+## 1.15.12 - 2022-02-11
 * Add deletions support to "Upload Changed files" command. (Pull request [#113](https://github.com/Natizyskunk/vscode-sftp/pull/113) from @brykov vscode-sftp:master merged inside [#117](https://github.com/Natizyskunk/vscode-sftp/pull/117)).
 
 * ## 1.15.11 - 2022-02-09
