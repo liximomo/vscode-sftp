@@ -260,7 +260,10 @@
                 "ecdsa-sha2-nistp256",
                 "ecdsa-sha2-nistp384",
                 "ecdsa-sha2-nistp521",
-                "ssh-dss"
+                "rsa-sha2-512",
+                "rsa-sha2-256",
+                "ssh-dss",
+                "ssh-ed25519"
               ]
             },
             "description": "Server host key formats. In server mode, this list must agree with the host private keys set in the hostKeys config setting."
