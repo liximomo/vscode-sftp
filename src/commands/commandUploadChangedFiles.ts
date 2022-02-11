@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { COMMAND_UPLOAD_CHANGEDFILES } from '../constants';
 import { getFileService } from '../modules/serviceManager';
-import { uploadFile, renameRemote } from '../fileHandlers';
+import { uploadFile, renameRemote, removeRemote } from '../fileHandlers';
 import { getGitService, GitAPI, Repository, Status, Change } from '../modules/git';
 import { checkCommand } from './abstract/createCommand';
 import logger from '../logger';
@@ -68,6 +68,7 @@ async function handleCommand(hint: any) {
   const creates: Change[] = [];
   const uploads: Change[] = [];
   const renames: Change[] = [];
+  const deletes: Change[] = [];
   for (const change of changes) {
     if (!getFileService(change.uri)) {
       continue;
@@ -81,8 +82,14 @@ async function handleCommand(hint: any) {
       case Status.INDEX_ADDED:
       case Status.UNTRACKED:
         creates.push(change);
+        break;
       case Status.INDEX_RENAMED:
         renames.push(change);
+        break;
+      case Status.INDEX_DELETED:
+      case Status.DELETED:
+        deletes.push(change);
+        break;
       default:
         break;
     }
@@ -104,6 +111,13 @@ async function handleCommand(hint: any) {
       }
     })
   );
+  await Promise.all(deletes.map(change => {
+    try {
+      removeRemote(change.uri)
+    } catch (e) {
+      logger.error('Deletion failed.', e);
+    }
+  }));
 
   logger.log('');
   logger.log('------ Upload Changed Files Result ------');
@@ -114,6 +128,7 @@ async function handleCommand(hint: any) {
     renames,
     c => `${simplifyPath(c.originalUri.fsPath)} ➞ ${simplifyPath(c.renameUri!.fsPath)}`
   );
+  outputGroup('deleted', deletes, c => simplifyPath(c.uri.fsPath));
 }
 
 function outputGroup<T>(label: string, items: T[], formatItem: (x: T) => string) {
