@@ -1,3 +1,6 @@
+## 1.15.13 - 2022-02-11
+* Add support for OpenSSH v8.8 SSH private key by using SHA-2 instead of SHA-1 to fix SSH public key signatures. (See issue [#112](https://github.com/Natizyskunk/vscode-sftp/issues/112)).
+
 ## 1.15.12 - 2022-02-11
 * Add deletions support to "Upload Changed files" command. (Pull request [#113](https://github.com/Natizyskunk/vscode-sftp/pull/113) from @brykov vscode-sftp:master merged inside [#117](https://github.com/Natizyskunk/vscode-sftp/pull/117)).
 
@@ -45,7 +48,7 @@
 
 ## 1.15.1 - 2021-08-24
   * Add the `useTempFile` option to the test config spec.
-  * Fix get target mode error && add more precise logger-infos for tranfer tasks  (Merged pull request [#29](https://github.com/Natizyskunk/vscode-sftp/pull/29) from @kripper vscode-sftp:master).
+  * Fix get target mode error && add more precise logger-infos for tranfer tasks (Merged pull request [#29](https://github.com/Natizyskunk/vscode-sftp/pull/29) from @kripper vscode-sftp:master).
 
 ## 1.15.0 - 2021-08-23
   * New option [useTempFile](https://github.com/Natizyskunk/vscode-sftp/wiki/Common-Config#usetempfile) (Merged pull request [#29](https://github.com/Natizyskunk/vscode-sftp/pull/29) from @kripper vscode-sftp:master).

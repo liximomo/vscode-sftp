@@ -1,9 +1,9 @@
 - [Error: Failure](#error-failure)
-	- [Error: Failure - Solution One](#error-failure---solution-one)
-	- [Error: Failure - Solution Two](#error-failure---solution-two)
+  - [Error: Failure - Solution One](#error-failure---solution-one)
+  - [Error: Failure - Solution Two](#error-failure---solution-two)
 - [Error: Connection closed](#error-connection-closed)
 - [ENFILE: file table overflow ...](#enfile-file-table-overflow-)
-	- [ENFILE: file table overflow ... - Solution for MacOS harsh limit](#enfile-file-table-overflow----solution-for-macos-harsh-limit)
+  - [ENFILE: file table overflow ... - Solution for MacOS harsh limit](#enfile-file-table-overflow----solution-for-macos-harsh-limit)
 - [How do I upload content inside a folder, but not the folder itself?](#how-do-i-upload-content-inside-a-folder-but-not-the-folder-itself)
 - [Clicking Upload Changed Files does not work](#clicking-upload-changed-files-does-not-work)
 - [How can I upload files as root?](#how-can-i-upload-files-as-root)
@@ -31,9 +31,6 @@ The problem would be that the SFTP extension keeps closing the connection for th
 You'll have to Explicitly override the default transport layer algorithms used for the connection to remove the new `"diffie-hellman-group-exchange-sha256"` algorithm that cause the problem from the `kex` section. Just add this in your `sftp.json` config file, which should make it work.
 ```json
 {
-	...
-	"host": "exemple.com",
-	...
 	"algorithms": {
 		"kex": [
 			"ecdh-sha2-nistp256", 
@@ -54,7 +51,11 @@ You'll have to Explicitly override the default transport layer algorithms used f
 			"ssh-rsa", 
 			"ecdsa-sha2-nistp256", 
 			"ecdsa-sha2-nistp384", 
-			"ecdsa-sha2-nistp521"
+			"ecdsa-sha2-nistp521",
+			"rsa-sha2-512",
+			"rsa-sha2-256",
+      "ssh-dss",
+      "ssh-ed25519"
 		],
 		"hmac": [
 			"hmac-sha2-256", 
