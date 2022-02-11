@@ -1,3 +1,6 @@
+## 1.15.11 - 2022-02-09
+* Enhance sftp interactiveAuth mode (See [Wiki](https://github.com/Natizyskunk/vscode-sftp/wiki/SFTP-only-Config#interactiveauth)). (Pull request [#94](https://github.com/Natizyskunk/vscode-sftp/pull/94) from @lacastorine vscode-sftp:lacastorine merged inside [#114](https://github.com/Natizyskunk/vscode-sftp/pull/114)).
+
 ## 1.15.10 - 2021-11-22
 * Update npm `json-schema` devDepedency to v0.2.3.
 

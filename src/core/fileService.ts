@@ -66,7 +66,7 @@ interface SftpOption {
   agent?: string;
   privateKeyPath?: string;
   passphrase: string | true;
-  interactiveAuth: boolean;
+  interactiveAuth: boolean | string[];
   algorithms: any;
   sshConfigPath?: string;
   concurrency: number;
@@ -265,7 +265,7 @@ function mergeConfigWithExternalRefer(
       }
     }
   });
-  
+
   // Bug introduced in pull request #69 : Fix ssh config resolution
   /* const parsedSSHConfig = sshConfig.parse(sshConfigContent);
   const computed = parsedSSHConfig.compute(copyed.host);

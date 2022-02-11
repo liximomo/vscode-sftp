@@ -13,8 +13,7 @@ more stability because some clients/servers have some sort of configured/hard co
 for enabling passphrase dialog.  This will prevent from using cleartext passphrase in this config.
 
 ## interactiveAuth
-*boolean*: Set to true to enable `verifyCode` dialog.  Keyboard interation mechanism.  For example, using
-Google Authentication (multi-factor).
+*boolean*|*string*[]: Enable keyboard interaction authentication mechanism. Set to true to enable `verifyCode` dialog. For example using Google Authentication (multi-factor). Or array of predefined phrases to automatically pass them without user prompting.
 
 Note: *Requires the server to have keyboard-interactive authentication enabled.*
 

@@ -38,7 +38,7 @@ boolean: Upload on every save operation of VS code
 **default**: false
 
 ### useTempFile
-boolean: Upload temp file on every save operation of VSCode to avoid breaking a webpage when a user acceses it 
+boolean: Upload temp file on every save operation of VSCode to avoid breaking a webpage when a user acceses it
 while the file is still being uploaded (is incomplete).
 
 **Default**: false
@@ -113,7 +113,7 @@ number: the maximum connection time
 
 ### limitOpenFilesOnRemote
 mixed: Limit open file descriptors to the specific number in a remote server. Set to true for using default limit(222). Do not set this unless you have to.
- 
+
 **default**: false
 
 
@@ -129,9 +129,9 @@ mixed: Limit open file descriptors to the specific number in a remote server. Se
 mixed: For an encrypted private key, this is the passphrase string used to decrypt it. Set to true for enable passphrase dialog. This will prevent from using cleartext passphrase in this config.
 
 ### interactiveAuth
-boolean: Set to true for enable verifyCode dialog. Keyboard interaction authentication mechanism. For example using Google Authentication (Multi factor)
+*boolean*|*string*[]: Enable keyboard interaction authentication mechanism. Set to true to enable `verifyCode` dialog. For example using Google Authentication (multi-factor). Or pass array of predefined phrases to automatically enter them without user prompting.
 
-Note: _(requires the server to have keyboard-interactive authentication enabled)_
+Note: *Requires the server to have keyboard-interactive authentication enabled.*
 
 **default**: false
 

@@ -14,7 +14,11 @@ const configScheme = {
   agent: nullable(Joi.string()),
   privateKeyPath: nullable(Joi.string()),
   passphrase: nullable(Joi.string().allow(true)),
-  interactiveAuth: Joi.boolean().optional(),
+  interactiveAuth: Joi.alternatives([
+    Joi.boolean(),
+    Joi.array()
+      .items(Joi.string()),
+  ]).optional(),
 
   secure: Joi.any().valid(true, false, 'control', 'implicit').optional(),
   secureOptions: nullable(Joi.object()),
@@ -49,21 +53,21 @@ describe("validation config", () => {
       privateKeyPath: null,
       passive: false,
       interactiveAuth: false,
-    
+
       remotePath: '/',
       uploadOnSave: false,
-      
+
       useTempFile: false,
       openSsh: false,
-    
+
       syncMode: 'update',
-    
+
       watcher: {
         files: false,
         autoUpload: false,
         autoDelete: false,
       },
-    
+
       ignore: [
         '**/.vscode',
         '**/.git',
@@ -83,13 +87,13 @@ describe("validation config", () => {
       port: 22,
       username: 'username',
       protocol: 'sftp',
-    
+
       remotePath: '/',
-    
+
       syncMode: 'update',
-    
+
       watcher: {},
-    
+
       ignore: [
         '**/.vscode',
         '**/.git',
@@ -118,21 +122,21 @@ describe("validation config", () => {
         protocol: 'unknown',
         passive: false,
         interactiveAuth: false,
-      
+
         remotePath: '/',
         uploadOnSave: false,
-      
+
         useTempFile: false,
         openSsh: false,
-      
+
         syncMode: 'update',
-      
+
         watcher: {
           files: false,
           autoUpload: false,
           autoDelete: false,
         },
-      
+
         ignore: [
           '**/.vscode',
           '**/.git',
@@ -154,21 +158,21 @@ describe("validation config", () => {
         protocol: 'sftp',
         passive: false,
         interactiveAuth: false,
-      
+
         remotePath: '/',
         uploadOnSave: false,
-      
+
         useTempFile: false,
         openSsh: false,
-      
+
         syncMode: 'update',
-      
+
         watcher: {
           files: false,
           autoUpload: false,
           autoDelete: false,
         },
-      
+
         ignore: [
           '**/.vscode',
           '**/.git',
@@ -214,21 +218,21 @@ describe("validation config", () => {
         protocol: 'sftp',
         passive: false,
         interactiveAuth: false,
-      
+
         remotePath: '/',
         uploadOnSave: false,
-      
+
         useTempFile: false,
         openSsh: false,
-      
+
         syncMode: 'update',
-      
+
         watcher: {
           files: false,
           autoUpload: false,
           autoDelete: false,
         },
-      
+
         ignore: [
           1,
           '**/.git',
@@ -260,18 +264,18 @@ describe("validation config", () => {
 
         remotePath: '/',
         uploadOnSave: false,
-      
+
         useTempFile: false,
         openSsh: false,
-      
+
         syncMode: 'update',
-      
+
         watcher: {
           files: false,
           autoUpload: false,
           autoDelete: false,
         },
-      
+
         ignore: [
           '**/.git',
           '**/.DS_Store',
