@@ -40,11 +40,11 @@ function adaptPath(filepath) {
 
 function getSshCommand(
   config: { host: string; port: number; username: string },
-  extraOpiton?: string
+  extraOption?: string
 ) {
   let sshStr = `ssh -t ${config.username}@${config.host} -p ${config.port}`;
-  if (extraOpiton) {
-    sshStr += ` ${extraOpiton}`;
+  if (extraOption) {
+    sshStr += ` ${extraOption}`;
   }
   // sshStr += ` "cd \\"${config.workingDir}\\"; exec \\$SHELL -l"`;
   return sshStr;
