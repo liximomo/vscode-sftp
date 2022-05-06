@@ -1,3 +1,7 @@
+## 1.15.14 - 2022-05-06
+* Update npm `async` depedency to v2.6.4.
+* Update npm `minimist` depedency to v1.2.6.
+
 ## 1.15.13 - 2022-02-11
 * Add support for OpenSSH v8.8 SSH private key by using SHA-2 instead of SHA-1 to fix SSH public key signatures. (See issue [#112](https://github.com/Natizyskunk/vscode-sftp/issues/112)).
 
