@@ -10,7 +10,7 @@ import {
   findAllFileService,
   disposeFileService,
 } from './serviceManager';
-import { reportError, isValidFile, isConfigFile, isInWorksapce } from '../helper';
+import { reportError, isValidFile, isConfigFile, isInWorkspace } from '../helper';
 import { downloadFile, uploadFile } from '../fileHandlers';
 
 let workspaceWatcher: vscode.Disposable;
@@ -93,7 +93,7 @@ function watchWorkspace({
 
   workspaceWatcher = onDidSaveTextDocument((doc: vscode.TextDocument) => {
     const uri = doc.uri;
-    if (!isValidFile(uri) || !isInWorksapce(uri.fsPath)) {
+    if (!isValidFile(uri) || !isInWorkspace(uri.fsPath)) {
       return;
     }
 
@@ -113,7 +113,7 @@ function watchWorkspace({
 
 function init() {
   onDidOpenTextDocument((doc: vscode.TextDocument) => {
-    if (!isValidFile(doc.uri) || !isInWorksapce(doc.uri.fsPath)) {
+    if (!isValidFile(doc.uri) || !isInWorkspace(doc.uri.fsPath)) {
       return;
     }
 
