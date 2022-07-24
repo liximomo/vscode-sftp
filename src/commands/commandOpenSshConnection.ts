@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 import { COMMAND_OPEN_CONNECTION_IN_TERMINAL } from '../constants';
 import { getAllFileService } from '../modules/serviceManager';
 import { ExplorerRoot } from '../modules/remoteExplorer';
-import { getUserSetting } from '../host';
 import { interpolate } from '../utils';
 import { checkCommand } from './abstract/createCommand';
 
@@ -20,17 +19,10 @@ function adaptPath(filepath) {
   if (isWindows) {
     return filepath.replace(/\\\\/g, '\\');
   }
-  
+
   // convert to unix style
   return filepath.replace(/\\\\/g, '/').replace(/\\/g, '/');
-  
-  // append with /mnt and convert c: to c
-  // return '/mnt/' + safeUnixPath.replace(/^([a-zA-Z]):/, '$1');
 }
-
-// function shouldUsePass(config) {
-//   return typeof config.password === 'string' && config.password.length > 0;
-// }
 
 function getSshCommand(
   config: { host: string; port: number; username: string },
