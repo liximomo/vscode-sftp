@@ -49,13 +49,13 @@ You'll have to Explicitly override the default transport layer algorithms used f
 		],
 		"serverHostKey": [
 			"ssh-rsa", 
+      			"ssh-dss",
+      			"ssh-ed25519",
 			"ecdsa-sha2-nistp256", 
 			"ecdsa-sha2-nistp384", 
 			"ecdsa-sha2-nistp521",
 			"rsa-sha2-512",
-			"rsa-sha2-256",
-      "ssh-dss",
-      "ssh-ed25519"
+			"rsa-sha2-256"
 		],
 		"hmac": [
 			"hmac-sha2-256", 
