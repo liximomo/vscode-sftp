@@ -575,7 +575,7 @@
     "@types/webpack-env": "^1.13.6",
     "braces": ">=2.3.1",
     "glob-parent": ">=5.1.2",
-    "jest": "^20.0.4",
+    "jest": "^29.0.3",
     "json-schema": ">=0.4.0",
     "memfs": "^2.15.5",
     "merge": ">=2.1.1",
