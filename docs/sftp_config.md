@@ -47,8 +47,8 @@ Explicit overrides for the default transport layer algorithms used for the conne
       "ecdsa-sha2-nistp256",
       "ecdsa-sha2-nistp384",
       "ecdsa-sha2-nistp521",
-      "rsa-sha2-512",
-      "rsa-sha2-256",
+			"rsa-sha2-512",
+			"rsa-sha2-256",
       "ssh-dss",
       "ssh-ed25519"
     ],
