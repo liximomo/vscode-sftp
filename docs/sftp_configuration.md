@@ -1,4 +1,4 @@
-# SFTP Configuration
+# SFTP configuration
 
 ## agent
 *string*: Path to ssh-agent's UNXI socket for ssh-agent-based user authentication.

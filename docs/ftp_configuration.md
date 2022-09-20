@@ -1,4 +1,4 @@
-# FTP Configuration
+# FTP(s) configuration
 
 ## secure
 *mixed*: Set to true for both control and data connection encryption.

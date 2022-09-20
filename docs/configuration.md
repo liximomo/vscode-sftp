@@ -196,7 +196,7 @@ Extra parameters appended to the SSH command used by "Open SSH in Terminal".
 
 ***
 
-# FTP only configuration
+# FTP(s) only configuration
 
 ## secure
 *mixed*: Set to true for both control and data connection encryption.

@@ -1,4 +1,4 @@
-# Common Configuration
+# Common configuration
 
 ## name
 *string*: A string to identify your configuration.
