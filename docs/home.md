@@ -1,7 +1,7 @@
 # Home
 
 1. [Setting](./setting.md)
-2. [Config](#)
+2. [Config](./config.md)
     - [Common](./common_config.md)
     - [SFTP](./sftp_config.md)
     - [FTP(s)](./ftp_config.md)
