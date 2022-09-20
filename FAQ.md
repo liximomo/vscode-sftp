@@ -55,7 +55,9 @@ You'll have to Explicitly override the default transport layer algorithms used f
 			"ecdsa-sha2-nistp384", 
 			"ecdsa-sha2-nistp521",
 			"rsa-sha2-512",
-			"rsa-sha2-256"
+			"rsa-sha2-256",
+		        "ssh-dss",
+		        "ssh-ed25519"
 		],
 		"hmac": [
 			"hmac-sha2-256", 
