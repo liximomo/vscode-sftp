@@ -12,7 +12,7 @@ Syncs your local directory with a remote server directory.
 Allows you to optionally edit upload a file to the remote directory after it saves locally. 
 This allows you to edit more or less directly on the server similar to WinScp or other similar programs.
 
-Very powerful, with smart features. Very simple, requires just three lines of config! Very fast, finished in a blink.
+Very powerful, with smart features. Very simple, requires just three lines of configuration! Very fast, finished in a blink.
 
 - Features
   - [Browser remote with Remote Explorer](#remote-explorer)
@@ -21,7 +21,7 @@ Very powerful, with smart features. Very simple, requires just three lines of co
   - Upload/Download
   - Upload on save
   - File Watcher
-  - Multiple configs
+  - Multiple configurations
   - Switchable profiles
   - Temp File support
 - [Commands](https://github.com/Natizyskunk/vscode-sftp/wiki/Commands)
@@ -48,9 +48,9 @@ To install it just follow thoses steps from within VSCode :
 ## Documentation
 - [Home](https://github.com/Natizyskunk/vscode-sftp/wiki)
 - [Settings](https://github.com/Natizyskunk/vscode-sftp/wiki/Setting)
-- [Common configuration](https://github.com/Natizyskunk/vscode-sftp/wiki/Common-Config)
-- [SFTP configuration](https://github.com/Natizyskunk/vscode-sftp/wiki/SFTP-only-Config)
-- [FTP confriguration](https://github.com/Natizyskunk/vscode-sftp/wiki/FTP(s)-only-Config)
+- [Common configuration](https://github.com/Natizyskunk/vscode-sftp/wiki/Common-Configuration)
+- [SFTP configuration](https://github.com/Natizyskunk/vscode-sftp/wiki/SFTP-only-Configuration)
+- [FTP confriguration](https://github.com/Natizyskunk/vscode-sftp/wiki/FTP(s)-only-Configuration)
 - [Commands](https://github.com/Natizyskunk/vscode-sftp/wiki/Commands)
 
 ## Usage
@@ -80,7 +80,7 @@ For instance:
 The password parameter is optional but if you don't add it, you will be constantly prompted for a password.
 Note that you must escape any backslashes and other special characters with a backslash.
 
-There are other Example Configs below.
+There are other Example configurations below.
 
 3. Save and close the `sftp.json` file.
 4. `Ctrl+Shift+P` on Windows/Linux or `Cmd+Shift+P` on Mac open command palette.
@@ -91,8 +91,8 @@ There are other Example Configs below.
 
 For detailed usage. Please go to [wiki](https://github.com/Natizyskunk/vscode-sftp/wiki).
 
-## Example Configs
-You can see the full config [here](https://github.com/Natizyskunk/vscode-sftp/wiki/config).
+## Example configurations
+You can see the full configuration [here](https://github.com/Natizyskunk/vscode-sftp/wiki/configuration).
 
 - [sftp sync extension for VS Code](#sftp-sync-extension-for-vs-code)
   - [Installation](#installation)
@@ -100,14 +100,14 @@ You can see the full config [here](https://github.com/Natizyskunk/vscode-sftp/wi
     - [Method 2 (Manual update)](#method-2-manual-update)
   - [Documentation](#documentation)
   - [Usage](#usage)
-  - [Example Configs](#example-configs)
+  - [Example configurations](#example-configurations)
     - [Simple](#simple)
     - [Profiles](#profiles)
     - [Multiple Context](#multiple-context)
     - [Connection Hopping](#connection-hopping)
       - [Single Hop](#single-hop)
       - [Multiple Hop](#multiple-hop)
-    - [Config in User Setting](#config-in-user-setting)
+    - [Configuration in User Setting](#configuration-in-user-setting)
   - [Remote Explorer](#remote-explorer)
   - [Debug](#debug)
   - [FAQ](#faq)
@@ -182,7 +182,7 @@ _Note：_ `name` is required in this mode.
 ### Connection Hopping
 You can connect to a target server through a proxy with ssh protocol.
 
-_Note：_ **Variable substitution is not working in a hop config.**
+_Note：_ **Variable substitution is not working in a hop configuration.**
 
 #### Single Hop
 local -> hop -> target
@@ -235,8 +235,8 @@ local -> hopa -> hopb -> target
 }
 ```
 
-### Config in User Setting
-You can use `remote` to tell sftp to get the config from [remote-fs](https://github.com/liximomo/vscode-remote-fs).
+### Configuration in User Setting
+You can use `remote` to tell sftp to get the configuration from [remote-fs](https://github.com/liximomo/vscode-remote-fs).
 
 In User Setting:
 ```json
