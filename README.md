@@ -72,7 +72,7 @@ For instance:
     "port": 21,
     "secure": true,
     "username": "username",
-    "remotePath": "/public_html/project",  <--- This is the path which will be downloaded if you "Download Project"
+    "remotePath": "/public_html/project", // <--- This is the path which will be downloaded if you "Download Project"
     "password": "password",
     "uploadOnSave": true
 }
@@ -111,6 +111,9 @@ You can see the full config [here](https://github.com/Natizyskunk/vscode-sftp/wi
   - [Remote Explorer](#remote-explorer)
   - [Debug](#debug)
   - [FAQ](#faq)
+  - [Donation](#donation)
+    - [Buy Me a Coffee](#buy-me-a-coffee)
+    - [PayPal](#paypal)
 
 ### Simple
 ```json
@@ -191,13 +194,13 @@ local -> hop -> target
   // hop
   "host": "hopHost",
   "username": "hopUsername",
-  "privateKeyPath": "/Users/localUser/.ssh/id_rsa", // The key file is assumed on the local.
+  "privateKeyPath": "/Users/localUser/.ssh/id_rsa", // <-- The key file is assumed on the local.
 
   "hop": {
     // target
     "host": "targetHost",
     "username": "targetUsername",
-    "privateKeyPath": "/Users/hopUser/.ssh/id_rsa", // The key file is assumed on the hop.
+    "privateKeyPath": "/Users/hopUser/.ssh/id_rsa", // <-- The key file is assumed on the hop.
   }
 }
 ```
@@ -212,21 +215,21 @@ local -> hopa -> hopb -> target
   // hopa
   "host": "hopAHost",
   "username": "hopAUsername",
-  "privateKeyPath": "/Users/hopAUsername/.ssh/id_rsa" // The key file is assumed on the local.
+  "privateKeyPath": "/Users/hopAUsername/.ssh/id_rsa" // <-- The key file is assumed on the local.
 
   "hop": [
     // hopb
     {
       "host": "hopBHost",
       "username": "hopBUsername",
-      "privateKeyPath": "/Users/hopaUser/.ssh/id_rsa" // The key file is assumed on the hopa.
+      "privateKeyPath": "/Users/hopaUser/.ssh/id_rsa" // <-- The key file is assumed on the hopa.
     },
 
     // target
     {
       "host": "targetHost",
       "username": "targetUsername",
-      "privateKeyPath": "/Users/hopbUser/.ssh/id_rsa", // The key file is assumed on the hopb.
+      "privateKeyPath": "/Users/hopbUser/.ssh/id_rsa", // <-- The key file is assumed on the hopb.
     }
   ]
 }
