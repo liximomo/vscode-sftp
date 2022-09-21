@@ -13,7 +13,7 @@ Id get more stability because some client/server have some sort of configured/ha
 Set to true for enabling passphrase dialog. This will prevent from using cleartext passphrase in this config.
 
 ## interactiveAuth
-*boolean*|*string*[]: Enable keyboard interaction authentication mechanism. Set to true to enable `verifyCode` dialog.
+*boolean*|*string[]*: Enable keyboard interaction authentication mechanism. Set to true to enable `verifyCode` dialog.
 For example using Google Authentication (multi-factor). Or pass array of predefined phrases to automatically enter them without user prompting.
 
 Note: *Requires the server to have keyboard-interactive authentication enabled.*
@@ -45,13 +45,13 @@ Explicit overrides for the default transport layer algorithms used for the conne
     ],
     "serverHostKey": [
       "ssh-rsa",
+      "ssh-dss",
+      "ssh-ed25519",
       "ecdsa-sha2-nistp256",
       "ecdsa-sha2-nistp384",
       "ecdsa-sha2-nistp521",
-      "rsa-sha2-512",
-      "rsa-sha2-256",
-      "ssh-dss",
-      "ssh-ed25519"
+			"rsa-sha2-512",
+			"rsa-sha2-256"
     ],
     "hmac": [
       "hmac-sha2-256",

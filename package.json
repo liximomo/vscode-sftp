@@ -2,11 +2,11 @@
   "name": "sftp",
   "displayName": "SFTP",
   "description": "SFTP/FTP sync",
-  "version": "1.15.13",
+  "version": "1.15.15",
   "publisher": "Natizyskunk",
   "author": "Natizyskunk <natan.fourie@hotmail.fr> (https://github.com/Natizyskunk)",
   "engines": {
-    "vscode": "^1.30.0"
+    "vscode": "^1.64.2"
   },
   "bugs": {
     "url": "https://github.com/Natizyskunk/vscode-sftp/issues",
