@@ -1,9 +1,9 @@
 - [Error: Failure](#error-failure)
-  - [Error: Failure - Solution One](#error-failure---solution-one)
-  - [Error: Failure - Solution Two](#error-failure---solution-two)
+	- [Error: Failure - Solution One](#error-failure---solution-one)
+	- [Error: Failure - Solution Two](#error-failure---solution-two)
 - [Error: Connection closed](#error-connection-closed)
 - [ENFILE: file table overflow ...](#enfile-file-table-overflow-)
-  - [ENFILE: file table overflow ... - Solution for MacOS harsh limit](#enfile-file-table-overflow----solution-for-macos-harsh-limit)
+	- [ENFILE: file table overflow ... - Solution for MacOS harsh limit](#enfile-file-table-overflow----solution-for-macos-harsh-limit)
 - [How do I upload content inside a folder, but not the folder itself?](#how-do-i-upload-content-inside-a-folder-but-not-the-folder-itself)
 - [Clicking Upload Changed Files does not work](#clicking-upload-changed-files-does-not-work)
 - [How can I upload files as root?](#how-can-i-upload-files-as-root)
@@ -23,12 +23,12 @@ Change `remotePath` to the actual path if it's a symlink.
 
 The problem would be that your server runs out of file descriptors.
 You should try to increase the file descriptors limit.
-If you don't have the permission to do this, set [limitOpenFilesOnRemote](https://github.com/Natizyskunk/vscode-sftp/wiki/Config#limitopenfilesonremote) option in your config.
+If you don't have the permission to do this, set [limitOpenFilesOnRemote](https://github.com/Natizyskunk/vscode-sftp/wiki/Configuration#limitopenfilesonremote) option in your config.
 
 ## Error: Connection closed
 
 The problem would be that the SFTP extension keeps closing the connection for those who use more legacy/old systems.
-You'll have to Explicitly override the default transport layer algorithms used for the connection to remove the new `"diffie-hellman-group-exchange-sha256"` algorithm that cause the problem from the `kex` section. Just add this in your `sftp.json` config file, which should make it work.
+You'll have to Explicitly override the default transport layer algorithms used for the connection to remove the new `"diffie-hellman-group-exchange-sha256"` algorithm that cause the problem from the `kex` section. Just add this in your `sftp.json` configuration file, which should make it work.
 ```json
 {
 	"algorithms": {
@@ -49,15 +49,13 @@ You'll have to Explicitly override the default transport layer algorithms used f
 		],
 		"serverHostKey": [
 			"ssh-rsa", 
-      			"ssh-dss",
-      			"ssh-ed25519",
+			"ssh-dss",
+			"ssh-ed25519",
 			"ecdsa-sha2-nistp256", 
 			"ecdsa-sha2-nistp384", 
 			"ecdsa-sha2-nistp521",
 			"rsa-sha2-512",
-			"rsa-sha2-256",
-		        "ssh-dss",
-		        "ssh-ed25519"
+			"rsa-sha2-256"
 		],
 		"hmac": [
 			"hmac-sha2-256", 
@@ -90,7 +88,7 @@ See [vscode-sftp issue #852](https://github.com/liximomo/vscode-sftp/issues/852)
 As quoted from **raoul2000**, "as long as you set the `context` property to `./[path]` (e.g., `./build`), it
 will work."
 
-Example config (where all JS and HTML files in `./build` will be copied to `/folder1/folder2/folder3`):
+Example configuration (where all JS and HTML files in `./build` will be copied to `/folder1/folder2/folder3`):
 ```json
 {
   "name": "My Server",

@@ -48,7 +48,7 @@
     "properties": {
       "remote": {
         "type": "string",
-        "description": "Name of remote which configs with `remoteFs.remote` in User Setting. Config will get merged to this remote."
+        "description": "Name of remote which configs with `remoteFs.remote` in User Setting. Configuration will get merged to this remote."
       },
       "uploadOnSave": {
         "type": "boolean",
@@ -72,7 +72,7 @@
       },
       "syncOption": {
         "type": "object",
-        "description": "Config the behavior of `Sync` command.",
+        "description": "Configuration the behavior of `Sync` command.",
         "properties": {
           "delete": {
             "type": "boolean",
@@ -257,16 +257,16 @@
             "items": {
               "enum": [
                 "ssh-rsa",
+                "ssh-dss",
+                "ssh-ed25519",
                 "ecdsa-sha2-nistp256",
                 "ecdsa-sha2-nistp384",
                 "ecdsa-sha2-nistp521",
                 "rsa-sha2-512",
-                "rsa-sha2-256",
-                "ssh-dss",
-                "ssh-ed25519"
+                "rsa-sha2-256"
               ]
             },
-            "description": "Server host key formats. In server mode, this list must agree with the host private keys set in the hostKeys config setting."
+            "description": "Server host key formats. In server mode, this list must agree with the host private keys set in the hostKeys configuration setting."
           },
           "hmac": {
             "type": "array",
@@ -289,7 +289,7 @@
       },
       "sshConfigPath": {
         "type": "string",
-        "description": "Absolute path to your SSH config file (eg. ~/.ssh/config)"
+        "description": "Absolute path to your SSH configuration file (eg. ~/.ssh/config)"
       },
       "concurrency": {
         "type": "number",

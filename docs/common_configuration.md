@@ -1,26 +1,26 @@
-# Common Configuration
+# Common configuration
 
 ## name
 *string*: A string to identify your configuration.
 
 ## context
-*string*: A relative path to the workspace root folder.  Use this when you want to map a subfolder
-to the `remotePath`.
+*string*: A path relative to the workspace root folder.
+Use this when you want to map a subfolder to the `remotePath`.
 
-**Default**: the workspace root.
+**default**: The workspace root.
 
 ## protocol
 *string*: `sftp` or `ftp`
 
-**Default**: `sftp`
+**default**: `sftp`
 
 ## host
 *string*: Hostname or IP address of the server.
 
 ## port
-*integer*: The SFTP/FTP port number of the server.
+*integer*: Port number of the server.
 
-**Default**: 22
+**default**: 22
 
 ## username
 *string*: Username for authentication.
@@ -31,33 +31,33 @@ to the `remotePath`.
 ## remtoePath
 *string*: The absolute path on the remote host.
 
-**Default**: `/`
+**default**: `/`
 
 ## uploadOnSave
 *boolean*: Upload on every save operation of VSCode.
 
-**Default**: false
+**default**: false
 
 ## useTempFile
-*boolean*: Upload temp file on every save operation of VSCode to avoid breaking a webpage when a user acceses it 
-while the file is still being uploaded (is incomplete).
+*boolean*: Upload temp file on every save operation of VSCode to avoid breaking a webpage when a user acceses it while the file is still being uploaded (is incomplete).
 
-**Default**: false
+**default**: false
 
-### openSsh
-*boolean*: Enable atomic file uploads (only supported by openSSH servers). if set to true, the `useTempFile` option must also be set to true.
+## openSsh
+*boolean*: Enable atomic file uploads (only supported by openSSH servers).
+If set to true, the `useTempFile` option must also be set to true.
 
-**Default**: false
+**default**: false
 
 ## downloadOnOpen
 *boolean*: Download the file from the remote server whenever it is opened.
 
-**Default**: false
+**default**: false
 
 ## syncOption
 *object*: Configure the behavior of the `Sync` command.
 
-**Default**: `{}`
+**default**: `{}`
 
 ## syncOption.delete
 *boolean*: Delete extraneous files from destination directories.
@@ -74,7 +74,7 @@ while the file is still being uploaded (is incomplete).
 ## ignore
 *string[]*: Same behavior as gitignore, all paths relative to context of the current configuration.
 
-**Default**: []
+**default**: []
 
 ## ignoreFile
 *string*: Absolute path to the ignore file or relative path relative to the workspace root folder.
@@ -93,30 +93,29 @@ Set `uploadOnSave` to false when you watch everything.
 *boolean*: Delete when the file is removed.
 
 ## remoteTimeOffsetInHours
-*number*: The number of hours difference between the local machine and the remote server. (remote minus local)
+*number*: The number of hours difference between the local machine and the remote server (remote minus local).
 
-**Default**: 0
+**default**: 0
 
 ## remoteExplorer
 *object*.
 
 ## remoteExplorer.fileExclude
-*string[]*: Configure that patterns for excluding files and folders.  The Remote Explorer decides which files and folders
-to show or hide based on this setting.
+*string[]*: Configure that patterns for excluding files and folders.
+The Remote Explorer decides which files and folders to show or hide based on this setting.
 
 ## concurrency
-*number*: Lowering the concurrency could get more stability because some clients/servers have some sort
-of configured/hard coded limit.
+*number*: Lowering the concurrency could get more stability because some clients/servers have some sort of configured/hard coded limit.
 
-**Default**: 4
+**default**: 4
 
 ## connectTimeout
 *number*: The maximum connection time.
 
-**Default**: 10000
+**default**: 10000
 
 ## limitOpenFilesOnRemote
-*mixed*: Limit open file descriptors to the specific number in a remote server.  Set to true for using
-default `limit(222)`.  Do not set this unless you have to.
+*mixed*: Limit open file descriptors to the specific number in a remote server.
+Set to true for using default `limit(222)`. Do not set this unless you have to.
 
-**Default**: false
+**default**: false

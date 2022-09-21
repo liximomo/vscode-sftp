@@ -1,3 +1,6 @@
+## 1.15.15 - 2022-05-06
+* Fix "Open SSH in Terminal" not working because "terminal.integrated.shell.windows" is deprecated and fix typo `src/commands/commandOpenSshConnection.ts`. (Pull request [#155](https://github.com/Natizyskunk/vscode-sftp/pull/155) from @mean-cj vscode-sftp:patch-2).
+
 ## 1.15.14 - 2022-05-06
 * Update npm `async` depedency to v2.6.4.
 * Update npm `minimist` depedency to v1.2.6.
@@ -9,13 +12,13 @@
 * Add deletions support to "Upload Changed files" command. (Pull request [#113](https://github.com/Natizyskunk/vscode-sftp/pull/113) from @brykov vscode-sftp:master merged inside [#117](https://github.com/Natizyskunk/vscode-sftp/pull/117)).
 
 * ## 1.15.11 - 2022-02-09
-* Enhance sftp interactiveAuth mode (See [Wiki](https://github.com/Natizyskunk/vscode-sftp/wiki/SFTP-only-Config#interactiveauth)). (Pull request [#94](https://github.com/Natizyskunk/vscode-sftp/pull/94) from @lacastorine vscode-sftp:lacastorine merged inside [#114](https://github.com/Natizyskunk/vscode-sftp/pull/114)).
+* Enhance sftp interactiveAuth mode (See [Wiki](https://github.com/Natizyskunk/vscode-sftp/wiki/SFTP-only-Configuration#interactiveauth)). (Pull request [#94](https://github.com/Natizyskunk/vscode-sftp/pull/94) from @lacastorine vscode-sftp:lacastorine merged inside [#114](https://github.com/Natizyskunk/vscode-sftp/pull/114)).
 
 ## 1.15.10 - 2021-11-22
 * Update npm `json-schema` devDepedency to v0.2.3.
 
 ## 1.15.9 - 2021-11-21
-* Remove ssh config bug introduced in pull request [#69](https://github.com/Natizyskunk/vscode-sftp/pull/69) from @clemyan while we can find another solution.
+* Remove ssh configuration bug introduced in pull request [#69](https://github.com/Natizyskunk/vscode-sftp/pull/69) from @clemyan while we can find another solution.
 
 ## 1.15.8 - 2021-11-12
   * Fix 'Upload Changed Files' & 'No Such File' bugs (Commit [fix upload changed files](https://github.com/wandway/vscode-sftp/commit/775016788e4c59db901dc68a20c1f61ebcca7bc7#diff-20516d8841b4891f1926f1e40e447e99e0575a5e36ba6814f6b85b45db1b8fbb) from @wandway vscode-sftp:master).
@@ -27,7 +30,7 @@
   * Upgrade `ssh2` version to official v1.5.0 by @mscdex.
 
 ## 1.15.6 - 2021-10-27
-  * Fix ssh config resolution (Merged pull request [#69](https://github.com/Natizyskunk/vscode-sftp/pull/69) from @clemyan vscode-sftp:fix-ssh-config).
+  * Fix ssh configuration resolution (Merged pull request [#69](https://github.com/Natizyskunk/vscode-sftp/pull/69) from @clemyan vscode-sftp:fix-ssh-config).
 
 ## 1.15.5 - 2021-10-27
   * Update mtime after file was saved before upload (Merged pull request [#75](https://github.com/Natizyskunk/vscode-sftp/pull/75) from @viperet vscode-sftp:save_before_upload_mtime).
@@ -36,7 +39,7 @@
   * Add code scanning alert.
 
 ## 1.15.4 - 2021-10-04
-  * Remove error message when calling sftp.sftp.sync.remoteToLocal command in vscode tasks.json.
+  * Remove error message when calling sftp.sync.remoteToLocal command in vscode tasks.json.
 
 ## 1.15.3 - 2021-09-10
   * Upgrade `ssh2` version to official v1.4.0 bcy @mscdex.
@@ -47,15 +50,15 @@
   * Fix the "Cannot read property 'handle' of undefined" bug (related to `useTempFile` bug) [TypeError: Cannot read property 'handle' of undefined](https://github.com/Natizyskunk/vscode-sftp/issues/43).
   * Fix the "fd argument must be of type number. Received undefined" bug (related to `useTempFile` bug) [TypeError since last update (The "fd" argument must be of type number.)](https://github.com/Natizyskunk/vscode-sftp/issues/34).
   * Fix the "Permission denied" bug when uploading.
-  * New option [openSsh](https://github.com/Natizyskunk/vscode-sftp/wiki/Common-Config#openssh) (Pull request [#42](https://github.com/Natizyskunk/vscode-sftp/pull/42) from @kripper vscode-sftp:atomic-rename merged inside [#45](https://github.com/Natizyskunk/vscode-sftp/pull/45)).
+  * New option [openSsh](https://github.com/Natizyskunk/vscode-sftp/wiki/Common-Configuration#openssh) (Pull request [#42](https://github.com/Natizyskunk/vscode-sftp/pull/42) from @kripper vscode-sftp:atomic-rename merged inside [#45](https://github.com/Natizyskunk/vscode-sftp/pull/45)).
   * Update of the wiki to add support for openSsh option.
 
 ## 1.15.1 - 2021-08-24
-  * Add the `useTempFile` option to the test config spec.
+  * Add the `useTempFile` option to the test configuration spec.
   * Fix get target mode error && add more precise logger-infos for tranfer tasks (Merged pull request [#29](https://github.com/Natizyskunk/vscode-sftp/pull/29) from @kripper vscode-sftp:master).
 
 ## 1.15.0 - 2021-08-23
-  * New option [useTempFile](https://github.com/Natizyskunk/vscode-sftp/wiki/Common-Config#usetempfile) (Merged pull request [#29](https://github.com/Natizyskunk/vscode-sftp/pull/29) from @kripper vscode-sftp:master).
+  * New option [useTempFile](https://github.com/Natizyskunk/vscode-sftp/wiki/Common-Configuration#usetempfile) (Merged pull request [#29](https://github.com/Natizyskunk/vscode-sftp/pull/29) from @kripper vscode-sftp:master).
   * Update of the wiki to add support for useTempFile option.
 
 ## 1.14.0 - 2021-08-06
@@ -111,7 +114,7 @@
   * Fix [#510](https://github.com/liximomo/vscode-sftp/issues/510).
 
 ## 1.12.0 - 2019-03-21
-  * new option [sshCustomParams](https://github.com/liximomo/vscode-sftp/wiki/SFTP-only-Config#sshcustomparams).
+  * new option [sshCustomParams](https://github.com/liximomo/vscode-sftp/wiki/SFTP-only-Configuration#sshcustomparams).
 
 ## 1.11.0 - 2019-03-15
   * Save before upload.
@@ -123,20 +126,20 @@
 
 ## 1.9.3 - 2019-01-30
   * New icon for RemoteExplorer. Thanks [niccolomineo](https://github.com/niccolomineo) and [jonbp](https://github.com/jonbp).
-  * Change `port` to number in the generated config.
+  * Change `port` to number in the generated configuration.
    
 ## 1.9.2 - 2019-01-22
-  * Fix [#388](https://github.com/liximomo/vscode-sftp/issues/388)
-  * Fix [#456](https://github.com/liximomo/vscode-sftp/issues/456)
-  * Fix [#459](https://github.com/liximomo/vscode-sftp/issues/459)
+  * Fix [#388](https://github.com/liximomo/vscode-sftp/issues/388).
+  * Fix [#456](https://github.com/liximomo/vscode-sftp/issues/456).
+  * Fix [#459](https://github.com/liximomo/vscode-sftp/issues/459).
 
 ## 1.9.0 - 2019-01-08
-  * Control files and folders to show or hide in Remote Explorer by `remoteExplorer.filesExclude`. [#410](https://github.com/liximomo/vscode-sftp/issues/410)
-  * Suport new OpenSSH key format. [#391](https://github.com/liximomo/vscode-sftp/issues/391)
+  * Control files and folders to show or hide in Remote Explorer by `remoteExplorer.filesExclude`. [#410](https://github.com/liximomo/vscode-sftp/issues/410).
+  * Suport new OpenSSH key format. [#391](https://github.com/liximomo/vscode-sftp/issues/391).
   * Improve performance.
 
 ## 1.8.4 - 2018-12-16
-  * Fix ignore not work when use profile. [#428](https://github.com/liximomo/vscode-sftp/issues/428)
+  * Fix ignore not work when use profile. [#428](https://github.com/liximomo/vscode-sftp/issues/428).
 
 ## 1.8.3 - 2018-12-14
   * Upgrade VSCode engine version.
@@ -150,17 +153,17 @@
 
 ## 1.7.6 - 2018-11-22
   * Reduce *80%* startup time.
-  * Fix [#396](https://github.com/liximomo/vscode-sftp/issues/396)
+  * Fix [#396](https://github.com/liximomo/vscode-sftp/issues/396).
 
 ## 1.7.5 - 2018-11-15
-  * Fix [#394](https://github.com/liximomo/vscode-sftp/issues/394)
+  * Fix [#394](https://github.com/liximomo/vscode-sftp/issues/394).
 
 ## 1.7.4 - 2018-11-09
-  * Fix [#362](https://github.com/liximomo/vscode-sftp/issues/362)
-  * Don't upload the file when it's in downloading. [#390](https://github.com/liximomo/vscode-sftp/issues/390)
+  * Fix [#362](https://github.com/liximomo/vscode-sftp/issues/362).
+  * Don't upload the file when it's in downloading. [#390](https://github.com/liximomo/vscode-sftp/issues/390).
 
 ## 1.7.3 - 2018-11-03
-  * New config [limitOpenFilesOnRemote](https://github.com/liximomo/vscode-sftp/wiki/Config#limitopenfilesonremote).
+  * New configuration [limitOpenFilesOnRemote](https://github.com/liximomo/vscode-sftp/wiki/Configuration#limitopenfilesonremote).
   * Show `upload file` context menu in SCM.
 
 ## 1.7.2 - 2018-10-29
@@ -176,22 +179,22 @@
   * New command [Download Active Folder](https://github.com/liximomo/vscode-sftp/wiki/Commands#sftp-download-active-folder).
   * New command [List Active Folder](https://github.com/liximomo/vscode-sftp/wiki/Commands#sftp-list-active-folder).
   * New command [Cancel All Transfers](https://github.com/liximomo/vscode-sftp/wiki/Commands#cancel-all-transfers).
-  * New config [remotetimeoffsetinhours](https://github.com/liximomo/vscode-sftp/wiki/Config#remotetimeoffsetinhours).
+  * New configuration [remotetimeoffsetinhours](https://github.com/liximomo/vscode-sftp/wiki/Configuration#remotetimeoffsetinhours).
 
 ## 1.6.0 - 2018-10-12
 ### New Features
   * New command [Sync Local -> Remote](https://github.com/liximomo/vscode-sftp/wiki/Commands#sftp-sync-local---remote).
   * New command [Sync Remote -> Local](https://github.com/liximomo/vscode-sftp/wiki/Commands#sftp-sync-remote---local).
   * New command [Sync Both Directions](https://github.com/liximomo/vscode-sftp/wiki/Commands#sftp-sync-both-directions).
-  * New config [syncOption](https://github.com/liximomo/vscode-sftp/wiki/Config#syncoption) for `Sync` command.
+  * New configuration [syncOption](https://github.com/liximomo/vscode-sftp/wiki/Configuration#syncoption) for `Sync` command.
 
 ### Breaking Changes
   * Remove Command `SFTP: Sync To Remote`.
   * Remove Command `SFTP: Sync To Local`.
-  * Remove config option `syncModel`.
+  * Remove configuration option `syncModel`.
 
 ## 1.5.13 - 2018-10-08
-* Fix [#344](https://github.com/liximomo/vscode-sftp/issues/344)
+* Fix [#344](https://github.com/liximomo/vscode-sftp/issues/344).
 
 ## 1.5.12 - 2018-10-07
 * New command `Diff Active File with Remote`.
@@ -206,14 +209,14 @@
   ```
 
 ## 1.5.10 - 2018-09-28
-* Fix [#332](https://github.com/liximomo/vscode-sftp/issues/332)
+* Fix [#332](https://github.com/liximomo/vscode-sftp/issues/332).
 
 ## 1.5.9 - 2018-09-27
-* Fix [#330](https://github.com/liximomo/vscode-sftp/issues/330)
+* Fix [#330](https://github.com/liximomo/vscode-sftp/issues/330).
 
 ## 1.5.8 - 2018-09-25
-* Show name in the remote explorer. [#315](https://github.com/liximomo/vscode-sftp/issues/315)
-* Fix [#308](https://github.com/liximomo/vscode-sftp/issues/308)
+* Show name in the remote explorer. [#315](https://github.com/liximomo/vscode-sftp/issues/315).
+* Fix [#308](https://github.com/liximomo/vscode-sftp/issues/308).
 
 ## 1.5.0 - 2018-09-13
 ### New Features
@@ -227,24 +230,24 @@
 
 ## 1.4.1 - 2018-09-03
 ### Feature
-  * [Config in User Setting](https://github.com/liximomo/vscode-sftp#config-in-user-setting) config your remote in User Setting
+  * [Configuration in User Setting](https://github.com/liximomo/vscode-sftp#configuration-in-user-setting) Configuration your remote in User Setting.
 
 ### Fix
-  * fix sshConfig file not overwriting default config ([#305](https://github.com/liximomo/vscode-sftp/issues/305))
+  * Fix sshConfig file not overwriting default configuration. [#305](https://github.com/liximomo/vscode-sftp/issues/305).
 
 ## 1.4.0 - 2018-08-27
 ### Feature
-  * [Connection Hopping](https://github.com/liximomo/vscode-sftp#connection-hopping) allow you to connection to a target server through a proxy with ssh protocol
+  * [Connection Hopping](https://github.com/liximomo/vscode-sftp#connection-hopping) allow you to connection to a target server through a proxy with ssh protocol.
 
 ## 1.3.9 - 2018-08-14
-* Fix [#286](https://github.com/liximomo/vscode-sftp/issues/286)
-* Fix [#287](https://github.com/liximomo/vscode-sftp/issues/287)
+* Fix [#286](https://github.com/liximomo/vscode-sftp/issues/286).
+* Fix [#287](https://github.com/liximomo/vscode-sftp/issues/287).
 
 ## 1.3.8 - 2018-08-13
-* Fix [#285](https://github.com/liximomo/vscode-sftp/issues/285)
+* Fix [#285](https://github.com/liximomo/vscode-sftp/issues/285).
  
 ## 1.3.7 - 2018-08-10
-* Fix bug in remoteExplorer.refresh
+* Fix bug in `remoteExplorer.refresh`.
 
 ## 1.3.0 - 2018-08-02
 ### New Features
@@ -252,14 +255,14 @@
 
 ## 1.2.7 - 2018-07-27
 ### New Features
-  * `ignoreFile` [option](https://github.com/liximomo/vscode-sftp/wiki/Config#ignorefile).
+  * `ignoreFile` [option](https://github.com/liximomo/vscode-sftp/wiki/Configuration#ignorefile).
 
 ## 1.2.3 - 2018-06-19
 ### New Features
   * [Swtichable Profiles](https://github.com/liximomo/vscode-sftp/#profiles).
 
 ## 1.2.0 - 2018-06-19
-* Support [SSH config file](https://www.ssh.com/ssh/config/). The default ssh config file is `~/.ssh/config`. This can be changed by `sshConfigPath` option.
+* Support [SSH configuration file](https://www.ssh.com/ssh/config/). The default ssh configuration file is `~/.ssh/config`. This can be changed by `sshConfigPath` option.
 
 ## 1.1.12 - 2018-06-08
 * Fix [#200](https://github.com/liximomo/vscode-sftp/issues/200). Thanks for [Gergo Koos](https://github.com/gergokoos).
@@ -278,13 +281,13 @@
 
 ## 1.1.8 - 2018-05-15
 * Some UX improvements.
-    * Only show `sftp` menu when extension get activated (Thanks [@mikolino](https://github.com/mikolino))
+    * Only show `sftp` menu when extension get activated (Thanks [@mikolino](https://github.com/mikolino)).
     * Remove some unnecessary warning.
 * Improve ftp reliability.
 * Upgrade `ssh2` version.
 
 ## 1.1.7 - 2018-03-31
-* `name` [config](https://github.com/liximomo/vscode-sftp#full-config).
+* `name` [configuration](https://github.com/liximomo/vscode-sftp#full-config).
 * Fix bugs.
 
 ## 1.1.6 - 2018-03-24
@@ -303,7 +306,7 @@
 * Fix ftp unexpectedly traverse up director [#80](https://github.com/liximomo/vscode-sftp/issues/80). Thanks for [Andrey Orst](https://github.com/andreyorst)'s help.
 
 ## 1.1.3 - 2018-03-18
-* Remove default ignore config. No files will be ignored if you don't explicitly config `ignore` option. Related isuse [#138](https://github.com/liximomo/vscode-sftp/issues/138).
+* Remove default ignore configuration. No files will be ignored if you don't explicitly configuration `ignore` option. Related isuse [#138](https://github.com/liximomo/vscode-sftp/issues/138).
 * Fix [#133](https://github.com/liximomo/vscode-sftp/issues/133).
 * Fix [#136](https://github.com/liximomo/vscode-sftp/issues/136).
 
@@ -318,20 +321,20 @@
 * Fix some bugs.
 
 ## 1.0.4 - 2018-02-08
-* New config option `concurrency`.
-* New config option `algorithms`.
+* New configuration option `concurrency`.
+* New configuration option `algorithms`.
 * Fix [#103](https://github.com/liximomo/vscode-sftp/issues/103).
 
 ## 1.0.3 - 2018-02-05
-* Simplify default config file's content when exec `sftp: config`.
-* Cconfig autocomplete.
+* Simplify default configuration file's content when exec `sftp: config`.
+* Configuration autocomplete.
 * Fix watcher stop work after 'download' or 'sync to local'.
 
 ## 1.0.2 - 2018-01-30
 * Add FTPS support.
 * Add passphrase/password dialog support.
-* Fix config not found error after config file changed.
-* Fix `sftp config` failed to show created config file in vscode.
+* Fix configuration not found error after configuration file changed.
+* Fix `sftp config` failed to show created configuration file in vscode.
 
 ## 1.0.0 - 2018-01-26
 🎉🎉🎉This release include some new features, bugfixs and improvements. It may be bring some new bugs, welcome to feedback.
@@ -345,38 +348,38 @@
 * When you download a folder through a command, the vscode explorer will be refreshed when the command finish.
 
 ### Breaking Changes
-* Change to git ignore [spec](https://git-scm.com/docs/gitignore). It's more powerful and concise. You may need to change your ignore config.
+* Change to git ignore [spec](https://git-scm.com/docs/gitignore). It's more powerful and concise. You may need to change your ignore configuration.
 
 
 ## 0.9.4 - 2017-12-18
 * `Context` now receives a relative path.
-* Fix [#69](https://github.com/liximomo/vscode-sftp/issues/69), [#70](https://github.com/liximomo/vscode-sftp/issues/70)
+* Fix [#69](https://github.com/liximomo/vscode-sftp/issues/69), [#70](https://github.com/liximomo/vscode-sftp/issues/70).
 
 ## 0.9.0 - 2017-12-16
-* Add a option to config a local path that correspond to a remote path.
-* Support multiple configs in one config file.
-* Remove `.sftpConfig.json` config file support.
-* Remove none-worksapce-root config files support.
+* Add a option to configuration a local path that correspond to a remote path.
+* Support multiple configurations in one configuration file.
+* Remove `.sftpConfig.json` configuration file support.
+* Remove none-worksapce-root configuration files support.
 
 ## 0.8.11 - 2017-11-30
 * Fix ftp can't preserve file permissions.
 
 ## 0.8.10 - 2017-11-20
-* Disable create config at none-workspace-root-folder
+* Disable create configuration at none-workspace-root-folder.
 
 ## 0.8.9 - 2017-11-17
 * Preserve file permissions.
 * Better README thanks [kataklys](https://github.com/kataklys).
 * Fix Empty (0kb) files when download and uplaod. Thanks for [kataklys](https://github.com/kataklys)'s help ([#33](https://github.com/liximomo/vscode-sftp/issues/33))
-* Show a waring for existing none-worksapce-root config files. Previously you can create multiple config files anywhere under workspace. So you won't need to open multiple vscode instances to make `sftp` working in different folders. Sincle vscode support [Multi-root Workspaces](https://code.visualstudio.com/docs/editor/multi-root-workspaces). There is no necessary to support multiple config now. This will make `sftp` both simple and a bettern starup performace.
+* Show a waring for existing none-worksapce-root configuration files. Previously you can create multiple configuration files anywhere under workspace. So you won't need to open multiple vscode instances to make `sftp` working in different folders. Sincle vscode support [Multi-root Workspaces](https://code.visualstudio.com/docs/editor/multi-root-workspaces). There is no necessary to support multiple configuration now. This will make `sftp` both simple and a bettern starup performace.
 
 ## 0.8.8 - 2017-11-11
 ### Bugfix
-* Files is not correctly filtered at config setup.
+* Files is not correctly filtered at configuration setup.
 
 ## 0.8.7 - 2017-11-07
 ### Bugfix
-* Config setup not work for directories whose name does end with `.vscode`.
+* Configuration setup not work for directories whose name does end with `.vscode`.
 
 ## 0.8.6 - 2017-11-06
 * Performance improvement.
@@ -395,7 +398,7 @@ Now `uploadOnSave` only happens on a vscode save opetarion. It used to happen on
 
 ## 0.8.3 - 2017-09-26
 ### Bugfix
-* fix couldn't create config through file picker when no sub files in the directory.
+* fix couldn't create configuration through file picker when no sub files in the directory.
 
 ## 0.8.2 - 2017-09-24
 ### Enhance
@@ -404,29 +407,29 @@ Now `uploadOnSave` only happens on a vscode save opetarion. It used to happen on
 
 ## 0.8.1 - 2017-09-22
 ### Bugfix
-* WIN could not find config(path is not normalized)
+* WIN could not find configuration(path is not normalized).
 
 ## 0.8.0 - 2017-09-22
 ### Feature
-* support multi-root workspace
+* support multi-root workspace.
 
 ### Change
-* Config file name is changing to `sftp.json` from `.sftpConfig.json` for concision.
+* Configuration file name is changing to `sftp.json` from `.sftpConfig.json` for concision.
 
 ### Bugfix
-* fix a bug that always return the same ssh session when have multiple configs in workspace
+* fix a bug that always return the same ssh session when have multiple configurations in workspace.
 
 ## 0.7.11 - 2017-09-13
 ### Bugfix
-* fix tribe retrive
+* fix tribe retrive.
 
 ## 0.7.10 - 2017-09-13
 ### Bugfix
-* fix config not found when have multiple config files in workspace
+* fix configuration not found when have multiple configuration files in workspace.
 
 ## 0.7.9 - 2017-09-01
 ### Bugfix
-* change tip text from uploading to sync when download and upload
+* change tip text from uploading to sync when download and upload.
 
 ## 0.7.8 - 2017-08-20
 ### Bugfix
@@ -442,22 +445,22 @@ Now `uploadOnSave` only happens on a vscode save opetarion. It used to happen on
 
 ## 0.7.5 - 2017-07-18
 ### Feature
-* A new editor config `sftp.printDebugLog`, dafault with false.
+* A new editor configuration `sftp.printDebugLog`, dafault with false.
 
 ## 0.7.4 - 2017-07-14
 ### Enhance
-* Config validation failing at startup does not require a reload to make extension work.
+* Configuration validation failing at startup does not require a reload to make extension work.
 
 ## 0.7.3 - 2017-07-13
 ### Feature
-* Config validation.
+* Configuration validation.
 
 ### Misc
 * More accurate watcher description.
 
 ## 0.7.2 - 2017-07-04
 ### Feature
-* Add a way to execute commands on all detected config root folders.(run commands throw command palette)
+* Add a way to execute commands on all detected configuration root folders.(run commands throw command palette)
 
 ## 0.7.1 - 2017-07-04
 ### Bugfix
@@ -465,7 +468,7 @@ Now `uploadOnSave` only happens on a vscode save opetarion. It used to happen on
 
 ## 0.7.0 - 2017-06-30
 ### Breaking Change
-* Now config files are located in .vscode folder. Just move every .sftpConfig.json to the .vscode folder of same hierarchy.
+* Now configuration files are located in .vscode folder. Just move every .sftpConfig.json to the .vscode folder of same hierarchy.
 
 ## 0.6.14 - 2017-06-29
 ### Enhance
@@ -498,7 +501,7 @@ Now `uploadOnSave` only happens on a vscode save opetarion. It used to happen on
 
 ## 0.6.7 - 2017-06-07
 ### Enhance
-* Keeping active so you don't have to reload vscode to active sftp when create config file at the first time.
+* Keeping active so you don't have to reload vscode to active sftp when create configuration file at the first time.
 
 ## 0.6.6 - 2017-06-06
 ### Bugfix
@@ -506,7 +509,7 @@ Now `uploadOnSave` only happens on a vscode save opetarion. It used to happen on
 
 ## 0.6.2 - 2017-06-05
 ### Bugfix
-* Incorrectly config not found error popup.
+* Incorrectly configuration not found error popup.
 
 ## 0.6.1 - 2017-06-03
 ### Bugfix
@@ -514,10 +517,10 @@ Now `uploadOnSave` only happens on a vscode save opetarion. It used to happen on
 
 ## 0.6.0 - 2017-06-02
 ### Feature
-* Support ftp
+* Support ftp.
 
 ### Feedback
-* More debug info
+* More debug info.
 
 ### Bugfix
 * Fix `SFTPFileSystem.rmdir` doesn't resolve correctly.
@@ -526,8 +529,8 @@ Now `uploadOnSave` only happens on a vscode save opetarion. It used to happen on
 
 ## 0.5.4 - 2017-05-30
 ### Feedback
-* Better error log
-* Output debug info in sftp output channel
+* Better error log.
+* Output debug info in sftp output channel.
 
 ### Bugfix
 * Fix some files missed uploading when they has updated because of throttle.
@@ -546,29 +549,29 @@ Now `uploadOnSave` only happens on a vscode save opetarion. It used to happen on
 
 ## 0.5.1 - 2017-05-22
 ### Enhance
-* Provide a way to run command at the workspace root
+* Provide a way to run command at the workspace root.
 
 ## 0.5.0 - 2017-05-19
 ### Feature
-* Keep ssh connect alive (re-connect only when needed)
+* Keep ssh connect alive (re-connect only when needed).
 
 ## 0.4.12 - 2017-05-18
 ### Bugfix
-* Fix binary file upload
+* Fix binary file upload.
 
 ## 0.4.11 - 2017-05-18
 ### Feedback
-* Better status indication
+* Better status indication.
 
 ## 0.4.10 - 2017-05-18
 ### Bugfix
-* Config file not found in windows
-* Check existence of privateKeyPath
+* Configuration file not found in windows.
+* Check existence of privateKeyPath.
 
 ## 0.4.0 - 2017-05-17
-### Config
-* Add option `syncModel`
+### Configuration
+* Add option `syncModel`.
 
 ### Command
-* New command Upload
-* New command Download
+* New command Upload.
+* New command Download.
