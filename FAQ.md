@@ -127,7 +127,11 @@ following:
 "sshCustomParams": "sudo su -;"
 ```
 
-## GIT : Updating server when checking out a branch or reverting changes/commits
+## Automatically sync both ways without user interaction
+
+See [vscode-sftp issue #136](https://github.com/Natizyskunk/vscode-sftp/issues/136).
+
+> *This can also be used with **GIT** this way when you're checking out a branch or reverting changes/commits, your server will also be updated.*
 
 ```json
 {
