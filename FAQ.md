@@ -137,14 +137,14 @@ following:
   "port": 22,
   "username": "user1",
   "remotePath": "/folder1/folder2/folder3",
-  "uploadOnSave": false, // set to false if watcher `autoUpload` is set to true & `files` is set to "**/*".
+  "uploadOnSave": false, // Set to false if watcher `autoUpload` is set to true & `files` is set to "**/*".
   "watcher": {
     "files": **/*",
     "autoUpload": true,
     "autoDelete": true
   }
-  "syncOption":{
-    "delete": true
+  "syncOption": {
+    "delete": true // Delete extraneous files from destination directories.
   },
 }
 ```
