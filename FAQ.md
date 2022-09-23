@@ -102,7 +102,7 @@ Example configuration (where all JS and HTML files in `./build` will be copied t
 ```json
 {
   "name": "My Server",
-  "host": "10.19.5.33",
+  "host": "<host_ip_address>",
   "protocol": "sftp",
   "port": 22,
   "username": "user1",
