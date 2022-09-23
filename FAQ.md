@@ -2,11 +2,12 @@
 	- [Error: Failure - Solution One](#error-failure---solution-one)
 	- [Error: Failure - Solution Two](#error-failure---solution-two)
 - [Error: Connection closed](#error-connection-closed)
+- [Error: Clicking Upload Changed Files does not work](#error-clicking-upload-changed-files-does-not-work)
 - [ENFILE: file table overflow ...](#enfile-file-table-overflow-)
 	- [ENFILE: file table overflow ... - Solution for MacOS harsh limit](#enfile-file-table-overflow----solution-for-macos-harsh-limit)
 - [How do I upload content inside a folder, but not the folder itself?](#how-do-i-upload-content-inside-a-folder-but-not-the-folder-itself)
-- [Clicking Upload Changed Files does not work](#clicking-upload-changed-files-does-not-work)
 - [How can I upload files as root?](#how-can-i-upload-files-as-root)
+- [GIT : Updating server when checking out a branch or reverting changes/commits](https://github.com/Natizyskunk/vscode-sftp/edit/master/FAQ.md#git--updating-server-when-checking-out-a-branch-or-reverting-changescommits)
 
 ## Error: Failure
 
@@ -66,6 +67,15 @@ You'll have to Explicitly override the default transport layer algorithms used f
 }
 ```
 
+## Error: Clicking Upload Changed Files does not work
+
+See [vscode-sftp issue #854](https://github.com/liximomo/vscode-sftp/issues/854).
+
+**@PaPa31** added a fix to make the 'Upload Changed Files' command visible and added a default keyboard shortcut to call it.
+<!-- **danieleiobbi** has a workaround to create a keyboard shortcut. -->
+
+![upload changed files keyboard shortcut](assets/faq/upload_changed_files_shortcut.png)
+
 ## ENFILE: file table overflow ...
 
 MacOS have a harsh limit on number of open files.
@@ -107,15 +117,6 @@ Example configuration (where all JS and HTML files in `./build` will be copied t
 }
 ```
 
-## Clicking Upload Changed Files does not work
-
-See [vscode-sftp issue #854](https://github.com/liximomo/vscode-sftp/issues/854).
-
-**@PaPa31** added a fix to make the 'Upload Changed Files' command visible and added a default keyboard shortcut to call it.
-<!-- **danieleiobbi** has a workaround to create a keyboard shortcut. -->
-
-![upload changed files keyboard shortcut](assets/faq/upload_changed_files_shortcut.png)
-
 ## How can I upload files as root?
 
 See [vscode-sftp issue #559](https://github.com/liximomo/vscode-sftp/issues/559).
@@ -124,4 +125,23 @@ See [vscode-sftp issue #559](https://github.com/liximomo/vscode-sftp/issues/559)
 following:
 ```json
 "sshCustomParams": "sudo su -;"
+```
+
+## GIT : Updating server when checking out a branch or reverting changes/commits
+
+```json
+{
+  "name": "My Server",
+  "host": "<host_ip_address>",
+  "protocol": "sftp",
+  "port": 22,
+  "username": "user1",
+  "remotePath": "/folder1/folder2/folder3",
+  "uploadOnSave": false,
+  "watcher": {
+    "files": **/*",
+    "autoUpload": true,
+    "autoDelete": true
+  }
+}
 ```
