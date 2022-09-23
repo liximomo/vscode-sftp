@@ -7,7 +7,7 @@
 	- [ENFILE: file table overflow ... - Solution for MacOS harsh limit](#enfile-file-table-overflow----solution-for-macos-harsh-limit)
 - [How do I upload content inside a folder, but not the folder itself?](#how-do-i-upload-content-inside-a-folder-but-not-the-folder-itself)
 - [How can I upload files as root?](#how-can-i-upload-files-as-root)
-- [GIT : Updating server when checking out a branch or reverting changes/commits](https://github.com/Natizyskunk/vscode-sftp/edit/master/FAQ.md#git--updating-server-when-checking-out-a-branch-or-reverting-changescommits)
+- [GIT : Updating server when checking out a branch or reverting changes/commits](https://github.com/Natizyskunk/vscode-sftp/blob/master/FAQ.md#git--updating-server-when-checking-out-a-branch-or-reverting-changescommits)
 
 ## Error: Failure
 
