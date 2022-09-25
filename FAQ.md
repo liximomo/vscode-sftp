@@ -7,7 +7,7 @@
 	- [ENFILE: file table overflow ... - Solution for MacOS harsh limit](#enfile-file-table-overflow----solution-for-macos-harsh-limit)
 - [How do I upload content inside a folder, but not the folder itself?](#how-do-i-upload-content-inside-a-folder-but-not-the-folder-itself)
 - [How can I upload files as root?](#how-can-i-upload-files-as-root)
-- [GIT : Updating server when checking out a branch or reverting changes/commits](https://github.com/Natizyskunk/vscode-sftp/blob/master/FAQ.md#git--updating-server-when-checking-out-a-branch-or-reverting-changescommits)
+- [Automatically sync both ways without user interaction](#automatically-sync-both-ways-without-user-interaction)
 
 ## Error: Failure
 
@@ -36,17 +36,19 @@ You'll have to Explicitly override the default transport layer algorithms used f
 		"kex": [
 			"ecdh-sha2-nistp256", 
 			"ecdh-sha2-nistp384", 
-			"ecdh-sha2-nistp521", 
-			"diffie-hellman-group14-sha1"
+			"ecdh-sha2-nistp521"
 		],
 		"cipher": [
-			"aes128-ctr", 
-			"aes192-ctr", 
-			"aes256-ctr", 
-			"aes128-gcm", 
-			"aes128-gcm@openssh.com", 
-			"aes256-gcm", 
-			"aes256-gcm@openssh.com"
+			"aes128-gcm",
+			"aes128-gcm@openssh.com",
+			"aes256-gcm",
+			"aes256-gcm@openssh.com",
+			"aes128-cbc",
+			"aes192-cbc",
+			"aes256-cbc",
+			"aes128-ctr",
+			"aes192-ctr",
+			"aes256-ctr"
 		],
 		"serverHostKey": [
 			"ssh-rsa", 
@@ -55,13 +57,12 @@ You'll have to Explicitly override the default transport layer algorithms used f
 			"ecdsa-sha2-nistp256", 
 			"ecdsa-sha2-nistp384", 
 			"ecdsa-sha2-nistp521",
-			"rsa-sha2-512",
-			"rsa-sha2-256"
+			"rsa-sha2-256",
+			"rsa-sha2-512"
 		],
 		"hmac": [
 			"hmac-sha2-256", 
-			"hmac-sha2-512", 
-			"hmac-sha1"
+			"hmac-sha2-512"
 		]
 	}
 }
