@@ -1,3 +1,6 @@
+## 1.15.19 - 2022-08-26
+* [#72] Change `uploadOnSave` default value from true to false.
+
 ## 1.15.18 - 2022-08-26
 * Update npm `async` depedency to v3.2.4.
 * Update npm `fs-extra` depedency to v10.1.0.
