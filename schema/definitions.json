@@ -53,7 +53,7 @@
       "uploadOnSave": {
         "type": "boolean",
         "description": "True to upload on every save operation of VS Code.",
-        "default": true
+        "default": false
       },
       "useTempFile": {
         "type": "boolean",

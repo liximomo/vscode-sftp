@@ -74,7 +74,7 @@ For instance:
     "username": "username",
     "remotePath": "/public_html/project", // <--- This is the path which will be downloaded if you "Download Project"
     "password": "password",
-    "uploadOnSave": true
+    "uploadOnSave": false
 }
 ```
 The password parameter is optional but if you don't add it, you will be constantly prompted for a password.
@@ -262,7 +262,7 @@ In sftp.json:
 {
   "remote": "dev",
   "remotePath": "/home/xx/",
-  "uploadOnSave": true,
+  "uploadOnSave": false,
   "ignore": [".vscode", ".git", ".DS_Store"]
 }
 ```
