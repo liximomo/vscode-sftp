@@ -1,3 +1,9 @@
+## 1.15.18 - 2022-08-26
+* Update npm `async` depedency to v3.2.4.
+* Update npm `fs-extra` depedency to v10.1.0.
+* Update npm `tmp` depedency to v0.2.1.
+* Update npm `upath` depedency to v2.0.1.
+
 ## 1.15.17 - 2022-08-26
 * Upgrade `ssh2` version to official v1.11.0 by @mscdex.
 
