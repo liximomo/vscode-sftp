@@ -182,7 +182,7 @@ export function newConfig(basePath) {
             port: 22,
             username: 'username',
             remotePath: '/',
-            uploadOnSave: true,
+            uploadOnSave: false,
             useTempFile: false,
             openSsh: false,
           },
