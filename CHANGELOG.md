@@ -1,6 +1,9 @@
+## 1.15.17 - 2022-08-26
+* Upgrade `ssh2` version to official v1.11.0 by @mscdex.
+
 ## 1.15.16 - 2022-05-26
 * Reorder cipher and serverHostKey algorithms.
-* Updating [FAQ.md](https://github.com/Natizyskunk/vscode-sftp/blob/master/FAQ.md), and [documentations](https://github.com/Natizyskunk/vscode-sftp/tree/master/docs).
+* Update [FAQ.md](https://github.com/Natizyskunk/vscode-sftp/blob/master/FAQ.md), and [documentations](https://github.com/Natizyskunk/vscode-sftp/tree/master/docs).
 
 ## 1.15.15 - 2022-08-21
 * Fix "Open SSH in Terminal" not working because "terminal.integrated.shell.windows" is deprecated and fix typo `src/commands/commandOpenSshConnection.ts`. (Pull request [#155](https://github.com/Natizyskunk/vscode-sftp/pull/155) from @mean-cj vscode-sftp:patch-2).
