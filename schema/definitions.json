@@ -48,12 +48,12 @@
     "properties": {
       "remote": {
         "type": "string",
-        "description": "Name of remote which configs with `remoteFs.remote` in User Setting. Config will get merged to this remote."
+        "description": "Name of remote which configs with `remoteFs.remote` in User Setting. Configuration will get merged to this remote."
       },
       "uploadOnSave": {
         "type": "boolean",
         "description": "True to upload on every save operation of VS Code.",
-        "default": true
+        "default": false
       },
       "useTempFile": {
         "type": "boolean",
@@ -72,7 +72,7 @@
       },
       "syncOption": {
         "type": "object",
-        "description": "Config the behavior of `Sync` command.",
+        "description": "Configuration the behavior of `Sync` command.",
         "properties": {
           "delete": {
             "type": "boolean",
@@ -232,22 +232,22 @@
             "type": "array",
             "items": {
               "enum": [
-                "aes128-ctr",
-                "aes192-ctr",
-                "aes256-ctr",
                 "aes128-gcm",
                 "aes128-gcm@openssh.com",
                 "aes256-gcm",
                 "aes256-gcm@openssh.com",
-                "aes256-cbc",
-                "aes192-cbc",
                 "aes128-cbc",
+                "aes192-cbc",
+                "aes256-cbc",
+                "aes128-ctr",
+                "aes192-ctr",
+                "aes256-ctr",
                 "blowfish-cbc",
                 "3des-cbc",
-                "arcfour256",
-                "arcfour128",
                 "cast128-cbc",
-                "arcfour"
+                "arcfour",
+                "arcfour128",
+                "arcfour256"
               ]
             },
             "description": "Ciphers."
@@ -257,16 +257,16 @@
             "items": {
               "enum": [
                 "ssh-rsa",
+                "ssh-dss",
+                "ssh-ed25519",
                 "ecdsa-sha2-nistp256",
                 "ecdsa-sha2-nistp384",
                 "ecdsa-sha2-nistp521",
-                "rsa-sha2-512",
                 "rsa-sha2-256",
-                "ssh-dss",
-                "ssh-ed25519"
+                "rsa-sha2-512"
               ]
             },
-            "description": "Server host key formats. In server mode, this list must agree with the host private keys set in the hostKeys config setting."
+            "description": "Server host key formats. In server mode, this list must agree with the host private keys set in the hostKeys configuration setting."
           },
           "hmac": {
             "type": "array",
@@ -289,7 +289,7 @@
       },
       "sshConfigPath": {
         "type": "string",
-        "description": "Absolute path to your SSH config file (eg. ~/.ssh/config)"
+        "description": "Absolute path to your SSH configuration file (eg. ~/.ssh/config)"
       },
       "concurrency": {
         "type": "number",
