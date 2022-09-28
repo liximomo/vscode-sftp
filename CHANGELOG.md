@@ -6,6 +6,7 @@
 * Update npm `tslint` depedency to v6.1.3 (Pull request [#207](https://github.com/Natizyskunk/vscode-sftp/pull/207) from @dependabot vscode-sftp:dependabot/npm_and_yarn/tslint-6.1.3).
 * Update npm `ts-loader` depedency to v9.4.1 (Pull request [#208](https://github.com/Natizyskunk/vscode-sftp/pull/208) from @dependabot vscode-sftp:dependabot/npm_and_yarn/ts-loader-9.4.1).
 * Update npm `typescript` depedency to v3.9.7.
+* Update npm `jest` depedency to v29.0.3.
 
 ## 1.15.19 - 2022-08-26
 * [#72] Change `uploadOnSave` default value from true to false.
