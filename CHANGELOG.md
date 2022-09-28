@@ -1,3 +1,6 @@
+## 1.15.20 - 2022-08-28
+* Fix typo 'worksapce' to 'workspace' (Pull request [#158](https://github.com/Natizyskunk/vscode-sftp/pull/158) from @NyaPPuu vscode-sftp:fix_typo).
+
 ## 1.15.19 - 2022-08-26
 * [#72] Change `uploadOnSave` default value from true to false.
 
