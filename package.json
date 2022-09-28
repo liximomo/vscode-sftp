@@ -580,7 +580,7 @@
     "pub:debug": "rm -rf _debug && mkdir _debug && vsce package --out _debug/sftp-debug.vsix && cd _debug && git init && git commit --allow-empty -m 'update debug package' && git checkout -b debug-pacakge && cp ../INSTALL_DEBUG.md README.md  && git add . && git commit -am 'update debug package' && git push git@github.com:Natizyskunk/vscode-sftp.git debug-pacakge --force"
   },
   "devDependencies": {
-    "@types/fs-extra": "^5.0.4",
+    "@types/fs-extra": "^9.0.13",
     "@types/jest": "^23.3.5",
     "@types/lru-cache": "^4.1.1",
     "@types/node": "^8.10.51",
