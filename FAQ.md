@@ -8,7 +8,7 @@
 - [How do I upload content inside a folder, but not the folder itself?](#how-do-i-upload-content-inside-a-folder-but-not-the-folder-itself)
 - [How can I upload files as root?](#how-can-i-upload-files-as-root)
 - [Automatically sync both ways without user interaction](#automatically-sync-both-ways-without-user-interaction)
-- [Show dotfiles/hidden files in remote explorer](#show-dotfiles-hidden-files-in-remote-explorer)
+- [Show dotfiles/hidden files in remote explorer](#show-dotfileshidden-files-in-remote-explorer)
 
 ## Error: Failure
 
