@@ -159,14 +159,20 @@ See [vscode-sftp issue #136](https://github.com/Natizyskunk/vscode-sftp/issues/1
 
 ### If using proftpd
 
-Please edit this config file `/etc/proftpd.conf`. Search for the `ListOptions` parameter and change it from `"-l"` to `"-la"`.
+Please edit the config file `proftpd.conf`. Depending on your installation, the default location for this file can be one of those :
+- `/etc/proftpd.conf`
+- `/etc/proftpd/proftpd.conf`
+- `/usr/local/etc/proftpd.conf`
+- `/usr/local/etc/proftpd/proftpd.conf`
+
+Search for the `ListOptions` parameter and change it from `"-l"` to `"-la"`.
 
 It should look like this : 
 ```conf
 #Global settings
 <Global>
 [...]
-ListOptions 		"-la" // Change it like this !
+ListOptions 		"-la"
 [...]
 </Global>
 ```
