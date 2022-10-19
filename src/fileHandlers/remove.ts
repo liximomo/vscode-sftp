@@ -1,3 +1,4 @@
+import { refreshRemoteExplorer } from './shared';
 import { fileOperations, FileType } from '../core';
 import createFileHandler from './createFileHandler';
 import { FileHandleOption } from './option';
@@ -32,5 +33,8 @@ export const removeRemote = createFileHandler<FileHandleOption & { skipDir?: boo
     return {
       ignore: config.ignore,
     };
+  },
+  afterHandle() {
+    refreshRemoteExplorer(this.target, false);
   },
 });
