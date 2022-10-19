@@ -9,7 +9,6 @@ export default checkFileCommand({
   getFileTarget: uriFromExplorerContextOrEditorContext,
 
   async handleFile({ target }) {
-    // todo: make this to a method of remoteExplorer
     await app.remoteExplorer.reveal({
       resource: UResource.makeResource(target.remoteUri),
       isDirectory: false,
