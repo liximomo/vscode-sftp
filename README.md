@@ -8,7 +8,7 @@ Maintained and updated version by [@Natizyskunk](https://github.com/Natizyskunk/
 
 ---
 
-VSCode-SFTP enables you to add, edit or delete files within a local directory and have it sync to a remote server directory using SSH File Transfer Protocol. The most basic setup requires only a few lines of configuration with a wide array of specific settings also available to meet the needs of any user. Both powerful and fast, it helps developers save time by allowing the use of a familiar editor and environment. 
+VSCode-SFTP enables you to add, edit or delete files within a local directory and have it sync to a remote server directory using different transfer protocols like FTP or SSH. The most basic setup requires only a few lines of configuration with a wide array of specific settings also available to meet the needs of any user. Both powerful and fast, it helps developers save time by allowing the use of a familiar editor and environment. 
 
 - Features
   - [Browser remote with Remote Explorer](#remote-explorer)
@@ -27,18 +27,18 @@ VSCode-SFTP enables you to add, edit or delete files within a local directory an
 ## Installation
 
 ### Method 1 (Recommended : Auto update)
-1. Select Extensions `Ctrl + Shift + X`
+1. Select Extensions (Ctrl + Shift + X)
 2. Uninstall current sftp extension from @liximomo
 3. Install new extension directly from VS Code Marketplace : https://marketplace.visualstudio.com/items?itemName=Natizyskunk.sftp
 4. Voilà!
 
 ### Method 2 (Manual update)
-To install it just follow these steps from within VSCode :
-1. Select Extensions `Ctrl + Shift + X`
+To install just follow these steps from within VSCode:
+1. Select Extensions (Ctrl + Shift + X)
 2. Uninstall current sftp extension from @liximomo
 3. Open "More Action" menu(ellipsis on the top) and click "Install from VSIX…"
 4. Locate VSIX file and select.
-5. Reload VSCode
+5. Reload VSCode.
 6. Voilà!
 
 ## Documentation
@@ -55,10 +55,11 @@ then download your project, and from that point sync.
 
 1. In `VS Code`, open a local directory you wish to sync to the remote server (or create an empty directory 
 that you wish to first download the contents of a remote server folder in order to edit locally).
-2. `Ctrl+Shift+P` on Windows/Linux or `Cmd+Shift+P` on Mac open command palette, run `SFTP: config` command
+2. `Ctrl+Shift+P` on Windows/Linux or `Cmd+Shift+P` on Mac open command palette, run `SFTP: config` command.
 3. A basic configuration file will appear named `sftp.json` under the `.vscode` directory.
-Edit the configuration parameters to your remote server
+Edit the configuration parameters to your remote server.
 
+For instance:
 ```json
 {
     "name": "Profile Name",
@@ -75,16 +76,17 @@ Edit the configuration parameters to your remote server
 The password parameter in `sftp.json` is optional, if left out you will be prompted for a password on sync.
 _Note：_ backslashes and other special characters must be escaped with a backslash.
 
-1. Save and close the `sftp.json` file.
-2. `Ctrl+Shift+P` on Windows/Linux or `Cmd+Shift+P` on Mac open command palette.
-3. Type `sftp` and you'll now see a number of other commands. You can also access many of the commands from the project's file explorer context menus.
-4. A good one to start with if you want to sync with a remote folder is `SFTP: Download Project`.  This will download the directory shown in the `remotePath` setting in `sftp.json` to your local open directory. 
-5. Done - you can now edit locally and after each save it will upload to sync your remote file with the local copy. 
+4. Save and close the `sftp.json` file.
+5. `Ctrl+Shift+P` on Windows/Linux or `Cmd+Shift+P` on Mac open command palette.
+6. Type `sftp` and you'll now see a number of other commands. You can also access many of the commands from the project's file explorer context menus.
+7. A good one to start with if you want to sync with a remote folder is `SFTP: Download Project`.  This will download the directory shown in the `remotePath` setting in `sftp.json` to your local open directory. 
+8. Done - you can now edit locally and after each save it will upload to sync your remote file with the local copy. 
+9. Enjoy!
 
 For detailed explanations please go to [wiki](https://github.com/Natizyskunk/vscode-sftp/wiki).
 
 ## Example configurations
-You can see the full list configuration options [here](https://github.com/Natizyskunk/vscode-sftp/wiki/configuration).
+You can see the full list of configuration options [here](https://github.com/Natizyskunk/vscode-sftp/wiki/configuration).
 
 - [sftp sync extension for VS Code](#sftp-sync-extension-for-vs-code)
   - [Installation](#installation)
@@ -282,7 +284,7 @@ _Note：_ You need to manually refresh the parent folder after you **delete** a 
 You can see all the Frequently Asked Questions [here](./FAQ.md).
 
 ## Donation
-If this project helped reduce development time and you wish to contribute financially
+If this project helped you reduce development time and you wish to contribute financially
 
 ### Buy Me a Coffee
 [![Buy Me A Coffee](https://bmc-cdn.nyc3.digitaloceanspaces.com/BMC-button-images/custom_images/orange_img.png)](https://www.buymeacoffee.com/Natizyskunk)
