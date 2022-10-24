@@ -490,6 +490,28 @@
           "when": "view == remoteExplorer && viewItem != root"
         },
         {
+          "command": "sftp.upload.folder",
+          "group": "3_trans@1",
+          "alt": "sftp.forceUpload",
+          "when": "sftp.enabled && viewItem != file"
+        },
+        {
+          "command": "sftp.upload.file",
+          "group": "3_trans@1",
+          "when": "view == remoteExplorer && viewItem != root && viewItem == file"
+        },
+        {
+          "command": "sftp.download.folder",
+          "group": "3_trans@2",
+          "alt": "sftp.forceDownload",
+          "when": "sftp.enabled && viewItem != file"
+        },
+        {
+          "command": "sftp.download.file",
+          "group": "3_trans@2",
+          "when": "view == remoteExplorer && viewItem != root && viewItem == file"
+        },
+        {
           "command": "sftp.delete.remote",
           "group": "7_modification",
           "when": "view == remoteExplorer && viewItem != root"
@@ -503,19 +525,6 @@
           "command": "sftp.create.file",
           "group": "7_modification",
           "when": "view == remoteExplorer && viewItem != file"
-        },
-        {
-          "command": "sftp.download.file",
-          "group": "2_files",
-          "when": "view == remoteExplorer && viewItem != root && viewItem == file",
-          "_comment": "!custom"
-        },
-        {
-          "command": "sftp.download.folder",
-          "group": "2_files",
-          "alt": "sftp.forceDownload",
-          "when": "sftp.enabled && viewItem != file",
-          "_comment": "!custom - (using != file so that whole site can be downloaded)"
         }
       ],
       "scm/title": [
@@ -584,7 +593,7 @@
     "@types/jest": "^23.3.5",
     "@types/lru-cache": "^4.1.1",
     "@types/node": "^8.10.51",
-    "@types/vscode": "1.30",
+    "@types/vscode": "1.40",
     "@types/webpack-env": "^1.13.6",
     "braces": ">=2.3.1",
     "glob-parent": ">=5.1.2",
