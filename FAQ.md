@@ -8,6 +8,7 @@
 - [How do I upload content inside a folder, but not the folder itself?](#how-do-i-upload-content-inside-a-folder-but-not-the-folder-itself)
 - [How can I upload files as root?](#how-can-i-upload-files-as-root)
 - [Automatically sync both ways without user interaction](#automatically-sync-both-ways-without-user-interaction)
+- [Show dotfiles/hidden files in remote explorer](#show-dotfileshidden-files-in-remote-explorer)
 
 ## Error: Failure
 
@@ -152,4 +153,26 @@ See [vscode-sftp issue #136](https://github.com/Natizyskunk/vscode-sftp/issues/1
     "delete": true // Delete extraneous files from destination directories.
   },
 }
+```
+
+## Show dotfiles/hidden files in remote explorer
+
+### If using proftpd
+
+Please edit the config file `proftpd.conf`. Depending on your installation, the default location for this file can be one of those :
+- `/etc/proftpd.conf`
+- `/etc/proftpd/proftpd.conf`
+- `/usr/local/etc/proftpd.conf`
+- `/usr/local/etc/proftpd/proftpd.conf`
+
+Search for the `ListOptions` parameter and change it from `"-l"` to `"-la"`.
+
+It should look like this : 
+```conf
+#Global settings
+<Global>
+[...]
+ListOptions 		"-la"
+[...]
+</Global>
 ```
