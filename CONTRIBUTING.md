@@ -1,6 +1,6 @@
 # Contributing to vscode-sftp
 
-After you've created a branch on your fork with your changes, [create a pull request][pr-link]. 
+After you've created a branch on your fork with your changes, [open a pull request][pr-link]. 
 
 *Please follow the guidelines given below while making a Pull Request to the vscode-sftp*
 

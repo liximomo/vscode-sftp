@@ -27,16 +27,16 @@ VSCode-SFTP enables you to add, edit or delete files within a local directory an
 ## Installation
 
 ### Method 1 (Recommended : Auto update)
-1. Select Extensions (Ctrl + Shift + X)
-2. Uninstall current sftp extension from @liximomo
-3. Install new extension directly from VS Code Marketplace : https://marketplace.visualstudio.com/items?itemName=Natizyskunk.sftp
+1. Select Extensions (Ctrl + Shift + X).
+2. Uninstall current sftp extension from @liximomo.
+3. Install new extension directly from VS Code Marketplace : https://marketplace.visualstudio.com/items?itemName=Natizyskunk.sftp.
 4. Voilà!
 
 ### Method 2 (Manual update)
 To install just follow these steps from within VSCode:
-1. Select Extensions (Ctrl + Shift + X)
-2. Uninstall current sftp extension from @liximomo
-3. Open "More Action" menu(ellipsis on the top) and click "Install from VSIX…"
+1. Select Extensions (Ctrl + Shift + X).
+2. Uninstall current sftp extension from @liximomo.
+3. Open "More Action" menu(ellipsis on the top) and click "Install from VSIX…".
 4. Locate VSIX file and select.
 5. Reload VSCode.
 6. Voilà!
@@ -56,8 +56,7 @@ then download your project, and from that point sync.
 1. In `VS Code`, open a local directory you wish to sync to the remote server (or create an empty directory 
 that you wish to first download the contents of a remote server folder in order to edit locally).
 2. `Ctrl+Shift+P` on Windows/Linux or `Cmd+Shift+P` on Mac open command palette, run `SFTP: config` command.
-3. A basic configuration file will appear named `sftp.json` under the `.vscode` directory.
-Edit the configuration parameters to your remote server.
+3. A basic configuration file will appear named `sftp.json` under the `.vscode` directory, open and edit the configuration parameters with your remote server information.
 
 For instance:
 ```json
