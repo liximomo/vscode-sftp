@@ -67,6 +67,8 @@ export default class RemoteTreeData
   implements vscode.TreeDataProvider<ExplorerItem>, vscode.TextDocumentContentProvider {
   private _roots: ExplorerRoot[] | null;
   private _rootsMap: Map<Id, ExplorerRoot> | null;
+  private _map: Map<vscode.Uri['query'], ExplorerItem>;
+
   private _onDidChangeFolder: vscode.EventEmitter<ExplorerItem> = new vscode.EventEmitter<
     ExplorerItem
   >();
@@ -74,7 +76,6 @@ export default class RemoteTreeData
   readonly onDidChangeTreeData: vscode.Event<ExplorerItem> = this._onDidChangeFolder.event;
   readonly onDidChange: vscode.Event<vscode.Uri> = this._onDidChangeFile.event;
 
-  // FIXME: refresh can't work for user created ExplorerItem
   async refresh(item?: ExplorerItem): Promise<any> {
     // refresh root
     if (!item) {
@@ -95,6 +96,10 @@ export default class RemoteTreeData
         .filter(i => !i.isDirectory)
         .forEach(i => this._onDidChangeFile.fire(makePreivewUrl(i.resource.uri)));
     } else {
+      const parent = await this.getParent(item);
+      if (parent) {
+        this._onDidChangeFolder.fire(parent);
+      }
       this._onDidChangeFile.fire(makePreivewUrl(item.resource.uri));
     }
   }
@@ -153,18 +158,27 @@ export default class RemoteTreeData
       .filter(filterFile)
       .map(file => {
         const isDirectory = file.type === FileType.Directory;
-
-        return {
-          resource: UResource.updateResource(item.resource, {
-            remotePath: file.fspath,
-          }),
-          isDirectory,
-        };
+        const newResource = UResource.updateResource(item.resource, {
+          remotePath: file.fspath,
+        });
+        const mapItem = this._map.get(newResource.uri.query);
+        if (mapItem) {
+          return mapItem;
+        } else {
+          const newItem = {
+            resource: UResource.updateResource(item.resource, {
+              remotePath: file.fspath,
+            }),
+            isDirectory,
+          };
+          this._map.set(newItem.resource.uri.query, newItem);
+          return newItem;
+        }
       })
       .sort(dirFirstSort);
   }
 
-  getParent(item: ExplorerChild): ExplorerItem | null {
+  async getParent(item: ExplorerChild): Promise<ExplorerItem> {
     const resourceUri = item.resource.uri;
     const root = this.findRoot(resourceUri);
     if (!root) {
@@ -172,15 +186,25 @@ export default class RemoteTreeData
     }
 
     if (item.resource.fsPath === root.resource.fsPath) {
-      return null;
+      return root;
     }
 
-    return {
-      resource: UResource.updateResource(item.resource, {
-        remotePath: upath.dirname(item.resource.fsPath),
-      }),
-      isDirectory: true,
-    };
+    const fspath = upath.dirname(item.resource.fsPath);
+    const newResource = UResource.updateResource(item.resource, {
+      remotePath: fspath,
+    });
+    const mapItem = this._map.get(newResource.uri.query);
+    if (mapItem) {
+      return mapItem;
+    } else {
+      const newMapItem = {
+        resource: newResource,
+        isDirectory: true,
+      };
+      this._map.set(newResource.uri.query, newMapItem);
+      await this.getChildren(newMapItem);
+      return newMapItem;
+    }
   }
 
   findRoot(uri: vscode.Uri): ExplorerRoot | null | undefined {
@@ -222,6 +246,7 @@ export default class RemoteTreeData
 
     this._roots = [];
     this._rootsMap = new Map();
+    this._map = new Map();
     getAllFileService().forEach(fileService => {
       const config = fileService.getConfig();
       const id = fileService.id;
@@ -243,6 +268,7 @@ export default class RemoteTreeData
       };
       this._roots!.push(item);
       this._rootsMap!.set(id, item);
+      this._map.set(item.resource.uri.query, item);
     });
     this._roots.sort((a,b) => a.explorerContext.config.remoteExplorer.order - b.explorerContext.config.remoteExplorer.order || a.explorerContext.fileService.name.localeCompare(b.explorerContext.fileService.name));
     return this._roots;

@@ -38,7 +38,7 @@ export const createRemoteFile = createFileHandler<FileHandleOption & { skipDir?:
     };
   },
   afterHandle() {
-    refreshRemoteExplorer(this.target, true);
+    refreshRemoteExplorer(this.target, false);
   },
 });
 
@@ -77,6 +77,6 @@ export const createRemoteFolder = createFileHandler<FileHandleOption & { skipDir
     };
   },
   afterHandle() {
-    refreshRemoteExplorer(this.target, true);
+    refreshRemoteExplorer(this.target, false);
   },
 });
