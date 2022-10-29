@@ -272,6 +272,17 @@ You can only view a files content with Remote Explorer. Run command `SFTP: Edit 
 
 _Note：_ You need to manually refresh the parent folder after you **delete** a file to make the explorer updated.
 
+You can order the remote Explorer by adding the `remoteExplorer.order` parameter inside your `sftp.json` config file.
+
+In sftp.json:
+```json
+{
+  "remoteExplorer": {
+    "order": 1 // <-- Default value is 0.
+  }
+}
+```
+
 ## Debug
 1. Open User Settings.
   - On Windows/Linux - `File > Preferences > Settings`
