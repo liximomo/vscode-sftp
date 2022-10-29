@@ -122,6 +122,11 @@
               "description": "Exclude pattern."
             },
             "default": []
+          },
+          "order": {
+            "type": "number",
+            "description": "Remote Explorer will ascending sorting by this value. If the values are the same, sort by name.",
+            "default": 0
           }
         }
       },

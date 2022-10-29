@@ -244,6 +244,7 @@ export default class RemoteTreeData
       this._roots!.push(item);
       this._rootsMap!.set(id, item);
     });
+    this._roots.sort((a,b) => a.explorerContext.config.remoteExplorer.order - b.explorerContext.config.remoteExplorer.order || a.explorerContext.fileService.name.localeCompare(b.explorerContext.fileService.name));
     return this._roots;
   }
 }
