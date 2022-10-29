@@ -13,8 +13,8 @@
 ## Error: Failure
 
 The failure error message comes from the remote side and is more or less the default/generic error 
-message that SSH' sftp server sends when a syscall fails or something similar happens.
-To know what exactly is going wrong you could try to enable debug output for the sftp server, 
+message that sftp server sends when a syscall fails or something similar happens.
+To know what exactly is going wrong you could try to enable debug output for the sftp server 
 and then execute your transfers again and see what (if anything) shows up in the logs there.
 
 ### Error: Failure - Solution One
@@ -23,13 +23,13 @@ Change `remotePath` to the actual path if it's a symlink.
 
 ### Error: Failure - Solution Two
 
-The problem would be that your server runs out of file descriptors.
+The problem could be that your server runs out of file descriptors.
 You should try to increase the file descriptors limit.
 If you don't have the permission to do this, set [limitOpenFilesOnRemote](https://github.com/Natizyskunk/vscode-sftp/wiki/Configuration#limitopenfilesonremote) option in your config.
 
 ## Error: Connection closed
 
-The problem would be that the SFTP extension keeps closing the connection for those who use more legacy/old systems.
+The problem could be that the SFTP extension keeps closing the connection for those who use more legacy/old systems.
 You'll have to Explicitly override the default transport layer algorithms used for the connection to remove the new `"diffie-hellman-group-exchange-sha256"` algorithm that cause the problem from the `kex` section. Just add this in your `sftp.json` configuration file, which should make it work.
 ```json
 {
@@ -145,7 +145,7 @@ See [vscode-sftp issue #136](https://github.com/Natizyskunk/vscode-sftp/issues/1
   "remotePath": "/folder1/folder2/folder3",
   "uploadOnSave": false, // Set to false if watcher `autoUpload` is set to true & `files` is set to "**/*".
   "watcher": {
-    "files": **/*",
+    "files": "**/*",
     "autoUpload": true,
     "autoDelete": true
   }

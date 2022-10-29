@@ -1,18 +1,14 @@
 # sftp sync extension for VS Code
 
-New version by [@Natizyskunk](https://github.com/Natizyskunk/) that just work 😀 <br>
-(This was originally a fork from [liximomo's SFTP plugin](https://github.com/liximomo/vscode-sftp.git))
+Maintained and updated version by [@Natizyskunk](https://github.com/Natizyskunk/) 😀 <br>
+(Forked from the no longer maintained [liximomo's SFTP plugin](https://github.com/liximomo/vscode-sftp.git))
 
 - VS Code marketplace : https://marketplace.visualstudio.com/items?itemName=Natizyskunk.sftp <br>
 - VSIX release : https://github.com/Natizyskunk/vscode-sftp/releases/
 
 ---
 
-Syncs your local directory with a remote server directory.
-Allows you to optionally edit upload a file to the remote directory after it saves locally. 
-This allows you to edit more or less directly on the server similar to WinScp or other similar programs.
-
-Very powerful, with smart features. Very simple, requires just three lines of configuration! Very fast, finished in a blink.
+VSCode-SFTP enables you to add, edit or delete files within a local directory and have it sync to a remote server directory using different transfer protocols like FTP or SSH. The most basic setup requires only a few lines of configuration with a wide array of specific settings also available to meet the needs of any user. Both powerful and fast, it helps developers save time by allowing the use of a familiar editor and environment. 
 
 - Features
   - [Browser remote with Remote Explorer](#remote-explorer)
@@ -32,18 +28,18 @@ Very powerful, with smart features. Very simple, requires just three lines of co
 
 ### Method 1 (Recommended : Auto update)
 1. Select Extensions (Ctrl + Shift + X).
-2. Uninstall current sftp extension from @liximomo
-3. Install new extension directly from VS Code Marketplace : https://marketplace.visualstudio.com/items?itemName=Natizyskunk.sftp
-4. Voilà !
+2. Uninstall current sftp extension from @liximomo.
+3. Install new extension directly from VS Code Marketplace : https://marketplace.visualstudio.com/items?itemName=Natizyskunk.sftp.
+4. Voilà!
 
 ### Method 2 (Manual update)
-To install it just follow thoses steps from within VSCode :
+To install just follow these steps from within VSCode:
 1. Select Extensions (Ctrl + Shift + X).
-2. Uninstall current sftp extension from @liximomo
-3. Open "More Action” menu(ellipsis on the top) and click “Install from VSIX…”.
+2. Uninstall current sftp extension from @liximomo.
+3. Open "More Action" menu(ellipsis on the top) and click "Install from VSIX…".
 4. Locate VSIX file and select.
 5. Reload VSCode.
-6. Voilà !
+6. Voilà!
 
 ## Documentation
 - [Home](https://github.com/Natizyskunk/vscode-sftp/wiki)
@@ -54,16 +50,15 @@ To install it just follow thoses steps from within VSCode :
 - [Commands](https://github.com/Natizyskunk/vscode-sftp/wiki/Commands)
 
 ## Usage
-If your latest files are on the server, you can start with an empty local folder,
+If the latest files are already on a remote server, you can start with an empty local folder,
 then download your project, and from that point sync.  
 
 1. In `VS Code`, open a local directory you wish to sync to the remote server (or create an empty directory 
-that you wish to first download the contents of a remote server folder in order to edit locally). 
+that you wish to first download the contents of a remote server folder in order to edit locally).
 2. `Ctrl+Shift+P` on Windows/Linux or `Cmd+Shift+P` on Mac open command palette, run `SFTP: config` command.
-3. A basic configuration file will appear named `sftp.json` under the `.vscode` directory.
-Edit the parameters to match your setup.
+3. A basic configuration file will appear named `sftp.json` under the `.vscode` directory, open and edit the configuration parameters with your remote server information.
 
-For instance: 
+For instance:
 ```json
 {
     "name": "Profile Name",
@@ -77,22 +72,20 @@ For instance:
     "uploadOnSave": false
 }
 ```
-The password parameter is optional but if you don't add it, you will be constantly prompted for a password.
-Note that you must escape any backslashes and other special characters with a backslash.
+The password parameter in `sftp.json` is optional, if left out you will be prompted for a password on sync.
+_Note：_ backslashes and other special characters must be escaped with a backslash.
 
-There are other Example configurations below.
+4. Save and close the `sftp.json` file.
+5. `Ctrl+Shift+P` on Windows/Linux or `Cmd+Shift+P` on Mac open command palette.
+6. Type `sftp` and you'll now see a number of other commands. You can also access many of the commands from the project's file explorer context menus.
+7. A good one to start with if you want to sync with a remote folder is `SFTP: Download Project`.  This will download the directory shown in the `remotePath` setting in `sftp.json` to your local open directory. 
+8. Done - you can now edit locally and after each save it will upload to sync your remote file with the local copy. 
+9. Enjoy!
 
-3. Save and close the `sftp.json` file.
-4. `Ctrl+Shift+P` on Windows/Linux or `Cmd+Shift+P` on Mac open command palette.
-5. Type "sftp" and you'll now see a number of other comands.
-6. A good one to start with if you want to start with a remote folder is `SFTP: Download Project`.  This will download the directory shown in the `remotePath` setting in `sftp.json` to your local open directory. 
-7. Done - you can now edit locally and after each save it will upload to your remote file. 
-8. Enjoy !
-
-For detailed usage. Please go to [wiki](https://github.com/Natizyskunk/vscode-sftp/wiki).
+For detailed explanations please go to [wiki](https://github.com/Natizyskunk/vscode-sftp/wiki).
 
 ## Example configurations
-You can see the full configuration [here](https://github.com/Natizyskunk/vscode-sftp/wiki/configuration).
+You can see the full list of configuration options [here](https://github.com/Natizyskunk/vscode-sftp/wiki/configuration).
 
 - [sftp sync extension for VS Code](#sftp-sync-extension-for-vs-code)
   - [Installation](#installation)
@@ -182,7 +175,7 @@ _Note：_ `name` is required in this mode.
 ### Connection Hopping
 You can connect to a target server through a proxy with ssh protocol.
 
-_Note：_ **Variable substitution is not working in a hop configuration.**
+_Note：_ Variable substitution is not working in a hop configuration.
 
 #### Single Hop
 local -> hop -> target
@@ -290,7 +283,7 @@ _Note：_ You need to manually refresh the parent folder after you **delete** a 
 You can see all the Frequently Asked Questions [here](./FAQ.md).
 
 ## Donation
-If this project helped you reduce development time, you can give me a cup of coffee :)
+If this project helped you reduce development time and you wish to contribute financially
 
 ### Buy Me a Coffee
 [![Buy Me A Coffee](https://bmc-cdn.nyc3.digitaloceanspaces.com/BMC-button-images/custom_images/orange_img.png)](https://www.buymeacoffee.com/Natizyskunk)

@@ -1,6 +1,6 @@
 # Contributing to vscode-sftp
 
-After you've created a branch on your fork with your changes, it's time to [make a pull request][pr-link]. 
+After you've created a branch on your fork with your changes, [open a pull request][pr-link]. 
 
 *Please follow the guidelines given below while making a Pull Request to the vscode-sftp*
 
@@ -14,7 +14,7 @@ After you've created a branch on your fork with your changes, it's time to [make
 * Please make sure you squash all commits together before opening a pull request. If your pull request requires changes upon review, please be sure to squash all additional commits as well. [This wiki page][squash-link] outlines the squash process.
 * Target your Pull Request to the `master` branch of the `vscode-sftp`
 
-Once you’ve submitted a pull request, the collaborators can review your proposed changes and decide whether or not to incorporate (pull in) your changes.
+Once you've submitted a pull request, the collaborators can review your proposed changes and decide whether or not to incorporate (pull in) your changes.
 
 ### Pull Request Pro Tips
 
@@ -28,7 +28,7 @@ and for others to understand and maintain in the future.
 
 ### Open Pull Requests
 
-Once you’ve opened a pull request, a discussion will start around your proposed changes.
+Once you've opened a pull request, a discussion will start around your proposed changes.
 
 Other contributors and users may chime in, but ultimately the decision is made by the collaborators.
 
