@@ -23,6 +23,7 @@ export default class RemoteExplorer {
     this._explorerView = vscode.window.createTreeView('remoteExplorer', {
       showCollapseAll: true,
       treeDataProvider: this._treeDataProvider,
+      canSelectMany: true,
     });
 
     registerCommand(context, COMMAND_REMOTEEXPLORER_REFRESH, () => this._refreshSelection());

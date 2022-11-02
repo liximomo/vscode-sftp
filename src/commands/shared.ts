@@ -127,7 +127,12 @@ export function uriFromExplorerContextOrEditorContext(item, items): undefined | 
     }
   } else if ((item as ExplorerItem).resource) {
     // from remote explorer
-    return item.resource.uri;
+    if (Array.isArray(items) && (items[0] as ExplorerItem).resource) {
+      // multi-select in remote explorer
+      return items.map(_ => _.resource.uri);
+    } else {
+      return item.resource.uri;
+    }
   }
 
   return;
