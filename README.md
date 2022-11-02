@@ -102,6 +102,8 @@ You can see the full list of configuration options [here](https://github.com/Nat
       - [Multiple Hop](#multiple-hop)
     - [Configuration in User Setting](#configuration-in-user-setting)
   - [Remote Explorer](#remote-explorer)
+    - [Multiple Select](#multiple-select)
+    - [Order](#order)
   - [Debug](#debug)
   - [FAQ](#faq)
   - [Donation](#donation)
@@ -270,8 +272,12 @@ Remote Explorer lets you explore files in remote. You can open Remote Explorer b
 
 You can only view a files content with Remote Explorer. Run command `SFTP: Edit in Local` to edit it in local.
 
-_Note：_ You need to manually refresh the parent folder after you **delete** a file to make the explorer updated.
+### Multiple Select
+You are able to select multiple files/folders at once on the remote server to download and upload. You can do it simply by holding down Ctrl or Shift while selecting all desired files, just like on the regular explorer view.
 
+_Note：_ You need to manually refresh the parent folder after you **delete** a file if the explorer isn't correctly updated.
+
+### Order
 You can order the remote Explorer by adding the `remoteExplorer.order` parameter inside your `sftp.json` config file.
 
 In sftp.json:
