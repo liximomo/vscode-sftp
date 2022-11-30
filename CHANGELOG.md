@@ -1,4 +1,4 @@
-## 1.16.1-fix-case-rename - 2022-11-30
+## pre-1.16.2 - 2022-11-30
 * [#271] Fix case change of file name not sent correctly (Pull request [#249](https://github.com/Natizyskunk/vscode-sftp/pull/249) from @NyaPPuu vscode-sftp:fix_rename).
 * [#272] Update npm `types/node` depedency to v9.6.51.
 
