@@ -1,3 +1,7 @@
+## 1.16.1-fix-case-rename - 2022-11-30
+* [#271] Fix case change of file name not sent correctly (Pull request [#249](https://github.com/Natizyskunk/vscode-sftp/pull/249) from @NyaPPuu vscode-sftp:fix_rename).
+* [#272] Update npm `types/node` depedency to v9.6.51.
+
 ## 1.16.1 - 2022-11-02
 * [#251] Add multiple select + Update `Download File` & `Downalod Folder` commands to the remote view + Add `Upload File` & `Upload Folder` commands to the remote view (Pull request [#221](https://github.com/Natizyskunk/vscode-sftp/pull/221) from @NyaPPuu vscode-sftp:add_multiple_select).
 
