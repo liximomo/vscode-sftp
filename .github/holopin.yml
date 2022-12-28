@@ -1,0 +1,10 @@
+organization: Natan FOURIÉ EIRL
+defaultSticker: dfgyhjk
+stickers:
+  -
+    id: dfgyhjk
+    alias: Test
+  -
+   id: dfgyhjl
+   alias: Test-2
+   
