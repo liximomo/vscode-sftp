@@ -3,13 +3,13 @@ defaultSticker: cl8p9eem9629909kycm8gkafb
 stickers:
   -
     id: cl8p9eem9629909kycm8gkafb
-    alias: "Hacktoberfest 2022: Registered"
+    alias: hacktoberfest-2022-registered
   -
    id: cla3qeh72120908mppm4t7dgp
-   alias: "Hacktoberfest 2022: Level 4"
+   alias: hacktoberfest-2022-level-4
   -
    id: cla3qe9bp105308mp12ty479d
-   alias: "Surfer Moby Dock"
+   alias: surfer-moby-dock
   -
    id: clarpdd11082308jl4uo3euvl
-   alias: "Appwrite Hacktoberfest 2022"
+   alias: appwrite-hacktoberfest-2022
