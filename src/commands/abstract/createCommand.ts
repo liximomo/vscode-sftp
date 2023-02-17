@@ -1,7 +1,7 @@
 import { Uri } from 'vscode';
 import logger from '../../logger';
 import { reportError } from '../../helper';
-import { handleCtxFromUri, FileHandlerContext } from '../../fileHandlers';
+import { handleCtxFromUri, allHandleCtxFromUri, FileHandlerContext } from '../../fileHandlers';
 import Command from './command';
 
 interface BaseCommandOption {
@@ -58,6 +58,35 @@ export function createFileCommand(commandOption: FileCommandOption & { name: str
       const pendingTasks = targetList.map(async uri => {
         try {
           await commandOption.handleFile(handleCtxFromUri(uri));
+        } catch (error) {
+          reportError(error);
+        }
+      });
+
+      await Promise.all(pendingTasks);
+    }
+  };
+}
+
+export function createFileMultiCommand(commandOption: FileCommandOption & { name: string }) {
+  return class FileCommand extends Command {
+    constructor() {
+      super();
+      this.id = commandOption.id;
+      this.name = commandOption.name;
+    }
+
+    protected async doCommandRun(...args) {
+      const target = await commandOption.getFileTarget(...args);
+      if (!target) {
+        logger.warn(`The "${this.name}" command get canceled because of missing targets.`);
+        return;
+      }
+
+      const targetList: Uri[] = Array.isArray(target) ? target : [target];
+      const pendingTasks = targetList.map(async uri => {
+        try {
+          await Promise.all(allHandleCtxFromUri(uri).map(commandOption.handleFile));
         } catch (error) {
           reportError(error);
         }

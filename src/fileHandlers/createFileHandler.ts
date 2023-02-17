@@ -52,6 +52,37 @@ export function handleCtxFromUri(uri: Uri): FileHandlerContext {
   };
 }
 
+export function allHandleCtxFromUri(uri: Uri): Array<FileHandlerContext> {
+  const fileService = getFileService(uri);
+  if (!fileService) {
+    if (uri.toString(true) == "file:///${command:sftp.sync.remoteToLocal}") {
+      throw '';
+    } else {
+      throw new Error(`Config Not Found. (${uri.toString(true)})`);
+    }
+  }
+
+  const configArr = fileService.getAllConfig();
+
+  return configArr.map(config => {
+    const target = UResource.from(uri, {
+      localBasePath: fileService.baseDir,
+      remoteBasePath: config.remotePath,
+      remoteId: fileService.id,
+      remote: {
+        host: config.host,
+        port: config.port,
+      },
+    });
+
+    return {
+      fileService,
+      config,
+      target,
+    };
+  })
+}
+
 export default function createFileHandler<T>(
   handlerOption: FileHandlerOption<T>
 ): (ctx: FileHandlerContext | Uri, option?: Partial<T>) => Promise<void> {

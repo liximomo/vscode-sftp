@@ -2,7 +2,7 @@ import { ExtensionContext } from 'vscode';
 import logger from './logger';
 import { registerCommand } from './host';
 import Command from './commands/abstract/command';
-import { createCommand, createFileCommand } from './commands/abstract/createCommand';
+import { createCommand, createFileCommand, createFileMultiCommand } from './commands/abstract/createCommand';
 
 export default function init(context: ExtensionContext) {
   loadCommands(
@@ -29,6 +29,19 @@ export default function init(context: ExtensionContext) {
     ),
     /fileCommand(.*)/,
     createFileCommand,
+    context
+  );
+  loadCommands(
+    require.context(
+      // Look for files in the current directory
+      './commands',
+      // Do not look in subdirectories
+      false,
+      // Only include "_base-" prefixed .vue files
+      /fileMultiCommand.*.ts$/
+    ),
+    /fileMultiCommand(.*)/,
+    createFileMultiCommand,
     context
   );
 }
