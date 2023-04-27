@@ -14,11 +14,11 @@ export default checkCommand({
       Array<vscode.QuickPickItem & { value: string | null }>
     >(
       (acc, service) => {
-        if (service.getAvaliableProfiles().length <= 0) {
+        if (service.getAvailableProfiles().length <= 0) {
           return acc;
         }
 
-        service.getAvaliableProfiles().forEach(profile => {
+        service.getAvailableProfiles().forEach(profile => {
           acc.push({
             value: profile,
             label: app.state.profile === profile ? `${profile} (active)` : profile,
@@ -35,7 +35,7 @@ export default checkCommand({
     );
 
     if (profiles.length <= 1) {
-      showInformationMessage('No Avaliable Profile.');
+      showInformationMessage('No Available Profile.');
       return;
     }
 
