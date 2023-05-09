@@ -77,6 +77,7 @@ export default abstract class FileSystem {
   abstract put(input: Readable, path, option?: FileOption): Promise<void>;
   abstract mkdir(dir: string): Promise<void>;
   abstract ensureDir(dir: string): Promise<void>;
+  abstract chmod(path: string, mode: number): Promise<void>;
   abstract list(dir: string, option?): Promise<FileEntry[]>;
   abstract lstat(path: string): Promise<FileStats>;
   abstract readlink(path: string): Promise<string>;

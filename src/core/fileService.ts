@@ -40,6 +40,8 @@ interface ServiceOption {
   useTempFile: boolean;
   openSsh: boolean;
   downloadOnOpen: boolean | 'confirm';
+  filePerm?: number;
+  dirPerm?: number;
   syncOption: {
     delete: boolean;
     skipCreate: boolean;
