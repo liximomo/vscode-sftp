@@ -517,16 +517,16 @@ export default class FileService {
     return createRemoteIfNoneExist(getHostInfo(config));
   }
 
-  getConfig(): ServiceConfig {
+  getConfig(useProfile = app.state.profile): ServiceConfig {
     let config = this._config;
     const hasProfile =
       config.profiles && Object.keys(config.profiles).length > 0;
-    if (hasProfile && app.state.profile) {
-      logger.info(`Using profile: ${app.state.profile}`);
-      const profile = config.profiles![app.state.profile];
+    if (hasProfile && useProfile) {
+      logger.info(`Using profile: ${useProfile}`);
+      const profile = config.profiles![useProfile];
       if (!profile) {
         throw new Error(
-          `Unkown Profile "${app.state.profile}".` +
+          `Unkown Profile "${useProfile}".` +
             ' Please check your profile setting.' +
             ' You can set a profile by running command `SFTP: Set Profile`.'
         );
@@ -547,6 +547,11 @@ export default class FileService {
     }
 
     return this._resolveServiceConfig(completeConfig);
+  }
+
+  getAllConfig(): Array<ServiceConfig> {
+    const profiles = this._config.profiles;
+    return profiles ? Object.keys(profiles).map(p => this.getConfig(p)) : [];
   }
 
   dispose() {

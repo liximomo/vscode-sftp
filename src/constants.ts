@@ -27,6 +27,15 @@ export const COMMAND_UPLOAD_ACTIVEFILE = 'sftp.upload.activeFile';
 export const COMMAND_UPLOAD_FOLDER = 'sftp.upload.folder';
 export const COMMAND_UPLOAD_ACTIVEFOLDER = 'sftp.upload.activeFolder';
 export const COMMAND_UPLOAD_PROJECT = 'sftp.upload.project';
+
+export const COMMAND_FORCE_UPLOAD_TO_ALL_PROFILES = 'sftp.forceUpload.to.allProfiles';
+export const COMMAND_UPLOAD_TO_ALL_PROFILES = 'sftp.upload.to.allProfiles';
+export const COMMAND_UPLOAD_FILE_TO_ALL_PROFILES = 'sftp.upload.file.to.allProfiles';
+export const COMMAND_UPLOAD_ACTIVEFILE_TO_ALL_PROFILES = 'sftp.upload.activeFile.to.allProfiles';
+export const COMMAND_UPLOAD_FOLDER_TO_ALL_PROFILES = 'sftp.upload.folder.to.allProfiles';
+export const COMMAND_UPLOAD_ACTIVEFOLDER_TO_ALL_PROFILES = 'sftp.upload.activeFolder.to.allProfiles';
+export const COMMAND_UPLOAD_PROJECT_TO_ALL_PROFILES = 'sftp.upload.project.to.allProfiles';
+
 export const COMMAND_FORCE_DOWNLOAD = 'sftp.forceDownload';
 export const COMMAND_DOWNLOAD = 'sftp.download';
 export const COMMAND_DOWNLOAD_FILE = 'sftp.download.file';

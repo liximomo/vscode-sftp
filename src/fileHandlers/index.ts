@@ -3,4 +3,4 @@ export * from './remove';
 export * from './diff';
 export * from './rename';
 export * from './create';
-export { handleCtxFromUri, FileHandlerContext } from './createFileHandler';
+export { handleCtxFromUri, allHandleCtxFromUri, FileHandlerContext } from './createFileHandler';

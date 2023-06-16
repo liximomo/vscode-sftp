@@ -134,6 +134,36 @@
         "category": "SFTP"
       },
       {
+        "command": "sftp.upload.file.to.allProfiles",
+        "title": "Upload File To All Profiles",
+        "category": "SFTP"
+      },
+      {
+        "command": "sftp.upload.activeFile.to.allProfiles",
+        "title": "Upload Active File To All Profiles",
+        "category": "SFTP"
+      },
+      {
+        "command": "sftp.upload.folder.to.allProfiles",
+        "title": "Upload Folder To All Profiles",
+        "category": "SFTP"
+      },
+      {
+        "command": "sftp.upload.activeFolder.to.allProfiles",
+        "title": "Upload Active Folder To All Profiles",
+        "category": "SFTP"
+      },
+      {
+        "command": "sftp.upload.project.to.allProfiles",
+        "title": "Upload Project To All Profiles",
+        "category": "SFTP"
+      },
+      {
+        "command": "sftp.forceUpload.to.allProfiles",
+        "title": "Force Upload To All Profiles",
+        "category": "SFTP"
+      },
+      {
         "command": "sftp.download.file",
         "title": "Download File",
         "category": "SFTP"
@@ -274,6 +304,18 @@
           "when": "sftp.enabled"
         },
         {
+          "command": "sftp.upload.activeFile.to.allProfiles",
+          "when": "sftp.enabled"
+        },
+        {
+          "command": "sftp.upload.activeFolder.to.allProfiles",
+          "when": "sftp.enabled"
+        },
+        {
+          "command": "sftp.upload.project.to.allProfiles",
+          "when": "sftp.enabled"
+        },
+        {
           "command": "sftp.download.activeFile",
           "when": "sftp.enabled"
         },
@@ -327,6 +369,18 @@
         },
         {
           "command": "sftp.forceUpload",
+          "when": "false"
+        },
+        {
+          "command": "sftp.upload.file.to.allProfiles",
+          "when": "false"
+        },
+        {
+          "command": "sftp.upload.folder.to.allProfiles",
+          "when": "false"
+        },
+        {
+          "command": "sftp.forceUpload.to.allProfiles",
           "when": "false"
         },
         {
@@ -416,6 +470,17 @@
           "when": "sftp.enabled && explorerResourceIsFolder"
         },
         {
+          "command": "sftp.upload.file.to.allProfiles",
+          "group": "sftp.trans@1",
+          "when": "sftp.enabled && !explorerResourceIsRoot && !explorerResourceIsFolder"
+        },
+        {
+          "command": "sftp.upload.folder.to.allProfiles",
+          "group": "sftp.trans@1",
+          "alt": "sftp.forceUpload.to.allProfiles",
+          "when": "sftp.enabled && explorerResourceIsFolder"
+        },
+        {
           "command": "sftp.download.file",
           "group": "sftp.trans@2",
           "when": "sftp.enabled && !explorerResourceIsRoot && !explorerResourceIsFolder"
@@ -430,6 +495,11 @@
       "editor/context": [
         {
           "command": "sftp.upload.file",
+          "group": "sftp.trans@1",
+          "when": "sftp.enabled && resourceScheme == file"
+        },
+        {
+          "command": "sftp.upload.file.to.allProfiles",
           "group": "sftp.trans@1",
           "when": "sftp.enabled && resourceScheme == file"
         },
@@ -497,6 +567,17 @@
         },
         {
           "command": "sftp.upload.file",
+          "group": "3_trans@1",
+          "when": "view == remoteExplorer && viewItem != root && viewItem == file"
+        },
+        {
+          "command": "sftp.upload.folder.to.allProfiles",
+          "group": "3_trans@1",
+          "alt": "sftp.forceUpload.to.allProfiles",
+          "when": "sftp.enabled && viewItem != file"
+        },
+        {
+          "command": "sftp.upload.file.to.allProfiles",
           "group": "3_trans@1",
           "when": "view == remoteExplorer && viewItem != root && viewItem == file"
         },
