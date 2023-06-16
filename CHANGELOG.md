@@ -1,4 +1,4 @@
-## 1.16.2 - 2023-06-16
+## 1.16.3 - 2023-06-16
 * [#356] New Feature : Upload to all profiles (Pull request [#313](https://github.com/Natizyskunk/vscode-sftp/pull/313) from @wewawa vscode-sftp:create_multi_command).
 * [#357] Fix : Correcting Typo 'avaliable' => 'available' (Pull request [#343](https://github.com/Natizyskunk/vscode-sftp/pull/343) from @kjo-sdds vscode-sftp:develop).
 * [#358] Permissions : Add filePerm and dirPerm options for configuring permissions (Pull request [#347](https://github.com/Natizyskunk/vscode-sftp/pull/347) from @Jchase2 vscode-sftp:develop).
