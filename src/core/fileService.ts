@@ -418,7 +418,7 @@ export default class FileService {
     this._createWatcher();
   }
 
-  getAvaliableProfiles(): string[] {
+  getAvailableProfiles(): string[] {
     return this._profiles || [];
   }
 
