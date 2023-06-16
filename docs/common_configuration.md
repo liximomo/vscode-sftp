@@ -33,6 +33,16 @@ Use this when you want to map a subfolder to the `remotePath`.
 
 **default**: `/`
 
+## filePerm
+*number*: Set octal file permissions for new files.
+
+**default**: false
+
+## dirPerm
+*number*: Set octal directory permissions for new directories.
+
+**default**: false
+
 ## uploadOnSave
 *boolean*: Upload on every save operation of VSCode.
 

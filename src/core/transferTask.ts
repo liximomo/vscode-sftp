@@ -20,6 +20,8 @@ export interface TransferOption {
   atime: number;
   mtime: number;
   mode?: number;
+  filePerm?: number;
+  dirPerm?: number;
   fallbackMode?: number;
   perserveTargetMode: boolean;
   useTempFile?: boolean;
@@ -122,8 +124,10 @@ export default class TransferTask implements Task {
       fallbackMode,
       atime,
       mtime,
+      filePerm
     } = this._TransferOption;
-    let { mode } = this._TransferOption;
+    // Set the mode if it's specified in the config, otherwise get mode from server.
+    let mode = filePerm ? parseInt(String(filePerm), 8) : this._TransferOption.mode;
     let targetFd; // Destination file
     let uploadFd; // Temp file or destination file when no temp file is used
     const uploadTarget = target + (useTempFile ? ".new" : "");

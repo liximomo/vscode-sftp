@@ -26,6 +26,8 @@ function createTransferHandle(direction: TransferDirection) {
         targetFsPath: remoteFsPath,
         targetFs: remoteFs,
         transferOption: option,
+        filePerm: this.config.filePerm,
+        dirPerm: this.config.dirPerm,
         transferDirection: TransferDirection.LOCAL_TO_REMOTE,
       };
     }
@@ -45,6 +47,9 @@ export const sync2Remote = createFileHandler<SyncOption>({
     const localFs = this.fileService.getLocalFileSystem();
     const { localFsPath, remoteFsPath } = this.target;
     const scheduler = this.fileService.createTransferScheduler(this.config.concurrency);
+    // Attach filePerm and dirPerm to transferOption
+    option.filePerm = this.config.filePerm;
+    option.dirPerm = this.config.dirPerm;
     await sync(
       {
         srcFsPath: localFsPath,
@@ -62,7 +67,7 @@ export const sync2Remote = createFileHandler<SyncOption>({
     const config = this.config;
     const syncOption = config.syncOption || {};
     return {
-      perserveTargetMode: config.protocol === 'sftp',
+      perserveTargetMode: config.protocol === 'sftp' && !config.filePerm && !config.dirPerm,
       useTempFile: config.useTempFile,
       openSsh: config.openSsh,
       // remoteTimeOffsetInHours: config.remoteTimeOffsetInHours,
@@ -119,7 +124,7 @@ export const upload = createFileHandler<TransferOption>({
   transformOption() {
     const config = this.config;
     return {
-      perserveTargetMode: config.protocol === 'sftp',
+      perserveTargetMode: config.protocol === 'sftp' && !config.filePerm && !config.dirPerm,
       useTempFile: config.useTempFile,
       openSsh: config.openSsh,
       // remoteTimeOffsetInHours: config.remoteTimeOffsetInHours,
@@ -137,7 +142,7 @@ export const uploadFile = createFileHandler<TransferOption>({
   transformOption() {
     const config = this.config;
     return {
-      perserveTargetMode: config.protocol === 'sftp',
+      perserveTargetMode: config.protocol === 'sftp' && !config.filePerm,
       useTempFile: config.useTempFile,
       openSsh: config.openSsh,
       // remoteTimeOffsetInHours: config.remoteTimeOffsetInHours,
@@ -155,7 +160,7 @@ export const uploadFolder = createFileHandler<TransferOption>({
   transformOption() {
     const config = this.config;
     return {
-      perserveTargetMode: config.protocol === 'sftp',
+      perserveTargetMode: config.protocol === 'sftp' && !config.dirPerm,
       useTempFile: config.useTempFile,
       openSsh: config.openSsh,
       // remoteTimeOffsetInHours: config.remoteTimeOffsetInHours,
