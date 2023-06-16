@@ -70,6 +70,18 @@ export default class LocalFileSystem extends FileSystem {
     });
   }
 
+  async chmod(path: string, mode: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+      fs.chmod(path, mode, (err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve();
+      });
+    });
+  }
+
   put(input: fs.ReadStream, path, option?: FileOption): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (option && option.fd && typeof option.fd !== 'number') {
