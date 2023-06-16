@@ -1,5 +1,7 @@
 # sftp sync extension for VS Code
 
+2023-05-15: fix connect sftp with public key
+
 Maintained and updated version by [@Natizyskunk](https://github.com/Natizyskunk/) 😀 <br>
 (Forked from the no longer maintained [liximomo's SFTP plugin](https://github.com/liximomo/vscode-sftp.git))
 
